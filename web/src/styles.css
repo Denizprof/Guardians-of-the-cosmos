@@ -699,30 +699,106 @@ details.concept p { margin: var(--sp-1) 0 var(--sp-2); }
   border-radius: var(--r-3); background: var(--glass-card); border: 1px solid var(--line-2); box-shadow: var(--shadow-3);
   color: var(--text-2); font-size: var(--fs-body); line-height: 1.55;
 }
-.welcome-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: clamp(20px, 3.4vw, 40px) clamp(18px, 3.4vw, 44px) var(--sp-4); }
-.welcome-head { padding-bottom: var(--sp-5); border-bottom: 1px solid var(--line); }
+.welcome-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--sp-4) clamp(18px, 3.4vw, 44px) var(--sp-5); }
 /* the amber of every radar view in the app marks the intro too */
-.welcome-kicker { margin: 0 0 var(--sp-3); font: 500 var(--fs-micro) var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--sar); }
-.welcome-card h1 { margin: 0; max-width: 20ch; font-size: var(--fs-display); font-weight: 650; line-height: 1.08; letter-spacing: -0.02em; color: var(--white); text-wrap: balance; }
-/* the title only receives focus programmatically (so a screen reader starts at the top): no ring */
-.welcome-card h1:focus, .welcome-card h1:focus-visible { outline: none; }
-.welcome-card h2 { margin: var(--sp-5) 0 var(--sp-2); font-size: var(--fs-lead); font-weight: 600; line-height: 1.3; color: var(--text); }
+.welcome-kicker { margin: 0; font: 500 var(--fs-micro) var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--sar); }
+.welcome-card h1 { margin: 0 0 var(--sp-4); max-width: 18ch; font-size: var(--fs-display); font-weight: 650; line-height: 1.08; letter-spacing: -0.02em; color: var(--white); text-wrap: balance; }
+.welcome-card h2 { margin: 0 0 var(--sp-3); font-size: clamp(22px, 2.6vw, 30px); font-weight: 650; line-height: 1.15; letter-spacing: -0.01em; color: var(--white); text-wrap: balance; }
+.welcome-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-lead); font-weight: 600; color: var(--text); }
+/* step headings only receive focus programmatically (so a screen reader starts at the top): no ring */
+.welcome-card h1:focus, .welcome-card h1:focus-visible, .welcome-card h2:focus, .welcome-card h2:focus-visible { outline: none; }
 .welcome-card p { margin: 0 0 var(--sp-3); text-wrap: pretty; }
-.welcome-cols { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); column-gap: clamp(24px, 4vw, 56px); }
-.welcome-lede { font-size: var(--fs-lead); line-height: 1.5; color: var(--text); }
-.welcome-note { margin-top: var(--sp-4); padding: var(--sp-3) 0 0; border-top: 1px solid var(--warn-line); color: var(--warn); font-size: var(--fs-small); line-height: 1.5; }
-.welcome-steps { list-style: none; margin: 0 0 var(--sp-3); padding: 0; border-top: 1px solid var(--line); }
-.welcome-steps li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--sp-3); align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
-.welcome-icon { display: grid; place-items: center; width: 20px; height: 22px; color: var(--sar); }
-.welcome-steps strong { display: block; color: var(--text); font-weight: 600; }
-.welcome-step-text { display: block; font-size: var(--fs-small); line-height: 1.5; color: var(--muted); text-wrap: pretty; }
-.welcome-hint { font-size: var(--fs-small); }
-.welcome-sources { margin-top: var(--sp-2); font-size: var(--fs-small); color: var(--muted); }
-.welcome-sources h2 { font-size: var(--fs-body); }
-.welcome-sources p { margin: 0; max-width: 96ch; }
-.welcome-actions { flex: none; display: flex; justify-content: flex-end; padding: var(--sp-3) clamp(18px, 3.4vw, 44px); border-top: 1px solid var(--line); background: var(--panel); }
-.welcome-start { min-width: 200px; min-height: 44px; font-size: var(--fs-lead); font-weight: 600; justify-content: center; }
-@media (max-width: 900px) { .welcome-cols { grid-template-columns: minmax(0, 1fr); } }
+.welcome-lede { font-size: var(--fs-lead); line-height: 1.55; color: var(--text); }
+.welcome-actions { flex: none; display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) clamp(18px, 3.4vw, 44px); border-top: 1px solid var(--line); background: var(--panel); }
+.welcome-start { min-width: 168px; min-height: 44px; font-size: var(--fs-lead); font-weight: 600; justify-content: center; }
+
+/* ---- Guided tour (four steps) */
+.welcome-card.tour { max-width: 960px; height: min(700px, 100%); }
+.tour-top { flex: none; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: clamp(16px, 2.6vw, 26px) clamp(18px, 3.4vw, 44px) 0; }
+.tour-skip { flex: none; white-space: nowrap; font-size: var(--fs-small); color: var(--muted); }
+.tour-skip:hover { color: var(--text); }
+.tour-progress { flex: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: var(--sp-3) clamp(18px, 3.4vw, 44px) 0; }
+.tour-progress span { height: 3px; border-radius: 3px; background: var(--line-2); transition: background-color 0.3s ease; }
+.tour-progress span.on { background: var(--sar); }
+.tour-step { animation: tour-in 0.32s ease-out both; }
+@keyframes tour-in { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+.tour-sub { color: var(--muted); }
+.tour-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 3.4vw, 44px); align-items: start; }
+.tour-art { display: block; width: 100%; height: auto; }
+
+/* step 1: hero */
+.tour-hero { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(16px, 3vw, 40px); align-items: center; padding-top: var(--sp-3); }
+.tour-hero .tour-art { max-width: 360px; justify-self: end; filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.45)); }
+.tour-facts { list-style: none; margin: var(--sp-4) 0; padding: 0; display: grid; gap: var(--sp-2); }
+.tour-facts li { display: grid; grid-template-columns: 10px auto 1fr; gap: 10px; align-items: baseline; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--r-2); background: rgba(255, 255, 255, 0.025); font-size: var(--fs-small); color: var(--muted); }
+.tour-facts li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--sar); box-shadow: 0 0 0 3px rgba(233, 196, 106, 0.18); align-self: center; }
+.tour-facts b { color: var(--text); font-weight: 600; font-size: var(--fs-body); white-space: nowrap; }
+.tour-who { font-size: var(--fs-small); color: var(--muted); }
+.tour-who b { color: var(--text-2); }
+.tour-pulse { opacity: 0; animation: tour-pulse 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes tour-pulse { 0% { opacity: 0; transform: translateY(-80px) scale(0.4); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(20px) scale(1.4); } }
+.tour-sat { animation: tour-float 6s ease-in-out infinite; }
+@keyframes tour-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+
+/* step 2: investigations */
+.tour-split .tour-art { margin: var(--sp-2) 0; border-radius: var(--r-3); }
+.tour-caption { font-size: var(--fs-small); color: var(--muted); }
+.tour-cases { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.tour-case { --c: var(--sar); display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 14px; padding: 8px 14px 8px 0; border: 1px solid var(--line); border-radius: var(--r-2); background: rgba(255, 255, 255, 0.025); overflow: hidden; }
+.tour-case > span:last-child { display: grid; gap: 2px; }
+.tour-dot { background: var(--c); border-radius: 0 3px 3px 0; }
+.tour-case-cat { font: 500 var(--fs-micro) var(--mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--c); }
+.tour-case b { color: var(--text); font-weight: 600; }
+.tour-case-what { font-size: var(--fs-small); color: var(--muted); }
+.cat-earthquake { --c: var(--cat-earthquake); }
+.cat-flood { --c: var(--cat-flood); }
+.cat-volcano { --c: var(--cat-volcano); }
+.cat-wildfire, .cat-deforestation { --c: var(--cat-wildfire); }
+
+/* step 3: tools */
+.tour-tools { list-style: none; margin: var(--sp-4) 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
+.tour-tools li { display: grid; gap: 6px; align-content: start; padding: 16px; border: 1px solid var(--line); border-radius: var(--r-3); background: rgba(255, 255, 255, 0.025); }
+.tour-tool-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: rgba(233, 196, 106, 0.12); color: var(--sar); margin-bottom: 4px; }
+.tour-tools b { color: var(--text); font-weight: 600; }
+.tour-tool-text { font-size: var(--fs-small); line-height: 1.45; color: var(--muted); }
+.tour-gestures { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-5); font-size: var(--fs-small); color: var(--muted); }
+.tour-gestures kbd { display: inline-block; margin-right: 6px; padding: 1px 7px; border: 1px solid var(--line-3); border-bottom-width: 2px; border-radius: 5px; font: 500 var(--fs-micro) var(--mono); color: var(--text); background: var(--panel-2); }
+
+/* step 4: before you start */
+.tour-note { padding: var(--sp-4); border: 1px solid var(--warn-line); border-radius: var(--r-3); background: rgba(255, 207, 138, 0.05); color: var(--warn); font-size: var(--fs-body); }
+.tour-note h3 { color: var(--warn); }
+.tour-sources { font-size: var(--fs-small); color: var(--muted); }
+.tour-badges-title { margin-top: var(--sp-5) !important; }
+.tour-badges { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
+.tour-badges li { display: grid; gap: 8px; align-content: start; padding: 14px; border: 1px solid var(--line); border-radius: var(--r-3); background: rgba(255, 255, 255, 0.025); font-size: var(--fs-small); color: var(--muted); }
+.tour-badge { justify-self: start; padding: 2px 8px; border-radius: 5px; border: 1px solid; font: 500 var(--fs-micro) var(--mono); }
+.tour-badge.obs { color: #8fd0ff; border-color: #2c5a80; background: rgba(111, 179, 255, 0.08); }
+.tour-badge.der { color: var(--sar); border-color: #7a6431; background: rgba(233, 196, 106, 0.08); }
+.tour-badge.int { color: #c9b4ff; border-color: #5b4a8a; background: rgba(180, 140, 255, 0.08); }
+
+/* footer */
+.tour-back { min-height: 44px; }
+.tour-back[disabled] { visibility: hidden; }
+.tour-count { margin-left: auto; font: 500 var(--fs-micro) var(--mono); color: var(--faint); }
+
+@media (max-width: 900px) {
+  .tour-hero, .tour-split { grid-template-columns: minmax(0, 1fr); }
+  .tour-hero .tour-art { order: -1; max-width: 240px; justify-self: center; }
+  .tour-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tour-badges { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .tour-tools { grid-template-columns: minmax(0, 1fr); }
+  .tour-facts b { white-space: normal; }
+  .tour-facts li { grid-template-columns: 10px 1fr; }
+  .tour-facts li span { grid-column: 2; }
+  .tour-count { display: none; }
+  .welcome-card.tour { height: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-step, .tour-pulse, .tour-sat { animation: none; }
+  .tour-pulse { opacity: 0.6; }
+}
 
 /* About panel: credits as a labelled list */
 .credits { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; font-size: var(--fs-small); line-height: 1.5; }
@@ -799,7 +875,7 @@ details.concept p { margin: var(--sp-1) 0 var(--sp-2); }
   .tool-label { display: none; }
   .layer-legend { margin-left: 0; }
   .welcome { padding: 8px; }
-  .welcome-start { width: 100%; }
+  .welcome-start { flex: 1; min-width: 0; }
   .welcome-actions { padding: var(--sp-2) var(--sp-3); }
 }
 

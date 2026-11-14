@@ -30,7 +30,7 @@ export const test = base.extend<{ allow: Allow; pageErrors: string[] }>({
     async ({ page, baseURL, allow }, use, testInfo) => {
       const errors: string[] = [];
       // The first-visit introduction (components/Welcome.tsx) is covered by its own spec; every other test starts in the tool.
-      await page.addInitScript(() => { try { localStorage.setItem('global-sar.intro-seen', '2'); } catch { /* storage blocked */ } });
+      await page.addInitScript(() => { try { localStorage.setItem('global-sar.intro-seen', '3'); } catch { /* storage blocked */ } });
       const soft: string[] = [];
       const origin = new URL(baseURL ?? 'http://localhost:5173').origin;
       const tolerated = (s: string) => allow.console.some((r) => r.test(s));

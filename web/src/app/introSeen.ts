@@ -3,7 +3,7 @@
 // the app works without it (the intro then simply shows on each visit).
 export const INTRO_SEEN_KEY = 'global-sar.intro-seen';
 /** Version of the introduction the visitor has seen. Raise it when the intro changes enough to be worth showing again. */
-export const INTRO_VERSION = '2';
+export const INTRO_VERSION = '3';
 
 function seen(): boolean {
   try {

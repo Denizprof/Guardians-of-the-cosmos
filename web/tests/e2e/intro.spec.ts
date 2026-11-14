@@ -14,9 +14,11 @@ test.describe('introduction screen', () => {
     await expect(intro(page)).toHaveAttribute('aria-modal', 'true');
     expect(await intro(page).evaluate((el) => el.contains(document.activeElement))).toBe(true);
 
+    // the guided tour: three Next steps, then Get started
+    for (let i = 0; i < 3; i++) await intro(page).getByRole('button', { name: 'Next' }).click();
     await page.getByRole('button', { name: 'Get started' }).click();
     await expect(intro(page)).toHaveCount(0);
-    expect(await page.evaluate((k) => localStorage.getItem(k), INTRO_SEEN_KEY)).toBe('2');
+    expect(await page.evaluate((k) => localStorage.getItem(k), INTRO_SEEN_KEY)).toBe('3');
     expect(await page.evaluate(() => !!document.activeElement && document.activeElement !== document.body)).toBe(true);
 
     await page.reload();
@@ -40,7 +42,7 @@ test.describe('introduction screen', () => {
   });
 
   test('the intro can be reopened from the About panel, and its credits link opens About', async ({ page }) => {
-    await page.addInitScript((k) => { try { localStorage.setItem(k, '2'); } catch { /* storage blocked */ } }, INTRO_SEEN_KEY);
+    await page.addInitScript((k) => { try { localStorage.setItem(k, '3'); } catch { /* storage blocked */ } }, INTRO_SEEN_KEY);
     await page.goto('/');
     await ready(page);
     await expect(intro(page)).toHaveCount(0);
@@ -49,19 +51,27 @@ test.describe('introduction screen', () => {
     await page.getByRole('button', { name: /Show the introduction again/ }).click();
     await expect(intro(page)).toBeVisible();
 
+    for (let i = 0; i < 3; i++) await intro(page).getByRole('button', { name: 'Next' }).click();
     await intro(page).getByRole('button', { name: /full credits/i }).click();
     await expect(intro(page)).toHaveCount(0);
     await expect(page.locator('section.panel[aria-label="About Global SAR"]')).toBeVisible();
   });
 
-  test('on a phone the intro fits the screen width and Get started is reachable by scrolling', async ({ page }) => {
+  test('on a phone the tour fits the screen width and its buttons stay in view', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
     await ready(page);
     await expect(intro(page)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    const start = page.getByRole('button', { name: 'Get started' });
-    await start.scrollIntoViewIfNeeded();
-    await expect(start).toBeInViewport();
+    await expect(intro(page).getByRole('button', { name: 'Next' })).toBeInViewport();
+    for (let i = 0; i < 3; i++) await intro(page).getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('button', { name: 'Get started' })).toBeInViewport();
+  });
+
+  test('Skip tour closes the intro from the first step', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    await intro(page).getByRole('button', { name: 'Skip tour' }).click();
+    await expect(intro(page)).toHaveCount(0);
   });
 });
