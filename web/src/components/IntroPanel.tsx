@@ -24,6 +24,8 @@ interface Props {
   onToggleCollapsed: () => void;
   /** Close control (the panel is on demand: it is not part of the landing view). */
   onClose?: () => void;
+  /** Reopen the introduction screen (About view only). */
+  onShowIntro?: () => void;
   /** Coverage probe: the one product currently shown on the map (null = none). */
   selectedScene?: string | null;
   onSelectScene?: (scene: string | null) => void;
@@ -185,6 +187,11 @@ function IntroPanel(p: Props) {
 
         {!probing && (
           <>
+            {p.onShowIntro && (
+              <div className="section">
+                <button type="button" className="btn" onClick={p.onShowIntro}>Show the introduction again</button>
+              </div>
+            )}
             <div className="section">
               <p>
                 Explore how Earth’s surface changes: geohazards, fire and forests, climate and ice, water, ecosystems and human activity. Investigations compare genuine satellite observations from before and after, led by NISAR, the NASA–ISRO radar that sees through clouds and darkness every 12 days. Every layer says whether it is an observation, a derived measurement or an interpretation.

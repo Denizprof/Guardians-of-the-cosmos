@@ -10,6 +10,8 @@ import SarLens, { type LensGeometry } from './components/SarLens';
 import { IconFilters, IconInfo, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
 import { InvestigationStrip, InvestigationsMenu } from './components/Investigations';
 import { readHash } from './app/readHash';
+import { markIntroSeen, shouldShowIntro } from './app/introSeen';
+import Welcome from './components/Welcome';
 import { useIsMobile, useViewportHeight } from './app/viewport';
 import { useCatalogs } from './app/useCatalogs';
 import { PANEL_W, useSwipe } from './app/useSwipe';
@@ -52,6 +54,8 @@ export default function App() {
 
   const init = useMemo(readHash, []);
   const [selectedId, setSelectedId] = useState<string | null>(init.event);
+  // Introduction screen: first visit to the landing view only (a link to an investigation skips it).
+  const [introOpen, setIntroOpen] = useState(() => shouldShowIntro(init));
   const [beforeId, setBeforeId] = useState<string | null>(init.b);
   const [afterId, setAfterId] = useState<string | null>(init.a);
   const [mode, setMode] = useState<CompareMode>(init.mode ?? 'swipe');
@@ -398,6 +402,26 @@ export default function App() {
     );
   }
 
+  const closeIntro = useCallback(() => {
+    markIntroSeen();
+    setIntroOpen(false);
+    // hand keyboard focus to the tool: its first toolbar control
+    window.setTimeout(() => appRef.current?.querySelector<HTMLElement>('.topbar .tool')?.focus({ preventScroll: true }), 0);
+  }, []);
+  const introCredits = useCallback(() => {
+    markIntroSeen();
+    setIntroOpen(false);
+    setSelectedId(null);
+    setPopover(null);
+    setPanelCollapsed(false);
+    setPanelView('about'); // the About panel carries the full credits; focus moves to its heading
+  }, []);
+  const showIntro = useCallback(() => {
+    closePanel();
+    setPopover(null);
+    setIntroOpen(true);
+  }, [closePanel]);
+
   const appClass = ['app', panelOpen ? 'has-panel' : '', selected ? 'has-event' : '', coverageMode && !selected ? 'probing' : '', lensOn ? (lensFull ? 'lens-on lens-full' : 'lens-on') : '']
     .filter(Boolean)
     .join(' ');
@@ -624,10 +648,13 @@ export default function App() {
           onSelectScene={setCoverageScene}
           onToggleCollapsed={toggleCollapsed}
           onClose={closePanel}
+          onShowIntro={showIntro}
         />
       ) : null}
 
       {selected && <Timeline event={selected} before={before} after={after} slot={slot} onSlot={setSlot} onPick={onTimelinePick} />}
+
+      {introOpen && <Welcome onClose={closeIntro} onCredits={introCredits} />}
     </div>
   );
 }
