@@ -9,8 +9,9 @@ export interface SarLensLayer {
   /** XYZ raster template. `{time}` (optional) is replaced by a YYYY-MM-DD date. */
   tiles: string;
   /**
-   * On-screen size of one tile. The services serve 256 px tiles; 512 draws each at 2x, i.e. one zoom level
-   * coarser: a quarter of the requests per stacked day, which is what keeps a 12-raster stack responsive.
+   * On-screen size of one tile. The services serve 256 px tiles; 256 shows them at native sharpness. (512 drew
+   * each at 2x, one zoom level coarser, and looked blocky. It was a load-saving choice from when the lens
+   * rendered the whole window; it now renders only its square from zoom 5, so full resolution is affordable.)
    */
   tileSize: number;
   minzoom: number;
@@ -51,7 +52,7 @@ export const SAR_LENS_SOURCE: SarLensSource = {
     {
       id: 'opera-rtc-s1',
       tiles: `${GIBS}/OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1/default/{time}/GoogleMapsCompatible_Level12/{z}/{y}/{x}.png`,
-      tileSize: 512,
+      tileSize: 256,
       minzoom: 0,
       maxzoom: 12,
       stackDays: 6,
@@ -60,7 +61,7 @@ export const SAR_LENS_SOURCE: SarLensSource = {
     {
       id: 'nisar-gcov',
       tiles: `${GIBS}/NISAR_L2_Geocoded_Polarimetric_Covariance/default/{time}/GoogleMapsCompatible_Level13/{z}/{y}/{x}.png`,
-      tileSize: 512,
+      tileSize: 256,
       minzoom: 0,
       maxzoom: 13,
       stackDays: 6,
@@ -77,10 +78,23 @@ export const SAR_LENS_SOURCE: SarLensSource = {
   provenance: [
     'Top: NISAR L2 GCOV, L-band 24 cm geocoded backscatter (NASA/JPL-Caltech and ISRO), daily tiles since 29 Oct 2025.',
     'Beneath: OPERA L2 RTC-S1, Copernicus Sentinel-1 C-band 5.6 cm terrain-corrected backscatter (NASA JPL OPERA, ASF DAAC).',
-    'False colour: co-polarized signal in red and blue, cross-polarized in green. 8-bit visualization, not calibrated dB values.',
+    'Shown in grey: brightness is the strength of the radar echo (bright = rough ground, buildings, vegetation; dark = smooth surfaces such as calm water). NASA publishes these tiles in false colour (co-polarized signal in red and blue, cross-polarized in green) with a different colour balance for each mission; the lens removes the colour so the two missions read as one picture. 8-bit visualization, not calibrated dB values.',
     'Coverage: each day holds only the swaths flown that day and no global composite exists. The lens stacks the most recent days, newest on top; dark areas had no radar pass in that window (or lie outside the product footprint).',
   ],
 };
+
+/**
+ * How the lens draws every radar tile. The two products arrive in different false-colour balances (NISAR
+ * passes looked like green stripes over a white and magenta Sentinel-1 picture), so colour is removed and
+ * the peak brightness is lowered a little so bright land is not a flat white. Display only: no values change.
+ */
+export const LENS_RASTER_PAINT = {
+  'raster-fade-duration': 0,
+  'raster-saturation': -1,
+  'raster-brightness-max': 0.86,
+  'raster-contrast': 0.12,
+  'raster-resampling': 'linear',
+} as const;
 
 const DAY = 864e5;
 const iso = (t: number) => new Date(t).toISOString().slice(0, 10);

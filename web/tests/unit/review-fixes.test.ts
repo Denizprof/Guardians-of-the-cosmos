@@ -326,3 +326,16 @@ describe('shipped layers.json legends', () => {
     if (g!.type === 'unverified') expect(g!.verified).toBe(false);
   });
 });
+
+import { LENS_RASTER_PAINT, SAR_LENS_SOURCE as LENS_SRC } from '../../src/map/sarLens';
+
+describe('SAR lens draws both missions as one grey radar picture', () => {
+  it('removes the per-mission false colour and says so in the provenance', () => {
+    expect(LENS_RASTER_PAINT['raster-saturation']).toBe(-1);
+    expect(LENS_SRC.provenance.join(' ')).toMatch(/Shown in grey/);
+    expect(LENS_SRC.provenance.join(' ')).toMatch(/not calibrated dB/);
+  });
+  it('requests tiles at native sharpness', () => {
+    for (const l of LENS_SRC.layers) expect(l.tileSize).toBe(256);
+  });
+});

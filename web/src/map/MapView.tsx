@@ -6,7 +6,7 @@ import type { Category, CompareMode, ContextEvent, SarEvent, SarLayer } from '..
 import { CATEGORY_COLOR, layerBounds } from '../lib';
 import type { CoverageResult } from '../services';
 import type { Pin } from '../content/explain';
-import { SAR_LENS_SOURCE, lensTileUrls } from './sarLens';
+import { LENS_RASTER_PAINT, SAR_LENS_SOURCE, lensTileUrls } from './sarLens';
 import { registerNodataProtocol } from './nodataKey';
 import { createTileErrorPolicy } from './tileErrors';
 
@@ -478,7 +478,7 @@ function lensStyle(): StyleSpecification {
       // Dark ground: where no pass happened the lens reads as 'no radar data', not as an error.
       { id: 'background', type: 'background', paint: { 'background-color': '#05080c' } },
       // bottom to top: underlay first, then the primary product, each oldest day first
-      ...urls.map((u) => ({ id: `lens-${u.id}`, type: 'raster' as const, source: `lens-${u.id}`, paint: { 'raster-fade-duration': 0 } })),
+      ...urls.map((u) => ({ id: `lens-${u.id}`, type: 'raster' as const, source: `lens-${u.id}`, paint: { ...LENS_RASTER_PAINT } })),
       ...STYLE.layers.filter((l) => keep.has(l.id)),
     ],
   };
