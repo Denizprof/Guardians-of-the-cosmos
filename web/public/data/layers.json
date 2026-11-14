@@ -39,7 +39,20 @@
     "content_type": "image/jpeg",
     "cors": "*"
    },
-   "nodata": "black"
+   "nodata": "black",
+   "legend": {
+    "type": "composite",
+    "stops": [],
+    "classes": [],
+    "simple": "Natural colours, similar to what the human eye would see from space. There is no colour scale: the picture itself is the information.",
+    "scientific": "True-colour composite of VIIRS corrected reflectance: red = band I1, green = band M4, blue = band M3. NASA GIBS publishes no colormap for this layer because it is imagery, not a mapped variable.",
+    "source": {
+     "label": "NASA Worldview layer description: Corrected Reflectance (True Color, VIIRS, NOAA-20)",
+     "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/viirs/noaa20/VIIRS_NOAA20_CorrectedReflectance_TrueColor.md"
+    },
+    "verified": true,
+    "note": "No colour key applies. NASA notes an occasional checkered pattern near the poles where several orbits overlap."
+   }
   },
   {
    "id": "gibs-opera-rtc-s1",
@@ -68,7 +81,7 @@
    "resolution": "30 m",
    "license": "NASA EOSDIS open data; contains modified Copernicus Sentinel data",
    "attribution": "Imagery: NASA GIBS. Data: NASA JPL OPERA RTC-S1 (ASF DAAC), contains modified Copernicus Sentinel-1 data.",
-   "description_simple": "A radar picture that sees through clouds and works at night. Bright means rough or built-up ground, dark means smooth surfaces such as calm water.",
+   "description_simple": "A radar picture that sees through clouds and works at night. Vegetation looks green, built-up ground white or pink, and smooth surfaces such as calm water black.",
    "description_scientific": "False-colour rendering of terrain-flattened gamma0 backscatter (OPERA_L2_RTC-S1_V1, CMR C2777436413-ASF). Each date shows only the Sentinel-1 swaths acquired that day.",
    "limitations": "C-band, not NISAR L-band: less penetration into vegetation. The tile is an 8-bit visualization, not calibrated dB values. Spatial coverage follows the OPERA production footprint (not verified here) and the 12-day Sentinel-1 revisit; most dates show only a few swaths. Many internal date gaps in GetCapabilities.",
    "verified": {
@@ -77,6 +90,36 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "composite",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#2e9e3f",
+      "label": "Green: vegetated areas"
+     },
+     {
+      "color": "#f6cfe0",
+      "label": "White / pink: urban and/or sparsely vegetated areas"
+     },
+     {
+      "color": "#000000",
+      "label": "Black: calm water, dry sand, frozen ground"
+     },
+     {
+      "color": "#b030c0",
+      "label": "Purple / magenta: rough water"
+     }
+    ],
+    "simple": "A false-colour radar image: vegetation looks green, towns and sparsely vegetated land look white or pink, calm water, dry sand and frozen ground look black, and rough water looks purple or magenta.",
+    "scientific": "False-colour RGB of Sentinel-1 RTC backscatter: co-polarized VV (or HH) in the red and blue channels, cross-polarized VH (or HV) in green. NASA publishes no colormap or value scale for this layer; other land covers can look similar.",
+    "source": {
+     "label": "NASA Worldview layer description: OPERA RTC-S1 (False Color)",
+     "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/multi-mission/opera/OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1.md"
+    },
+    "verified": true,
+    "note": "Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). NASA advises consulting auxiliary data, because other land covers can have a similar appearance."
    }
   },
   {
@@ -105,7 +148,7 @@
    "resolution": "375 m (I-bands), 750 m (M11)",
    "license": "NASA EOSDIS open data, no restrictions",
    "attribution": "Imagery: NASA GIBS, part of NASA ESDIS. Data: NASA LANCE, NOAA-20 VIIRS.",
-   "description_simple": "A false-colour view where fresh burn scars look dark brown or red and healthy vegetation looks green. Smoke becomes nearly transparent.",
+   "description_simple": "A false-colour view where burn scars look deep or bright red and vegetation looks bright green.",
    "description_scientific": "Shortwave-infrared / near-infrared / red composite. Burned surfaces have low NIR and higher SWIR reflectance; active flaming fronts can saturate M11.",
    "limitations": "Not a fire-detection product: use thermal anomalies (FIRMS) or GOES Fire Temperature for active fire. 375-750 m pixels miss small fires. Clouds block the view. Date gaps exist (e.g. 2025-08-31/2025-09-02). No daylight observation (polar night in winter) and gaps between orbits are shown transparent: the dark areas in the source JPEG carry no data.",
    "verified": {
@@ -115,7 +158,49 @@
     "content_type": "image/jpeg",
     "cors": "*"
    },
-   "nodata": "black"
+   "nodata": "black",
+   "legend": {
+    "type": "composite",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#c0281c",
+      "label": "Deep or bright red: burn scars"
+     },
+     {
+      "color": "#3ecf3e",
+      "label": "Bright green: vegetation"
+     },
+     {
+      "color": "#e3b7a8",
+      "label": "Pinkish: bare soil, desert"
+     },
+     {
+      "color": "#0a0a14",
+      "label": "Very dark: liquid water on the ground"
+     },
+     {
+      "color": "#10206a",
+      "label": "Dark blue: sediment in water"
+     },
+     {
+      "color": "#40e0d0",
+      "label": "Bright turquoise: snow and ice; high ice clouds"
+     },
+     {
+      "color": "#ffffff",
+      "label": "White: low water-droplet clouds"
+     }
+    ],
+    "simple": "A false-colour image: burn scars look deep or bright red, vegetation bright green, bare soil pinkish, water very dark, snow and ice turquoise, and low clouds white.",
+    "scientific": "Corrected reflectance composite with red = M11 (shortwave infrared), green = I2 (near infrared), blue = I1 (red visible). Burned areas reflect more in M11 and less in I2, so they turn red; vegetation reflects strongly in I2, so it turns green. No colormap: it is imagery.",
+    "source": {
+     "label": "NASA Worldview layer description: Corrected Reflectance (Bands M11-I2-I1, VIIRS, NOAA-20)",
+     "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/viirs/noaa20/VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1.md"
+    },
+    "verified": true,
+    "note": "Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). The red of a burn scar varies with the vegetation burned, the residue and how complete the burn was."
+   }
   },
   {
    "id": "gibs-goes-east-firetemp",
@@ -150,6 +235,56 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "composite",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#e02010",
+      "label": "Red: warm fire"
+     },
+     {
+      "color": "#ff8c00",
+      "label": "Orange: very warm fire"
+     },
+     {
+      "color": "#ffe000",
+      "label": "Yellow: hot fire"
+     },
+     {
+      "color": "#fffbe8",
+      "label": "Near white: very hot fire"
+     },
+     {
+      "color": "#6b1030",
+      "label": "Shades of maroon: burn scars"
+     },
+     {
+      "color": "#b060c0",
+      "label": "Purples to pink: clear sky over land"
+     },
+     {
+      "color": "#050505",
+      "label": "Near black: clear sky over water, snow, or night"
+     },
+     {
+      "color": "#3060d0",
+      "label": "Shades of blue: water clouds"
+     },
+     {
+      "color": "#30a040",
+      "label": "Shades of green: ice clouds"
+     }
+    ],
+    "simple": "Fires go from red (warm) through orange and yellow to near white (very hot). Burn scars are maroon, clear land is purple to pink, water clouds are blue and ice clouds are green.",
+    "scientific": "Fire Temperature RGB from GOES-East ABI using the 3.9, 2.2 and 1.6 micrometre channels: cooler fires appear only at 3.9 um (red); more intense fires add signal at 2.2 and 1.6 um, moving the colour towards yellow and white. It is a qualitative RGB, not a temperature scale in kelvin.",
+    "source": {
+     "label": "NASA Worldview layer description: Fire Temperature (ABI, GOES-East)",
+     "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/goes/GOES-East_ABI_FireTemp.md"
+    },
+    "verified": true,
+    "note": "Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). The colour guide is quoted from NASA; the underlying reference is the NOAA GOES-R Fire Temperature RGB Quick Guide."
    }
   },
   {
@@ -179,7 +314,7 @@
    "resolution": "30 m",
    "license": "NASA EOSDIS open data; contains modified Copernicus Sentinel data",
    "attribution": "Imagery: NASA GIBS. Data: NASA JPL OPERA DIST-ALERT-HLS (LP DAAC), built from USGS Landsat and Copernicus Sentinel-2 data.",
-   "description_simple": "Flags places where plants have recently been lost, for example after a fire, logging or clearing. Red means more than half of the vegetation cover is gone.",
+   "description_simple": "Flags places where plants have recently been lost, for example after a fire, logging or clearing. Red means a confirmed loss of at least half of the vegetation cover.",
    "description_scientific": "OPERA_L3_DIST-ALERT-HLS_V1 (CMR C2746980408-LPCLOUD): per-pixel vegetation cover loss relative to a multi-year baseline. Classes (GIBS colormap): 0 no disturbance; 1-3 first/provisional/confirmed <50% loss; 4-6 first/provisional/confirmed >=50% loss; 7-8 confirmed and finished.",
    "limitations": "Disturbance is not the same as deforestation: fire, drought, harvest and flooding also trigger it. Optical, so cloud cover leaves gaps (the Amazon wet season especially). Each date only shows granules processed for that day. We saw intermittent HTTP 500 responses on some tiles and dates (e.g. 2026-06-20 and 2026-09-15 at z9-z11), so the client should retry.",
    "verified": {
@@ -188,6 +323,56 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "classes",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#121212",
+      "label": "No disturbance"
+     },
+     {
+      "color": "#005555",
+      "label": "First detection, < 50 % vegetation loss"
+     },
+     {
+      "color": "#897f4e",
+      "label": "Provisional, < 50 % vegetation loss"
+     },
+     {
+      "color": "#dee043",
+      "label": "Confirmed, < 50 % vegetation loss"
+     },
+     {
+      "color": "#008888",
+      "label": "First detection, >= 50 % vegetation loss"
+     },
+     {
+      "color": "#e48727",
+      "label": "Provisional, >= 50 % vegetation loss"
+     },
+     {
+      "color": "#e01b07",
+      "label": "Confirmed, >= 50 % vegetation loss"
+     },
+     {
+      "color": "#777777",
+      "label": "Confirmed < 50 %, finished"
+     },
+     {
+      "color": "#dddddd",
+      "label": "Confirmed >= 50 %, finished"
+     }
+    ],
+    "simple": "Teal means a loss of vegetation seen only once so far, olive or orange means seen twice (provisional), and yellow or red means confirmed. Red is a confirmed loss of at least half the vegetation cover; grey means the disturbance has finished. Near-black means no disturbance.",
+    "scientific": "OPERA DIST-ALERT-HLS vegetation disturbance status, classes 0-8: confidence (first detection, provisional, confirmed) crossed with magnitude (< 50 % or >= 50 % vegetation cover loss), plus two \"finished\" classes. Colours are an exact class lookup from the NASA GIBS colormap OPERA_Vegetation_Disturbance_Status.",
+    "source": {
+     "label": "NASA GIBS colormap: OPERA_Vegetation_Disturbance_Status",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Vegetation_Disturbance_Status.xml"
+    },
+    "verified": true,
+    "note": "Transparent = no data. \"No disturbance\" is drawn as opaque near-black (#121212), so observed areas without change look dark, not empty."
    }
   },
   {
@@ -220,6 +405,33 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "ramp",
+    "units": "year",
+    "stops": [
+     {
+      "color": "#ffff00",
+      "label": "2001"
+     },
+     {
+      "color": "#ff8000",
+      "label": "2013"
+     },
+     {
+      "color": "#ff0000",
+      "label": "2025"
+     }
+    ],
+    "classes": [],
+    "simple": "Yellow appears to mark the oldest tree cover loss and red the most recent, with black for no loss. UMD publishes no legend for this version of the tiles, so the year labels are our own reading of the tiles, not an official key.",
+    "scientific": "Year of gross forest cover loss (lossyear) drawn on a yellow-to-red ramp: the green channel falls linearly from equal-to-red (yellow, first loss year) to zero (red, last loss year), in 25 equal steps for 2001-2025. The official UMD/Google viewer legend gives yellow = start of the record, orange = intermediate, red = latest year, black = no loss, dark grey (#404040) = water or no data.",
+    "source": {
+     "label": "UMD/Google Global Forest Change viewer, \"Forest Loss Year\" layer legend",
+     "url": "https://earthenginepartners.appspot.com/science-2013-global-forest"
+    },
+    "verified": false,
+    "note": "The published legend belongs to the v1.7 tiles (2000-2019) served from the same tile path pattern; no legend is published for the v1.13 tiles. That the ramp now ends at 2025 was checked by comparing v1.7 and v1.13 tiles pixel by pixel (same colour step for the same pixel; pixels new in v1.13 use the six reddest steps), so the year labels are measured, not quoted. Black and dark grey are opaque. Colours get darker when zoomed out; the reason is not documented."
    }
   },
   {
@@ -257,6 +469,45 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "ramp",
+    "units": "NDSI snow cover (0-100)",
+    "stops": [
+     {
+      "color": "#f0f080",
+      "label": "1"
+     },
+     {
+      "color": "#f0d284",
+      "label": "25"
+     },
+     {
+      "color": "#f0b489",
+      "label": "50"
+     },
+     {
+      "color": "#f0968e",
+      "label": "75"
+     },
+     {
+      "color": "#f08585",
+      "label": "99"
+     },
+     {
+      "color": "#ff0000",
+      "label": "100"
+     }
+    ],
+    "classes": [],
+    "simple": "Pale yellow means a weak snow signal, salmon pink a strong one and bright red the maximum. Where nothing is drawn there is no snow, or the ground could not be seen (cloud, night, water).",
+    "scientific": "MOD10_L2 NDSI snow cover, integer values 1-100, one colour per value from the NASA GIBS colormap MODIS_NDSI_Snow_Cover: pale yellow (1) shading to salmon (99), with 100 in pure red. Value 0 and all flag classes are transparent.",
+    "source": {
+     "label": "NASA GIBS colormap: MODIS_NDSI_Snow_Cover",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_NDSI_Snow_Cover.xml"
+    },
+    "verified": true,
+    "note": "Transparent = NDSI 0 (no snow), missing data, no decision, night, inland water, ocean, cloud, detector saturated, fill. The colormap gives no units for the 1-100 index."
    }
   },
   {
@@ -292,6 +543,49 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "ramp",
+    "units": "%",
+    "stops": [
+     {
+      "color": "#111111",
+      "label": "0 %"
+     },
+     {
+      "color": "#a300a3",
+      "label": "10 %"
+     },
+     {
+      "color": "#5c00ff",
+      "label": "25 %"
+     },
+     {
+      "color": "#00d98e",
+      "label": "50 %"
+     },
+     {
+      "color": "#ffd400",
+      "label": "75 %"
+     },
+     {
+      "color": "#ff3333",
+      "label": "90 %"
+     },
+     {
+      "color": "#ffffff",
+      "label": "100 %"
+     }
+    ],
+    "classes": [],
+    "simple": "The colour shows how much of the sea surface is covered by ice: purple for a little, violet-blue for about a quarter, green for about half, yellow for three quarters, red for about 90 % and white for a fully ice-covered sea. Ice-free ocean is drawn almost black.",
+    "scientific": "Sea ice concentration (area fraction) 0-100 % from the GHRSST MUR L4 analysis, one colour per 1 % step in the NASA GIBS colormap GHRSST_Sea_Ice_Concentration.",
+    "source": {
+     "label": "NASA GIBS colormap: GHRSST_Sea_Ice_Concentration",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/GHRSST_Sea_Ice_Concentration.xml"
+    },
+    "verified": true,
+    "note": "Transparent = no data. The 0-1 % class is drawn as opaque dark grey (#111111), so ice-free ocean appears almost black, not empty."
    }
   },
   {
@@ -330,6 +624,49 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "ramp",
+    "units": "K",
+    "stops": [
+     {
+      "color": "#c900ff",
+      "label": "< 200 K"
+     },
+     {
+      "color": "#2100ff",
+      "label": "225 K"
+     },
+     {
+      "color": "#00b3ff",
+      "label": "250 K"
+     },
+     {
+      "color": "#66ff12",
+      "label": "275 K"
+     },
+     {
+      "color": "#ffff00",
+      "label": "300 K"
+     },
+     {
+      "color": "#ff7f00",
+      "label": "325 K"
+     },
+     {
+      "color": "#ff0100",
+      "label": ">= 350 K"
+     }
+    ],
+    "classes": [],
+    "simple": "Purple and blue are the coldest ground, green is around freezing (273 K is 0 degrees Celsius), yellow is warm (300 K is about 27 degrees Celsius) and orange to red is very hot ground.",
+    "scientific": "MODIS/Terra daytime land surface temperature in kelvin, coloured in 0.6 K steps from < 200 K to >= 350 K by the NASA GIBS colormap MODIS_Land_Surface_Temp.",
+    "source": {
+     "label": "NASA GIBS colormap: MODIS_Land_Surface_Temp",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_Land_Surface_Temp.xml"
+    },
+    "verified": true,
+    "note": "Transparent = no data (the colormap marks only the fill value as no data)."
    }
   },
   {
@@ -367,6 +704,53 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "ramp",
+    "units": "m3/m3",
+    "stops": [
+     {
+      "color": "#ffa200",
+      "label": "0.0 m3/m3"
+     },
+     {
+      "color": "#fff800",
+      "label": "0.1 m3/m3"
+     },
+     {
+      "color": "#4da600",
+      "label": "0.2 m3/m3"
+     },
+     {
+      "color": "#00ca95",
+      "label": "0.3 m3/m3"
+     },
+     {
+      "color": "#009aff",
+      "label": "0.4 m3/m3"
+     },
+     {
+      "color": "#0000db",
+      "label": "0.5 m3/m3"
+     },
+     {
+      "color": "#060664",
+      "label": "0.6 m3/m3"
+     },
+     {
+      "color": "#505050",
+      "label": ">= 0.7 m3/m3"
+     }
+    ],
+    "classes": [],
+    "simple": "Orange and yellow mean dry soil, green means moderately moist, and light blue to dark blue means wet soil. The very wettest soils are shown dark grey.",
+    "scientific": "SMAP L4 analysed root-zone soil moisture as a volume fraction (m3 of water per m3 of soil), coloured from 0.000 to >= 0.700 by the NASA GIBS colormap SMAP_Analyzed_Soil_Moisture.",
+    "source": {
+     "label": "NASA GIBS colormap: SMAP_Analyzed_Soil_Moisture",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/SMAP_Analyzed_Soil_Moisture.xml"
+    },
+    "verified": true,
+    "note": "Transparent = no data."
    }
   },
   {
@@ -393,7 +777,7 @@
    "resolution": "250 m",
    "license": "NASA EOSDIS open data, no restrictions",
    "attribution": "Imagery: NASA GIBS. Data: MODIS/Aqua+Terra Global Flood Product MCDWD_L3_NRT (NASA LANCE).",
-   "description_simple": "Water seen where it is not normally present, combining two days of observations to see past some clouds.",
+   "description_simple": "Shows flood water (water where it is not normally present) as well as normal surface water, combining two days of observations to see past some clouds.",
    "description_scientific": "MCDWD L3 NRT 2-day flood product: surface water from MODIS water detection, compared against a reference water mask to flag unusual water.",
    "limitations": "Optical: persistent cloud during storms hides floods; SAR (NISAR, Sentinel-1/OPERA DSWx-S1) is better during events. Cloud shadow and terrain shadow can be misclassified as water. MODIS is near end of mission; a VIIRS equivalent (VIIRS_Combined_Flood_2-Day, from 2025-06-03) exists in GIBS.",
    "verified": {
@@ -402,6 +786,36 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "classes",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#32d2f5",
+      "label": "Surface water (normal water)"
+     },
+     {
+      "color": "#ffff00",
+      "label": "Recurring flood"
+     },
+     {
+      "color": "#fa1e24",
+      "label": "Flood"
+     },
+     {
+      "color": "#afafaf",
+      "label": "Insufficient data"
+     }
+    ],
+    "simple": "Red is flood water, yellow is flooding that returns to the same place in many years, and cyan is water that is normally there. Grey means there was not enough data.",
+    "scientific": "MCDWD L3 NRT 2-day water product, classes 1 = surface water, 2 = recurring flood, 3 = flood, 255 = insufficient data, coloured by the NASA GIBS colormap MODIS_Flood. Water pixels are split using reference-water and recurring-flood layers.",
+    "source": {
+     "label": "NASA GIBS colormap: MODIS_Flood",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_Flood.xml"
+    },
+    "verified": true,
+    "note": "Transparent = no water, or no data. NASA states the recurring-flood class exists only from Release 1.1 (10 December 2025); in earlier dates such pixels are most likely shown as flood. Grey also covers mountain areas removed by the terrain filter."
    }
   },
   {
@@ -432,7 +846,7 @@
    "license": "NASA EOSDIS open data; contains modified Copernicus Sentinel data",
    "attribution": "Imagery: NASA GIBS. Data: NASA JPL OPERA DSWx-S1 (PO.DAAC), contains modified Copernicus Sentinel-1 data.",
    "description_simple": "Open water mapped by radar, so it works through clouds: useful during floods.",
-   "description_scientific": "OPERA_L3_DSWX-S1_V1 (CMR C2949811996-POCLOUD): water and no-water classification from RTC-S1 backscatter, with partial-surface-water and inundated-vegetation classes per the product legend.",
+   "description_scientific": "OPERA_L3_DSWX-S1_V1 (CMR C2949811996-POCLOUD): water and no-water classification from RTC-S1 backscatter, drawn in GIBS as not water, open water, inundated vegetation and two masked classes (HAND, layover/shadow).",
    "limitations": "C-band: misses water under dense canopy (L-band NISAR is better there). Wind-roughened water and dry sand can be misclassified. Coverage follows Sentinel-1 swaths, so each date shows only that day's acquisitions. Several date gaps in the record.",
    "verified": {
     "date": "2026-11-14",
@@ -440,6 +854,40 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "classes",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#ffffff",
+      "label": "Not water"
+     },
+     {
+      "color": "#0000ff",
+      "label": "Open water"
+     },
+     {
+      "color": "#00ff00",
+      "label": "Inundated vegetation"
+     },
+     {
+      "color": "#c8c8c8",
+      "label": "Masked: Height Above Nearest Drainage (HAND)"
+     },
+     {
+      "color": "#808080",
+      "label": "Masked: radar layover / shadow"
+     }
+    ],
+    "simple": "Blue is open water and green is flooded vegetation. White is land that was observed and is not water; grey areas were masked out and carry no answer.",
+    "scientific": "OPERA DSWx-S1 water classification: 0 = not water, 1 = open water, 3 = inundated vegetation, 250 = HAND masked, 251 = layover/shadow masked, coloured by the NASA GIBS colormap OPERA_Dynamic_Surface_Water_Extent_S1.",
+    "source": {
+     "label": "NASA GIBS colormap: OPERA_Dynamic_Surface_Water_Extent_S1",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Dynamic_Surface_Water_Extent_S1.xml"
+    },
+    "verified": true,
+    "note": "Transparent = fill value (no data). \"Not water\" is opaque white, so each radar swath covers the basemap."
    }
   },
   {
@@ -464,7 +912,7 @@
    "resolution": "30 m",
    "license": "Copernicus Programme data, free of charge without restriction of use (per the JRC download page)",
    "attribution": "Source: EC JRC/Google",
-   "description_simple": "How often each place was covered by water over four decades. Dark blue means permanently wet, light means only sometimes.",
+   "description_simple": "How often each place was covered by water over four decades. Solid blue means almost always wet; faint red or pink means water was seen only rarely.",
    "description_scientific": "Percentage of valid Landsat observations classified as water, 1984-2024 (GSW v1.5). Pekel et al. 2016, Nature 540:418-422, doi:10.1038/nature20584.",
    "limitations": "RGB visualization tiles, for display not analysis. Static summary with no time slider. The v1.5 seasonality, monthly and yearly assets cover only 2022-2024 (merge with v1.4 for full history). z14 returns 404. Clouds and terrain shadow reduce valid observations in some regions.",
    "verified": {
@@ -473,6 +921,41 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "ramp",
+    "units": "%",
+    "stops": [
+     {
+      "color": "#ff0000",
+      "label": "1 %"
+     },
+     {
+      "color": "#bf003f",
+      "label": "25 %"
+     },
+     {
+      "color": "#7f007f",
+      "label": "50 %"
+     },
+     {
+      "color": "#3f00bf",
+      "label": "75 %"
+     },
+     {
+      "color": "#0000ff",
+      "label": "100 %"
+     }
+    ],
+    "classes": [],
+    "simple": "Solid blue means water was there almost all the time. Purple means about half the time, and faint red or pink means water was seen only rarely. Places never seen as water are left empty.",
+    "scientific": "Surface water occurrence, 1-100 % of valid Landsat observations classified as water. Per the JRC Data Users Guide the symbology runs from #FF0000 at 1 % opacity (1 % occurrence) to #0000FF at 100 % opacity (100 % occurrence); in the tiles both hue and opacity change linearly with occurrence.",
+    "source": {
+     "label": "JRC Global Surface Water Data Users Guide (v2024), Occurrence symbology",
+     "url": "https://storage.googleapis.com/water-world/downloads_ancillary/DataUsersGuidev2024_v.5.pdf"
+    },
+    "verified": true,
+    "note": "Tile opacity equals the occurrence value, so low values are nearly see-through and their apparent colour depends on the basemap underneath. Transparent = not water or no data. The 25, 50 and 75 % colours were read from the tiles and match a straight red-to-blue blend."
    }
   },
   {
@@ -499,7 +982,7 @@
    "license": "Copernicus Programme data, free of charge without restriction of use (per the JRC download page)",
    "attribution": "Source: EC JRC/Google",
    "description_simple": "Shows where new lakes or reservoirs appeared, where water disappeared, and where it became seasonal, between the first and last years of the record.",
-   "description_scientific": "Categorical transitions between first-year and last-year water class (permanent, seasonal, new, lost, seasonal-to-permanent, and so on) from the GSW v1.5 time series. Legend per the JRC Data Users Guide.",
+   "description_scientific": "Categorical transitions between first-year and last-year water class (permanent, seasonal, new, lost, seasonal-to-permanent, and so on) from the GSW v1.5 time series. The tiles use the colour-blind-safe (deuteranopia) palette published by JRC, which differs from the table in the Data Users Guide for several classes.",
    "limitations": "Compares only the start and end of the record; intermediate changes are hidden. RGB display tiles only. Reservoir-filling and land-reclamation signals are robust; small or narrow channels below 30 m are not resolved.",
    "verified": {
     "date": "2026-11-14",
@@ -507,6 +990,60 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "classes",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#0000dd",
+      "label": "Permanent"
+     },
+     {
+      "color": "#22b14c",
+      "label": "New permanent"
+     },
+     {
+      "color": "#93073e",
+      "label": "Lost permanent"
+     },
+     {
+      "color": "#99d9ea",
+      "label": "Seasonal"
+     },
+     {
+      "color": "#b5e61d",
+      "label": "New seasonal"
+     },
+     {
+      "color": "#ebb4bb",
+      "label": "Lost seasonal"
+     },
+     {
+      "color": "#ff8b37",
+      "label": "Seasonal to permanent"
+     },
+     {
+      "color": "#ffdd66",
+      "label": "Permanent to seasonal"
+     },
+     {
+      "color": "#7f7f7f",
+      "label": "Ephemeral permanent"
+     },
+     {
+      "color": "#acacac",
+      "label": "Ephemeral seasonal"
+     }
+    ],
+    "simple": "Blue is water that stayed permanent. Green shades are new water, dark red and pink are water that was lost, and orange and yellow mark water that switched between seasonal and permanent. Grey is water that appeared and then disappeared again.",
+    "scientific": "JRC GSW transition classes 1-10 between the first and last year of the record. The tiles use the colour-blind-friendly (deuteranopia) symbology published by JRC (transitions_deuteranopia.qml); class names are those of the Data Users Guide.",
+    "source": {
+     "label": "JRC Global Surface Water symbology file: transitions_deuteranopia.qml",
+     "url": "https://storage.googleapis.com/global-surface-water/downloads_ancillary/transitions_deuteranopia.qml"
+    },
+    "verified": true,
+    "note": "Transparent = not water. Nine of the ten colours were confirmed by reading the tiles; \"Ephemeral permanent\" (#7f7f7f) did not occur in the tiles checked and is taken from the symbology file. The Data Users Guide table lists a slightly different standard palette (for example Lost permanent #D1102D), which these tiles do not use."
    }
   },
   {
@@ -545,6 +1082,40 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "classes",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#121212",
+      "label": "No disturbance"
+     },
+     {
+      "color": "#dee043",
+      "label": "Confirmed, < 50 % vegetation loss"
+     },
+     {
+      "color": "#e01b07",
+      "label": "Confirmed, >= 50 % vegetation loss"
+     },
+     {
+      "color": "#777777",
+      "label": "Confirmed < 50 %, finished"
+     },
+     {
+      "color": "#dddddd",
+      "label": "Confirmed >= 50 %, finished"
+     }
+    ],
+    "simple": "Yellow marks a confirmed loss of less than half the vegetation cover during the year, red a confirmed loss of half or more. Grey means the disturbance has finished; near-black means no disturbance.",
+    "scientific": "OPERA DIST-ANN-HLS annual summary of DIST-ALERT: only confirmed disturbances of the year are reported (status values 0, 3, 6, 7, 8). Colours are an exact class lookup from the NASA GIBS colormap OPERA_Vegetation_Disturbance_Annual.",
+    "source": {
+     "label": "NASA GIBS colormap: OPERA_Vegetation_Disturbance_Annual",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Vegetation_Disturbance_Annual.xml"
+    },
+    "verified": true,
+    "note": "Transparent = no data. \"No disturbance\" is drawn as opaque near-black (#121212)."
    }
   },
   {
@@ -583,6 +1154,45 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "ramp",
+    "units": "NDVI",
+    "stops": [
+     {
+      "color": "#f1ecec",
+      "label": "0.0"
+     },
+     {
+      "color": "#b09b8a",
+      "label": "0.2"
+     },
+     {
+      "color": "#8fb716",
+      "label": "0.4"
+     },
+     {
+      "color": "#3e8a01",
+      "label": "0.6"
+     },
+     {
+      "color": "#086701",
+      "label": "0.8"
+     },
+     {
+      "color": "#001801",
+      "label": "1.0"
+     }
+    ],
+    "classes": [],
+    "simple": "Pale and brown tones mean little or no green vegetation, yellow-green means some, and dark green means dense, leafy vegetation.",
+    "scientific": "MOD13Q1 16-day NDVI (unitless), coloured from 0.0 to 1.0 by the NASA GIBS colormap MODIS_L3_NDVI. NDVI at or below zero is transparent.",
+    "source": {
+     "label": "NASA GIBS colormap: MODIS_L3_NDVI",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_L3_NDVI.xml"
+    },
+    "verified": true,
+    "note": "Transparent = NDVI at or below zero, or no data."
    }
   },
   {
@@ -607,7 +1217,7 @@
    "license": "NASA SEDAC open data (CC BY 4.0 per SEDAC policy; not verified this session)",
    "attribution": "Imagery: NASA GIBS. Data: Global Human Built-up And Settlement Extent (HBASE) v1, NASA SEDAC / CIESIN.",
    "description_simple": "Where buildings and settlements were around 2010: a baseline to compare against today's imagery.",
-   "description_scientific": "HBASE v1 (CMR C3550193482-ESDIS): built-up/settlement probability-derived extent from Landsat GLS 2010.",
+   "description_scientific": "HBASE v1 (CMR C3550193482-ESDIS): built-up and settlement extent from Landsat GLS 2010, drawn in GIBS as three classes (HBASE, road, not HBASE).",
    "limitations": "A single epoch (circa 2010), so it shows no change by itself. Compare with recent Sentinel-2 or EOX annual mosaics or with NISAR backscatter. For multi-epoch built-up, GHSL (JRC) is the better source but no browser tile service was found (unverified).",
    "verified": {
     "date": "2026-11-14",
@@ -615,6 +1225,32 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "classes",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#d95f02",
+      "label": "HBASE (built-up and settlement)"
+     },
+     {
+      "color": "#377eb8",
+      "label": "Road"
+     },
+     {
+      "color": "#e1e1e1",
+      "label": "Not HBASE"
+     }
+    ],
+    "simple": "Orange is built-up or settled land around 2010 and blue is roads. Light grey is land that is not built-up.",
+    "scientific": "HBASE v1 classification from Landsat GLS 2010: 200 = not HBASE, 201 = HBASE, 202 = road, coloured by the NASA GIBS colormap Landsat_Human_Built-up_And_Settlement_Extent.",
+    "source": {
+     "label": "NASA GIBS colormap: Landsat_Human_Built-up_And_Settlement_Extent",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/Landsat_Human_Built-up_And_Settlement_Extent.xml"
+    },
+    "verified": true,
+    "note": "Transparent = no data, cloud or shadow. \"Not HBASE\" is opaque light grey, so the layer covers the basemap over all mapped land."
    }
   },
   {
@@ -653,6 +1289,49 @@
     "status": 200,
     "content_type": "image/png",
     "cors": "*"
+   },
+   "legend": {
+    "type": "ramp",
+    "units": "nW/(cm2 sr)",
+    "stops": [
+     {
+      "color": "#070707",
+      "label": "0 nW/(cm2 sr)"
+     },
+     {
+      "color": "#343434",
+      "label": "1 nW/(cm2 sr)"
+     },
+     {
+      "color": "#7e7e7e",
+      "label": "5 nW/(cm2 sr)"
+     },
+     {
+      "color": "#a7a7a7",
+      "label": "10 nW/(cm2 sr)"
+     },
+     {
+      "color": "#d4d4d4",
+      "label": "20 nW/(cm2 sr)"
+     },
+     {
+      "color": "#eeeeee",
+      "label": "30 nW/(cm2 sr)"
+     },
+     {
+      "color": "#ffffff",
+      "label": ">= 38.2 nW/(cm2 sr)"
+     }
+    ],
+    "classes": [],
+    "simple": "A greyscale picture: the brighter the pixel, the more light reached the satellite at night. Black is dark, white is the brightest light.",
+    "scientific": "Black Marble at-sensor top-of-atmosphere Day/Night Band radiance in nW/(cm2 sr), drawn in greyscale with a log10 stretch from 0 to >= 38.2 by the NASA GIBS colormap VIIRS_DayNightBand_At_Sensor_Radiance.",
+    "source": {
+     "label": "NASA GIBS colormap: VIIRS_DayNightBand_At_Sensor_Radiance",
+     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/VIIRS_DayNightBand_At_Sensor_Radiance.xml"
+    },
+    "verified": true,
+    "note": "Transparent = no data. Zero radiance is drawn as opaque near-black (#070707), so dark areas cover the basemap. Brightness is not only city light: NASA notes moonlit clouds, snow, sea ice, auroras, fires, gas flares and fishing fleets also appear."
    }
   },
   {
@@ -694,6 +1373,19 @@
     "status": 200,
     "content_type": "image/jpeg",
     "cors": "http://localhost:5173 (echoes request Origin)"
+   },
+   "legend": {
+    "type": "composite",
+    "stops": [],
+    "classes": [],
+    "simple": "A colour picture of the land made from a year of Sentinel-2 images with the clouds removed. There is no colour scale: the picture itself is the information.",
+    "scientific": "Colour-corrected 8-bit RGB mosaic from Sentinel-2; EOX lists the RGB bands of its products as red = B04, green = B03, blue = B02. Colours are balanced for visual consistency, so they are not calibrated reflectance values.",
+    "source": {
+     "label": "EOxCloudless documentation: product list",
+     "url": "https://cloudless.eox.at/documentation/product-list"
+    },
+    "verified": true,
+    "note": "No colour key applies. EOX states the mosaics favour visual clarity and consistency over spectral accuracy."
    }
   }
  ]

@@ -292,3 +292,37 @@ describe('tile error policy: late success cancels a pending notice', () => {
     expect(p.hasDelivered('k')).toBe(true);
   });
 });
+
+import { cleanLegend } from '../../src/components/LayerLegend';
+import shippedLayers from '../../public/data/layers.json';
+
+describe('layer colour legends', () => {
+  const base = { simple: 's', scientific: 'x', source: { label: 'NASA', url: 'https://example.org' }, verified: true };
+  it('keeps well-formed ramps and classes', () => {
+    const r = cleanLegend({ ...base, type: 'ramp', stops: [{ color: '#000000', label: '0' }, { color: '#ffffff', label: '1' }] });
+    expect(r?.type).toBe('ramp');
+    expect(r?.verified).toBe(true);
+  });
+  it('never draws malformed colours, and downgrades an empty legend to unverified', () => {
+    const r = cleanLegend({ ...base, type: 'classes', classes: [{ color: 'red', label: 'bad' }, { color: 'javascript:1', label: 'bad' }] });
+    expect(r?.type).toBe('unverified');
+    expect(r?.verified).toBe(false);
+    expect(cleanLegend(null)).toBeNull();
+    expect(cleanLegend({ type: 'ramp' })).toBeNull();
+  });
+  it('an unverified legend is never presented as verified', () => {
+    expect(cleanLegend({ ...base, type: 'unverified', verified: true })?.verified).toBe(false);
+  });
+});
+
+describe('shipped layers.json legends', () => {
+  const layers = (shippedLayers as { layers: { id: string; legend?: unknown }[] }).layers;
+  it.each(layers.map((l) => [l.id, l] as const))('%s has a usable legend with an https source', (_id, l) => {
+    const g = cleanLegend(l.legend);
+    expect(g).not.toBeNull();
+    expect(g!.source.url).toMatch(/^https:\/\//);
+    expect(g!.simple.length).toBeGreaterThan(10);
+    if (g!.type === 'ramp') expect(g!.stops!.length).toBeGreaterThanOrEqual(3);
+    if (g!.type === 'unverified') expect(g!.verified).toBe(false);
+  });
+});

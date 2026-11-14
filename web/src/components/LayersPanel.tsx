@@ -3,6 +3,7 @@ import type { CatalogLayer } from '../layers';
 import { clampDate, defaultDate, isSubDaily } from '../layers';
 import { EVIDENCE_LABEL, GROUPS } from '../lib';
 import { IconClose } from './icons';
+import LayerLegend from './LayerLegend';
 
 export interface LayerState {
   on: boolean;
@@ -80,6 +81,7 @@ function LayersPanel({ layers, state, level, onChange, onClose, error }: Props) 
                       />
                     </div>
                   )}
+                  {s.on && <LayerLegend legend={l.legend} level={level} title={l.title} />}
                   {info === l.id && (
                     <div className="layer-info">
                       <span className={`evidence ${l.kind}`}>{EVIDENCE_LABEL[l.kind]}</span>

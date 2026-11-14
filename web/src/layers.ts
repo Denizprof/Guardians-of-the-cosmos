@@ -25,6 +25,8 @@ export interface CatalogLayer {
   description_scientific: string;
   limitations: string;
   verified: { date: string; sample_tile: string; status: number; content_type: string; cors: string | null };
+  /** Colour legend from the provider's official colormap / documentation (see components/LayerLegend.tsx). */
+  legend?: unknown;
   /** 'black': a JPEG layer whose no-data pixels are solid black; keyed to transparent when drawn. */
   nodata?: 'black';
 }
