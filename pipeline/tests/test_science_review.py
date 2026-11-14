@@ -28,7 +28,7 @@ def test_validity_mask_blanks_invalid_and_fill_samples_only():
 def test_validity_mask_is_a_no_op_without_a_mask():
     hh = np.ones((2, 2), np.float32)
     g, frac = nisar_io.apply_validity_mask(Grid({"HHHH": hh}, np.arange(2.0), np.arange(2.0), 32619))
-    assert frac == 0.0 and np.isfinite(g.data["HHHH"]).all()
+    assert frac is None and np.isfinite(g.data["HHHH"]).all()  # None, not 0.0: "nothing applied" is not "0 % masked"
 
 
 def test_provenance_records_the_mask_step_for_gcov_only():
@@ -159,3 +159,25 @@ def test_to_mercator_places_a_hot_pixel_at_its_true_position():
     lon, lat = Transformer.from_crs(3857, 4326, always_xy=True).transform(mx, my)
     ex, ey = Transformer.from_crs(4326, epsg, always_xy=True).transform(lon, lat)
     assert abs(ex - x[c0]) < 1.5 * dx and abs(ey - y[r0]) < 1.5 * dx, (ex - x[c0], ey - y[r0])
+
+
+# ------------------------------------------------------------------ review 2: provenance must not claim a mask step that did not run
+def test_cached_gcov_records_no_mask_instead_of_claiming_one(monkeypatch, tmp_path):
+    hh = np.ones((4, 4), np.float32)
+    monkeypatch.setattr(process, "CACHE", tmp_path)
+    monkeypatch.setattr(process, "read_gcov", lambda url, bbox: (Grid({"HHHH": hh.copy(), "HVHV": hh.copy()}, np.arange(4.0), np.arange(4.0), 32619), {}))
+    _, meta = process.cached_gcov("NISAR_L2_GCOV_BETA_V1", GRAN_BEFORE, (0, 0, 1, 1))
+    assert "masked_fraction" not in meta and meta["no_validity_mask"] is True
+    steps = process.provenance("NISAR_L2_GCOV_BETA_V1", GRAN_BEFORE, meta, ["step"])["processing"]
+    assert steps[-1] == "This product carries no GCOV validity mask, so none was applied."
+    assert not any("mask applied" in s for s in steps)
+
+
+def test_cached_gcov_with_a_mask_still_reports_the_fraction(monkeypatch, tmp_path):
+    hh = np.ones((4, 4), np.float32)
+    mask = np.ones((4, 4), np.uint8)
+    mask[0, 0] = 0
+    monkeypatch.setattr(process, "CACHE", tmp_path)
+    monkeypatch.setattr(process, "read_gcov", lambda url, bbox: (Grid({"HHHH": hh.copy(), "HVHV": hh.copy(), "mask": mask}, np.arange(4.0), np.arange(4.0), 32619), {}))
+    _, meta = process.cached_gcov("NISAR_L2_GCOV_BETA_V1", GRAN_BEFORE, (0, 0, 1, 1))
+    assert meta["masked_fraction"] == pytest.approx(1 / 16)

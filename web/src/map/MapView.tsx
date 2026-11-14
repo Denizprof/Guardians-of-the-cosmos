@@ -8,6 +8,7 @@ import type { CoverageResult } from '../services';
 import type { Pin } from '../content/explain';
 import { SAR_LENS_SOURCE, lensTileUrls } from './sarLens';
 import { registerNodataProtocol } from './nodataKey';
+import { createTileErrorPolicy } from './tileErrors';
 
 // Untouched worker copy served from public/vendor (see vite.config.ts).
 maplibregl.setWorkerUrl(new URL('vendor/maplibre-gl-worker.mjs', document.baseURI).href);
@@ -491,6 +492,7 @@ const LENS_WINDOW_MIN_ZOOM = 5;
 const LENS_DROP_AFTER = 3;
 /** A tiled globe source that never delivered a tile raises the load-failure notice after this many errors. */
 const TILE_FAILURES_BEFORE_NOTICE = 3;
+const TILE_NOTICE_GRACE_MS = 5000;
 const EMPTY_FC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
 
 function MapView(p: MapViewProps) {
@@ -541,21 +543,27 @@ function MapView(p: MapViewProps) {
     // Non-tile failures (style, a NISAR investigation image) are always reported.
     for (const m of [a, b]) {
       const report = mapErrorReporter('globe', () => cb.current.onMapError);
-      const delivered = new Set<string>();
-      const failures = new Map<string, number>();
+      const policy = createTileErrorPolicy(TILE_FAILURES_BEFORE_NOTICE);
+      // Keyed by source id AND its current tile URL: a satellite layer re-added for another date keeps its
+      // id, and a date whose tiles all fail must not inherit "has delivered" from the date that worked.
+      const keyOf = (src: string) => `${src}|${overlayUrls.get(m)?.get(src) ?? ''}`;
       m.on('data', (e: { dataType?: string; sourceId?: string; tile?: unknown }) => {
-        if (e.dataType === 'source' && e.tile && e.sourceId) delivered.add(e.sourceId);
+        if (e.dataType === 'source' && e.tile && e.sourceId) policy.delivered(keyOf(e.sourceId));
       });
       m.on('error', (e: { sourceId?: string; tile?: unknown; error?: { message?: string; status?: number } }) => {
         const src = e?.sourceId;
         if (!src || !e.tile) return report(e);
-        const n = (failures.get(src) ?? 0) + 1;
-        failures.set(src, n);
-        if (delivered.has(src) || n < TILE_FAILURES_BEFORE_NOTICE) {
-          console.warn(`[map:globe] ${src} tile failed (${n})`, e?.error?.status ?? '', e?.error?.message ?? '');
+        const key = keyOf(src);
+        const r = policy.failed(key);
+        if (r.action === 'notify') {
+          // GIBS returns bursts of one-off HTTP 500s; a layer's first tiles can fail before any good one
+          // arrives. Give it a few seconds and notify only if still nothing has loaded for this layer + date.
+          window.setTimeout(() => {
+            if (!policy.hasDelivered(key) && keyOf(src) === key) report(e);
+          }, TILE_NOTICE_GRACE_MS);
           return;
         }
-        if (n === TILE_FAILURES_BEFORE_NOTICE) report(e);
+        console.warn(`[map:globe] ${src} tile failed (${r.count})`, e?.error?.status ?? '', e?.error?.message ?? '');
       });
     }
     a.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), 'bottom-left');

@@ -62,6 +62,24 @@ export function parsePointResponse(body: unknown): WeatherValue[] | null {
   return out;
 }
 
+export const MAX_UPSTREAM_PER_MIN = 30;
+const CACHE_MS = 10 * 60_000;
+
+/** True for a browser request that comes from another site (or another origin on this machine). */
+export function crossSite(req: IncomingMessage): boolean {
+  const site = req.headers?.['sec-fetch-site'];
+  if (typeof site === 'string' && site !== 'same-origin' && site !== 'none') return true;
+  const origin = req.headers?.origin;
+  if (typeof origin === 'string') {
+    try {
+      if (new URL(origin).host !== req.headers.host) return true;
+    } catch {
+      return true;
+    }
+  }
+  return false;
+}
+
 function send(res: ServerResponse, code: number, body: unknown) {
   res.statusCode = code;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -75,6 +93,13 @@ export function meteomaticsMiddleware(env: Record<string, string | undefined>, f
   const pass = env.METEOMATICS_PASSWORD ?? '';
   const configured = Boolean(user && pass);
   const auth = configured ? `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}` : '';
+  // Quota protection. While the server runs, any web page open in the same browser could fire blind
+  // requests at this route and spend the account's Meteomatics quota (it could not read the answers).
+  // So: only same-origin browser requests are served, identical requests are cached briefly, and the
+  // number of upstream calls per minute is capped.
+  const cache = new Map<string, { at: number; body: unknown }>();
+  let windowStart = 0;
+  let calls = 0;
 
   return async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
     const url = new URL(req.url ?? '/', 'http://localhost');
@@ -82,9 +107,16 @@ export function meteomaticsMiddleware(env: Record<string, string | undefined>, f
     if (req.method !== 'GET') return send(res, 405, { error: 'Use GET.' });
     if (url.pathname === '/api/meteomatics/status') return send(res, 200, { configured });
     if (url.pathname !== '/api/meteomatics/point') return send(res, 404, { error: 'Not found.' });
+    if (crossSite(req)) return send(res, 403, { error: 'Cross-site requests are not allowed.' });
     if (!configured) return send(res, 503, { error: 'Meteomatics is not configured: set METEOMATICS_USERNAME and METEOMATICS_PASSWORD in web/.env.local and restart the server.' });
     const q = parsePointQuery(url.searchParams);
     if (typeof q === 'string') return send(res, 400, { error: q });
+    const key = `${q.lat},${q.lon},${q.time.slice(0, 13)}`; // same point within the same hour
+    const now = Date.now();
+    const hit = cache.get(key);
+    if (hit && now - hit.at < CACHE_MS) return send(res, 200, hit.body);
+    if (now - windowStart >= 60_000) { windowStart = now; calls = 0; }
+    if (++calls > MAX_UPSTREAM_PER_MIN) return send(res, 429, { error: 'Too many weather requests in a minute. Try again shortly.' });
     try {
       const up = await fetchImpl(buildPointUrl(q), { headers: { Authorization: auth, Accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(20000) });
       if (up.status === 401) return send(res, 502, { error: 'Meteomatics rejected the username or password. Check web/.env.local.' });
@@ -93,7 +125,10 @@ export function meteomaticsMiddleware(env: Record<string, string | undefined>, f
       if (!up.ok) return send(res, 502, { error: `Meteomatics responded HTTP ${up.status}.` });
       const values = parsePointResponse(await up.json());
       if (!values) return send(res, 502, { error: 'Meteomatics returned an unexpected response.' });
-      return send(res, 200, { lat: q.lat, lon: q.lon, time: q.time, values, source: 'Meteomatics Weather API', retrieved: new Date().toISOString() });
+      const body = { lat: q.lat, lon: q.lon, time: q.time, values, source: 'Meteomatics Weather API', retrieved: new Date().toISOString() };
+      if (cache.size > 500) cache.clear();
+      cache.set(key, { at: now, body });
+      return send(res, 200, body);
     } catch (e) {
       const name = e instanceof Error ? e.name : '';
       // error class only: never the URL, headers or credentials

@@ -224,3 +224,71 @@ describe('Meteomatics server route', () => {
     expect(formatWeatherValue({ parameter: 'precip_24h:mm', value: null, date: null }).text).toBe('not available');
   });
 });
+
+import { crossSite, MAX_UPSTREAM_PER_MIN } from '../../meteomatics-proxy';
+
+describe('Meteomatics route protects the account quota', () => {
+  const env = { METEOMATICS_USERNAME: 'u', METEOMATICS_PASSWORD: 'p' };
+  const good = () => new Response(JSON.stringify({ data: [{ parameter: 't_2m:C', coordinates: [{ dates: [{ date: 'd', value: 1 }] }] }] }));
+  const run = async (mw: ReturnType<typeof meteomaticsMiddleware>, url: string, headers: Record<string, string> = {}) => {
+    const res = { statusCode: 0, setHeader() {}, end() {} };
+    await mw({ url, method: 'GET', headers } as never, res as never, () => {});
+    return res.statusCode;
+  };
+  it('refuses cross-site browser requests and accepts same-origin ones', () => {
+    const r = (h: Record<string, string>) => crossSite({ headers: h } as never);
+    expect(r({ 'sec-fetch-site': 'cross-site' })).toBe(true);
+    expect(r({ 'sec-fetch-site': 'same-site' })).toBe(true);
+    expect(r({ origin: 'https://evil.example', host: 'localhost:5173' })).toBe(true);
+    expect(r({ 'sec-fetch-site': 'same-origin', origin: 'http://localhost:5173', host: 'localhost:5173' })).toBe(false);
+    expect(r({})).toBe(false); // curl / server-side checks
+  });
+  it('a cross-site request never reaches Meteomatics', async () => {
+    let n = 0;
+    const mw = meteomaticsMiddleware(env, (async () => { n++; return good(); }) as unknown as typeof fetch);
+    expect(await run(mw, '/api/meteomatics/point?lat=1&lon=2', { 'sec-fetch-site': 'cross-site' })).toBe(403);
+    expect(n).toBe(0);
+  });
+  it('serves a repeated point from cache and caps upstream calls per minute', async () => {
+    let n = 0;
+    const mw = meteomaticsMiddleware(env, (async () => { n++; return good(); }) as unknown as typeof fetch);
+    const t = '&time=2026-11-14T12:00:00Z';
+    expect(await run(mw, `/api/meteomatics/point?lat=1&lon=2${t}`)).toBe(200);
+    expect(await run(mw, `/api/meteomatics/point?lat=1&lon=2${t}`)).toBe(200);
+    expect(n).toBe(1);
+    let last = 200;
+    for (let i = 0; i < MAX_UPSTREAM_PER_MIN + 2; i++) last = await run(mw, `/api/meteomatics/point?lat=${10 + i}&lon=2${t}`);
+    expect(last).toBe(429);
+    expect(n).toBeLessThanOrEqual(MAX_UPSTREAM_PER_MIN);
+  });
+});
+
+import { createTileErrorPolicy } from '../../src/map/tileErrors';
+
+describe('tile error policy: notify only for a source that never delivered, per layer AND date', () => {
+  it('a source that delivered tiles only logs its later failures', () => {
+    const p = createTileErrorPolicy(3);
+    p.delivered('ov-x|url-day1');
+    expect([1, 2, 3, 4].map(() => p.failed('ov-x|url-day1').action)).toEqual(['log', 'log', 'log', 'log']);
+  });
+  it('a source that never delivered notifies exactly once, at the threshold', () => {
+    const p = createTileErrorPolicy(3);
+    expect([1, 2, 3, 4, 5].map(() => p.failed('ov-y|u').action)).toEqual(['log', 'log', 'notify', 'log', 'log']);
+  });
+  it('a broken new date of a layer that worked on another date still notifies', () => {
+    const p = createTileErrorPolicy(3);
+    p.delivered('ov-x|url-day1');
+    p.failed('ov-x|url-day1');
+    expect([1, 2, 3].map(() => p.failed('ov-x|url-day2').action)).toEqual(['log', 'log', 'notify']);
+  });
+});
+
+describe('tile error policy: late success cancels a pending notice', () => {
+  it('hasDelivered turns true once a tile arrives, also after early failures', () => {
+    const p = createTileErrorPolicy(3);
+    expect([1, 2, 3].map(() => p.failed('k').action).at(-1)).toBe('notify');
+    expect(p.hasDelivered('k')).toBe(false);
+    p.delivered('k');
+    expect(p.hasDelivered('k')).toBe(true);
+  });
+});

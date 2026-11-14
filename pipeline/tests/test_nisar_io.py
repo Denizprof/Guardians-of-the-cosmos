@@ -447,3 +447,26 @@ def test_grid_transform_is_pixel_corner_based(gcov_file):
     t = g.transform
     assert (t.a, t.e) == (1000.0, -1000.0)
     assert t * (0, 0) == (x[0] - 500.0, y[0] + 500.0)  # corner of the first pixel, not its centre
+
+
+# Review 2: a connection dropped mid-body raises http.client.IncompleteRead, which is not an OSError and used
+# to escape the retry loop, killing the whole run on one flaky chunk.
+def test_connection_dropped_mid_body_is_retried(make_server, token, no_sleep):
+    import http.client
+
+    body = bytes(range(256)) * 40
+    s = make_server(body)
+    rf = RemoteFile(s.url, token, block=1024)
+    real_open = rf.opener.open
+    state = {"dropped": 0}
+
+    def flaky_open(req, timeout=None):
+        if state["dropped"] == 0:
+            state["dropped"] += 1
+            raise http.client.IncompleteRead(b"partial", 1000)
+        return real_open(req, timeout=timeout)
+
+    rf.opener.open = flaky_open
+    rf.seek(2048)
+    assert rf.read(100) == body[2048:2148]
+    assert state["dropped"] == 1 and no_sleep == [1.0]  # one backoff, then success

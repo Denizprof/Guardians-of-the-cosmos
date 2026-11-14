@@ -6,6 +6,7 @@ Earthdata Login bearer token from the EARTHDATA_TOKEN environment variable
 """
 from __future__ import annotations
 
+import http.client
 import io
 import os
 import time
@@ -125,7 +126,9 @@ class RemoteFile(io.RawIOBase):
                         delay = max(delay, min(float(ra), 120.0))
                 elif e.code < 500:
                     raise
-            except (urllib.error.URLError, OSError, TimeoutError) as e:
+            # http.client.HTTPException covers IncompleteRead (connection dropped mid-body with a
+            # Content-Length), which is NOT an OSError and used to escape the retry loop entirely.
+            except (urllib.error.URLError, OSError, TimeoutError, http.client.HTTPException) as e:
                 last = e
             time.sleep(delay)
             delay = min(delay * 2, 30)
@@ -275,12 +278,12 @@ def read_gcov(url: str, bbox, pols=("HHHH", "HVHV"), freq="A"):
 MASK_INVALID, MASK_FILL = 0, 255
 
 
-def apply_validity_mask(grid: "Grid") -> tuple["Grid", float]:
+def apply_validity_mask(grid: "Grid") -> tuple["Grid", float | None]:
     """Set backscatter to NaN where the GCOV mask marks a sample invalid (0) or outside the swath (255).
-    Returns the grid and the fraction of pixels masked. A product without a mask is returned unchanged."""
+    Returns the grid and the fraction of pixels masked, or None as the fraction when the product has no mask."""
     m = grid.data.get("mask")
     if m is None:
-        return grid, 0.0
+        return grid, None  # no mask in the product: nothing was applied, and provenance must not claim it
     bad = (m == MASK_INVALID) | (m == MASK_FILL)
     for k, v in grid.data.items():
         if k != "mask" and v.dtype.kind == "f":

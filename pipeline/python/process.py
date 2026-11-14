@@ -174,7 +174,8 @@ def provenance(collection: str, granule: str, meta: dict, steps: list[str]) -> d
         "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
         "processing": steps + ([f"GCOV validity mask applied: samples flagged 0 (not from fully-focused radar samples) or 255 "
                                  f"(outside the swath) set to no-data ({100 * meta['masked_fraction']:.2f} % of pixels)."]
-                                if "masked_fraction" in meta else []),
+                                if "masked_fraction" in meta else
+                                ["This product carries no GCOV validity mask, so none was applied."] if meta.get("no_validity_mask") else []),
     }
 
 
@@ -289,7 +290,10 @@ def cached_gcov(coll: str, gran: str, bbox):
     if hh is not None and np.isfinite(hh).mean() < 0.2:
         # an (almost) empty window would publish a transparent overlay that reads as "no change"
         raise RuntimeError(f"{gran}: only {100 * np.isfinite(hh).mean():.1f} % valid HH pixels in {bbox}; check the bbox / swath")
-    meta = {**meta, "masked_fraction": round(frac, 6)}
+    if frac is not None:  # only claim the mask step when the product actually carries a mask
+        meta = {**meta, "masked_fraction": round(frac, 6)}
+    else:
+        meta = {**meta, "no_validity_mask": True}
     return grid, meta
 
 
@@ -481,6 +485,7 @@ def krasheninnikov(cfg) -> list[dict]:
         })
         print(f"  {name}: HH median {np.nanmedian(hh):.1f} dB, HV median {np.nanmedian(hv):.1f} dB", flush=True)
     # Change from first to last date (same geometry): seasonal effects included, see caveats.
+    same_grid(first_grid, g, "krasheninnikov")  # refuse to subtract misregistered scenes, like the other events
     change = hh - first_hh
     mc, corners = to_mercator(g, change)
     layers.append({
