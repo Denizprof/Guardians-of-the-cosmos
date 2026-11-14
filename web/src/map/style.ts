@@ -17,7 +17,8 @@ export const TERRAIN_OFF_ZOOM = 5.5;
 /** Native detail of the 10 m Sentinel-2 basemap is ~z14; allow a little overzoom, no more. */
 export const MAX_ZOOM = 14.5;
 
-const NAME: any = ['coalesce', ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']];
+// Turkey is shown under its official name, Türkiye (the tiles carry the English exonym 'Turkey').
+const NAME: any = ['match', ['get', 'name_en'], 'Turkey', 'Türkiye', ['coalesce', ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']]];
 const IS_POINT: any = ['match', ['geometry-type'], ['MultiPoint', 'Point'], true, false];
 const LABEL_PAINT = { 'text-color': '#ffffff', 'text-halo-color': 'rgba(4, 7, 12, 0.85)', 'text-halo-width': 1.4, 'text-halo-blur': 0.4 };
 export const FONT = ['Noto Sans Regular'];
