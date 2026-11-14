@@ -60,6 +60,9 @@ export async function fetchWeather(lon: number, lat: number, time: string | null
   return r.body as WeatherResult;
 }
 
+/** Set by the GitHub Pages build (VITE_STATIC_SITE=1): there is no server, so server-backed features are off. */
+const STATIC_SITE = import.meta.env.VITE_STATIC_SITE === '1';
+
 type State =
   | { s: 'idle' }
   | { s: 'loading' }
@@ -77,7 +80,8 @@ export default function WeatherSection({ lon, lat, date }: { lon: number; lat: n
     const c = (ctl.current = new AbortController());
     setState({ s: 'loading' });
     try {
-      if (!(await meteomaticsConfigured(c.signal))) return setState({ s: 'unconfigured' });
+      // Static hosting (GitHub Pages) has no server route: say so without sending a request that can only 404.
+      if (STATIC_SITE || !(await meteomaticsConfigured(c.signal))) return setState({ s: 'unconfigured' });
       const result = await fetchWeather(lon, lat, date, c.signal);
       if (!c.signal.aborted) setState({ s: 'ready', result });
     } catch (e) {
@@ -100,8 +104,14 @@ export default function WeatherSection({ lon, lat, date }: { lon: number; lat: n
       {state.s === 'loading' && <p className="muted small" role="status">Asking Meteomatics…</p>}
       {state.s === 'unconfigured' && (
         <p className="callout" role="status">
-          Meteomatics is not connected. Add your username and password to <span className="mono">web/.env.local</span> and restart the server (see{' '}
-          <span className="mono">docs/meteomatics.md</span>). No weather values are shown without it.
+          {STATIC_SITE ? (
+            <>Weather data is not connected on this hosted site: it needs the app's own server to keep the weather account private. No weather values are shown.</>
+          ) : (
+            <>
+              Meteomatics is not connected. Add your username and password to <span className="mono">web/.env.local</span> and restart the server (see{' '}
+              <span className="mono">docs/meteomatics.md</span>). No weather values are shown without it.
+            </>
+          )}
         </p>
       )}
       {state.s === 'error' && (

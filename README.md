@@ -33,11 +33,19 @@ The globe also shows about 170 recent USGS (M6.3+) and NASA EONET events as **co
 - `docs/data-sources.md`: every dataset and API we use
 - `design/`, `src/`: reserved from the original scaffold
 
+## Live site
+The static build is published with GitHub Pages on every push to `main` (`.github/workflows/pages.yml`):
+https://denizprof.github.io/Guardians-of-the-cosmos/
+
+The published site has no server, so the Meteomatics weather section and the AI assistant show "not connected" there. Everything else works: the globe, investigations, satellite layers with colour legends, the SAR lens, the coverage probe and the event catalogs.
+
 ## Run the demo
 ```bash
 cd web && npm install && npm run dev
 ```
 Open http://localhost:5173. The data package is already committed.
+
+Optional: weather-model values from Meteomatics need your own account; see [docs/meteomatics.md](docs/meteomatics.md).
 
 ## Rebuild the data
 ```bash
