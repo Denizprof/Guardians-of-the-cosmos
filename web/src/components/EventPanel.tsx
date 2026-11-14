@@ -3,6 +3,7 @@ import { CATEGORY_COLOR, CATEGORY_LABEL, EVIDENCE_LABEL, evidenceOf, safeHref, f
 import { CONCEPTS, EVENT_CONTENT } from '../content/explain';
 import { Suspense, lazy, memo, useState } from 'react';
 import { IconChevron, IconClose } from './icons';
+import WeatherSection from './WeatherSection';
 
 // Both talk to live services and are only needed when the reader asks for them: keep them out of the first paint.
 const AssistantPanel = lazy(() => import('../assistant/AssistantPanel').then((m) => ({ default: m.AssistantPanel })));
@@ -316,6 +317,10 @@ function EventPanel(p: Props) {
 
         <div className="section">
           <EarthdataSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={ev.date} />
+        </div>
+
+        <div className="section">
+          <WeatherSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={ev.date} />
         </div>
 
         <div className="section">

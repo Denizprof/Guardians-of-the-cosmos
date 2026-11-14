@@ -3,6 +3,7 @@ import type { ContextEvent } from '../types';
 import { CATEGORY_COLOR, CATEGORY_LABEL, fmtCoord, fmtDatePrecise, isCoarseDate, safeHref } from '../lib';
 import { detailSource, fetchEventDetails, storedFields, type DetailField, type EventDetails } from '../eventDetails';
 import { IconChevron, IconClose, IconExternal } from './icons';
+import WeatherSection from './WeatherSection';
 
 interface Props {
   event: ContextEvent;
@@ -120,6 +121,11 @@ function ContextPanel({ event: ev, collapsed, onCheckCoverage, onClose, onToggle
         <div className="section">
           <h3>Stored record</h3>
           <FieldList fields={stored} />
+        </div>
+
+        <div className="section">
+          {/* a date known only to the year/month cannot give a weather time: ask for current conditions instead */}
+          <WeatherSection key={ev.id} lon={ev.lon} lat={ev.lat} date={isCoarseDate(ev.date_precision) ? null : (ev.date ?? null)} />
         </div>
 
         <div className="section">

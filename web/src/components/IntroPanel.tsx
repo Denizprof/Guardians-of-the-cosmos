@@ -3,6 +3,7 @@ import type { SarEvent } from '../types';
 import { CATEGORY_COLOR, CATEGORY_LABEL, fmtCoord, fmtDate } from '../lib';
 import type { CoverageResult } from '../services';
 import { IconChevron, IconClose } from './icons';
+import WeatherSection from './WeatherSection';
 
 // NASA CMR search UI is only needed once a point has been probed.
 const EarthdataPanel = lazy(() => import('./EarthdataPanel'));
@@ -139,6 +140,12 @@ function IntroPanel(p: Props) {
             <Suspense fallback={<p className="muted small" role="status">Loading the NASA Earthdata search…</p>}>
               <EarthdataPanel key={`${p.probe.lon},${p.probe.lat},${p.probe.date}`} lon={p.probe.lon} lat={p.probe.lat} date={p.probe.date} windowDays={p.probe.date ? 7 : 3} />
             </Suspense>
+          </div>
+        )}
+
+        {p.probe && (
+          <div className="section">
+            <WeatherSection key={`${p.probe.lon},${p.probe.lat},${p.probe.date}`} lon={p.probe.lon} lat={p.probe.lat} date={p.probe.date} />
           </div>
         )}
 

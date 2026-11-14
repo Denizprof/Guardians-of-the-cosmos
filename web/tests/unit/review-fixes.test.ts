@@ -173,3 +173,54 @@ describe('sub-daily layers ask the service for its latest image', () => {
     expect(toOverlay(goes, null, 1).url).toBe('https://gibs.example/L/default/M/{z}/{y}/{x}.png');
   });
 });
+
+import { buildPointUrl, meteomaticsMiddleware, parsePointQuery, parsePointResponse, METEOMATICS_PARAMS } from '../../meteomatics-proxy';
+import { formatWeatherValue } from '../../src/components/WeatherSection';
+
+describe('Meteomatics server route', () => {
+  const call = async (env: Record<string, string>, path: string, upstream?: (url: string, init: RequestInit) => Promise<Response>) => {
+    const seen: { url: string; init: RequestInit }[] = [];
+    const mw = meteomaticsMiddleware(env, (async (u: string, i: RequestInit) => { seen.push({ url: u, init: i }); return upstream!(u, i); }) as unknown as typeof fetch);
+    let body = ''; let nexted = false;
+    const res = { statusCode: 0, setHeader() {}, end(b: string) { body = b; } };
+    await mw({ url: path, method: 'GET' } as never, res as never, () => { nexted = true; });
+    return { status: res.statusCode, json: body ? JSON.parse(body) : null, raw: body, seen, nexted };
+  };
+  const creds = { METEOMATICS_USERNAME: 'test-user', METEOMATICS_PASSWORD: 'TEST-PASS-NOT-REAL' };
+  const good = { data: [{ parameter: 't_2m:C', coordinates: [{ lat: 1, lon: 2, dates: [{ date: '2026-11-14T12:00:00Z', value: 12.3 }] }] }] };
+
+  it('validates the point and time, and builds a fixed-parameter URL with no credentials in it', () => {
+    expect(parsePointQuery(new URLSearchParams('lat=95&lon=0'))).toMatch(/out of range/);
+    expect(parsePointQuery(new URLSearchParams('lon=0'))).toMatch(/required/);
+    expect(parsePointQuery(new URLSearchParams('lat=1&lon=2&time=../../x'))).toMatch(/ISO 8601/);
+    const q = parsePointQuery(new URLSearchParams('lat=38.01934&lon=-105.07134&time=2026-06-29T10:21:00Z'));
+    expect(q).toEqual({ lat: 38.0193, lon: -105.0713, time: '2026-06-29T10:21:00Z' });
+    expect(buildPointUrl(q as never)).toBe(`https://api.meteomatics.com/2026-06-29T10:21:00Z/${METEOMATICS_PARAMS.join(',')}/38.0193,-105.0713/json`);
+  });
+  it('reports not configured, and never calls Meteomatics, without credentials', async () => {
+    expect((await call({}, '/api/meteomatics/status')).json).toEqual({ configured: false });
+    const r = await call({}, '/api/meteomatics/point?lat=1&lon=2', async () => new Response('{}'));
+    expect(r.status).toBe(503);
+    expect(r.seen).toHaveLength(0);
+  });
+  it('adds Basic auth server-side and never returns the credentials', async () => {
+    const r = await call(creds, '/api/meteomatics/point?lat=1&lon=2&time=2026-11-14T12:00:00Z', async () => new Response(JSON.stringify(good), { status: 200 }));
+    expect(r.status).toBe(200);
+    expect(r.json.values).toEqual([{ parameter: 't_2m:C', value: 12.3, date: '2026-11-14T12:00:00Z' }]);
+    expect((r.seen[0].init.headers as Record<string, string>).Authorization).toBe(`Basic ${Buffer.from('test-user:TEST-PASS-NOT-REAL').toString('base64')}`);
+    expect(r.raw).not.toContain('TEST-PASS-NOT-REAL');
+    expect(r.raw).not.toContain('test-user');
+  });
+  it('turns upstream failures into clear errors, not empty weather', async () => {
+    expect((await call(creds, '/api/meteomatics/point?lat=1&lon=2', async () => new Response('', { status: 401 }))).json.error).toMatch(/username or password/);
+    expect((await call(creds, '/api/meteomatics/point?lat=1&lon=2', async () => new Response('', { status: 403 }))).json.error).toMatch(/plan/);
+    expect((await call(creds, '/api/meteomatics/point?lat=1&lon=2', async () => new Response('{"x":1}', { status: 200 }))).json.error).toMatch(/unexpected/);
+    expect((await call(creds, '/api/meteomatics/point?lat=1&lon=2', async () => { throw new Error('net'); })).status).toBe(502);
+  });
+  it('leaves other paths alone and parses missing values as not available', async () => {
+    expect((await call(creds, '/data/events.json')).nexted).toBe(true);
+    expect(parsePointResponse({ data: [{ parameter: 'p', coordinates: [] }] })).toEqual([{ parameter: 'p', value: null, date: null }]);
+    expect(formatWeatherValue({ parameter: 't_2m:C', value: 12.34, date: null })).toEqual({ label: 'Air temperature (2 m)', text: '12.3 °C' });
+    expect(formatWeatherValue({ parameter: 'precip_24h:mm', value: null, date: null }).text).toBe('not available');
+  });
+});
