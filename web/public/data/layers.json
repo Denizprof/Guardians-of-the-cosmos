@@ -31,14 +31,15 @@
    "attribution": "Imagery: NASA Global Imagery Browse Services (GIBS), part of NASA ESDIS. Data: NASA LANCE, NOAA-20 VIIRS.",
    "description_simple": "What the whole planet looked like on a given day, in natural colours. Good for spotting volcanic plumes, large floods and smoke.",
    "description_scientific": "Daily global composite of VIIRS corrected reflectance (Rayleigh-corrected TOA, true-colour band combination) from swath L1B (VJ102IMG). Daytime ascending passes only.",
-   "limitations": "One image per day; clouds hide the surface; 375 m is too coarse for buildings or small landslides. Swath gaps near the equator. GetCapabilities lists internal date gaps (e.g. 2019-12-31/2020-01-02, 2022-01-12/2022-01-14) that return HTTP 404. Note the GIBS REST path order is {z}/{y}/{x} (TileMatrix/TileRow/TileCol); the template already uses that order.",
+   "limitations": "One image per day; clouds hide the surface; 375 m is too coarse for buildings or small landslides. Swath gaps near the equator. GetCapabilities lists internal date gaps (e.g. 2019-12-31/2020-01-02, 2022-01-12/2022-01-14) that return HTTP 404. Note the GIBS REST path order is {z}/{y}/{x} (TileMatrix/TileRow/TileCol); the template already uses that order. No daylight observation (polar night in winter) and gaps between orbits are shown transparent: the dark areas in the source JPEG carry no data.",
    "verified": {
     "date": "2026-11-14",
     "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/2026-11-13/GoogleMapsCompatible_Level9/3/3/2.jpg",
     "status": 200,
     "content_type": "image/jpeg",
     "cors": "*"
-   }
+   },
+   "nodata": "black"
   },
   {
    "id": "gibs-opera-rtc-s1",
@@ -106,14 +107,15 @@
    "attribution": "Imagery: NASA GIBS, part of NASA ESDIS. Data: NASA LANCE, NOAA-20 VIIRS.",
    "description_simple": "A false-colour view where fresh burn scars look dark brown or red and healthy vegetation looks green. Smoke becomes nearly transparent.",
    "description_scientific": "Shortwave-infrared / near-infrared / red composite. Burned surfaces have low NIR and higher SWIR reflectance; active flaming fronts can saturate M11.",
-   "limitations": "Not a fire-detection product: use thermal anomalies (FIRMS) or GOES Fire Temperature for active fire. 375-750 m pixels miss small fires. Clouds block the view. Date gaps exist (e.g. 2025-08-31/2025-09-02).",
+   "limitations": "Not a fire-detection product: use thermal anomalies (FIRMS) or GOES Fire Temperature for active fire. 375-750 m pixels miss small fires. Clouds block the view. Date gaps exist (e.g. 2025-08-31/2025-09-02). No daylight observation (polar night in winter) and gaps between orbits are shown transparent: the dark areas in the source JPEG carry no data.",
    "verified": {
     "date": "2026-11-14",
     "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1/default/2026-11-13/GoogleMapsCompatible_Level9/3/4/5.jpg",
     "status": 200,
     "content_type": "image/jpeg",
     "cors": "*"
-   }
+   },
+   "nodata": "black"
   },
   {
    "id": "gibs-goes-east-firetemp",

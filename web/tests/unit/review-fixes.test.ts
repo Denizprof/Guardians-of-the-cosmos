@@ -140,3 +140,29 @@ describe('assistant context stays truthful and schema-sized', () => {
     expect(c.references).toHaveLength(20);
   });
 });
+
+import { keyBlackToTransparent, withNodataKey, NODATA_PROTOCOL } from '../../src/map/nodataKey';
+import { toOverlay, type CatalogLayer } from '../../src/layers';
+
+describe('JPEG no-data (solid black) is drawn transparent, real imagery is kept', () => {
+  it('keys pixels whose channels are all <= 10 and leaves dark-but-real pixels opaque', () => {
+    const px = new Uint8ClampedArray([
+      0, 0, 0, 255, //     no-data
+      8, 6, 9, 255, //     JPEG ringing at the no-data edge
+      20, 40, 70, 255, //  dark ocean (real)
+      11, 0, 0, 255, //    one channel above the threshold: kept
+      200, 180, 150, 255, // land
+    ]);
+    expect(keyBlackToTransparent(px)).toBe(2);
+    expect([px[3], px[7], px[11], px[15], px[19]]).toEqual([0, 0, 255, 255, 255]);
+  });
+  it('rewrites only https tile URLs to the keying protocol', () => {
+    expect(withNodataKey('https://gibs.example/a/{z}/{y}/{x}.jpg')).toBe(`${NODATA_PROTOCOL}://gibs.example/a/{z}/{y}/{x}.jpg`);
+    expect(withNodataKey('http://x/y.jpg')).toBe('http://x/y.jpg');
+  });
+  it('toOverlay applies the protocol only to layers flagged nodata: black', () => {
+    const base = { id: 'v', url: 'https://gibs.example/L/default/{time}/{z}/{y}/{x}.jpg', tileSize: 256, minzoom: 0, maxzoom: 9, attribution: 'a', time: null } as unknown as CatalogLayer;
+    expect(toOverlay({ ...base, nodata: 'black' }, null, 1).url.startsWith(`${NODATA_PROTOCOL}://`)).toBe(true);
+    expect(toOverlay(base, null, 1).url.startsWith('https://')).toBe(true);
+  });
+});

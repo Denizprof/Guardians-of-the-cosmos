@@ -17,9 +17,9 @@ describe('SAR lens source', () => {
   it('stacks each layer back from its own latest served day, oldest first', () => {
     const [opera, nisar] = SAR_LENS_SOURCE.layers;
     expect(layerDates(SAR_LENS_SOURCE, opera, NOW)).toEqual(['2026-11-08', '2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13']);
-    // NISAR tiles for the previous UTC day are not served yet (404 when checked), hence the 2-day lag
-    expect(layerDates(SAR_LENS_SOURCE, nisar, NOW).at(-1)).toBe('2026-11-12');
-    expect(lensDates(SAR_LENS_SOURCE, NOW)).toEqual(['2026-11-07', '2026-11-08', '2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13']);
+    // NISAR tiles for the last two UTC days were not served yet (404 when checked 14 Nov 2026), hence the 3-day lag
+    expect(layerDates(SAR_LENS_SOURCE, nisar, NOW).at(-1)).toBe('2026-11-11');
+    expect(lensDates(SAR_LENS_SOURCE, NOW)).toEqual(['2026-11-06', '2026-11-07', '2026-11-08', '2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13']);
   });
   it('never asks for today (tiles of the current day are incomplete)', () => {
     for (const l of SAR_LENS_SOURCE.layers) expect(layerDates(SAR_LENS_SOURCE, l, NOW)).not.toContain('2026-11-14');
@@ -28,7 +28,7 @@ describe('SAR lens source', () => {
     const tiles = lensTileUrls(SAR_LENS_SOURCE, NOW);
     expect(tiles).toHaveLength(SAR_LENS_SOURCE.layers.reduce((n, l) => n + l.stackDays, 0));
     expect(tiles[0].url).toContain('OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1/default/2026-11-08/GoogleMapsCompatible_Level12/');
-    expect(tiles.at(-1)!.url).toContain('NISAR_L2_Geocoded_Polarimetric_Covariance/default/2026-11-12/GoogleMapsCompatible_Level13/');
+    expect(tiles.at(-1)!.url).toContain('NISAR_L2_Geocoded_Polarimetric_Covariance/default/2026-11-11/GoogleMapsCompatible_Level13/');
     expect(new Set(tiles.map((t) => t.id)).size).toBe(tiles.length);
     for (const t of tiles) {
       expect(t.url).not.toContain('{time}');
@@ -37,8 +37,8 @@ describe('SAR lens source', () => {
     }
   });
   it('labels the date span, and is honest that the mosaic is partial', () => {
-    expect(lensDateLabel(SAR_LENS_SOURCE, NOW)).toBe('7 to 13 Nov 2026');
-    expect(lensDateLabel(SAR_LENS_SOURCE, Date.UTC(2026, 11, 3))).toBe('26 Nov 2026 to 2 Dec 2026');
+    expect(lensDateLabel(SAR_LENS_SOURCE, NOW)).toBe('6 to 13 Nov 2026');
+    expect(lensDateLabel(SAR_LENS_SOURCE, Date.UTC(2026, 11, 3))).toBe('25 Nov 2026 to 2 Dec 2026');
     expect(SAR_LENS_SOURCE.partial).toBe(true);
     expect(SAR_LENS_SOURCE.partialNote).toMatch(/gaps/);
     expect(SAR_LENS_SOURCE.provenance.join(' ')).toMatch(/no global composite/);

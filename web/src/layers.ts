@@ -2,6 +2,7 @@
 // Entries are live-verified by the research step and stored in public/data/layers.json.
 import type { CategoryGroup, EvidenceClass } from './types';
 import type { TileOverlay } from './map/MapView';
+import { withNodataKey } from './map/nodataKey';
 
 export interface CatalogLayer {
   id: string;
@@ -24,6 +25,8 @@ export interface CatalogLayer {
   description_scientific: string;
   limitations: string;
   verified: { date: string; sample_tile: string; status: number; content_type: string; cors: string | null };
+  /** 'black': a JPEG layer whose no-data pixels are solid black; keyed to transparent when drawn. */
+  nodata?: 'black';
 }
 
 export async function loadLayerCatalog(): Promise<CatalogLayer[]> {
@@ -84,9 +87,11 @@ export function timeToken(l: CatalogLayer, date: string | null): string {
 }
 
 export function toOverlay(l: CatalogLayer, date: string | null, opacity: number): TileOverlay {
+  const url = l.url.replace('{time}', timeToken(l, date));
   return {
     id: l.id,
-    url: l.url.replace('{time}', timeToken(l, date)),
+    // JPEG layers whose no-data is solid black get it keyed to transparent (see map/nodataKey.ts)
+    url: l.nodata === 'black' ? withNodataKey(url) : url,
     tileSize: l.tileSize,
     minzoom: l.minzoom,
     maxzoom: l.maxzoom,

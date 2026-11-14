@@ -64,7 +64,10 @@ export const SAR_LENS_SOURCE: SarLensSource = {
       minzoom: 0,
       maxzoom: 13,
       stackDays: 6,
-      lagDays: 2, // checked 14 Nov 2026: the previous UTC day still answers 404
+      // checked 14 Nov 2026 (headless run): 12 Nov still answered 404 on every tile, so the newest published
+      // day is three back. The lens also drops any day whose tiles keep failing (see MapView), so a slower
+      // publishing day costs one skipped layer, never a false alarm.
+      lagDays: 3,
     },
   ],
   date: null,

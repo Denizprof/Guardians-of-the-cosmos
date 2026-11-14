@@ -7,9 +7,12 @@ import { CATEGORY_COLOR, layerBounds } from '../lib';
 import type { CoverageResult } from '../services';
 import type { Pin } from '../content/explain';
 import { SAR_LENS_SOURCE, lensTileUrls } from './sarLens';
+import { registerNodataProtocol } from './nodataKey';
 
 // Untouched worker copy served from public/vendor (see vite.config.ts).
 maplibregl.setWorkerUrl(new URL('vendor/maplibre-gl-worker.mjs', document.baseURI).href);
+// JPEG satellite layers with black no-data (VIIRS true colour etc.) are keyed to transparent; see nodataKey.ts
+registerNodataProtocol(maplibregl as unknown as Parameters<typeof registerNodataProtocol>[0]);
 // Up to three maps (A, B, SAR lens) share one image queue; the lens alone stacks twelve raster sources (two products x six days).
 maplibregl.config.MAX_PARALLEL_IMAGE_REQUESTS = 32;
 maplibregl.config.MAX_PARALLEL_IMAGE_REQUESTS_PER_FRAME = 16;
@@ -484,6 +487,8 @@ const SPIN_MAX_MS = 30_000;
 const BASE_PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, 1.5);
 /** From this zoom the SAR lens renders only its square (see the lens effect); below it, a clipped full view. */
 const LENS_WINDOW_MIN_ZOOM = 5;
+/** A stacked lens day whose tiles failed this many times is treated as unavailable and removed. */
+const LENS_DROP_AFTER = 3;
 const EMPTY_FC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
 
 function MapView(p: MapViewProps) {
@@ -859,9 +864,34 @@ function MapView(p: MapViewProps) {
       canvasContextAttributes: { powerPreference: 'high-performance', contextType: 'webgl2', antialias: false },
     });
     lens.getCanvas().setAttribute('aria-label', 'Globe: SAR lens view');
-    // GIBS answers a day without a pass with a transparent 200 tile, so an error event is a real failure
-    // (network, 5xx, CORS). Report it: otherwise a failed tile looks exactly like "no radar data here".
-    lens.on('error', mapErrorReporter('lens', () => cb.current.onMapError));
+    // Lens tile errors. GIBS answers a day *without a pass* with a transparent 200 tile, but a day that is
+    // *not published yet* answers 404 on every tile, and GIBS occasionally returns a one-off 500. Neither is
+    // a reason to alarm the reader (measured 14 Nov 2026: all failures were the unpublished newest NISAR day
+    // plus two isolated OPERA 500s). So: a stacked day whose tiles keep failing is dropped from the stack
+    // (logged), isolated errors are logged only, and the visible notice appears only when no radar source is
+    // left at all, which is the case where "no data" would otherwise be implied.
+    const report = mapErrorReporter('lens', () => cb.current.onMapError);
+    const lensFailures = new Map<string, number>();
+    const delivered = new Set<string>(); // sources that have loaded at least one tile: never dropped
+    const dropped = new Set<string>();
+    lens.on('data', (e: { dataType?: string; sourceId?: string; tile?: unknown }) => {
+      if (e.dataType === 'source' && e.tile && e.sourceId?.startsWith('lens-')) delivered.add(e.sourceId);
+    });
+    lens.on('error', (e: { sourceId?: string; error?: { message?: string; status?: number } }) => {
+      const src = e?.sourceId;
+      if (!src || !src.startsWith('lens-')) return report(e); // style / terrain / labels: report as usual
+      const n = (lensFailures.get(src) ?? 0) + 1;
+      lensFailures.set(src, n);
+      console.warn(`[map:lens] ${src} tile failed (${n})`, e?.error?.status ?? '', e?.error?.message ?? '');
+      // a day that has delivered tiles is real data with a few flaky tiles (GIBS sporadic 500s): keep it
+      if (n < LENS_DROP_AFTER || dropped.has(src) || delivered.has(src)) return;
+      dropped.add(src);
+      console.warn(`[map:lens] ${src}: tiles keep failing (day not published yet or unavailable); dropped from the lens stack`);
+      if (lens.getLayer(src)) lens.removeLayer(src);
+      if (lens.getSource(src)) lens.removeSource(src);
+      const left = Object.keys(lens.getStyle()?.sources ?? {}).filter((k) => k.startsWith('lens-') && !dropped.has(k));
+      if (!left.length) cb.current.onMapError?.('lens', 'all SAR lens sources');
+    });
     let styled = false;
     // Two ways to show the lens:
     //  - 'clip':   a full-viewport map with the same camera as map A, clipped to the square by CSS. Exact at
