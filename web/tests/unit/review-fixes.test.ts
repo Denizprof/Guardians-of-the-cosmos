@@ -166,3 +166,10 @@ describe('JPEG no-data (solid black) is drawn transparent, real imagery is kept'
     expect(toOverlay(base, null, 1).url.startsWith('https://')).toBe(true);
   });
 });
+
+describe('sub-daily layers ask the service for its latest image', () => {
+  it('drops the {time} segment (computed 10-minute slots are published irregularly and 404)', () => {
+    const goes = { id: 'g', url: 'https://gibs.example/L/default/{time}/M/{z}/{y}/{x}.png', tileSize: 256, minzoom: 0, maxzoom: 7, attribution: 'a', time: { start: '2026-11-10', end: 'present', step: 'PT10M', default: '' } } as unknown as CatalogLayer;
+    expect(toOverlay(goes, null, 1).url).toBe('https://gibs.example/L/default/M/{z}/{y}/{x}.png');
+  });
+});

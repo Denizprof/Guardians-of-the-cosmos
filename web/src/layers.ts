@@ -87,7 +87,10 @@ export function timeToken(l: CatalogLayer, date: string | null): string {
 }
 
 export function toOverlay(l: CatalogLayer, date: string | null, opacity: number): TileOverlay {
-  const url = l.url.replace('{time}', timeToken(l, date));
+  // Sub-daily layers (GOES, every 10 min): time slots are published irregularly (probed 14 Nov 2026: -40 min
+  // 404, -60 min 200, -3 h to -6 h 404), so any computed slot can miss. GIBS serves the latest available
+  // image when the time segment is left out, which is exactly what "latest" in the panel promises.
+  const url = isSubDaily(l) ? l.url.replace('{time}/', '') : l.url.replace('{time}', timeToken(l, date));
   return {
     id: l.id,
     // JPEG layers whose no-data is solid black get it keyed to transparent (see map/nodataKey.ts)

@@ -489,6 +489,8 @@ const BASE_PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, 1.5);
 const LENS_WINDOW_MIN_ZOOM = 5;
 /** A stacked lens day whose tiles failed this many times is treated as unavailable and removed. */
 const LENS_DROP_AFTER = 3;
+/** A tiled globe source that never delivered a tile raises the load-failure notice after this many errors. */
+const TILE_FAILURES_BEFORE_NOTICE = 3;
 const EMPTY_FC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
 
 function MapView(p: MapViewProps) {
@@ -531,8 +533,31 @@ function MapView(p: MapViewProps) {
     reduced.current = mq.matches;
     const a = makeMap(aEl.current!, () => reduced.current);
     const b = makeMap(bEl.current!, () => reduced.current);
-    a.on('error', mapErrorReporter('globe', () => cb.current.onMapError));
-    b.on('error', mapErrorReporter('globe', () => cb.current.onMapError));
+    // Tile errors on the globe. Measured over all 19 satellite layers (14 Nov 2026): layers that loaded 100+
+    // tiles still produced a few errors each: sporadic GIBS HTTP 500s and 404s for tiles outside a layer's
+    // coverage (e.g. JRC surface water has no tiles near the poles). Alarming on those told users "data failed
+    // to load" for layers that were working. So a tiled source raises the notice only when it has failed
+    // repeatedly WITHOUT ever delivering a tile (a really broken layer); everything else is logged.
+    // Non-tile failures (style, a NISAR investigation image) are always reported.
+    for (const m of [a, b]) {
+      const report = mapErrorReporter('globe', () => cb.current.onMapError);
+      const delivered = new Set<string>();
+      const failures = new Map<string, number>();
+      m.on('data', (e: { dataType?: string; sourceId?: string; tile?: unknown }) => {
+        if (e.dataType === 'source' && e.tile && e.sourceId) delivered.add(e.sourceId);
+      });
+      m.on('error', (e: { sourceId?: string; tile?: unknown; error?: { message?: string; status?: number } }) => {
+        const src = e?.sourceId;
+        if (!src || !e.tile) return report(e);
+        const n = (failures.get(src) ?? 0) + 1;
+        failures.set(src, n);
+        if (delivered.has(src) || n < TILE_FAILURES_BEFORE_NOTICE) {
+          console.warn(`[map:globe] ${src} tile failed (${n})`, e?.error?.status ?? '', e?.error?.message ?? '');
+          return;
+        }
+        if (n === TILE_FAILURES_BEFORE_NOTICE) report(e);
+      });
+    }
     a.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), 'bottom-left');
     a.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
     const sync = (src: MlMap, dst: MlMap) => () => {
