@@ -470,7 +470,7 @@ export default function App() {
             className="tool"
             aria-pressed={!selected && panelView === 'about'}
             onClick={() => {
-              if (!selected && panelView === 'about') return closePanel();
+              if (!selected && panelView === 'about') return; // already open: clicking again must not close it (the X and Escape do)
               closePanel();
               setPanelView('about');
               setPanelCollapsed(false);
