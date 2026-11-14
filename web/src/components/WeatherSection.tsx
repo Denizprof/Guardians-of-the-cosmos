@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { EVIDENCE_LABEL, fmtDateTime } from '../lib';
 
 /**
- * Weather at a point and time from the Meteomatics Weather API, through the app's own server route
- * (/api/meteomatics, see web/meteomatics-proxy.ts). The browser never sees the account credentials.
- * Meteomatics values are MODEL output (analysis / forecast), not satellite observations: labelled as such.
+ * Weather at a point and time. With a configured server, from the Meteomatics Weather API through the app's
+ * own route (/api/meteomatics, see web/meteomatics-proxy.ts), so the browser never sees the credentials.
+ * Otherwise (GitHub Pages, or no account) from the key-less Open-Meteo API: ERA5 reanalysis for past events,
+ * forecast models for recent days. All values are MODEL output, not satellite observations: labelled as such.
  */
 export interface WeatherValue {
   parameter: string;
@@ -63,10 +64,79 @@ export async function fetchWeather(lon: number, lat: number, time: string | null
 /** Set by the GitHub Pages build (VITE_STATIC_SITE=1): there is no server, so server-backed features are off. */
 const STATIC_SITE = import.meta.env.VITE_STATIC_SITE === '1';
 
+/** Open-Meteo hourly variable for each parameter we show, in the same keys as Meteomatics. */
+const OPEN_METEO_VARS = ['temperature_2m', 'precipitation', 'wind_speed_10m', 'pressure_msl'] as const;
+/** The forecast API keeps about 92 past days; older dates come from the ERA5 reanalysis archive. */
+const FORECAST_PAST_DAYS = 90;
+
+const isoDay = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+
+/** Build the Open-Meteo request for a point and time (no key needed, CORS enabled). */
+export function buildOpenMeteoUrl(lon: number, lat: number, time: string | null, now = Date.now()): string {
+  const target = time ? Date.parse(time) : now;
+  const t = Number.isNaN(target) ? now : Math.min(target, now);
+  const archive = now - t > FORECAST_PAST_DAYS * 86_400_000;
+  const q = new URLSearchParams({
+    latitude: lat.toFixed(4),
+    longitude: lon.toFixed(4),
+    hourly: OPEN_METEO_VARS.join(','),
+    wind_speed_unit: 'ms',
+    timezone: 'UTC',
+    start_date: isoDay(t - 86_400_000), // the day before, for the 24 h precipitation sum
+    end_date: isoDay(t),
+  });
+  return `${archive ? 'https://archive-api.open-meteo.com/v1/archive' : 'https://api.open-meteo.com/v1/forecast'}?${q}`;
+}
+
+/** Reduce an Open-Meteo hourly response to the values at the hour nearest `time`. Null when the shape is wrong. */
+export function parseOpenMeteo(body: unknown, time: string | null, now = Date.now()): { time: string; values: WeatherValue[] } | null {
+  const h = (body as { hourly?: Record<string, unknown> } | null)?.hourly;
+  const times = h?.time;
+  if (!h || !Array.isArray(times) || times.length === 0) return null;
+  const target = Math.min(time && !Number.isNaN(Date.parse(time)) ? Date.parse(time) : now, now);
+  let i = 0;
+  let best = Infinity;
+  times.forEach((s, k) => {
+    const d = Math.abs(Date.parse(`${s}Z`) - target);
+    if (d < best) { best = d; i = k; }
+  });
+  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+  const at = (name: string) => num((h[name] as unknown[] | undefined)?.[i]);
+  const precip = (h.precipitation as unknown[] | undefined) ?? [];
+  const window = precip.slice(Math.max(0, i - 23), i + 1).map(num);
+  const precip24 = window.length > 0 && window.every((v) => v !== null) ? window.reduce((a, b) => a! + b!, 0) : null;
+  const date = `${times[i]}:00Z`;
+  return {
+    time: date,
+    values: [
+      { parameter: 't_2m:C', value: at('temperature_2m'), date },
+      { parameter: 'precip_24h:mm', value: precip24, date },
+      { parameter: 'wind_speed_10m:ms', value: at('wind_speed_10m'), date },
+      { parameter: 'msl_pressure:hPa', value: at('pressure_msl'), date },
+    ],
+  };
+}
+
+export async function fetchOpenMeteo(lon: number, lat: number, time: string | null, signal: AbortSignal): Promise<WeatherResult> {
+  const url = buildOpenMeteoUrl(lon, lat, time);
+  const r = await getJson(url, signal);
+  if (!r.ok) throw new Error(typeof r.body?.reason === 'string' ? r.body.reason : `Weather request failed (HTTP ${r.status})`);
+  const parsed = parseOpenMeteo(r.body, time);
+  if (!parsed) throw new Error('Weather service returned an unexpected response');
+  const archive = url.includes('archive-api');
+  return {
+    lat,
+    lon,
+    time: parsed.time,
+    values: parsed.values,
+    source: archive ? 'Open-Meteo historical weather (ECMWF ERA5 reanalysis)' : 'Open-Meteo weather forecast models',
+    retrieved: new Date().toISOString(),
+  };
+}
+
 type State =
   | { s: 'idle' }
   | { s: 'loading' }
-  | { s: 'unconfigured' }
   | { s: 'error'; message: string }
   | { s: 'ready'; result: WeatherResult };
 
@@ -80,9 +150,10 @@ export default function WeatherSection({ lon, lat, date }: { lon: number; lat: n
     const c = (ctl.current = new AbortController());
     setState({ s: 'loading' });
     try {
-      // Static hosting (GitHub Pages) has no server route: say so without sending a request that can only 404.
-      if (STATIC_SITE || !(await meteomaticsConfigured(c.signal))) return setState({ s: 'unconfigured' });
-      const result = await fetchWeather(lon, lat, date, c.signal);
+      // Meteomatics when the app's own server has an account; otherwise (GitHub Pages, or no credentials)
+      // the key-less Open-Meteo API, called directly from the browser.
+      const useMeteomatics = !STATIC_SITE && (await meteomaticsConfigured(c.signal).catch(() => false));
+      const result = useMeteomatics ? await fetchWeather(lon, lat, date, c.signal) : await fetchOpenMeteo(lon, lat, date, c.signal);
       if (!c.signal.aborted) setState({ s: 'ready', result });
     } catch (e) {
       if (c.signal.aborted) return;
@@ -96,24 +167,12 @@ export default function WeatherSection({ lon, lat, date }: { lon: number; lat: n
       {state.s === 'idle' && (
         <>
           <p className="muted small">
-            Temperature, rain, wind and pressure at this point{date ? ' at the event time' : ' now'}, from the Meteomatics weather model.
+            Temperature, rain, wind and pressure at this point{date ? ' at the event time' : ' now'}, from weather models.
           </p>
-          <button type="button" className="btn" onClick={load}>Get weather (Meteomatics)</button>
+          <button type="button" className="btn" onClick={load}>Get weather</button>
         </>
       )}
-      {state.s === 'loading' && <p className="muted small" role="status">Asking Meteomatics…</p>}
-      {state.s === 'unconfigured' && (
-        <p className="callout" role="status">
-          {STATIC_SITE ? (
-            <>Weather data is not connected on this hosted site: it needs the app's own server to keep the weather account private. No weather values are shown.</>
-          ) : (
-            <>
-              Meteomatics is not connected. Add your username and password to <span className="mono">web/.env.local</span> and restart the server (see{' '}
-              <span className="mono">docs/meteomatics.md</span>). No weather values are shown without it.
-            </>
-          )}
-        </p>
-      )}
+      {state.s === 'loading' && <p className="muted small" role="status">Getting weather data…</p>}
       {state.s === 'error' && (
         <div role="alert">
           <p className="callout warn">Could not get weather data: {state.message}</p>
