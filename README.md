@@ -69,6 +69,11 @@ npm start
 - **"running scripts is disabled on this system"** in PowerShell: that is a Windows setting, not a project error. Use `npm.cmd run setup` and `npm.cmd start` instead, or run the commands in Command Prompt (cmd).
 - **Do not clone into `C:\Windows\System32`** (where an administrator terminal opens). Use a normal folder such as `C:\dev` or Documents; short paths also avoid Windows path-length problems.
 
+### macOS notes
+- Install Node.js from [nodejs.org](https://nodejs.org) or with Homebrew (`brew install node`). The first time you run `git`, macOS offers to install Apple's command line tools; accept it.
+- Run the four commands above in the **Terminal** app, or double-click `start-mac.command` after cloning. If macOS says the file cannot be opened, right-click it and choose **Open**, or run `./start-mac.command` in Terminal.
+- To install it as an app, use Chrome or Edge (**Install Global SAR**), or in Safari choose **File > Add to Dock**.
+
 ### Install it as an app
 Open the running app in Chrome or Edge and choose **Install Global SAR** (the icon at the right of the address bar, or the browser menu). It then opens in its own window with its own icon, like a desktop app. On a phone, use **Add to Home screen**. The app still needs the local server (or a hosted copy) and an internet connection, because the map imagery is loaded live.
 
