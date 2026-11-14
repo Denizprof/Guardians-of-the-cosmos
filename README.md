@@ -57,7 +57,7 @@ npm run setup
 npm start
 ```
 
-`npm start` builds the app and serves it at http://localhost:4173. The repository is private, so you need to be invited as a collaborator before you can clone it.
+`npm start` builds the app and serves it at http://localhost:4173.
 
 | Command (from the repo root) | What it does |
 | --- | --- |
@@ -109,7 +109,7 @@ On Windows, keep the repo at a short path such as `C:\dev\...`; some Python pack
 - No simulated or predicted layers.
 
 ## Team
-Add names and roles here.
+Azra, Ece, Arte, Daniel, Berk and Efe, for the NASA Space Apps Challenge 2026.
 
 ## NASA resources
 - Space Apps Challenge: https://www.spaceappschallenge.org
@@ -118,3 +118,9 @@ Add names and roles here.
 
 ## Credits
 NISAR data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Event context: USGS, NASA EONET. Globe imagery: Sentinel-2 cloudless 2024 by EOX (CC BY-NC-SA 4.0). Terrain: Mapzen/AWS Terrain Tiles. Labels: © OpenStreetMap contributors, OpenFreeMap.
+
+## License
+
+The code in this repository is released under the [MIT License](LICENSE).
+
+Third-party data and imagery keep their own licenses, listed under Credits. For example, the Sentinel-2 cloudless imagery by EOX is CC BY-NC-SA 4.0, so it may not be used commercially.
