@@ -1,0 +1,13 @@
+{
+  "name": "guardians-of-the-cosmos",
+  "private": true,
+  "description": "Global SAR: Earth change explorer (NASA Space Apps 2026). Root scripts forward to web/.",
+  "engines": { "node": ">=20.19" },
+  "scripts": {
+    "setup": "npm --prefix web ci",
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "start": "npm --prefix web run build && npm --prefix web run preview",
+    "test": "npm --prefix web test"
+  }
+}

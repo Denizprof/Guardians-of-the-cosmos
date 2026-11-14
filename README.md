@@ -38,13 +38,40 @@ The repository is private, and GitHub Pages needs a public repository or a paid 
 
 A published site has no server, so the Meteomatics weather section and the AI assistant would show "not connected" there. Everything else works: the globe, investigations, satellite layers with colour legends, the SAR lens, the coverage probe and the event catalogs.
 
-## Run the demo
-```bash
-cd web && npm install && npm run dev
-```
-Open http://localhost:5173. The data package is already committed.
+## Get it running
 
-Optional: weather-model values from Meteomatics need your own account; see [docs/meteomatics.md](docs/meteomatics.md).
+You need [Node.js](https://nodejs.org) 20.19 or newer (22 recommended) and git. No API keys are needed: the data package is already in the repository.
+
+```bash
+git clone https://github.com/Denizprof/Guardians-of-the-cosmos.git
+```
+```bash
+cd Guardians-of-the-cosmos
+```
+```bash
+npm run setup
+```
+```bash
+npm start
+```
+
+`npm start` builds the app and serves it at http://localhost:4173. The repository is private, so you need to be invited as a collaborator before you can clone it.
+
+| Command (from the repo root) | What it does |
+| --- | --- |
+| `npm run setup` | Installs the web app's dependencies (once) |
+| `npm start` | Builds and serves the finished app at http://localhost:4173 |
+| `npm run dev` | Development server with live reload at http://localhost:5173 |
+| `npm test` | Runs the web unit tests |
+
+### Install it as an app
+Open the running app in Chrome or Edge and choose **Install Global SAR** (the icon at the right of the address bar, or the browser menu). It then opens in its own window with its own icon, like a desktop app. On a phone, use **Add to Home screen**. The app still needs the local server (or a hosted copy) and an internet connection, because the map imagery is loaded live.
+
+### Optional: weather data
+Weather-model values from Meteomatics need your own account. Copy `web/env.example` to `web/.env.local`, fill in your username and password, and restart. Details: [docs/meteomatics.md](docs/meteomatics.md). Without it the weather section says "not connected" and everything else works.
+
+### Optional: AI assistant
+The assistant panel says "not connected" until a model is plugged in. See [docs/assistant-integration.md](docs/assistant-integration.md).
 
 ## Rebuild the data
 ```bash
