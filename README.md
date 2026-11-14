@@ -1,48 +1,176 @@
-# Guardians of the Cosmos: Global SAR
+<div align="center">
 
-**See what happened. Compare what changed. Understand what the radar sees.**
+# 🛰️ Guardians of the Cosmos · Global SAR
 
-A map-first explorer of real NASA-ISRO **NISAR** L-band radar observations, built for the NASA Space Apps Challenge 2026 ("Dancing with the SARs").
+### See what happened. Compare what changed. Understand what the radar sees.
 
-## Status
-- [x] Pick challenge: Dancing with the SARs
-- [x] Define users and problem: see [docs/design-brief.md](docs/design-brief.md)
-- [x] Design concept
-- [x] Prototype: photoreal 3D globe, five NISAR investigations, quantitative layers
-- [ ] Demo and submission
+**A map-first 3D globe that turns real NASA-ISRO NISAR radar data into stories anyone can read.**
 
-## Investigations
+[![Live demo](https://img.shields.io/badge/Live_demo-globalsar.earth-D9A0C6?style=for-the-badge)](https://globalsar.earth)
+[![NASA Space Apps 2026](https://img.shields.io/badge/NASA_Space_Apps-2026-0B3D91?style=for-the-badge)](https://www.spaceappschallenge.org)
+[![Challenge](https://img.shields.io/badge/Challenge-Dancing_with_the_SARs-9B4F82?style=for-the-badge)](https://www.spaceappschallenge.org)
 
-| Event | Technique | NISAR data (ASF DAAC) | Result |
-| --- | --- | --- | --- |
-| Venezuela earthquakes, 24 Jun 2026 | Interferometry (GUNW) | Track 162A frame 007: 1→13 Jun (pre-event) vs 13→25 Jun (spans the quake), PROVISIONAL | Up to about 45 cm line-of-sight motion away from the satellite along the coast; pre-event noise 3.5 cm (std) |
-| Limpopo floods, Jan 2026 | Backscatter (GCOV HH/HV) | Track 114A frame 165: 24 Dec, 5 Jan, 17 Jan, BETA | About 322–379 km² of new water around Chókwè (3,370 km² study area; range from two speckle filters) |
-| Krasheninnikov volcano, 2025–26 | Backscatter time series (GCOV) | Track 060D frame 061: 11 dates, 18 Jun – 28 Oct 2026 | Full-resolution HH/HV time series on one fixed calibrated stretch (12 layers) |
-| União do Sul clear-cut (Mato Grosso), Oct 2026 | HV canopy change (GCOV) | Track 002A frame 172: 4 dates, 18 Sep – 24 Oct 2026 (change pair 30 Sep → 24 Oct) | 35.7 km² strong HV loss; 68 % of the INPE DETER alert box vs 11 % of the wider area |
-| Aspen Acres fire (Colorado), Jun 2026 | HV canopy change (GCOV) | Track 019A frame 021: 4 dates, 15 Jun – 14 Aug 2026 | 68 km² woody canopy loss (reported fire size 372 km²; grass/shrub burn is under-detected by L-band HV) |
+![Data](https://img.shields.io/badge/data-real_NISAR_L--band-1A1424)
+![Tests](https://img.shields.io/badge/tests-1%2C071_passing-2E7D32)
+![Vulnerabilities](https://img.shields.io/badge/npm_audit-0_vulnerabilities-2E7D32)
+![Stack](https://img.shields.io/badge/stack-React_19_·_TypeScript_·_MapLibre_GL-3178C6)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-The globe also shows about 170 recent USGS (M6.3+) and NASA EONET events as **context only**, with no SAR analysis claimed. The coverage probe lists the real NISAR acquisitions over any clicked point, live from the ASF search API.
+**[▶ Try it live](https://globalsar.earth)** · [How it works](#-how-it-works) · [Results](#-results-on-real-nisar-data) · [Run it locally](#-run-it-locally) · [Science](#-the-science)
 
-## Repo layout
-- `web/`: the app (React + Vite + TypeScript + MapLibre GL 3D globe). Static build, no server, no API keys.
-- `pipeline/`: offline data pipeline.
-  - `src/*.mjs` (Node): NISAR browse images and context events. No login needed.
-  - `python/` (Python): quantitative layers read from NISAR HDF5. Needs an Earthdata token.
-- `web/public/data/`: the generated data package the app reads (`events.json` with full provenance, overlay images).
-- `docs/design-brief.md`: challenge, problem, users, goals
-- `docs/data-sources.md`: every dataset and API we use
-- `design/`, `src/`: reserved from the original scaffold
+</div>
 
-## Live site
-https://denizprof.github.io/Guardians-of-the-cosmos/
+---
 
-`.github/workflows/pages.yml` builds the web app and publishes it to GitHub Pages on every push to `main`. This needs **Settings > Pages > Source** set to **GitHub Actions** (with "Deploy from a branch", GitHub shows this README instead of the app).
+## ⚡ TL;DR (30 seconds)
 
-The published site has no server, so the Meteomatics weather section and the AI assistant show "not connected" there. Everything else works: the globe, investigations, satellite layers with colour legends, the SAR lens, the coverage probe and the event catalogs.
+| | |
+| --- | --- |
+| **Problem** | Radar satellites see Earth through clouds and darkness, but their images look like grey noise to students, the public and many decision-makers. The data hides in huge HDF5 files behind logins. |
+| **Solution** | **Global SAR**: a photoreal 3D globe where you click an earthquake, flood, fire or volcano, swipe between *before* and *after* radar images, and read a plain-language explanation with real units. |
+| **Proof** | **5 investigations on genuine NISAR data**: 45 cm of earthquake ground motion, 322–379 km² of new flood water, 35.7 km² of cleared forest, 68 km² of burned canopy and an 11-date volcano time series. |
+| **Trust** | Every layer shows its mission, product, data tier, track, frame, dates and processing steps. NASA images say *“NASA browse”*; our computations say *“derived by team”*. Nothing is simulated. |
+| **Quality** | 1,071 automated tests (789 web, 196 Python, 59 pipeline JS, 27 gateway), accessibility checks, 0 known dependency vulnerabilities. Static site, no API keys. |
 
-## Get it running
+---
 
-You need [Node.js](https://nodejs.org) 20.19 or newer (22 recommended) and git. No API keys are needed: the data package is already in the repository.
+## 🎯 Why it matters
+
+NASA and ISRO's **NISAR** mission is one of the most capable Earth radar satellites ever launched. Its L-band signal sees through clouds, smoke and darkness, passes into tree canopies, and measures ground motion of a few centimetres. That makes it ideal for floods (often under storm clouds), earthquakes, wildfires and deforestation.
+
+Its value is lost if nobody can read it. Global SAR is built so that **a first-time user can say what changed in each demo within one minute, with no radar knowledge.**
+
+### Who it's for
+
+| User | What they need | What Global SAR gives them |
+| --- | --- | --- |
+| 🎓 **Students and the public** | See what a disaster did to the ground | Click an event, swipe before/after, read the *Simple* explanation |
+| 👩‍🏫 **Teachers and science communicators** | Ready, trustworthy radar examples | Five curated investigations with sources, units and stated limits |
+| 🔬 **Researchers and analysts** | Find which NISAR data exists for a place and date | A live coverage probe for any point on Earth, plus *Scientific* explanations |
+
+---
+
+## ✨ Features
+
+- 🌍 **Photoreal 3D globe**: Sentinel-2 cloudless imagery, terrain, atmosphere and a starfield; tilt, rotate and fly to events.
+- 🔎 **Five NISAR investigations**: earthquake, flood, volcano, deforestation and wildfire, all on real radar data.
+- ↔️ **Before / after comparison**: swipe, side-by-side and overlay modes, with a timeline of radar passes and a shareable URL.
+- 💬 **Two explanation levels**: *Simple* and *Scientific*, with numbered annotation pins and live legends in physical units (cm, dB).
+- 🔍 **SAR lens**: look through the radar at any spot on the globe.
+- 📡 **Live NISAR coverage probe**: click anywhere to list the real NISAR acquisitions over that point (ASF Search API).
+- 🛰️ **“NASA Earthdata available here”**: a live CMR search for other NASA datasets at a location.
+- 🗂️ **19 global satellite layers** (NASA GIBS, UMD, JRC, EOX) with per-layer dates and colour legends.
+- 🌋 **Event catalogs as context**: about 170 recent USGS (M6.3+) and NASA EONET events, plus tsunamis, eruptions, FIRMS fires, landslides and flood alerts, with a six-group taxonomy and filters. Context only: no SAR analysis is claimed for them.
+- 🏷️ **Evidence badges**: observation, derived, interpretation, model or simulation, so users always know what they are looking at.
+- 📱 **Installable app (PWA)** with a mobile layout (bottom sheet, stacked comparison).
+- 🤖 **AI assistant integration layer**: UI, adapter, JSON contract and gateway are built and tested. It never invents answers: until a model is connected it says *“not connected”*.
+
+---
+
+## 📊 Results on real NISAR data
+
+All results are **derived by the team** from genuine NISAR products distributed by the ASF DAAC. They are heuristic and not field-validated; see [Honest limits](#️-honest-limits).
+
+| Investigation | Technique | NISAR data | Result | Independent check |
+| --- | --- | --- | --- | --- |
+| 🌎 **Venezuela earthquakes**, 24 Jun 2026 | Interferometry (GUNW) | Track 162A, frame 007; 1→13 Jun (pre-event) vs 13→25 Jun; PROVISIONAL | Up to **~45 cm** line-of-sight motion away from the satellite along the coast | Pre-event pair noise only **3.5 cm** (std); pattern consistent with NASA's published analysis |
+| 🌊 **Limpopo floods**, Mozambique, Jan 2026 | Backscatter change (GCOV HH/HV) | Track 114A, frame 165; 24 Dec, 5 Jan, 17 Jan; BETA | **322–379 km²** of new water around Chókwè, in a 3,370 km² study area | Range from two speckle filters; a scene-wide +3.07 dB brightening is removed first |
+| 🌳 **União do Sul clear-cut**, Mato Grosso, Oct 2026 | HV canopy change (GCOV) | Track 002A, frame 172; 4 dates, 18 Sep – 24 Oct | **35.7 km²** strong HV loss | **68 %** of the official INPE DETER alert box shows loss, vs 11 % of the wider area |
+| 🔥 **Aspen Acres fire**, Colorado, Jun 2026 | HV canopy change (GCOV) | Track 019A, frame 021; 4 dates, 15 Jun – 14 Aug | **68 km²** woody canopy loss | Reported fire size 372 km²; L-band HV sees trees, not grass and shrub burn |
+| 🌋 **Krasheninnikov volcano**, 2026 | Backscatter time series (GCOV) | Track 060D, frame 061; 11 dates, 18 Jun – 28 Oct | 12 full-resolution HH/HV layers on one fixed calibrated stretch | Qualitative only; no quantitative claim |
+
+---
+
+## 🧭 How it works
+
+```mermaid
+flowchart LR
+    A["🛰️ NISAR L-band radar<br/>NASA-ISRO"] --> B["ASF DAAC archive<br/>GUNW · GCOV · browse"]
+    B --> C["Stage 1 · Node, no login<br/>browse images + georeferencing<br/>USGS / EONET context"]
+    B --> D["Stage 2 · Python + Earthdata token<br/>streams only the needed HDF5 chunks"]
+    D --> E["InSAR → ground motion (cm)<br/>backscatter → change (dB)<br/>water and canopy masks"]
+    C --> F["Data package<br/>events.json with full provenance<br/>+ WebP overlays"]
+    E --> F
+    F --> G["🌍 Global SAR web app<br/>React · TypeScript · MapLibre GL"]
+    H["Live APIs<br/>ASF Search · NASA CMR · GIBS · Photon"] --> G
+```
+
+1. **Collect.** The pipeline pulls real NISAR products from NASA's ASF DAAC. Stage 1 needs no login: it downloads NASA's official browse images and georeferences them by fitting each image's data corners to the ASF footprint (residual recorded per layer, about 25–650 m).
+2. **Process.** Stage 2 streams only the HDF5 chunks it needs over HTTPS, with retries for flaky networks, and computes quantitative layers (see [The science](#-the-science)).
+3. **Explore.** The web app reads one static data package (`events.json` plus WebP overlays) and calls a few public APIs live. There is no backend, database or user account.
+
+---
+
+## 🔬 The science
+
+<details>
+<summary><b>InSAR ground motion (GUNW)</b></summary>
+
+- Line-of-sight displacement **d = −φλ / 4π**, with λ taken from the product's `centerFrequency`.
+- The ionosphere phase screen is subtracted; pixels with coherence < 0.3 or outside connected components are masked.
+- Displacement is referenced to a far-field box; both pairs share one colour scale.
+- The noise floor comes from the pre-event pair: **3.5 cm** standard deviation for Venezuela.
+</details>
+
+<details>
+<summary><b>Flood mapping (GCOV HH)</b></summary>
+
+- Threshold = centre of the histogram valley, with bimodality checked per date. For Limpopo the 5 Jan histogram is not bimodal, so both dates use the 17 Jan threshold (−14.75 dB); the provenance record says so.
+- **New water** = water-like after AND not water-like before AND darkened by more than 3 dB relative to the scene-wide median change, which removes calibration and soil-moisture offsets between dates.
+- Area is a range from two speckle filters: a 3×3 median (estimate) and a 5×5 boxcar (lower bound).
+</details>
+
+<details>
+<summary><b>Forest and fire loss (GCOV HV)</b></summary>
+
+- HV log-ratio on a 3×3 median; the scene-wide median change is removed first; strong loss is below −3 dB.
+- Volume scattering collapses when canopy is removed or burned.
+- Where an independent reference exists (INPE DETER), the loss fraction inside its box is reported next to the area-wide fraction.
+</details>
+
+<details>
+<summary><b>Time series and browse imagery</b></summary>
+
+- Volcano time series: an HH/HV composite on one fixed calibrated stretch for all dates, so colours compare across dates.
+- NASA browse renderings are georeferenced from footprint corners with an honest positional uncertainty of about 1–1.4 km. They are labelled as visualizations and never used for measurement.
+</details>
+
+### Scientific integrity
+
+- ✅ Every layer records mission, product, data tier, CRID, track, frame, acquisition times, granule ID and each processing step.
+- ✅ NASA images are labelled *“NASA browse”*; our computations are labelled *“derived by team”*.
+- ✅ Known limits are stated in the app next to the result they affect.
+- ✅ No simulated or predicted layers. Out of scope by design: predicting earthquakes or eruptions.
+
+---
+
+## ⚠️ Honest limits
+
+- **Line of sight only.** InSAR measures motion along the satellite's viewing direction; the troposphere is not corrected.
+- **Early calibration.** Early-2026 NISAR products are BETA (CRID X05010); several investigations use BETA or mixed PROVISIONAL/VALIDATED data, flagged in each provenance record.
+- **Best estimates.** Flood and canopy areas are heuristic and not field-validated, so they are given as ranges where possible.
+- **Not official.** Results are the team's own derived analysis, not official NASA products.
+- **Coverage gaps.** We found no public NISAR products from 27 Jul to 10 Aug 2026.
+- **Hosted site.** The weather (Meteomatics) section and the AI assistant need a server, so they show *“not connected”* on [globalsar.earth](https://globalsar.earth). Everything else works there.
+
+---
+
+## 🧱 Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| Front end | React 19, TypeScript 7, Vite 8 |
+| Map | MapLibre GL 6 (3D globe, terrain, atmosphere) |
+| Data pipeline | Node.js (ASF, browse, catalogs) · Python (h5py + fsspec HDF5 streaming, NumPy, SciPy, scikit-image, rasterio, pyproj) |
+| Testing | Vitest, fast-check (property and fuzz tests), Testing Library, Playwright, axe-core, pytest, Hypothesis |
+| Hosting | GitHub Pages via GitHub Actions, custom domain **globalsar.earth** (HTTPS) |
+| Assistant | Node gateway with JSON-schema contract, CORS, size and rate limits |
+
+---
+
+## 🚀 Run it locally
+
+**Requirements:** [Node.js](https://nodejs.org) 20.19+ (22 recommended) and git. **No API keys:** the data package is already in the repo.
 
 ```bash
 git clone https://github.com/Denizprof/Guardians-of-the-cosmos.git
@@ -57,70 +185,136 @@ npm run setup
 npm start
 ```
 
-`npm start` builds the app and serves it at http://localhost:4173.
+Then open **http://localhost:4173**.
 
-| Command (from the repo root) | What it does |
+| Command (repo root) | What it does |
 | --- | --- |
 | `npm run setup` | Installs the web app's dependencies (once) |
-| `npm start` | Builds and serves the finished app at http://localhost:4173 |
+| `npm start` | Builds and serves the app at http://localhost:4173 |
 | `npm run dev` | Development server with live reload at http://localhost:5173 |
 | `npm test` | Runs the web unit tests |
 
-### Windows notes
-- **Easiest:** after cloning, double-click `start-windows.cmd`. It installs on the first run, then builds and starts the app.
-- **"running scripts is disabled on this system"** in PowerShell: that is a Windows setting, not a project error. Use `npm.cmd run setup` and `npm.cmd start` instead, or run the commands in Command Prompt (cmd).
-- **Do not clone into `C:\Windows\System32`** (where an administrator terminal opens). Use a normal folder such as `C:\dev` or Documents; short paths also avoid Windows path-length problems.
+<details>
+<summary><b>🪟 Windows notes</b></summary>
 
-### macOS notes
-- Install Node.js from [nodejs.org](https://nodejs.org) or with Homebrew (`brew install node`). The first time you run `git`, macOS offers to install Apple's command line tools; accept it.
-- Run the four commands above in the **Terminal** app, or double-click `start-mac.command` after cloning. If macOS says the file cannot be opened, right-click it and choose **Open**, or run `./start-mac.command` in Terminal.
-- To install it as an app, use Chrome or Edge (**Install Global SAR**), or in Safari choose **File > Add to Dock**.
+- **Easiest:** double-click `start-windows.cmd` after cloning. It installs on the first run, then builds and starts the app.
+- **“running scripts is disabled on this system”** in PowerShell is a Windows setting, not a project error. Use `npm.cmd run setup` and `npm.cmd start`, or run the commands in Command Prompt.
+- **Don't clone into `C:\Windows\System32`.** Use a short path such as `C:\dev`, which also avoids Windows path-length problems.
+</details>
 
-### Install it as an app
-Open the running app in Chrome or Edge and choose **Install Global SAR** (the icon at the right of the address bar, or the browser menu). It then opens in its own window with its own icon, like a desktop app. On a phone, use **Add to Home screen**. The app still needs the local server (or a hosted copy) and an internet connection, because the map imagery is loaded live.
+<details>
+<summary><b>🍎 macOS notes</b></summary>
 
-### Optional: weather data
-Weather-model values from Meteomatics need your own account. Copy `web/env.example` to `web/.env.local`, fill in your username and password, and restart. Details: [docs/meteomatics.md](docs/meteomatics.md). Without it the weather section says "not connected" and everything else works.
+- Install Node.js from [nodejs.org](https://nodejs.org) or with Homebrew (`brew install node`). Accept the command line tools prompt the first time you run `git`.
+- Or double-click `start-mac.command`. If macOS blocks it, right-click it and choose **Open**, or run `./start-mac.command` in Terminal.
+</details>
 
-### Optional: AI assistant
-The assistant panel says "not connected" until a model is plugged in. See [docs/assistant-integration.md](docs/assistant-integration.md).
+<details>
+<summary><b>📲 Install it as an app</b></summary>
 
-## Rebuild the data
+Open the app in Chrome or Edge and choose **Install Global SAR** in the address bar or browser menu. On a phone, use **Add to Home screen**. It still needs an internet connection, because map imagery loads live.
+</details>
+
+<details>
+<summary><b>🌦️ Optional: weather data and 🤖 AI assistant</b></summary>
+
+- **Weather:** copy `web/env.example` to `web/.env.local`, add your Meteomatics username and password, and restart. Details: [docs/meteomatics.md](docs/meteomatics.md).
+- **AI assistant:** implement a model endpoint that follows `shared/assistant-contract/`, start the gateway (`cd assistant-gateway && ASSISTANT_MODEL_URL=<your endpoint> npm start`), and set `VITE_ASSISTANT_GATEWAY_URL=/` in `web/.env.local`. Full guide: [docs/assistant-integration.md](docs/assistant-integration.md).
+</details>
+
+---
+
+## 🔄 Rebuild the data
+
 ```bash
 cd pipeline && npm install
 node src/fetch-browse.mjs && node src/fetch-context.mjs && node src/fetch-catalogs.mjs
 pip install -r python/requirements.txt
 python python/process.py
 ```
-`python/process.py` needs a free Earthdata Login token. Generate it at https://urs.earthdata.nasa.gov/user_tokens and set it as the `EARTHDATA_TOKEN` environment variable. Never commit it.
 
-On Windows, keep the repo at a short path such as `C:\dev\...`; some Python packages fail beyond the 260-character path limit.
+`python/process.py` needs a free **NASA Earthdata Login** token: create it at https://urs.earthdata.nasa.gov/user_tokens and set it as the `EARTHDATA_TOKEN` environment variable. **Never commit it.** On Windows, keep the repo at a short path such as `C:\dev\...`.
 
-## How it works
-- **Stage 1 (no login):** downloads NASA's official NISAR browse images and georeferences them. Their KML sidecars require a login, so the pipeline fits each image's data corners to the ASF footprint and records the residual per layer (about 25–650 m).
-- **Stage 2 (Earthdata token):** streams only the needed HDF5 chunks over HTTPS, with retries for flaky networks.
-  - GUNW: ionosphere screen removed, coherence mask applied, then line-of-sight displacement in cm.
-  - GCOV: dB, log-ratio change, and a histogram-valley water threshold combined with a −3 dB change test.
+---
 
-## Scientific integrity
-- Every layer records mission, product, data tier, CRID, track, frame, acquisition times, granule ID and each processing step.
-- NASA browse images are labelled "NASA browse". Our computations are labelled "derived by team".
-- Known limits are stated in the app: line-of-sight only, uncorrected troposphere, BETA calibration, seasonal snow, heuristic water classification.
-- No simulated or predicted layers.
+## ✅ Quality and testing
 
-## Team
-Azra, Ece, Arte, Daniel, Berk and Efe, for the NASA Space Apps Challenge 2026.
+| Suite | Command | Result |
+| --- | --- | --- |
+| Web unit + property/fuzz (Vitest, fast-check) | `cd web && npm test` | **789 / 789** pass |
+| End-to-end + accessibility (Playwright, axe-core) | `cd web && npm run test:e2e` | Desktop, mobile (375×812), keyboard, resilience and visual suites |
+| Pipeline JS (node:test + fast-check) | `cd pipeline && npm test` | **59** pass, 2 todo |
+| Pipeline Python (pytest + Hypothesis) | `cd pipeline && python -m pytest` | **196 / 196** pass |
+| Assistant gateway (node:test) | `cd assistant-gateway && npm test` | **27 / 27** pass |
+| Type check + production build | `cd web && npm run build` | pass |
+| Dependency audit | `npm audit --omit=dev` | **0** vulnerabilities |
 
-## NASA resources
-- Space Apps Challenge: https://www.spaceappschallenge.org
-- NISAR data documentation (ASF): https://nisar-docs.asf.alaska.edu/
-- Earthdata: https://www.earthdata.nasa.gov
+A QA audit found 23 issues; 19 are fixed with regression tests. Reports: [docs/qa/](docs/qa/) and [docs/final-report.md](docs/final-report.md).
 
-## Credits
-NISAR data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Event context: USGS, NASA EONET. Globe imagery: Sentinel-2 cloudless 2024 by EOX (CC BY-NC-SA 4.0). Terrain: Mapzen/AWS Terrain Tiles. Labels: © OpenStreetMap contributors, OpenFreeMap.
+---
 
-## License
+## 🗂️ Repository layout
+
+```text
+Guardians-of-the-cosmos/
+├── web/                    # The app: React + Vite + TypeScript + MapLibre GL (static build)
+│   ├── src/                # Components, map, assistant UI, explanations, services
+│   ├── public/data/        # Data package: events.json (with provenance), layers.json, overlays
+│   └── tests/              # Unit, property/fuzz, e2e, accessibility, visual and perf tests
+├── pipeline/               # Offline data pipeline
+│   ├── src/*.mjs           # Node: ASF search, browse images, georeferencing, catalogs
+│   ├── python/             # Python: quantitative layers from NISAR HDF5
+│   └── tests/              # node:test + pytest suites with recorded fixtures
+├── assistant-gateway/      # Optional AI assistant gateway (contract-tested)
+├── shared/assistant-contract/  # JSON schemas shared by app, gateway and model
+├── docs/                   # Design brief, data sources, final report, QA, research
+├── .github/workflows/      # GitHub Pages deployment
+├── start-windows.cmd       # One-click start on Windows
+└── start-mac.command       # One-click start on macOS
+```
+
+---
+
+## 📚 Documentation
+
+| Document | What's inside |
+| --- | --- |
+| [docs/design-brief.md](docs/design-brief.md) | Challenge, problem, users, goals and design principles |
+| [docs/final-report.md](docs/final-report.md) | Feature inventory, methods, results, tests and known limits |
+| [docs/data-sources.md](docs/data-sources.md) | Every dataset and API we use, with licences |
+| [docs/assistant-integration.md](docs/assistant-integration.md) | How to connect an AI model |
+| [docs/meteomatics.md](docs/meteomatics.md) | Optional weather data setup |
+| [docs/qa/](docs/qa/) | QA issues, code review and test report |
+
+---
+
+## 👩‍🚀 Team
+
+**Guardians of the Cosmos**: Azra · Ece · Berk · Daniel · Efe · Arte
+
+Built for the **NASA Space Apps Challenge 2026**, challenge *Dancing with the SARs*.
+
+---
+
+## 🙏 Credits and data sources
+
+- **NISAR data:** NASA/JPL-Caltech & ISRO, distributed by the [ASF DAAC](https://nisar-docs.asf.alaska.edu/).
+- **Event context:** USGS, NASA EONET, NOAA NCEI, NASA FIRMS, NASA GLC, GDACS.
+- **Satellite layers:** NASA GIBS, University of Maryland, JRC, EOX.
+- **Globe imagery:** Sentinel-2 cloudless 2024 by EOX (CC BY-NC-SA 4.0).
+- **Terrain:** Mapzen / AWS Terrain Tiles. **Labels:** © OpenStreetMap contributors, OpenFreeMap. **Geocoding:** Photon.
+- **NASA resources:** [Space Apps Challenge](https://www.spaceappschallenge.org) · [NISAR documentation](https://nisar-docs.asf.alaska.edu/) · [Earthdata](https://www.earthdata.nasa.gov)
+
+---
+
+## 📄 License
 
 The code in this repository is released under the [MIT License](LICENSE).
 
-Third-party data and imagery keep their own licenses, listed under Credits. For example, the Sentinel-2 cloudless imagery by EOX is CC BY-NC-SA 4.0, so it may not be used commercially.
+Third-party data and imagery keep their own licences, listed under Credits. For example, the Sentinel-2 cloudless imagery by EOX is CC BY-NC-SA 4.0, so it may not be used commercially.
+
+<div align="center">
+
+**[▶ Explore Earth's changes at globalsar.earth](https://globalsar.earth)**
+
+</div>
