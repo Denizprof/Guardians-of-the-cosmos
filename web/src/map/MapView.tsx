@@ -227,9 +227,9 @@ function MapView(p: MapViewProps) {
 
     // 'style.load', not 'load': with satellite tiles streaming in, 'load' can take many seconds and the
     // markers must not wait for imagery.
-    // On phones start with the attribution folded into its (i) button (MapLibre opens it once the first
-    // source reports its attribution); the About panel carries the full credits.
-    if (window.innerWidth <= 820) {
+    // Start with the attribution folded into its (i) button on every screen size (MapLibre opens it once
+    // the first source reports its attribution); the About panel carries the full credits.
+    {
       const fold = () => {
         const attrib = aEl.current?.querySelector('.maplibregl-ctrl-attrib');
         if (!attrib?.classList.contains('maplibregl-compact-show')) return;
