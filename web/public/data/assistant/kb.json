@@ -1,0 +1,2110 @@
+{
+ "version": "1",
+ "generated": "2026-11-14",
+ "counts": {
+  "total": 112,
+  "app": 18,
+  "verified_sar": 24,
+  "rejected_sar": 18
+ },
+ "records": [
+  {
+   "id": "kb:app-what",
+   "topic": "app",
+   "title": "What Global SAR is",
+   "text_en": "Global SAR is a 3D globe for exploring real radar observations of Earth, led by NISAR, the NASA and ISRO radar satellite. It was made for the NASA Space Apps Challenge 2026, in the challenge called Dancing with the SARs.",
+   "text_tr": "Global SAR, Dünya'nın gerçek radar gözlemlerini keşfetmek için hazırlanmış üç boyutlu bir küredir; merkezinde NASA ve ISRO'nun radar uydusu NISAR vardır. NASA Space Apps Challenge 2026'nın Dancing with the SARs başlıklı görevi için yapılmıştır.",
+   "questions_en": [
+    "What is Global SAR?",
+    "What is this app?",
+    "What is this website for?",
+    "What can I do here?",
+    "Who made this for which challenge?"
+   ],
+   "questions_tr": [
+    "Global SAR nedir?",
+    "Bu uygulama nedir?",
+    "Bu site ne işe yarar?",
+    "Burada ne yapabilirim?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-who",
+   "topic": "app",
+   "title": "Who Global SAR is for",
+   "text_en": "Global SAR is for students and teachers, journalists, people who work on disasters and the environment, and anyone curious about how our planet changes. You do not need to know anything about radar: every investigation explains what you are looking at.",
+   "text_tr": "Global SAR; öğrenciler ve öğretmenler, gazeteciler, afet ve çevre alanında çalışanlar ve gezegenimizin nasıl değiştiğini merak eden herkes içindir. Radar hakkında bir şey bilmeniz gerekmez: her inceleme neye baktığınızı açıklar.",
+   "questions_en": [
+    "Who is this app for?",
+    "Do I need to know radar to use this?",
+    "Is this for students?",
+    "Can a beginner use Global SAR?"
+   ],
+   "questions_tr": [
+    "Bu uygulama kimler için?",
+    "Kullanmak için radar bilmem gerekir mi?",
+    "Öğrenciler kullanabilir mi?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-not",
+   "topic": "app",
+   "title": "What Global SAR is not",
+   "text_en": "Global SAR is not a live emergency alert system. The investigations are the project's own analysis, not official NASA products, and every layer says whether it is an observation, a measurement the project derived or an interpretation.",
+   "text_tr": "Global SAR canlı bir acil durum uyarı sistemi değildir. İncelemeler projenin kendi analizidir, resmî NASA ürünü değildir; her katman bir gözlem mi, projenin türettiği bir ölçüm mü yoksa bir yorum mu olduğunu belirtir.",
+   "questions_en": [
+    "Is this a live alert system?",
+    "Can I use this for emergency warnings?",
+    "Are these official NASA products?",
+    "Is the analysis official?",
+    "Can I rely on this in an emergency?"
+   ],
+   "questions_tr": [
+    "Bu canlı bir uyarı sistemi mi?",
+    "Acil durumda buna güvenebilir miyim?",
+    "Bunlar resmî NASA ürünü mü?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:tool-investigations",
+   "topic": "app",
+   "title": "The Investigations tool",
+   "text_en": "Investigations are five worked examples: an earthquake, a flood, a volcano, a forest clearing and a wildfire. Each compares radar images from before and after, with a timeline, and explains what you see at a Simple or Scientific level. Open them from the Investigations button in the top bar or from the cards at the bottom of the globe.",
+   "text_tr": "İncelemeler beş hazır örnektir: bir deprem, bir sel, bir yanardağ, bir orman kesimi ve bir orman yangını. Her biri öncesi ve sonrası radar görüntülerini bir zaman çizelgesiyle karşılaştırır ve gördüklerinizi Basit veya Bilimsel düzeyde açıklar. Üst çubuktaki Investigations düğmesinden veya kürenin altındaki kartlardan açılır.",
+   "questions_en": [
+    "What are the investigations?",
+    "How do I open an investigation?",
+    "Which examples does the app have?",
+    "How many investigations are there?",
+    "Where do I find the before and after examples?"
+   ],
+   "questions_tr": [
+    "İncelemeler nedir?",
+    "Bir incelemeyi nasıl açarım?",
+    "Uygulamada hangi örnekler var?",
+    "Kaç inceleme var?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:tool-filters",
+   "topic": "app",
+   "title": "The Filters tool",
+   "text_en": "With Filters you choose which kinds of events appear on the globe, switch on catalogs of past earthquakes, tsunamis, eruptions, fires, landslides and floods, and set a range of years. Click a marker to read its record.",
+   "text_tr": "Filtreler ile kürede hangi tür olayların görüneceğini seçer, geçmiş deprem, tsunami, patlama, yangın, heyelan ve sel kataloglarını açar ve bir yıl aralığı belirlersiniz. Bir işarete tıklayarak kaydını okuyabilirsiniz.",
+   "questions_en": [
+    "What does Filters do?",
+    "How do I show past earthquakes on the globe?",
+    "How do I filter events by year?",
+    "How do I hide some kinds of events?",
+    "What are the dots on the globe?"
+   ],
+   "questions_tr": [
+    "Filtreler ne işe yarar?",
+    "Geçmiş depremleri kürede nasıl gösteririm?",
+    "Olayları yıla göre nasıl filtrelerim?",
+    "Küredeki noktalar nedir?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-catalogs",
+   "topic": "app",
+   "title": "Event catalogs in Filters",
+   "text_en": "The Filters panel offers these catalogs of reported events: active fires of the last 24 hours (NASA FIRMS), tsunamis since 1900 (NOAA NCEI), earthquakes of magnitude 7 and above since 1900 (USGS), significant eruptions since 1900 (NOAA NCEI), flood alerts since 2000 (GDACS) and landslides (NASA Global Landslide Catalog).",
+   "text_tr": "Filtreler paneli şu bildirilmiş olay kataloglarını sunar: son 24 saatin aktif yangınları (NASA FIRMS), 1900'den beri tsunamiler (NOAA NCEI), 1900'den beri 7 ve üzeri büyüklükteki depremler (USGS), 1900'den beri önemli patlamalar (NOAA NCEI), 2000'den beri sel uyarıları (GDACS) ve heyelanlar (NASA Global Landslide Catalog).",
+   "questions_en": [
+    "Which event catalogs are available?",
+    "Where do the earthquake markers come from?",
+    "What is the source of the fire markers?",
+    "Which catalogs can I switch on?",
+    "Where does the tsunami data come from?"
+   ],
+   "questions_tr": [
+    "Hangi olay katalogları var?",
+    "Deprem işaretleri nereden geliyor?",
+    "Yangın işaretlerinin kaynağı nedir?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:tool-layers",
+   "topic": "app",
+   "title": "The Satellite layers tool",
+   "text_en": "Satellite layers lets you lay global satellite datasets over the globe, such as daily true-colour imagery, snow, flood water or night lights. Each layer has a colour legend that says what its colours mean and where that comes from.",
+   "text_tr": "Uydu katmanları, günlük gerçek renkli görüntüler, kar, sel suyu veya gece ışıkları gibi küresel uydu veri setlerini kürenin üzerine sermenizi sağlar. Her katmanın, renklerinin ne anlama geldiğini ve bunun nereden geldiğini söyleyen bir renk açıklaması vardır.",
+   "questions_en": [
+    "What are satellite layers?",
+    "How do I add a satellite layer?",
+    "How do I see what the colours of a layer mean?",
+    "Can I see snow or night lights?",
+    "Where is the colour legend?"
+   ],
+   "questions_tr": [
+    "Uydu katmanları nedir?",
+    "Uydu katmanı nasıl eklerim?",
+    "Bir katmanın renkleri ne anlama geliyor, nereden görürüm?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:tool-lens",
+   "topic": "app",
+   "title": "The SAR lens tool",
+   "text_en": "The SAR lens is a square you can move and resize. Inside it the same place is shown in radar, from recent NISAR and Sentinel-1 passes, as a mosaic of recent daily passes that can have gaps. It can be expanded to the full screen.",
+   "text_tr": "SAR merceği, taşıyıp boyutlandırabileceğiniz bir karedir. İçinde aynı yer, yakın tarihli NISAR ve Sentinel-1 geçişlerinden oluşan ve boşluklar içerebilen bir mozaik olarak radarla gösterilir. Tam ekrana genişletilebilir.",
+   "questions_en": [
+    "What is the SAR lens?",
+    "How do I see a place in radar?",
+    "Why does the SAR lens have gaps?",
+    "Can I make the SAR lens bigger?",
+    "Which satellites does the SAR lens use?"
+   ],
+   "questions_tr": [
+    "SAR merceği nedir?",
+    "Bir yeri radarla nasıl görürüm?",
+    "SAR merceğinde neden boşluklar var?",
+    "SAR merceği hangi uyduları kullanır?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:tool-probe",
+   "topic": "app",
+   "title": "The Coverage probe tool",
+   "text_en": "With the Coverage probe you click anywhere on Earth to list the real NISAR products recorded over that point, and view each one on its own: its picture and its footprint. Only one product is drawn at a time. The list comes live from the ASF DAAC search API, and the pictures are NASA browse renderings, for looking, not measuring.",
+   "text_tr": "Kapsama sondası ile Dünya'da herhangi bir yere tıklayarak o nokta üzerinde kaydedilmiş gerçek NISAR ürünlerini listeler ve her birini tek tek görüntülersiniz: resmi ve kapsadığı alan. Aynı anda yalnızca bir ürün çizilir. Liste canlı olarak ASF DAAC arama servisinden gelir; resimler NASA'nın ön izleme görüntüleridir, ölçmek için değil bakmak içindir.",
+   "questions_en": [
+    "What is the coverage probe?",
+    "How do I check if NISAR has data for a place?",
+    "How do I see which NISAR images exist at a point?",
+    "Where does the coverage probe get its list?",
+    "Can I measure from the probe pictures?"
+   ],
+   "questions_tr": [
+    "Kapsama sondası nedir?",
+    "Bir yer için NISAR verisi var mı, nasıl bakarım?",
+    "Sonda listesi nereden geliyor?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:tool-search",
+   "topic": "app",
+   "title": "Search",
+   "text_en": "With Search in the top bar you can find a place, an investigation or a pair of coordinates and fly there.",
+   "text_tr": "Üst çubuktaki arama ile bir yer, bir inceleme veya bir koordinat çifti bulup oraya uçabilirsiniz.",
+   "questions_en": [
+    "How do I search for a place?",
+    "Can I enter coordinates?",
+    "How do I go to a city?",
+    "How do I find a location on the globe?"
+   ],
+   "questions_tr": [
+    "Bir yeri nasıl ararım?",
+    "Koordinat girebilir miyim?",
+    "Bir şehre nasıl giderim?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-navigate",
+   "topic": "app",
+   "title": "Moving the globe",
+   "text_en": "Drag to turn the globe, scroll or pinch to zoom, and hold the right mouse button (or use two fingers) to tilt.",
+   "text_tr": "Küreyi döndürmek için sürükleyin, yakınlaştırmak için kaydırın veya iki parmakla sıkıştırın, eğmek için sağ fare düğmesini basılı tutun (veya iki parmak kullanın).",
+   "questions_en": [
+    "How do I move the globe?",
+    "How do I zoom in?",
+    "How do I tilt the view?",
+    "How do I rotate the Earth?"
+   ],
+   "questions_tr": [
+    "Küreyi nasıl hareket ettiririm?",
+    "Nasıl yakınlaştırırım?",
+    "Görünümü nasıl eğerim?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-compare",
+   "topic": "app",
+   "title": "Comparing before and after",
+   "text_en": "Inside an investigation you can compare the Before and After images in three ways: Swipe, Side by side and Overlay. On the timeline, choose Before or After and then click a date to put that observation in that slot.",
+   "text_tr": "Bir incelemenin içinde Öncesi ve Sonrası görüntülerini üç şekilde karşılaştırabilirsiniz: Swipe (kaydırma), Side by side (yan yana) ve Overlay (üst üste). Zaman çizelgesinde Before veya After'ı seçip bir tarihe tıklayarak o gözlemi o yuvaya yerleştirirsiniz.",
+   "questions_en": [
+    "How do I compare before and after?",
+    "What is swipe mode?",
+    "How do I change the before image?",
+    "How does the timeline work?",
+    "Can I see the two images side by side?"
+   ],
+   "questions_tr": [
+    "Öncesi ve sonrasını nasıl karşılaştırırım?",
+    "Zaman çizelgesi nasıl çalışır?",
+    "Öncesi görüntüsünü nasıl değiştiririm?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-levels",
+   "topic": "app",
+   "title": "Simple and Scientific levels",
+   "text_en": "Explanations come at two levels. Simple uses plain words for a general reader; Scientific uses precise terms and gives the processing details. You can switch between them inside an investigation and in this chat.",
+   "text_tr": "Açıklamalar iki düzeyde sunulur. Basit (Simple) düzey genel okur için sade bir dil kullanır; Bilimsel (Scientific) düzey kesin terimler kullanır ve işleme ayrıntılarını verir. İkisi arasında bir incelemenin içinde ve bu sohbette geçiş yapabilirsiniz.",
+   "questions_en": [
+    "What is the difference between Simple and Scientific?",
+    "How do I get a more detailed explanation?",
+    "Can you explain it more simply?",
+    "What are the explanation levels?"
+   ],
+   "questions_tr": [
+    "Basit ve Bilimsel arasındaki fark nedir?",
+    "Daha ayrıntılı açıklamayı nasıl alırım?",
+    "Açıklama düzeyleri nelerdir?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-evidence",
+   "topic": "app",
+   "title": "Evidence labels on layers",
+   "text_en": "Every layer carries an evidence label: Satellite observation, Derived measurement, Interpretation, Model output or Simulation. NASA browse renderings are labelled as observations; maps the project computed itself are labelled as derived measurements.",
+   "text_tr": "Her katman bir kanıt etiketi taşır: uydu gözlemi (Satellite observation), türetilmiş ölçüm (Derived measurement), yorum (Interpretation), model çıktısı (Model output) veya simülasyon (Simulation). NASA'nın ön izleme görüntüleri gözlem olarak, projenin kendi hesapladığı haritalar türetilmiş ölçüm olarak etiketlenir.",
+   "questions_en": [
+    "What do observation and derived mean?",
+    "What is a derived measurement?",
+    "What are the evidence labels?",
+    "How do I know if a layer is real data or an interpretation?",
+    "What does the badge on a layer mean?"
+   ],
+   "questions_tr": [
+    "Gözlem ve türetilmiş ne demek?",
+    "Türetilmiş ölçüm nedir?",
+    "Kanıt etiketleri nelerdir?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-tiers",
+   "topic": "app",
+   "title": "NISAR quality tier labels",
+   "text_en": "Each NISAR product in the app shows the quality tier NASA assigned to it: BETA, PROVISIONAL or VALIDATED. The tier appears next to each radar layer and in the Coverage probe list. Urgent Response products are tasked acquisitions and are not listed by the probe.",
+   "text_tr": "Uygulamadaki her NISAR ürünü, NASA'nın ona verdiği kalite kademesini gösterir: BETA, PROVISIONAL veya VALIDATED. Kademe her radar katmanının yanında ve kapsama sondası listesinde görünür. Urgent Response ürünleri görevlendirilmiş çekimlerdir ve sonda tarafından listelenmez.",
+   "questions_en": [
+    "What do BETA, PROVISIONAL and VALIDATED mean?",
+    "What is a quality tier?",
+    "What is the BETA badge?",
+    "Where do I see the tier of a product?"
+   ],
+   "questions_tr": [
+    "BETA, PROVISIONAL ve VALIDATED ne demek?",
+    "Kalite kademesi nedir?",
+    "BETA etiketi nedir?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-credits",
+   "topic": "app",
+   "title": "Data credits",
+   "text_en": "Radar imagery is NISAR L-band from NASA/JPL-Caltech and ISRO, distributed by ASF DAAC. Context markers come from USGS and NASA EONET. The globe imagery is Sentinel-2 cloudless 2024 by EOX IT Services GmbH, terrain is Mapzen/AWS Terrain Tiles, and borders and place names are from OpenStreetMap contributors. The full list is in the About panel.",
+   "text_tr": "Radar görüntüleri NASA/JPL-Caltech ve ISRO'nun NISAR L-bant verisidir ve ASF DAAC tarafından dağıtılır. Bağlam işaretleri USGS ve NASA EONET'ten gelir. Küre görüntüsü EOX IT Services GmbH'nin Sentinel-2 cloudless 2024 ürünüdür, arazi Mapzen/AWS Terrain Tiles'tır, sınırlar ve yer adları OpenStreetMap katkıcılarındandır. Tam liste About panelindedir.",
+   "questions_en": [
+    "Where does the data come from?",
+    "Who provides the radar images?",
+    "What are the data sources?",
+    "Who made the base map?",
+    "Where are the credits?"
+   ],
+   "questions_tr": [
+    "Veriler nereden geliyor?",
+    "Radar görüntülerini kim sağlıyor?",
+    "Veri kaynakları nelerdir?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-intro-again",
+   "topic": "app",
+   "title": "Seeing the introduction again",
+   "text_en": "The introduction is shown on a first visit. To see it again, open About in the top bar and choose Show the introduction again.",
+   "text_tr": "Tanıtım ilk ziyarette gösterilir. Tekrar görmek için üst çubuktan About'u açın ve Show the introduction again seçeneğini seçin.",
+   "questions_en": [
+    "How do I see the introduction again?",
+    "Where is the welcome screen?",
+    "How do I reopen the intro?",
+    "Where is the About section?"
+   ],
+   "questions_tr": [
+    "Tanıtımı tekrar nasıl görürüm?",
+    "Karşılama ekranı nerede?",
+    "About bölümü nerede?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:app-assistant",
+   "topic": "app",
+   "title": "How this assistant works",
+   "text_en": "This assistant answers only from a checked knowledge base and from what is open in your view, and it cites what it used. It runs in your own browser. When it has no source for a question it says so instead of guessing, and it cannot predict earthquakes or other disasters.",
+   "text_tr": "Bu asistan yalnızca kontrol edilmiş bir bilgi tabanından ve görünümünüzde açık olanlardan yanıt verir ve kullandığı kaynağı gösterir. Kendi tarayıcınızda çalışır. Bir soru için kaynağı yoksa tahmin yürütmek yerine bunu söyler; depremleri veya başka afetleri önceden bildiremez.",
+   "questions_en": [
+    "Who are you?",
+    "How do you work?",
+    "Can I trust your answers?",
+    "Where do your answers come from?",
+    "Are you ChatGPT?",
+    "Do you make things up?"
+   ],
+   "questions_tr": [
+    "Sen kimsin?",
+    "Nasıl çalışıyorsun?",
+    "Yanıtlarına güvenebilir miyim?",
+    "Yanıtların nereden geliyor?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:concept-sar",
+   "topic": "radar",
+   "title": "What is synthetic aperture radar?",
+   "text_en": "A radar satellite sends its own microwave pulses to the ground and records the echoes. Because it brings its own \"light\", it sees at night and straight through clouds and smoke.",
+   "text_scientific_en": "SAR synthesizes a long antenna by coherently combining echoes recorded along the orbit, giving metre-scale resolution from 747 km altitude. Each pixel stores amplitude (how much energy came back) and phase (the exact distance to the ground, modulo the wavelength).",
+   "questions_en": [
+    "What is synthetic aperture radar?",
+    "What is SAR?",
+    "What is synthetic aperture radar?",
+    "How does a radar satellite work?",
+    "How can radar see at night and through clouds?"
+   ],
+   "source": {
+    "label": "Global SAR radar explainer",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:concept-backscatter",
+   "topic": "radar",
+   "title": "Bright and dark: backscatter",
+   "text_en": "Bright means a lot of the pulse bounced back to the satellite. Calm water acts like a mirror and sends the pulse away, so it looks black. Buildings act like corner reflectors and look very bright. Forests are medium-bright because the canopy scatters the pulse in all directions.",
+   "text_scientific_en": "Radar brightness (backscatter, γ⁰) depends on surface roughness relative to the wavelength, geometry (local incidence angle) and dielectric properties (moisture). Specular reflection from smooth water gives very low γ⁰; dihedral double-bounce (walls, flooded trunks) gives very high γ⁰; volume scattering in canopies is intermediate and strongly depolarizing.",
+   "questions_en": [
+    "Bright and dark: backscatter",
+    "What is backscatter?",
+    "Why is water black in radar images?",
+    "Why are cities bright in radar images?",
+    "What do bright and dark mean in a radar image?"
+   ],
+   "source": {
+    "label": "Global SAR radar explainer",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:concept-polarization",
+   "topic": "radar",
+   "title": "Polarization: HH and HV",
+   "text_en": "NISAR sends pulses with a horizontal wave (H) and listens for both horizontal (HH) and vertical (HV) echoes. Only messy, three-dimensional targets like tree branches flip the wave to vertical, so HV is a \"vegetation detector\".",
+   "text_scientific_en": "Co-polarized HH is dominated by surface and double-bounce scattering; cross-polarized HV arises mainly from multiple scattering in volumes (canopies). The HH/HV ratio helps separate bare ground, vegetation, urban areas and flooded vegetation (HH strongly enhanced by trunk–water double bounce).",
+   "questions_en": [
+    "Polarization: HH and HV",
+    "What is polarization?",
+    "What do HH and HV mean?",
+    "What is the difference between HH and HV?",
+    "Why is HV good for vegetation?"
+   ],
+   "source": {
+    "label": "Global SAR radar explainer",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:concept-insar",
+   "topic": "radar",
+   "title": "Interferometry: measuring motion",
+   "text_en": "Compare the echo timing of two passes over the same place, 12 days apart. If the ground moved toward or away from the satellite, the echo arrives slightly earlier or later. The rainbow bands (fringes) are contour lines of that motion.",
+   "text_scientific_en": "The interferometric phase Δφ = 4πΔR/λ links phase to line-of-sight (LOS) range change ΔR. With λ ≈ 24 cm for NISAR L-band, one 2π fringe corresponds to λ/2 ≈ 12 cm of LOS change. Phase also contains atmospheric, ionospheric and orbital terms that must be separated from ground motion.",
+   "questions_en": [
+    "Interferometry: measuring motion",
+    "What is interferometry?",
+    "What is InSAR?",
+    "What are the rainbow fringes?",
+    "How does radar measure ground motion?"
+   ],
+   "source": {
+    "label": "Global SAR radar explainer",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:concept-coherence",
+   "topic": "radar",
+   "title": "Coherence: when the radar loses track",
+   "text_en": "Fringes only work where the ground looks the same in both passes. Water, moving leaves or a collapsed landscape scramble the echo, and the interferogram turns into random noise there.",
+   "text_scientific_en": "Coherence (0–1) measures the correlation of the two complex images. Water surfaces decorrelate within milliseconds; vegetation, snow, and surface disruption reduce coherence. Low-coherence pixels carry no usable phase and must be masked.",
+   "questions_en": [
+    "Coherence: when the radar loses track",
+    "What is coherence?",
+    "Why is there noise over water in an interferogram?",
+    "Why does the radar lose track?",
+    "What does low coherence mean?"
+   ],
+   "source": {
+    "label": "Global SAR radar explainer",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:concept-lband",
+   "topic": "radar",
+   "title": "Why L-band matters",
+   "text_en": "NISAR uses long 24 cm waves, about four times longer than Europe’s Sentinel-1. Long waves slip past leaves and reach the ground, so NISAR can measure motion and floods under forests where shorter waves fail.",
+   "text_scientific_en": "Longer wavelength penetrates canopies and keeps interferometric coherence over vegetated and agricultural terrain for longer repeat intervals. The cost: L-band is more sensitive to the ionosphere, which adds long-wavelength phase ramps that must be estimated (e.g. by split-spectrum methods).",
+   "questions_en": [
+    "Why L-band matters",
+    "Why does L-band matter?",
+    "What is L-band?",
+    "Why does NISAR use a long wavelength?",
+    "What is special about NISAR radar?"
+   ],
+   "source": {
+    "label": "Global SAR radar explainer",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:event-venezuela-2026-happened",
+   "topic": "investigation",
+   "title": "Venezuela earthquakes: what happened",
+   "text_en": "On 24 June 2026 at about 22:04 UTC, two large earthquakes (M7.5 and M7.2) struck north-central Venezuela, near the coastal fault system that runs along the Caribbean shore. NASA used NISAR to map how far the ground shifted.",
+   "questions_en": [
+    "What happened in the Venezuela earthquakes?",
+    "Tell me about the Venezuela earthquakes.",
+    "When did the Venezuela earthquakes happen?",
+    "Where was the Venezuela earthquakes?",
+    "What is the Venezuela earthquakes investigation about?"
+   ],
+   "source": {
+    "label": "USGS; NASA Earth Observatory",
+    "url": "https://science.nasa.gov/earth/earth-observatory/where-venezuelas-earthquakes-shifted-the-ground/"
+   }
+  },
+  {
+   "id": "kb:event-venezuela-2026-radar",
+   "topic": "investigation",
+   "title": "Venezuela earthquakes: what the radar shows",
+   "text_en": "The default view is our measurement: how far the ground moved toward (red) or away from (blue) the satellite, in centimetres, computed from NISAR’s interferograms. BEFORE covers 1–13 June, with no earthquake: almost everything stays within a few centimetres (pale). AFTER covers 13–25 June: land south of the coast moved up to about 45 cm away from the satellite (deep blue). Black gaps are places where the radar could not get a reliable measurement (water, steep mountains, dense vegetation).",
+   "text_scientific_en": "Derived layers (default): LOS displacement d = −φ·λ/4π (λ = 24.20 cm from centerFrequency 1239 MHz) from GUNW unwrappedPhase minus the product’s ionospherePhaseScreen, masked where coherence < 0.3 or outside connected components, referenced to a far-field box (69.1–68.7°W, 9.8–10.0°N). Both pairs share one ±50 cm colour scale. Pre-seismic pair (06-01 → 06-13): 1st–99th percentile −5.0 to +8.3 cm, standard deviation 3.5 cm, i.e. our noise floor (residual troposphere/ionosphere). Coseismic pair (06-13 → 06-25): 1st percentile −45 cm (away from the satellite), 99th +14.9 cm, standard deviation 12 cm. About half the area survives the coherence mask in each pair.",
+   "questions_en": [
+    "What does the radar show for the Venezuela earthquakes?",
+    "How do I read the Venezuela earthquakes images?",
+    "What do the colours mean in the Venezuela earthquakes investigation?",
+    "What changed between before and after in the Venezuela earthquakes?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Venezuela earthquakes\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/venezuela-2026"
+   }
+  },
+  {
+   "id": "kb:event-venezuela-2026-caveats",
+   "topic": "investigation",
+   "title": "Venezuela earthquakes: limits of the analysis",
+   "text_en": "Derived by our team from NISAR data, not an official NASA product. Troposphere and solid-earth tides are not corrected; expect a few centimetres of error (pre-seismic noise: 3.5 cm standard deviation). Interferograms show motion along the radar line of sight only (one direction), not full 3-D motion. PROVISIONAL data tier: calibrated, but will be reprocessed by NASA in 2027.",
+   "questions_en": [
+    "How reliable is the Venezuela earthquakes analysis?",
+    "What are the limitations of the Venezuela earthquakes investigation?",
+    "Is the Venezuela earthquakes map an official NASA product?",
+    "How accurate is the Venezuela earthquakes measurement?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Venezuela earthquakes\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/venezuela-2026"
+   }
+  },
+  {
+   "id": "kb:event-venezuela-2026-pin-v-coast",
+   "topic": "investigation",
+   "title": "Venezuela earthquakes: Crowded fringes along the coast",
+   "text_en": "The deepest blue in the AFTER map sits here, along the coast near the epicentres: the ground moved tens of centimetres away from the satellite. In NASA’s rainbow picture the colour bands crowd together here, and only after 24 June.",
+   "text_scientific_en": "High fringe density = steep LOS displacement gradient near the rupture. The band is absent in the pre-seismic pair, which isolates it as coseismic.",
+   "questions_en": [
+    "What is \"Crowded fringes along the coast\" in the Venezuela earthquakes investigation?",
+    "What does the marker \"Crowded fringes along the coast\" show?",
+    "Explain Crowded fringes along the coast."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Venezuela earthquakes\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/venezuela-2026"
+   }
+  },
+  {
+   "id": "kb:event-venezuela-2026-pin-v-broad",
+   "topic": "investigation",
+   "title": "Venezuela earthquakes: The noise floor",
+   "text_en": "In the BEFORE map (no earthquake) the ground here still shows a few centimetres of apparent motion, and NASA’s rainbow pictures show wide gentle bands in BOTH pairs. That is the air and the ionosphere slightly delaying the radar signal, not the earthquake: about ±3.5 cm is our measurement noise.",
+   "text_scientific_en": "Long-wavelength phase common to both pairs: likely ionospheric (dispersive, strong at L-band) plus tropospheric delay. Split-spectrum ionosphere correction and weather-model tropospheric correction would reduce it.",
+   "questions_en": [
+    "What is \"The noise floor\" in the Venezuela earthquakes investigation?",
+    "What does the marker \"The noise floor\" show?",
+    "Explain The noise floor."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Venezuela earthquakes\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/venezuela-2026"
+   }
+  },
+  {
+   "id": "kb:event-venezuela-2026-pin-v-lake",
+   "topic": "investigation",
+   "title": "Venezuela earthquakes: Lake Valencia: noise",
+   "text_en": "A patch of noise inside the land: this is Lake Valencia. Water changes from second to second, so the radar cannot compare the two passes there.",
+   "text_scientific_en": "Temporal decorrelation of the water surface (coherence ≈ 0). Its position also checks our georeferencing of the browse image.",
+   "questions_en": [
+    "What is \"Lake Valencia: noise\" in the Venezuela earthquakes investigation?",
+    "What does the marker \"Lake Valencia: noise\" show?",
+    "Explain Lake Valencia: noise."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Venezuela earthquakes\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/venezuela-2026"
+   }
+  },
+  {
+   "id": "kb:event-venezuela-2026-pin-v-sea",
+   "topic": "investigation",
+   "title": "Venezuela earthquakes: Caribbean Sea: no signal",
+   "text_en": "All the speckle in the north is sea. No measurement is possible over water, which is why we only see motion on land.",
+   "text_scientific_en": "Open ocean is fully decorrelated; any offshore part of the rupture is invisible to InSAR.",
+   "questions_en": [
+    "What is \"Caribbean Sea: no signal\" in the Venezuela earthquakes investigation?",
+    "What does the marker \"Caribbean Sea: no signal\" show?",
+    "Explain Caribbean Sea: no signal."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Venezuela earthquakes\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/venezuela-2026"
+   }
+  },
+  {
+   "id": "kb:event-mozambique-floods-2026-happened",
+   "topic": "investigation",
+   "title": "Limpopo and Incomati floods: what happened",
+   "text_en": "In January 2026, flooding along the Limpopo and Incomati rivers in southern Mozambique inundated floodplains and farmland. NASA compared NISAR observations from 5 and 17 January to map open water.",
+   "questions_en": [
+    "What happened in the Limpopo and Incomati floods?",
+    "Tell me about the Limpopo and Incomati floods.",
+    "When did the Limpopo and Incomati floods happen?",
+    "Where was the Limpopo and Incomati floods?",
+    "What is the Limpopo and Incomati floods investigation about?"
+   ],
+   "source": {
+    "label": "NASA Scientific Visualization Studio",
+    "url": "https://svs.gsfc.nasa.gov/5661"
+   }
+  },
+  {
+   "id": "kb:event-mozambique-floods-2026-radar",
+   "topic": "investigation",
+   "title": "Limpopo and Incomati floods: what the radar shows",
+   "text_en": "The default view is our measurement of radar brightness on 5 and 17 January around Chókwè. Dark = the pulse bounced away, which is what calm water does. Pick “water mask” in the AFTER slot: bright blue = roughly 320–380 km² of new water on 17 January, mostly across the Limpopo floodplain and its irrigated fields. Muted blue = roughly 330–480 km² that was water on both dates (river channels, lakes, wetlands). The ranges come from two ways of smoothing the radar speckle. Pick “change (dB)” to see where it got darker (blue) or brighter (red).",
+   "text_scientific_en": "Product: NISAR L2 GCOV (geocoded, terrain-flattened backscatter γ⁰), dual-pol HH/HV, track 114 ascending, frame 165. Browse composite per NISAR QA defaults: R = HH, G = HV, B = HH; each channel in linear power, clipped to its own 5th–95th percentile, gamma 0.5. Because each date is stretched independently, brightness is not comparable quantitatively between dates. Open water appears as very low backscatter in both channels (specular reflection). An HH increase relative to HV in vegetated floodplains can indicate flooded vegetation via trunk–water double bounce, which L-band detects beneath canopies.",
+   "questions_en": [
+    "What does the radar show for the Limpopo and Incomati floods?",
+    "How do I read the Limpopo and Incomati floods images?",
+    "What do the colours mean in the Limpopo and Incomati floods investigation?",
+    "What changed between before and after in the Limpopo and Incomati floods?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Limpopo and Incomati floods\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/mozambique-floods-2026"
+   }
+  },
+  {
+   "id": "kb:event-mozambique-floods-2026-caveats",
+   "topic": "investigation",
+   "title": "Limpopo and Incomati floods: limits of the analysis",
+   "text_en": "BETA data tier: NASA states these early products are not fully calibrated and not intended for science. Relative patterns are still informative. Flood areas are our heuristic classification, not field-validated. Compare with NASA’s open-water maps (SVS 5661) before quoting them. Wind-roughened water and smooth surfaces such as tarmac can mimic or hide water in radar images.",
+   "questions_en": [
+    "How reliable is the Limpopo and Incomati floods analysis?",
+    "What are the limitations of the Limpopo and Incomati floods investigation?",
+    "Is the Limpopo and Incomati floods map an official NASA product?",
+    "How accurate is the Limpopo and Incomati floods measurement?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Limpopo and Incomati floods\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/mozambique-floods-2026"
+   }
+  },
+  {
+   "id": "kb:event-mozambique-floods-2026-pin-m-chokwe",
+   "topic": "investigation",
+   "title": "Limpopo and Incomati floods: Limpopo floodplain near Chókwè",
+   "text_en": "The Limpopo valley around Chókwè, a farming area that floods when the river overtops its banks. Compare how much of the valley floor is dark on each date.",
+   "text_scientific_en": "Floodplain agriculture: expect γ⁰ to drop where fields become open water, and HH to rise where crops or shrubs stand in water.",
+   "questions_en": [
+    "What is \"Limpopo floodplain near Chókwè\" in the Limpopo and Incomati floods investigation?",
+    "What does the marker \"Limpopo floodplain near Chókwè\" show?",
+    "Explain Limpopo floodplain near Chókwè."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Limpopo and Incomati floods\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/mozambique-floods-2026"
+   }
+  },
+  {
+   "id": "kb:event-mozambique-floods-2026-pin-m-corumana",
+   "topic": "investigation",
+   "title": "Limpopo and Incomati floods: Corumana reservoir (reference)",
+   "text_en": "A reservoir: permanent calm water, so it is dark on both dates. Use it as a reference for what water looks like to radar.",
+   "text_scientific_en": "Stable open-water target; useful as an in-scene reference for the water threshold. Its mapped position also checks our georeferencing.",
+   "questions_en": [
+    "What is \"Corumana reservoir (reference)\" in the Limpopo and Incomati floods investigation?",
+    "What does the marker \"Corumana reservoir (reference)\" show?",
+    "Explain Corumana reservoir (reference)."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Limpopo and Incomati floods\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/mozambique-floods-2026"
+   }
+  },
+  {
+   "id": "kb:event-krasheninnikov-2026-happened",
+   "topic": "investigation",
+   "title": "Krasheninnikov volcano: what happened",
+   "text_en": "Krasheninnikov, a volcano in the Kronotsky Reserve of Kamchatka, began erupting on 2–3 August 2025, days after the M8.8 Kamchatka earthquake; its previous eruption was around 1550. Lava was still flowing onto its eastern flanks in late October 2026 (KVERT). NASA released a NISAR time-lapse of the lava flows.",
+   "questions_en": [
+    "What happened in the Krasheninnikov volcano?",
+    "Tell me about the Krasheninnikov volcano.",
+    "When did the Krasheninnikov volcano happen?",
+    "Where was the Krasheninnikov volcano?",
+    "What is the Krasheninnikov volcano investigation about?"
+   ],
+   "source": {
+    "label": "Smithsonian GVP / KVERT weekly reports; NASA JPL; NASA SVS",
+    "url": "https://svs.gsfc.nasa.gov/5675"
+   }
+  },
+  {
+   "id": "kb:event-krasheninnikov-2026-radar",
+   "topic": "investigation",
+   "title": "Krasheninnikov volcano: what the radar shows",
+   "text_en": "Eleven NISAR passes on the same orbit, 12 days apart, from 18 June to 28 October 2026, processed by us at full resolution (about 20 m). Step through them on the timeline. Every date uses the same colour scale, so a colour change means the ground really changed. Green = vegetation, pale/white = strong echoes from rough surfaces such as fresh lava, dark = smooth surfaces or slopes hidden from the radar. Look at the pale fan on the east side of the summit cone: that is where the Kamchatka volcano observatory (KVERT) reported lava flowing.",
+   "text_scientific_en": "Derived layers: NISAR L2 GCOV γ⁰ HH and HV, track 060 descending, frame 061, ~22 × 20 km box; 3×3 boxcar, dB, composite R = B = HH (−25..0 dB), G = HV (−32..−7 dB) with one fixed stretch for all dates, unlike NASA’s per-image browse stretch. 2026-06-18 to 2026-10-16 PROVISIONAL, 2026-10-28 VALIDATED. Scene median HH change 18 Jun → 28 Oct is only +0.1 dB, so seasonal effects are modest in this box; local changes stand out in the change layer.",
+   "questions_en": [
+    "What does the radar show for the Krasheninnikov volcano?",
+    "How do I read the Krasheninnikov volcano images?",
+    "What do the colours mean in the Krasheninnikov volcano investigation?",
+    "What changed between before and after in the Krasheninnikov volcano?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Krasheninnikov volcano\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/krasheninnikov-2026"
+   }
+  },
+  {
+   "id": "kb:event-krasheninnikov-2026-caveats",
+   "topic": "investigation",
+   "title": "Krasheninnikov volcano: limits of the analysis",
+   "text_en": "Derived by our team from NISAR data, not an official product. Lava interpretation relies on KVERT reports plus backscatter, not a mapped flow outline. Data tiers are mixed (PROVISIONAL and VALIDATED), so small calibration differences between dates are possible. Slopes facing away from the radar are in shadow, and slopes facing it are compressed (layover); both distort apparent brightness.",
+   "questions_en": [
+    "How reliable is the Krasheninnikov volcano analysis?",
+    "What are the limitations of the Krasheninnikov volcano investigation?",
+    "Is the Krasheninnikov volcano map an official NASA product?",
+    "How accurate is the Krasheninnikov volcano measurement?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Krasheninnikov volcano\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/krasheninnikov-2026"
+   }
+  },
+  {
+   "id": "kb:event-krasheninnikov-2026-pin-k-summit",
+   "topic": "investigation",
+   "title": "Krasheninnikov volcano: Krasheninnikov summit",
+   "text_en": "The volcano’s summit, inside its old caldera.",
+   "text_scientific_en": "Summit per Smithsonian GVP (volcano 300190). Steep slopes facing away from the radar fall into shadow (dark); slopes facing it are compressed (layover).",
+   "questions_en": [
+    "What is \"Krasheninnikov summit\" in the Krasheninnikov volcano investigation?",
+    "What does the marker \"Krasheninnikov summit\" show?",
+    "Explain Krasheninnikov summit."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Krasheninnikov volcano\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/krasheninnikov-2026"
+   }
+  },
+  {
+   "id": "kb:event-krasheninnikov-2026-pin-k-fan",
+   "topic": "investigation",
+   "title": "Krasheninnikov volcano: Pale fan east of the cone",
+   "text_en": "A bright fan on the east side of the cone, on every date. Rough new lava reflects radar strongly, and this is where KVERT reported lava flows.",
+   "text_scientific_en": "High HH and HV with no vegetation signature: consistent with a rough aʻa-type lava surface. Interpretation supported by KVERT reports, not an outline of the flow.",
+   "questions_en": [
+    "What is \"Pale fan east of the cone\" in the Krasheninnikov volcano investigation?",
+    "What does the marker \"Pale fan east of the cone\" show?",
+    "Explain Pale fan east of the cone."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Krasheninnikov volcano\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/krasheninnikov-2026"
+   }
+  },
+  {
+   "id": "kb:event-krasheninnikov-2026-pin-k-sw",
+   "topic": "investigation",
+   "title": "Krasheninnikov volcano: New bright patch (unexplained)",
+   "text_en": "This area got much brighter between 18 June and 17 August. Radar alone cannot tell us why, so we mark it as unexplained instead of guessing.",
+   "text_scientific_en": "HH increase > +6 dB, persistent after mid-August. Candidates: fresh deposits, wetting, vegetation change. Needs optical imagery or field reports to resolve.",
+   "questions_en": [
+    "What is \"New bright patch (unexplained)\" in the Krasheninnikov volcano investigation?",
+    "What does the marker \"New bright patch (unexplained)\" show?",
+    "Explain New bright patch (unexplained)."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Krasheninnikov volcano\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/krasheninnikov-2026"
+   }
+  },
+  {
+   "id": "kb:event-uniao-do-sul-deforestation-2026-happened",
+   "topic": "investigation",
+   "title": "Amazon clear-cut, União do Sul: what happened",
+   "text_en": "In late September to mid-October 2026, about 6.2 km² of Amazon forest near União do Sul (Mato Grosso, Brazil) was clear-cut. Brazil’s INPE detected it with its DETER satellite alert system on 14 October 2026; Sentinel-2 imagery shows the forest still intact on 26 September, so the clearing happened between 26 September and 14 October.",
+   "questions_en": [
+    "What happened in the Amazon clear-cut, União do Sul?",
+    "Tell me about the Amazon clear-cut, União do Sul.",
+    "When did the Amazon clear-cut, União do Sul happen?",
+    "Where was the Amazon clear-cut, União do Sul?",
+    "What is the Amazon clear-cut, União do Sul investigation about?"
+   ],
+   "source": {
+    "label": "INPE DETER (TerraBrasilis); Sentinel-2 via Microsoft Planetary Computer",
+    "url": "https://terrabrasilis.dpi.inpe.br/en/home-page/"
+   }
+  },
+  {
+   "id": "kb:event-uniao-do-sul-deforestation-2026-radar",
+   "topic": "investigation",
+   "title": "Amazon clear-cut, União do Sul: what the radar shows",
+   "text_en": "Four NISAR passes, 18 September to 24 October 2026, on one fixed colour scale: green = forest (the radar echo bounces around inside the canopy), pink/dark = open ground. Pick “change (dB)” in the AFTER slot: blue = the forest echo dropped. Inside the box around INPE’s alert, 68 % of the ground shows a strong drop, against 11 % in the wider area. Radar sees through the clouds of the rainy season, when optical satellites often cannot.",
+   "text_scientific_en": "NISAR L2 GCOV γ⁰ HH/HV, track 002 ascending, frame 172. HV (cross-pol) responds to canopy volume scattering; clearing removes it. HV log-ratio on a 3×3 median of dB; the scene-wide median change (−1.19 dB, partly a calibration difference: the 24 Oct scene is VALIDATED P05036, the 30 Sep scene PROVISIONAL P05023) is removed before thresholding at −3 dB.",
+   "questions_en": [
+    "What does the radar show for the Amazon clear-cut, União do Sul?",
+    "How do I read the Amazon clear-cut, União do Sul images?",
+    "What do the colours mean in the Amazon clear-cut, União do Sul investigation?",
+    "What changed between before and after in the Amazon clear-cut, União do Sul?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Amazon clear-cut, União do Sul\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/uniao-do-sul-deforestation-2026"
+   }
+  },
+  {
+   "id": "kb:event-uniao-do-sul-deforestation-2026-caveats",
+   "topic": "investigation",
+   "title": "Amazon clear-cut, União do Sul: limits of the analysis",
+   "text_en": "Derived by our team; heuristic threshold, not field-validated. Before and after scenes differ in processing version (PROVISIONAL vs VALIDATED). HV also drops with tillage and drying vegetation, so loss outside the alert polygon is not necessarily deforestation.",
+   "questions_en": [
+    "How reliable is the Amazon clear-cut, União do Sul analysis?",
+    "What are the limitations of the Amazon clear-cut, União do Sul investigation?",
+    "Is the Amazon clear-cut, União do Sul map an official NASA product?",
+    "How accurate is the Amazon clear-cut, União do Sul measurement?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Amazon clear-cut, União do Sul\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/uniao-do-sul-deforestation-2026"
+   }
+  },
+  {
+   "id": "kb:event-uniao-do-sul-deforestation-2026-pin-u-deter",
+   "topic": "investigation",
+   "title": "Amazon clear-cut, União do Sul: INPE DETER clear-cut alert",
+   "text_en": "Centre of the area INPE flagged as freshly cleared forest (6.2 km²). The radar echo from the canopy dropped sharply here.",
+   "text_scientific_en": "DETER clear-cut polygon deter_amz.41873_curr, view date 2026-10-14. 68 % of its bounding box shows HV loss > 3 dB below the scene median change.",
+   "questions_en": [
+    "What is \"INPE DETER clear-cut alert\" in the Amazon clear-cut, União do Sul investigation?",
+    "What does the marker \"INPE DETER clear-cut alert\" show?",
+    "Explain INPE DETER clear-cut alert."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Amazon clear-cut, União do Sul\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/uniao-do-sul-deforestation-2026"
+   }
+  },
+  {
+   "id": "kb:event-aspen-acres-fire-2026-happened",
+   "topic": "investigation",
+   "title": "Aspen Acres wildfire: what happened",
+   "text_en": "The Aspen Acres fire burned in Custer County, Colorado, from late June 2026 (NASA EONET / IRWIN record dated 29 June 2026), with a reported size of 91,982 acres (about 372 km²).",
+   "questions_en": [
+    "What happened in the Aspen Acres wildfire?",
+    "Tell me about the Aspen Acres wildfire.",
+    "When did the Aspen Acres wildfire happen?",
+    "Where was the Aspen Acres wildfire?",
+    "What is the Aspen Acres wildfire investigation about?"
+   ],
+   "source": {
+    "label": "NASA EONET (IRWIN record)",
+    "url": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21019"
+   }
+  },
+  {
+   "id": "kb:event-aspen-acres-fire-2026-radar",
+   "topic": "investigation",
+   "title": "Aspen Acres wildfire: what the radar shows",
+   "text_en": "Four NISAR passes from 15 June to 14 August 2026, on one fixed colour scale; the before/after pair is 27 June → 14 August. Pick “change (dB)” in the AFTER slot: blue = the vegetation echo dropped, which happens where fire destroyed trees and shrubs. The radar shows about 68 km² of strong canopy loss. That is smaller than the 372 km² reported fire area, because grass and low shrub fires change the radar echo much less than burned forest.",
+   "text_scientific_en": "NISAR L2 GCOV γ⁰ HH/HV, track 019 ascending, frame 021, all PROVISIONAL (P05023). Change pair 2026-06-27 → 2026-08-14. HV log-ratio on a 3×3 median of dB, scene median (+0.37 dB) removed, threshold −3 dB: 68.1 km² of 1,539 km² analysed.",
+   "questions_en": [
+    "What does the radar show for the Aspen Acres wildfire?",
+    "How do I read the Aspen Acres wildfire images?",
+    "What do the colours mean in the Aspen Acres wildfire investigation?",
+    "What changed between before and after in the Aspen Acres wildfire?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Aspen Acres wildfire\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/aspen-acres-fire-2026"
+   }
+  },
+  {
+   "id": "kb:event-aspen-acres-fire-2026-caveats",
+   "topic": "investigation",
+   "title": "Aspen Acres wildfire: limits of the analysis",
+   "text_en": "Derived by our team; heuristic threshold, not field-validated. No official burn perimeter was used for validation. Reported fire area (372 km²) and radar canopy-loss area (68 km²) measure different things.",
+   "questions_en": [
+    "How reliable is the Aspen Acres wildfire analysis?",
+    "What are the limitations of the Aspen Acres wildfire investigation?",
+    "Is the Aspen Acres wildfire map an official NASA product?",
+    "How accurate is the Aspen Acres wildfire measurement?"
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Aspen Acres wildfire\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/aspen-acres-fire-2026"
+   }
+  },
+  {
+   "id": "kb:event-aspen-acres-fire-2026-pin-a-eonet",
+   "topic": "investigation",
+   "title": "Aspen Acres wildfire: EONET fire location",
+   "text_en": "The reported location of the Aspen Acres fire, which the incident record describes as about 20 miles south-west of Pueblo.",
+   "text_scientific_en": "NASA EONET event EONET_21019 (IRWIN 2026-COCUX-001160); point location, not a perimeter.",
+   "questions_en": [
+    "What is \"EONET fire location\" in the Aspen Acres wildfire investigation?",
+    "What does the marker \"EONET fire location\" show?",
+    "Explain EONET fire location."
+   ],
+   "source": {
+    "label": "Global SAR investigation \"Aspen Acres wildfire\" (the project's own analysis, not an official NASA product)",
+    "url": "https://globalsar.earth/#/e/aspen-acres-fire-2026"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-viirs-noaa20-truecolor",
+   "topic": "layer",
+   "title": "Layer: Daily true-colour Earth (VIIRS NOAA-20)",
+   "text_en": "What the whole planet looked like on a given day, in natural colours. Good for spotting volcanic plumes, large floods and smoke. Provider: NASA GIBS (LANCE / EOSDIS). Mission: NOAA-20 (JPSS-1). Resolution: 375 m (VIIRS I-band); served at GIBS Level 9. Limitations: One image per day; clouds hide the surface; 375 m is too coarse for buildings or small landslides. Swath gaps near the equator. GetCapabilities lists internal date gaps (e.g. 2019-12-31/2020-01-02, 2022-01-12/2022-01-14) that return HTTP 404. Note the GIBS REST path order is {z}/{y}/{x} (TileMatrix/TileRow/TileCol);",
+   "text_scientific_en": "Daily global composite of VIIRS corrected reflectance (Rayleigh-corrected TOA, true-colour band combination) from swath L1B (VJ102IMG). Daytime ascending passes only. Provider: NASA GIBS (LANCE / EOSDIS). Mission: NOAA-20 (JPSS-1). Resolution: 375 m (VIIRS I-band); served at GIBS Level 9. Limitations: One image per day; clouds hide the surface; 375 m is too coarse for buildings or small landslides. Swath gaps near the equator. GetCapabilities lists internal date gaps (e.g. 2019-12-31/2020-01-02, 2022-01-12/2022-01-14) that return HTTP 404. Note the GIBS REST path order is {z}/{y}/{x} (TileMatrix/TileRow/TileCol); the template already uses that order.",
+   "questions_en": [
+    "What does the Daily true-colour Earth (VIIRS NOAA-20) layer show?",
+    "What is Daily true-colour Earth (VIIRS NOAA-20)?",
+    "What are the limitations of Daily true-colour Earth (VIIRS NOAA-20)?",
+    "Where does the Daily true-colour Earth (VIIRS NOAA-20) data come from?",
+    "What is the resolution of Daily true-colour Earth (VIIRS NOAA-20)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (LANCE / EOSDIS)",
+    "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/viirs/noaa20/VIIRS_NOAA20_CorrectedReflectance_TrueColor.md"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-viirs-noaa20-truecolor-colours",
+   "topic": "layer",
+   "title": "Colours of: Daily true-colour Earth (VIIRS NOAA-20)",
+   "text_en": "Natural colours, similar to what the human eye would see from space. There is no colour scale: the picture itself is the information. No colour key applies. NASA notes an occasional checkered pattern near the poles where several orbits overlap.",
+   "text_scientific_en": "True-colour composite of VIIRS corrected reflectance: red = band I1, green = band M4, blue = band M3. NASA GIBS publishes no colormap for this layer because it is imagery, not a mapped variable. No colour key applies. NASA notes an occasional checkered pattern near the poles where several orbits overlap.",
+   "questions_en": [
+    "What do the colours mean in Daily true-colour Earth (VIIRS NOAA-20)?",
+    "How do I read the Daily true-colour Earth (VIIRS NOAA-20) legend?",
+    "What do the colors of the Daily true-colour Earth (VIIRS NOAA-20) layer mean?"
+   ],
+   "source": {
+    "label": "NASA Worldview layer description: Corrected Reflectance (True Color, VIIRS, NOAA-20)",
+    "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/viirs/noaa20/VIIRS_NOAA20_CorrectedReflectance_TrueColor.md"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-opera-rtc-s1",
+   "topic": "layer",
+   "title": "Layer: Radar backscatter, Sentinel-1 (OPERA RTC-S1)",
+   "text_en": "A radar picture that sees through clouds and works at night. Vegetation looks green, built-up ground white or pink, and smooth surfaces such as calm water black. Provider: NASA JPL OPERA (data at ASF DAAC), tiles by NASA GIBS. Mission: Copernicus Sentinel-1. Resolution: 30 m. Limitations: C-band, not NISAR L-band: less penetration into vegetation. The tile is an 8-bit visualization, not calibrated dB values. Spatial coverage follows the OPERA production footprint (not verified here) and the 12-day Sentinel-1 revisit; most dates show only a few swaths. Many internal date gaps in GetCapabilities.",
+   "text_scientific_en": "False-colour rendering of terrain-flattened gamma0 backscatter (OPERA_L2_RTC-S1_V1, CMR C2777436413-ASF). Each date shows only the Sentinel-1 swaths acquired that day. Provider: NASA JPL OPERA (data at ASF DAAC), tiles by NASA GIBS. Mission: Copernicus Sentinel-1. Resolution: 30 m. Limitations: C-band, not NISAR L-band: less penetration into vegetation. The tile is an 8-bit visualization, not calibrated dB values. Spatial coverage follows the OPERA production footprint (not verified here) and the 12-day Sentinel-1 revisit; most dates show only a few swaths. Many internal date gaps in GetCapabilities.",
+   "questions_en": [
+    "What does the Radar backscatter, Sentinel-1 (OPERA RTC-S1) layer show?",
+    "What is Radar backscatter, Sentinel-1 (OPERA RTC-S1)?",
+    "What are the limitations of Radar backscatter, Sentinel-1 (OPERA RTC-S1)?",
+    "Where does the Radar backscatter, Sentinel-1 (OPERA RTC-S1) data come from?",
+    "What is the resolution of Radar backscatter, Sentinel-1 (OPERA RTC-S1)?"
+   ],
+   "source": {
+    "label": "NASA JPL OPERA (data at ASF DAAC), tiles by NASA GIBS",
+    "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/multi-mission/opera/OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1.md"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-opera-rtc-s1-colours",
+   "topic": "layer",
+   "title": "Colours of: Radar backscatter, Sentinel-1 (OPERA RTC-S1)",
+   "text_en": "A false-colour radar image: vegetation looks green, towns and sparsely vegetated land look white or pink, calm water, dry sand and frozen ground look black, and rough water looks purple or magenta. Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). NASA advises consulting auxiliary data, because other land covers can have a similar appearance.",
+   "text_scientific_en": "False-colour RGB of Sentinel-1 RTC backscatter: co-polarized VV (or HH) in the red and blue channels, cross-polarized VH (or HV) in green. NASA publishes no colormap or value scale for this layer; other land covers can look similar. Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). NASA advises consulting auxiliary data, because other land covers can have a similar appearance.",
+   "questions_en": [
+    "What do the colours mean in Radar backscatter, Sentinel-1 (OPERA RTC-S1)?",
+    "How do I read the Radar backscatter, Sentinel-1 (OPERA RTC-S1) legend?",
+    "What do the colors of the Radar backscatter, Sentinel-1 (OPERA RTC-S1) layer mean?"
+   ],
+   "source": {
+    "label": "NASA Worldview layer description: OPERA RTC-S1 (False Color)",
+    "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/multi-mission/opera/OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1.md"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-viirs-noaa20-fire-falsecolor",
+   "topic": "layer",
+   "title": "Layer: Fire and burn-scar false colour (VIIRS M11-I2-I1)",
+   "text_en": "A false-colour view where burn scars look deep or bright red and vegetation looks bright green. Provider: NASA GIBS (LANCE / EOSDIS). Mission: NOAA-20 (JPSS-1). Resolution: 375 m (I-bands), 750 m (M11). Limitations: Not a fire-detection product: use thermal anomalies (FIRMS) or GOES Fire Temperature for active fire. 375-750 m pixels miss small fires. Clouds block the view. Date gaps exist (e.g. 2025-08-31/2025-09-02). No daylight observation (polar night in winter) and gaps between orbits are shown transparent: the dark areas in the source JPEG carry no data.",
+   "text_scientific_en": "Shortwave-infrared / near-infrared / red composite. Burned surfaces have low NIR and higher SWIR reflectance; active flaming fronts can saturate M11. Provider: NASA GIBS (LANCE / EOSDIS). Mission: NOAA-20 (JPSS-1). Resolution: 375 m (I-bands), 750 m (M11). Limitations: Not a fire-detection product: use thermal anomalies (FIRMS) or GOES Fire Temperature for active fire. 375-750 m pixels miss small fires. Clouds block the view. Date gaps exist (e.g. 2025-08-31/2025-09-02). No daylight observation (polar night in winter) and gaps between orbits are shown transparent: the dark areas in the source JPEG carry no data.",
+   "questions_en": [
+    "What does the Fire and burn-scar false colour (VIIRS M11-I2-I1) layer show?",
+    "What is Fire and burn-scar false colour (VIIRS M11-I2-I1)?",
+    "What are the limitations of Fire and burn-scar false colour (VIIRS M11-I2-I1)?",
+    "Where does the Fire and burn-scar false colour (VIIRS M11-I2-I1) data come from?",
+    "What is the resolution of Fire and burn-scar false colour (VIIRS M11-I2-I1)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (LANCE / EOSDIS)",
+    "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/viirs/noaa20/VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1.md"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-viirs-noaa20-fire-falsecolor-colours",
+   "topic": "layer",
+   "title": "Colours of: Fire and burn-scar false colour (VIIRS M11-I2-I1)",
+   "text_en": "A false-colour image: burn scars look deep or bright red, vegetation bright green, bare soil pinkish, water very dark, snow and ice turquoise, and low clouds white. Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). The red of a burn scar varies with the vegetation burned, the residue and how complete the burn was.",
+   "text_scientific_en": "Corrected reflectance composite with red = M11 (shortwave infrared), green = I2 (near infrared), blue = I1 (red visible). Burned areas reflect more in M11 and less in I2, so they turn red; vegetation reflects strongly in I2, so it turns green. No colormap: it is imagery. Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). The red of a burn scar varies with the vegetation burned, the residue and how complete the burn was.",
+   "questions_en": [
+    "What do the colours mean in Fire and burn-scar false colour (VIIRS M11-I2-I1)?",
+    "How do I read the Fire and burn-scar false colour (VIIRS M11-I2-I1) legend?",
+    "What do the colors of the Fire and burn-scar false colour (VIIRS M11-I2-I1) layer mean?"
+   ],
+   "source": {
+    "label": "NASA Worldview layer description: Corrected Reflectance (Bands M11-I2-I1, VIIRS, NOAA-20)",
+    "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/viirs/noaa20/VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1.md"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-goes-east-firetemp",
+   "topic": "layer",
+   "title": "Layer: Fire temperature every 10 minutes (GOES-East ABI)",
+   "text_en": "A weather-satellite view of hot spots over the Americas, refreshed every 10 minutes. Very hot fires glow yellow to white. Provider: NASA GIBS (data NOAA). Mission: GOES-East (geostationary). Resolution: 2 km at nadir (ABI IR); GIBS Level 7. Limitations: {time} must be a full UTC timestamp on a 10-minute boundary (YYYY-MM-DDThh:mm:00Z), not a date. Rolling retention: GetCapabilities on 2026-11-14 listed only ~4 days (from 2026-11-10T02:10Z) with sub-hourly gaps. Americas/Atlantic disk only; 2 km pixels; sun glint and hot bare ground can mimic fire.",
+   "text_scientific_en": "Fire Temperature RGB (ABI 3.9, 2.2 and 1.6 um channels) from the geostationary GOES-East disk. Highlights high-temperature sources day and night. Provider: NASA GIBS (data NOAA). Mission: GOES-East (geostationary). Resolution: 2 km at nadir (ABI IR); GIBS Level 7. Limitations: {time} must be a full UTC timestamp on a 10-minute boundary (YYYY-MM-DDThh:mm:00Z), not a date. Rolling retention: GetCapabilities on 2026-11-14 listed only ~4 days (from 2026-11-10T02:10Z) with sub-hourly gaps. Americas/Atlantic disk only; 2 km pixels; sun glint and hot bare ground can mimic fire.",
+   "questions_en": [
+    "What does the Fire temperature every 10 minutes (GOES-East ABI) layer show?",
+    "What is Fire temperature every 10 minutes (GOES-East ABI)?",
+    "What are the limitations of Fire temperature every 10 minutes (GOES-East ABI)?",
+    "Where does the Fire temperature every 10 minutes (GOES-East ABI) data come from?",
+    "What is the resolution of Fire temperature every 10 minutes (GOES-East ABI)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (data NOAA)",
+    "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/goes/GOES-East_ABI_FireTemp.md"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-goes-east-firetemp-colours",
+   "topic": "layer",
+   "title": "Colours of: Fire temperature every 10 minutes (GOES-East ABI)",
+   "text_en": "Fires go from red (warm) through orange and yellow to near white (very hot). Burn scars are maroon, clear land is purple to pink, water clouds are blue and ice clouds are green. Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). The colour guide is quoted from NASA; the underlying reference is the NOAA GOES-R Fire Temperature RGB Quick Guide.",
+   "text_scientific_en": "Fire Temperature RGB from GOES-East ABI using the 3.9, 2.2 and 1.6 micrometre channels: cooler fires appear only at 3.9 um (red); more intense fires add signal at 2.2 and 1.6 um, moving the colour towards yellow and white. It is a qualitative RGB, not a temperature scale in kelvin. Swatches illustrate the colour names used in the NASA description; they are not sampled from a colour table (this layer has none). The colour guide is quoted from NASA; the underlying reference is the NOAA GOES-R Fire Temperature RGB Quick Guide.",
+   "questions_en": [
+    "What do the colours mean in Fire temperature every 10 minutes (GOES-East ABI)?",
+    "How do I read the Fire temperature every 10 minutes (GOES-East ABI) legend?",
+    "What do the colors of the Fire temperature every 10 minutes (GOES-East ABI) layer mean?"
+   ],
+   "source": {
+    "label": "NASA Worldview layer description: Fire Temperature (ABI, GOES-East)",
+    "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/goes/GOES-East_ABI_FireTemp.md"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-opera-dist-alert-hls",
+   "topic": "layer",
+   "title": "Layer: Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)",
+   "text_en": "Flags places where plants have recently been lost, for example after a fire, logging or clearing. Red means a confirmed loss of at least half of the vegetation cover. Provider: NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS. Mission: Landsat 8/9 and Sentinel-2A/B/C (Harmonized Landsat Sentinel-2). Resolution: 30 m. Limitations: Disturbance is not the same as deforestation: fire, drought, harvest and flooding also trigger it. Optical, so cloud cover leaves gaps (the Amazon wet season especially). Each date only shows granules processed for that day.",
+   "text_scientific_en": "OPERA_L3_DIST-ALERT-HLS_V1 (CMR C2746980408-LPCLOUD): per-pixel vegetation cover loss relative to a multi-year baseline. Classes (GIBS colormap): 0 no disturbance; 1-3 first/provisional/confirmed <50% loss; 4-6 first/provisional/confirmed >=50% loss; 7-8 confirmed and finished. Provider: NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS. Mission: Landsat 8/9 and Sentinel-2A/B/C (Harmonized Landsat Sentinel-2). Resolution: 30 m. Limitations: Disturbance is not the same as deforestation: fire, drought, harvest and flooding also trigger it. Optical, so cloud cover leaves gaps (the Amazon wet season especially). Each date only shows granules processed for that day. We saw intermittent HTTP 500 responses on some tiles and dates (e.g.",
+   "questions_en": [
+    "What does the Vegetation disturbance alerts (OPERA DIST-ALERT, HLS) layer show?",
+    "What is Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)?",
+    "What are the limitations of Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)?",
+    "Where does the Vegetation disturbance alerts (OPERA DIST-ALERT, HLS) data come from?",
+    "What is the resolution of Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)?"
+   ],
+   "source": {
+    "label": "NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Vegetation_Disturbance_Status.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-opera-dist-alert-hls-colours",
+   "topic": "layer",
+   "title": "Colours of: Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)",
+   "text_en": "Teal means a loss of vegetation seen only once so far, olive or orange means seen twice (provisional), and yellow or red means confirmed. Red is a confirmed loss of at least half the vegetation cover; grey means the disturbance has finished. Near-black means no disturbance. Transparent = no data. \"No disturbance\" is drawn as opaque near-black (#121212), so observed areas without change look dark, not empty.",
+   "text_scientific_en": "OPERA DIST-ALERT-HLS vegetation disturbance status, classes 0-8: confidence (first detection, provisional, confirmed) crossed with magnitude (< 50 % or >= 50 % vegetation cover loss), plus two \"finished\" classes. Colours are an exact class lookup from the NASA GIBS colormap OPERA_Vegetation_Disturbance_Status. Transparent = no data. \"No disturbance\" is drawn as opaque near-black (#121212), so observed areas without change look dark, not empty.",
+   "questions_en": [
+    "What do the colours mean in Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)?",
+    "How do I read the Vegetation disturbance alerts (OPERA DIST-ALERT, HLS) legend?",
+    "What do the colors of the Vegetation disturbance alerts (OPERA DIST-ALERT, HLS) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: OPERA_Vegetation_Disturbance_Status",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Vegetation_Disturbance_Status.xml"
+   }
+  },
+  {
+   "id": "kb:layer-umd-hansen-gfc-lossyear-v1-13",
+   "topic": "layer",
+   "title": "Layer: Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)",
+   "text_en": "Where trees were lost between 2001 and 2025. The colour shows the year the loss was detected. Provider: University of Maryland GLAD / Google (tiles on Google Cloud Storage). Mission: Landsat 5, 7, 8, 9. Resolution: 1 arc-second (~30 m). Limitations: This tile path is not listed on the GFC download page; it is the path used by the GLAD web viewer, so it could change without notice (v1.11 and v1.12 paths also still respond). Tiles are RGB only, with no legend or values. Gross loss includes fire, plantation harvest and storms, not only deforestation.",
+   "text_scientific_en": "Global Forest Change 2000-2025 v1.13 'lossyear' layer: stand-replacement disturbance (canopy removal) at Landsat scale, rendered as an RGB colour ramp by year. Reference: Hansen et al. 2013, Science 342:850-853. Provider: University of Maryland GLAD / Google (tiles on Google Cloud Storage). Mission: Landsat 5, 7, 8, 9. Resolution: 1 arc-second (~30 m). Limitations: This tile path is not listed on the GFC download page; it is the path used by the GLAD web viewer, so it could change without notice (v1.11 and v1.12 paths also still respond). Tiles are RGB only, with no legend or values. Gross loss includes fire, plantation harvest and storms, not only deforestation.",
+   "questions_en": [
+    "What does the Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13) layer show?",
+    "What is Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)?",
+    "What are the limitations of Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)?",
+    "Where does the Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13) data come from?",
+    "What is the resolution of Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)?"
+   ],
+   "source": {
+    "label": "University of Maryland GLAD / Google (tiles on Google Cloud Storage)",
+    "url": "https://earthenginepartners.appspot.com/science-2013-global-forest"
+   }
+  },
+  {
+   "id": "kb:layer-umd-hansen-gfc-lossyear-v1-13-colours",
+   "topic": "layer",
+   "title": "Colours of: Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)",
+   "text_en": "These colours are not officially documented by the provider. Yellow appears to mark the oldest tree cover loss and red the most recent, with black for no loss. UMD publishes no legend for this version of the tiles, so the year labels are our own reading of the tiles, not an official key. The published legend belongs to the v1.7 tiles (2000-2019) served from the same tile path pattern; no legend is published for the v1.13 tiles. That the ramp now ends at 2025 was checked by comparing v1.7 and v1.13 tiles pixel by pixel (same colour step for the same pixel;",
+   "text_scientific_en": "These colours are not officially documented by the provider. Year of gross forest cover loss (lossyear) drawn on a yellow-to-red ramp: the green channel falls linearly from equal-to-red (yellow, first loss year) to zero (red, last loss year), in 25 equal steps for 2001-2025. The official UMD/Google viewer legend gives yellow = start of the record, orange = intermediate, red = latest year, black = no loss, dark grey (#404040) = water or no data. The published legend belongs to the v1.7 tiles (2000-2019) served from the same tile path pattern; no legend is published for the v1.13 tiles.",
+   "questions_en": [
+    "What do the colours mean in Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)?",
+    "How do I read the Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13) legend?",
+    "What do the colors of the Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13) layer mean?"
+   ],
+   "source": {
+    "label": "UMD/Google Global Forest Change viewer, \"Forest Loss Year\" layer legend",
+    "url": "https://earthenginepartners.appspot.com/science-2013-global-forest"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-modis-terra-ndsi-snow",
+   "topic": "layer",
+   "title": "Layer: Daily snow cover (MODIS Terra NDSI)",
+   "text_en": "Where the ground is covered by snow on a given day. Provider: NASA GIBS (data NSIDC / LANCE). Mission: Terra. Resolution: 500 m. Limitations: Optical: no retrievals under cloud or polar night. Snow under dense forest is underestimated. Terra is in an extended mission; record continuity relies on VIIRS successors. Some multi-day gaps in the record (see GetCapabilities).",
+   "text_scientific_en": "Normalized Difference Snow Index snow cover from MOD10_L2 (V061 standard, 6.1 NRT). Daytime swath product mapped daily. Provider: NASA GIBS (data NSIDC / LANCE). Mission: Terra. Resolution: 500 m. Limitations: Optical: no retrievals under cloud or polar night. Snow under dense forest is underestimated. Terra is in an extended mission; record continuity relies on VIIRS successors. Some multi-day gaps in the record (see GetCapabilities).",
+   "questions_en": [
+    "What does the Daily snow cover (MODIS Terra NDSI) layer show?",
+    "What is Daily snow cover (MODIS Terra NDSI)?",
+    "What are the limitations of Daily snow cover (MODIS Terra NDSI)?",
+    "Where does the Daily snow cover (MODIS Terra NDSI) data come from?",
+    "What is the resolution of Daily snow cover (MODIS Terra NDSI)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (data NSIDC / LANCE)",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_NDSI_Snow_Cover.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-modis-terra-ndsi-snow-colours",
+   "topic": "layer",
+   "title": "Colours of: Daily snow cover (MODIS Terra NDSI)",
+   "text_en": "Pale yellow means a weak snow signal, salmon pink a strong one and bright red the maximum. Where nothing is drawn there is no snow, or the ground could not be seen (cloud, night, water). Transparent = NDSI 0 (no snow), missing data, no decision, night, inland water, ocean, cloud, detector saturated, fill. The colormap gives no units for the 1-100 index.",
+   "text_scientific_en": "MOD10_L2 NDSI snow cover, integer values 1-100, one colour per value from the NASA GIBS colormap MODIS_NDSI_Snow_Cover: pale yellow (1) shading to salmon (99), with 100 in pure red. Value 0 and all flag classes are transparent. Transparent = NDSI 0 (no snow), missing data, no decision, night, inland water, ocean, cloud, detector saturated, fill. The colormap gives no units for the 1-100 index.",
+   "questions_en": [
+    "What do the colours mean in Daily snow cover (MODIS Terra NDSI)?",
+    "How do I read the Daily snow cover (MODIS Terra NDSI) legend?",
+    "What do the colors of the Daily snow cover (MODIS Terra NDSI) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: MODIS_NDSI_Snow_Cover",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_NDSI_Snow_Cover.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-ghrsst-mur-sea-ice",
+   "topic": "layer",
+   "title": "Layer: Sea ice concentration (GHRSST MUR L4)",
+   "text_en": "How much of the polar ocean is covered by floating sea ice each day. Provider: NASA GIBS (data NASA JPL PO.DAAC, MUR v4.1). Mission: Multi-mission analysis (passive microwave sea-ice input). Resolution: 0.01 degree analysis grid (the underlying sea-ice input is coarser; not verified). Limitations: This is an analysis (interpolated), not a direct image. About a 2-day latency (latest on 2026-11-14 was 2026-11-12). Not suitable for individual floes or leads; SAR (NISAR, Sentinel-1) is needed for those. For climate-record sea-ice extent, prefer the NSIDC Sea Ice Index (not reachable from our network).",
+   "text_scientific_en": "Sea-ice fraction field distributed with the MUR-JPL-L4-GLOB-v4.1 foundation SST analysis (CMR C1996881146-POCLOUD). Gap-free daily analysis. Provider: NASA GIBS (data NASA JPL PO.DAAC, MUR v4.1). Mission: Multi-mission analysis (passive microwave sea-ice input). Resolution: 0.01 degree analysis grid (the underlying sea-ice input is coarser; not verified). Limitations: This is an analysis (interpolated), not a direct image. About a 2-day latency (latest on 2026-11-14 was 2026-11-12). Not suitable for individual floes or leads; SAR (NISAR, Sentinel-1) is needed for those. For climate-record sea-ice extent, prefer the NSIDC Sea Ice Index (not reachable from our network).",
+   "questions_en": [
+    "What does the Sea ice concentration (GHRSST MUR L4) layer show?",
+    "What is Sea ice concentration (GHRSST MUR L4)?",
+    "What are the limitations of Sea ice concentration (GHRSST MUR L4)?",
+    "Where does the Sea ice concentration (GHRSST MUR L4) data come from?",
+    "What is the resolution of Sea ice concentration (GHRSST MUR L4)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (data NASA JPL PO.DAAC, MUR v4.1)",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/GHRSST_Sea_Ice_Concentration.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-ghrsst-mur-sea-ice-colours",
+   "topic": "layer",
+   "title": "Colours of: Sea ice concentration (GHRSST MUR L4)",
+   "text_en": "The colour shows how much of the sea surface is covered by ice: purple for a little, violet-blue for about a quarter, green for about half, yellow for three quarters, red for about 90 % and white for a fully ice-covered sea. Ice-free ocean is drawn almost black. Transparent = no data. The 0-1 % class is drawn as opaque dark grey (#111111), so ice-free ocean appears almost black, not empty.",
+   "text_scientific_en": "Sea ice concentration (area fraction) 0-100 % from the GHRSST MUR L4 analysis, one colour per 1 % step in the NASA GIBS colormap GHRSST_Sea_Ice_Concentration. Transparent = no data. The 0-1 % class is drawn as opaque dark grey (#111111), so ice-free ocean appears almost black, not empty.",
+   "questions_en": [
+    "What do the colours mean in Sea ice concentration (GHRSST MUR L4)?",
+    "How do I read the Sea ice concentration (GHRSST MUR L4) legend?",
+    "What do the colors of the Sea ice concentration (GHRSST MUR L4) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: GHRSST_Sea_Ice_Concentration",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/GHRSST_Sea_Ice_Concentration.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-modis-terra-lst-day",
+   "topic": "layer",
+   "title": "Layer: Daytime land surface temperature (MODIS Terra)",
+   "text_en": "How hot the ground surface was in the late morning, measured from its heat glow. Provider: NASA GIBS (data LP DAAC / LANCE). Mission: Terra. Resolution: 1 km. Limitations: Surface skin temperature, not air temperature. No data under cloud. 1 km pixels mix land-cover types. SAR is not a substitute: thermal IR is the correct observation.",
+   "text_scientific_en": "Split-window land surface temperature from MOD11_L2 (around 10:30 local solar time, descending). Clear-sky only. Provider: NASA GIBS (data LP DAAC / LANCE). Mission: Terra. Resolution: 1 km. Limitations: Surface skin temperature, not air temperature. No data under cloud. 1 km pixels mix land-cover types. SAR is not a substitute: thermal IR is the correct observation.",
+   "questions_en": [
+    "What does the Daytime land surface temperature (MODIS Terra) layer show?",
+    "What is Daytime land surface temperature (MODIS Terra)?",
+    "What are the limitations of Daytime land surface temperature (MODIS Terra)?",
+    "Where does the Daytime land surface temperature (MODIS Terra) data come from?",
+    "What is the resolution of Daytime land surface temperature (MODIS Terra)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (data LP DAAC / LANCE)",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_Land_Surface_Temp.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-modis-terra-lst-day-colours",
+   "topic": "layer",
+   "title": "Colours of: Daytime land surface temperature (MODIS Terra)",
+   "text_en": "Purple and blue are the coldest ground, green is around freezing (273 K is 0 degrees Celsius), yellow is warm (300 K is about 27 degrees Celsius) and orange to red is very hot ground. Transparent = no data (the colormap marks only the fill value as no data).",
+   "text_scientific_en": "MODIS/Terra daytime land surface temperature in kelvin, coloured in 0.6 K steps from < 200 K to >= 350 K by the NASA GIBS colormap MODIS_Land_Surface_Temp. Transparent = no data (the colormap marks only the fill value as no data).",
+   "questions_en": [
+    "What do the colours mean in Daytime land surface temperature (MODIS Terra)?",
+    "How do I read the Daytime land surface temperature (MODIS Terra) legend?",
+    "What do the colors of the Daytime land surface temperature (MODIS Terra) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: MODIS_Land_Surface_Temp",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_Land_Surface_Temp.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-smap-l4-root-zone-soil-moisture",
+   "topic": "layer",
+   "title": "Layer: Root-zone soil moisture (SMAP L4)",
+   "text_en": "How wet the soil is down to about 1 metre: a model guided by satellite measurements. Useful for drought. Provider: NASA GIBS (data NASA GMAO / NSIDC DAAC). Mission: SMAP (assimilated into a land-surface model). Resolution: 9 km (EASE-Grid 2.0). Limitations: This is a model product (kind = model), not a direct observation. 9 km. About a 4-day latency. Several short gaps in 2026 (e.g. 2026-08-09/2026-08-16) per GetCapabilities.",
+   "text_scientific_en": "SPL4SMAU (CMR C3480440639-NSIDC_CPRD) 12z instantaneous root-zone (0-100 cm) soil moisture from the GEOS land model with SMAP brightness-temperature assimilation. Provider: NASA GIBS (data NASA GMAO / NSIDC DAAC). Mission: SMAP (assimilated into a land-surface model). Resolution: 9 km (EASE-Grid 2.0). Limitations: This is a model product (kind = model), not a direct observation. 9 km. About a 4-day latency. Several short gaps in 2026 (e.g. 2026-08-09/2026-08-16) per GetCapabilities.",
+   "questions_en": [
+    "What does the Root-zone soil moisture (SMAP L4) layer show?",
+    "What is Root-zone soil moisture (SMAP L4)?",
+    "What are the limitations of Root-zone soil moisture (SMAP L4)?",
+    "Where does the Root-zone soil moisture (SMAP L4) data come from?",
+    "What is the resolution of Root-zone soil moisture (SMAP L4)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (data NASA GMAO / NSIDC DAAC)",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/SMAP_Analyzed_Soil_Moisture.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-smap-l4-root-zone-soil-moisture-colours",
+   "topic": "layer",
+   "title": "Colours of: Root-zone soil moisture (SMAP L4)",
+   "text_en": "Orange and yellow mean dry soil, green means moderately moist, and light blue to dark blue means wet soil. The very wettest soils are shown dark grey. Transparent = no data.",
+   "text_scientific_en": "SMAP L4 analysed root-zone soil moisture as a volume fraction (m3 of water per m3 of soil), coloured from 0.000 to >= 0.700 by the NASA GIBS colormap SMAP_Analyzed_Soil_Moisture. Transparent = no data.",
+   "questions_en": [
+    "What do the colours mean in Root-zone soil moisture (SMAP L4)?",
+    "How do I read the Root-zone soil moisture (SMAP L4) legend?",
+    "What do the colors of the Root-zone soil moisture (SMAP L4) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: SMAP_Analyzed_Soil_Moisture",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/SMAP_Analyzed_Soil_Moisture.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-modis-flood-2day",
+   "topic": "layer",
+   "title": "Layer: Flood water, 2-day composite (MODIS Terra + Aqua)",
+   "text_en": "Shows flood water (water where it is not normally present) as well as normal surface water, combining two days of observations to see past some clouds. Provider: NASA GIBS (data NASA LANCE MCDWD). Mission: Terra and Aqua. Resolution: 250 m. Limitations: Optical: persistent cloud during storms hides floods; SAR (NISAR, Sentinel-1/OPERA DSWx-S1) is better during events. Cloud shadow and terrain shadow can be misclassified as water. MODIS is near end of mission; a VIIRS equivalent (VIIRS_Combined_Flood_2-Day, from 2025-06-03) exists in GIBS.",
+   "text_scientific_en": "MCDWD L3 NRT 2-day flood product: surface water from MODIS water detection, compared against a reference water mask to flag unusual water. Provider: NASA GIBS (data NASA LANCE MCDWD). Mission: Terra and Aqua. Resolution: 250 m. Limitations: Optical: persistent cloud during storms hides floods; SAR (NISAR, Sentinel-1/OPERA DSWx-S1) is better during events. Cloud shadow and terrain shadow can be misclassified as water. MODIS is near end of mission; a VIIRS equivalent (VIIRS_Combined_Flood_2-Day, from 2025-06-03) exists in GIBS.",
+   "questions_en": [
+    "What does the Flood water, 2-day composite (MODIS Terra + Aqua) layer show?",
+    "What is Flood water, 2-day composite (MODIS Terra + Aqua)?",
+    "What are the limitations of Flood water, 2-day composite (MODIS Terra + Aqua)?",
+    "Where does the Flood water, 2-day composite (MODIS Terra + Aqua) data come from?",
+    "What is the resolution of Flood water, 2-day composite (MODIS Terra + Aqua)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (data NASA LANCE MCDWD)",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_Flood.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-modis-flood-2day-colours",
+   "topic": "layer",
+   "title": "Colours of: Flood water, 2-day composite (MODIS Terra + Aqua)",
+   "text_en": "Red is flood water, yellow is flooding that returns to the same place in many years, and cyan is water that is normally there. Grey means there was not enough data. Transparent = no water, or no data. NASA states the recurring-flood class exists only from Release 1.1 (10 December 2025); in earlier dates such pixels are most likely shown as flood. Grey also covers mountain areas removed by the terrain filter.",
+   "text_scientific_en": "MCDWD L3 NRT 2-day water product, classes 1 = surface water, 2 = recurring flood, 3 = flood, 255 = insufficient data, coloured by the NASA GIBS colormap MODIS_Flood. Water pixels are split using reference-water and recurring-flood layers. Transparent = no water, or no data. NASA states the recurring-flood class exists only from Release 1.1 (10 December 2025); in earlier dates such pixels are most likely shown as flood. Grey also covers mountain areas removed by the terrain filter.",
+   "questions_en": [
+    "What do the colours mean in Flood water, 2-day composite (MODIS Terra + Aqua)?",
+    "How do I read the Flood water, 2-day composite (MODIS Terra + Aqua) legend?",
+    "What do the colors of the Flood water, 2-day composite (MODIS Terra + Aqua) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: MODIS_Flood",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_Flood.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-opera-dswx-s1",
+   "topic": "layer",
+   "title": "Layer: Surface water from radar (OPERA DSWx-S1)",
+   "text_en": "Open water mapped by radar, so it works through clouds: useful during floods. Provider: NASA JPL OPERA (data at PO.DAAC), tiles by NASA GIBS. Mission: Copernicus Sentinel-1. Resolution: 30 m. Limitations: C-band: misses water under dense canopy (L-band NISAR is better there). Wind-roughened water and dry sand can be misclassified. Coverage follows Sentinel-1 swaths, so each date shows only that day's acquisitions. Several date gaps in the record.",
+   "text_scientific_en": "OPERA_L3_DSWX-S1_V1 (CMR C2949811996-POCLOUD): water and no-water classification from RTC-S1 backscatter, drawn in GIBS as not water, open water, inundated vegetation and two masked classes (HAND, layover/shadow). Provider: NASA JPL OPERA (data at PO.DAAC), tiles by NASA GIBS. Mission: Copernicus Sentinel-1. Resolution: 30 m. Limitations: C-band: misses water under dense canopy (L-band NISAR is better there). Wind-roughened water and dry sand can be misclassified. Coverage follows Sentinel-1 swaths, so each date shows only that day's acquisitions. Several date gaps in the record.",
+   "questions_en": [
+    "What does the Surface water from radar (OPERA DSWx-S1) layer show?",
+    "What is Surface water from radar (OPERA DSWx-S1)?",
+    "What are the limitations of Surface water from radar (OPERA DSWx-S1)?",
+    "Where does the Surface water from radar (OPERA DSWx-S1) data come from?",
+    "What is the resolution of Surface water from radar (OPERA DSWx-S1)?"
+   ],
+   "source": {
+    "label": "NASA JPL OPERA (data at PO.DAAC), tiles by NASA GIBS",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Dynamic_Surface_Water_Extent_S1.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-opera-dswx-s1-colours",
+   "topic": "layer",
+   "title": "Colours of: Surface water from radar (OPERA DSWx-S1)",
+   "text_en": "Blue is open water and green is flooded vegetation. White is land that was observed and is not water; grey areas were masked out and carry no answer. Transparent = fill value (no data). \"Not water\" is opaque white, so each radar swath covers the basemap.",
+   "text_scientific_en": "OPERA DSWx-S1 water classification: 0 = not water, 1 = open water, 3 = inundated vegetation, 250 = HAND masked, 251 = layover/shadow masked, coloured by the NASA GIBS colormap OPERA_Dynamic_Surface_Water_Extent_S1. Transparent = fill value (no data). \"Not water\" is opaque white, so each radar swath covers the basemap.",
+   "questions_en": [
+    "What do the colours mean in Surface water from radar (OPERA DSWx-S1)?",
+    "How do I read the Surface water from radar (OPERA DSWx-S1) legend?",
+    "What do the colors of the Surface water from radar (OPERA DSWx-S1) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: OPERA_Dynamic_Surface_Water_Extent_S1",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Dynamic_Surface_Water_Extent_S1.xml"
+   }
+  },
+  {
+   "id": "kb:layer-jrc-gsw-occurrence-v1-5",
+   "topic": "layer",
+   "title": "Layer: Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)",
+   "text_en": "How often each place was covered by water over four decades. Solid blue means almost always wet; faint red or pink means water was seen only rarely. Provider: European Commission Joint Research Centre (JRC) / Google. Mission: Landsat 5, 7, 8, 9. Resolution: 30 m. Limitations: RGB visualization tiles, for display not analysis. Static summary with no time slider. The v1.5 seasonality, monthly and yearly assets cover only 2022-2024 (merge with v1.4 for full history). z14 returns 404. Clouds and terrain shadow reduce valid observations in some regions.",
+   "text_scientific_en": "Percentage of valid Landsat observations classified as water, 1984-2024 (GSW v1.5). Pekel et al. 2016, Nature 540:418-422, doi:10.1038/nature20584. Provider: European Commission Joint Research Centre (JRC) / Google. Mission: Landsat 5, 7, 8, 9. Resolution: 30 m. Limitations: RGB visualization tiles, for display not analysis. Static summary with no time slider. The v1.5 seasonality, monthly and yearly assets cover only 2022-2024 (merge with v1.4 for full history). z14 returns 404. Clouds and terrain shadow reduce valid observations in some regions.",
+   "questions_en": [
+    "What does the Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5) layer show?",
+    "What is Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)?",
+    "What are the limitations of Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)?",
+    "Where does the Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5) data come from?",
+    "What is the resolution of Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)?"
+   ],
+   "source": {
+    "label": "European Commission Joint Research Centre (JRC) / Google",
+    "url": "https://storage.googleapis.com/water-world/downloads_ancillary/DataUsersGuidev2024_v.5.pdf"
+   }
+  },
+  {
+   "id": "kb:layer-jrc-gsw-occurrence-v1-5-colours",
+   "topic": "layer",
+   "title": "Colours of: Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)",
+   "text_en": "Solid blue means water was there almost all the time. Purple means about half the time, and faint red or pink means water was seen only rarely. Places never seen as water are left empty. Tile opacity equals the occurrence value, so low values are nearly see-through and their apparent colour depends on the basemap underneath. Transparent = not water or no data. The 25, 50 and 75 % colours were read from the tiles and match a straight red-to-blue blend.",
+   "text_scientific_en": "Surface water occurrence, 1-100 % of valid Landsat observations classified as water. Per the JRC Data Users Guide the symbology runs from #FF0000 at 1 % opacity (1 % occurrence) to #0000FF at 100 % opacity (100 % occurrence); in the tiles both hue and opacity change linearly with occurrence. Tile opacity equals the occurrence value, so low values are nearly see-through and their apparent colour depends on the basemap underneath. Transparent = not water or no data. The 25, 50 and 75 % colours were read from the tiles and match a straight red-to-blue blend.",
+   "questions_en": [
+    "What do the colours mean in Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)?",
+    "How do I read the Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5) legend?",
+    "What do the colors of the Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5) layer mean?"
+   ],
+   "source": {
+    "label": "JRC Global Surface Water Data Users Guide (v2024), Occurrence symbology",
+    "url": "https://storage.googleapis.com/water-world/downloads_ancillary/DataUsersGuidev2024_v.5.pdf"
+   }
+  },
+  {
+   "id": "kb:layer-jrc-gsw-transitions-v1-5",
+   "topic": "layer",
+   "title": "Layer: Water gained and lost 1984-2024 (JRC GSW transitions)",
+   "text_en": "Shows where new lakes or reservoirs appeared, where water disappeared, and where it became seasonal, between the first and last years of the record. Provider: European Commission Joint Research Centre (JRC) / Google. Mission: Landsat 5, 7, 8, 9. Resolution: 30 m. Limitations: Compares only the start and end of the record; intermediate changes are hidden. RGB display tiles only. Reservoir-filling and land-reclamation signals are robust; small or narrow channels below 30 m are not resolved.",
+   "text_scientific_en": "Categorical transitions between first-year and last-year water class (permanent, seasonal, new, lost, seasonal-to-permanent, and so on) from the GSW v1.5 time series. The tiles use the colour-blind-safe (deuteranopia) palette published by JRC, which differs from the table in the Data Users Guide for several classes. Provider: European Commission Joint Research Centre (JRC) / Google. Mission: Landsat 5, 7, 8, 9. Resolution: 30 m. Limitations: Compares only the start and end of the record; intermediate changes are hidden. RGB display tiles only. Reservoir-filling and land-reclamation signals are robust; small or narrow channels below 30 m are not resolved.",
+   "questions_en": [
+    "What does the Water gained and lost 1984-2024 (JRC GSW transitions) layer show?",
+    "What is Water gained and lost 1984-2024 (JRC GSW transitions)?",
+    "What are the limitations of Water gained and lost 1984-2024 (JRC GSW transitions)?",
+    "Where does the Water gained and lost 1984-2024 (JRC GSW transitions) data come from?",
+    "What is the resolution of Water gained and lost 1984-2024 (JRC GSW transitions)?"
+   ],
+   "source": {
+    "label": "European Commission Joint Research Centre (JRC) / Google",
+    "url": "https://storage.googleapis.com/global-surface-water/downloads_ancillary/transitions_deuteranopia.qml"
+   }
+  },
+  {
+   "id": "kb:layer-jrc-gsw-transitions-v1-5-colours",
+   "topic": "layer",
+   "title": "Colours of: Water gained and lost 1984-2024 (JRC GSW transitions)",
+   "text_en": "Blue is water that stayed permanent. Green shades are new water, dark red and pink are water that was lost, and orange and yellow mark water that switched between seasonal and permanent. Grey is water that appeared and then disappeared again. Transparent = not water. Nine of the ten colours were confirmed by reading the tiles; \"Ephemeral permanent\" (#7f7f7f) did not occur in the tiles checked and is taken from the symbology file. The Data Users Guide table lists a slightly different standard palette (for example Lost permanent #D1102D), which these tiles do not use.",
+   "text_scientific_en": "JRC GSW transition classes 1-10 between the first and last year of the record. The tiles use the colour-blind-friendly (deuteranopia) symbology published by JRC (transitions_deuteranopia.qml); class names are those of the Data Users Guide. Transparent = not water. Nine of the ten colours were confirmed by reading the tiles; \"Ephemeral permanent\" (#7f7f7f) did not occur in the tiles checked and is taken from the symbology file. The Data Users Guide table lists a slightly different standard palette (for example Lost permanent #D1102D), which these tiles do not use.",
+   "questions_en": [
+    "What do the colours mean in Water gained and lost 1984-2024 (JRC GSW transitions)?",
+    "How do I read the Water gained and lost 1984-2024 (JRC GSW transitions) legend?",
+    "What do the colors of the Water gained and lost 1984-2024 (JRC GSW transitions) layer mean?"
+   ],
+   "source": {
+    "label": "JRC Global Surface Water symbology file: transitions_deuteranopia.qml",
+    "url": "https://storage.googleapis.com/global-surface-water/downloads_ancillary/transitions_deuteranopia.qml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-opera-dist-ann-hls",
+   "topic": "layer",
+   "title": "Layer: Annual vegetation disturbance (OPERA DIST-ANN, HLS)",
+   "text_en": "A yearly summary of where vegetation was lost or damaged. Provider: NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS. Mission: Landsat 8/9 and Sentinel-2A/B/C (HLS). Resolution: 30 m. Limitations: Same cause ambiguity as DIST-ALERT (fire, harvest and clearing are not separated). Annual granularity. The 2026 annual value was not yet published on 2026-11-14.",
+   "text_scientific_en": "OPERA_L3_DIST-ANN-HLS_V1 (CMR C2519119034-LPCLOUD): annual roll-up of DIST-ALERT vegetation-loss status. GetCapabilities lists annual values for 2023, 2024 and 2025. Provider: NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS. Mission: Landsat 8/9 and Sentinel-2A/B/C (HLS). Resolution: 30 m. Limitations: Same cause ambiguity as DIST-ALERT (fire, harvest and clearing are not separated). Annual granularity. The 2026 annual value was not yet published on 2026-11-14.",
+   "questions_en": [
+    "What does the Annual vegetation disturbance (OPERA DIST-ANN, HLS) layer show?",
+    "What is Annual vegetation disturbance (OPERA DIST-ANN, HLS)?",
+    "What are the limitations of Annual vegetation disturbance (OPERA DIST-ANN, HLS)?",
+    "Where does the Annual vegetation disturbance (OPERA DIST-ANN, HLS) data come from?",
+    "What is the resolution of Annual vegetation disturbance (OPERA DIST-ANN, HLS)?"
+   ],
+   "source": {
+    "label": "NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Vegetation_Disturbance_Annual.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-opera-dist-ann-hls-colours",
+   "topic": "layer",
+   "title": "Colours of: Annual vegetation disturbance (OPERA DIST-ANN, HLS)",
+   "text_en": "Yellow marks a confirmed loss of less than half the vegetation cover during the year, red a confirmed loss of half or more. Grey means the disturbance has finished; near-black means no disturbance. Transparent = no data. \"No disturbance\" is drawn as opaque near-black (#121212).",
+   "text_scientific_en": "OPERA DIST-ANN-HLS annual summary of DIST-ALERT: only confirmed disturbances of the year are reported (status values 0, 3, 6, 7, 8). Colours are an exact class lookup from the NASA GIBS colormap OPERA_Vegetation_Disturbance_Annual. Transparent = no data. \"No disturbance\" is drawn as opaque near-black (#121212).",
+   "questions_en": [
+    "What do the colours mean in Annual vegetation disturbance (OPERA DIST-ANN, HLS)?",
+    "How do I read the Annual vegetation disturbance (OPERA DIST-ANN, HLS) legend?",
+    "What do the colors of the Annual vegetation disturbance (OPERA DIST-ANN, HLS) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: OPERA_Vegetation_Disturbance_Annual",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Vegetation_Disturbance_Annual.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-modis-terra-ndvi-16day",
+   "topic": "layer",
+   "title": "Layer: Vegetation greenness, 16-day (MODIS Terra NDVI)",
+   "text_en": "How green and leafy the land is, averaged over 16 days. It shows crops, droughts and seasons. Provider: NASA GIBS (data LP DAAC). Mission: Terra. Resolution: 250 m. Limitations: Valid {time} values are the composite start dates, which restart each 1 January (e.g. 2026-01-01, 2026-01-17 ... 2026-10-16). Use the GetCapabilities list; other dates are not guaranteed. Latency is about a month. NDVI saturates over dense forest.",
+   "text_scientific_en": "MOD13Q1 V061 NDVI composite (best-quality pixel over 16 days). Provider: NASA GIBS (data LP DAAC). Mission: Terra. Resolution: 250 m. Limitations: Valid {time} values are the composite start dates, which restart each 1 January (e.g. 2026-01-01, 2026-01-17 ... 2026-10-16). Use the GetCapabilities list; other dates are not guaranteed. Latency is about a month. NDVI saturates over dense forest.",
+   "questions_en": [
+    "What does the Vegetation greenness, 16-day (MODIS Terra NDVI) layer show?",
+    "What is Vegetation greenness, 16-day (MODIS Terra NDVI)?",
+    "What are the limitations of Vegetation greenness, 16-day (MODIS Terra NDVI)?",
+    "Where does the Vegetation greenness, 16-day (MODIS Terra NDVI) data come from?",
+    "What is the resolution of Vegetation greenness, 16-day (MODIS Terra NDVI)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (data LP DAAC)",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_L3_NDVI.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-modis-terra-ndvi-16day-colours",
+   "topic": "layer",
+   "title": "Colours of: Vegetation greenness, 16-day (MODIS Terra NDVI)",
+   "text_en": "Pale and brown tones mean little or no green vegetation, yellow-green means some, and dark green means dense, leafy vegetation. Transparent = NDVI at or below zero, or no data.",
+   "text_scientific_en": "MOD13Q1 16-day NDVI (unitless), coloured from 0.0 to 1.0 by the NASA GIBS colormap MODIS_L3_NDVI. NDVI at or below zero is transparent. Transparent = NDVI at or below zero, or no data.",
+   "questions_en": [
+    "What do the colours mean in Vegetation greenness, 16-day (MODIS Terra NDVI)?",
+    "How do I read the Vegetation greenness, 16-day (MODIS Terra NDVI) legend?",
+    "What do the colors of the Vegetation greenness, 16-day (MODIS Terra NDVI) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: MODIS_L3_NDVI",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_L3_NDVI.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-landsat-hbase-2010",
+   "topic": "layer",
+   "title": "Layer: Built-up and settlement extent 2010 (HBASE, Landsat)",
+   "text_en": "Where buildings and settlements were around 2010: a baseline to compare against today's imagery. Provider: NASA SEDAC / CIESIN (Columbia University), tiles by NASA GIBS. Mission: Landsat (Global Land Survey 2010). Resolution: 30 m. Limitations: A single epoch (circa 2010), so it shows no change by itself. Compare with recent Sentinel-2 or EOX annual mosaics or with NISAR backscatter. For multi-epoch built-up, GHSL (JRC) is the better source but no browser tile service was found (unverified).",
+   "text_scientific_en": "HBASE v1 (CMR C3550193482-ESDIS): built-up and settlement extent from Landsat GLS 2010, drawn in GIBS as three classes (HBASE, road, not HBASE). Provider: NASA SEDAC / CIESIN (Columbia University), tiles by NASA GIBS. Mission: Landsat (Global Land Survey 2010). Resolution: 30 m. Limitations: A single epoch (circa 2010), so it shows no change by itself. Compare with recent Sentinel-2 or EOX annual mosaics or with NISAR backscatter. For multi-epoch built-up, GHSL (JRC) is the better source but no browser tile service was found (unverified).",
+   "questions_en": [
+    "What does the Built-up and settlement extent 2010 (HBASE, Landsat) layer show?",
+    "What is Built-up and settlement extent 2010 (HBASE, Landsat)?",
+    "What are the limitations of Built-up and settlement extent 2010 (HBASE, Landsat)?",
+    "Where does the Built-up and settlement extent 2010 (HBASE, Landsat) data come from?",
+    "What is the resolution of Built-up and settlement extent 2010 (HBASE, Landsat)?"
+   ],
+   "source": {
+    "label": "NASA SEDAC / CIESIN (Columbia University), tiles by NASA GIBS",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/Landsat_Human_Built-up_And_Settlement_Extent.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-landsat-hbase-2010-colours",
+   "topic": "layer",
+   "title": "Colours of: Built-up and settlement extent 2010 (HBASE, Landsat)",
+   "text_en": "Orange is built-up or settled land around 2010 and blue is roads. Light grey is land that is not built-up. Transparent = no data, cloud or shadow. \"Not HBASE\" is opaque light grey, so the layer covers the basemap over all mapped land.",
+   "text_scientific_en": "HBASE v1 classification from Landsat GLS 2010: 200 = not HBASE, 201 = HBASE, 202 = road, coloured by the NASA GIBS colormap Landsat_Human_Built-up_And_Settlement_Extent. Transparent = no data, cloud or shadow. \"Not HBASE\" is opaque light grey, so the layer covers the basemap over all mapped land.",
+   "questions_en": [
+    "What do the colours mean in Built-up and settlement extent 2010 (HBASE, Landsat)?",
+    "How do I read the Built-up and settlement extent 2010 (HBASE, Landsat) legend?",
+    "What do the colors of the Built-up and settlement extent 2010 (HBASE, Landsat) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: Landsat_Human_Built-up_And_Settlement_Extent",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/Landsat_Human_Built-up_And_Settlement_Extent.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-viirs-noaa20-night-lights",
+   "topic": "layer",
+   "title": "Layer: Night lights, daily (VIIRS Day/Night Band, NOAA-20)",
+   "text_en": "Lights at night seen from space: cities, roads, gas flares and fishing fleets. Outages after disasters show up as missing lights. Provider: NASA GIBS (data NASA LANCE Black Marble). Mission: NOAA-20 (JPSS-1). Resolution: 15 arc-second grid (~500 m); DNB native ~750 m. Limitations: At-sensor radiance, not corrected for moonlight, clouds or atmosphere (the standard Black Marble VNP46A2 product does this). Summer twilight blanks high latitudes. Light is a proxy for activity, not a measurement of buildings or damage.",
+   "text_scientific_en": "Daily gridded at-sensor DNB radiance (VJ146A1/VJ146A1G NRT, night descending passes). Provider: NASA GIBS (data NASA LANCE Black Marble). Mission: NOAA-20 (JPSS-1). Resolution: 15 arc-second grid (~500 m); DNB native ~750 m. Limitations: At-sensor radiance, not corrected for moonlight, clouds or atmosphere (the standard Black Marble VNP46A2 product does this). Summer twilight blanks high latitudes. Light is a proxy for activity, not a measurement of buildings or damage.",
+   "questions_en": [
+    "What does the Night lights, daily (VIIRS Day/Night Band, NOAA-20) layer show?",
+    "What is Night lights, daily (VIIRS Day/Night Band, NOAA-20)?",
+    "What are the limitations of Night lights, daily (VIIRS Day/Night Band, NOAA-20)?",
+    "Where does the Night lights, daily (VIIRS Day/Night Band, NOAA-20) data come from?",
+    "What is the resolution of Night lights, daily (VIIRS Day/Night Band, NOAA-20)?"
+   ],
+   "source": {
+    "label": "NASA GIBS (data NASA LANCE Black Marble)",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/VIIRS_DayNightBand_At_Sensor_Radiance.xml"
+   }
+  },
+  {
+   "id": "kb:layer-gibs-viirs-noaa20-night-lights-colours",
+   "topic": "layer",
+   "title": "Colours of: Night lights, daily (VIIRS Day/Night Band, NOAA-20)",
+   "text_en": "A greyscale picture: the brighter the pixel, the more light reached the satellite at night. Black is dark, white is the brightest light. Transparent = no data. Zero radiance is drawn as opaque near-black (#070707), so dark areas cover the basemap. Brightness is not only city light: NASA notes moonlit clouds, snow, sea ice, auroras, fires, gas flares and fishing fleets also appear.",
+   "text_scientific_en": "Black Marble at-sensor top-of-atmosphere Day/Night Band radiance in nW/(cm2 sr), drawn in greyscale with a log10 stretch from 0 to >= 38.2 by the NASA GIBS colormap VIIRS_DayNightBand_At_Sensor_Radiance. Transparent = no data. Zero radiance is drawn as opaque near-black (#070707), so dark areas cover the basemap. Brightness is not only city light: NASA notes moonlit clouds, snow, sea ice, auroras, fires, gas flares and fishing fleets also appear.",
+   "questions_en": [
+    "What do the colours mean in Night lights, daily (VIIRS Day/Night Band, NOAA-20)?",
+    "How do I read the Night lights, daily (VIIRS Day/Night Band, NOAA-20) legend?",
+    "What do the colors of the Night lights, daily (VIIRS Day/Night Band, NOAA-20) layer mean?"
+   ],
+   "source": {
+    "label": "NASA GIBS colormap: VIIRS_DayNightBand_At_Sensor_Radiance",
+    "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/VIIRS_DayNightBand_At_Sensor_Radiance.xml"
+   }
+  },
+  {
+   "id": "kb:layer-eox-s2cloudless-annual",
+   "topic": "layer",
+   "title": "Layer: Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)",
+   "text_en": "One cloud-free picture of Earth per year. Flip between years to watch cities, mines and new coastlines grow. Provider: EOX IT Services GmbH. Mission: Copernicus Sentinel-2. Resolution: 10 m (Sentinel-2 visible bands). Limitations: Substitute only the 4-digit year (YYYY) for {time}, not a full date. Mosaics blend many dates in each year, so they suit year-to-year change but not exact dating. Licence is non-commercial (CC BY-NC-SA 4.0). CORS echoes the request origin instead of '*'. Tested to z17 over Cairo; deeper zooms were not tested.",
+   "text_scientific_en": "Annual cloudless true-colour mosaics compiled from Sentinel-2 L1C/L2A scenes. Layer identifiers s2cloudless-2017_3857 ... s2cloudless-2025_3857 (2016 is 's2cloudless_3857'). Provider: EOX IT Services GmbH. Mission: Copernicus Sentinel-2. Resolution: 10 m (Sentinel-2 visible bands). Limitations: Substitute only the 4-digit year (YYYY) for {time}, not a full date. Mosaics blend many dates in each year, so they suit year-to-year change but not exact dating. Licence is non-commercial (CC BY-NC-SA 4.0). CORS echoes the request origin instead of '*'. Tested to z17 over Cairo; deeper zooms were not tested.",
+   "questions_en": [
+    "What does the Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX) layer show?",
+    "What is Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)?",
+    "What are the limitations of Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)?",
+    "Where does the Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX) data come from?",
+    "What is the resolution of Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)?"
+   ],
+   "source": {
+    "label": "EOX IT Services GmbH",
+    "url": "https://cloudless.eox.at/documentation/product-list"
+   }
+  },
+  {
+   "id": "kb:layer-eox-s2cloudless-annual-colours",
+   "topic": "layer",
+   "title": "Colours of: Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)",
+   "text_en": "A colour picture of the land made from a year of Sentinel-2 images with the clouds removed. There is no colour scale: the picture itself is the information. No colour key applies. EOX states the mosaics favour visual clarity and consistency over spectral accuracy.",
+   "text_scientific_en": "Colour-corrected 8-bit RGB mosaic from Sentinel-2; EOX lists the RGB bands of its products as red = B04, green = B03, blue = B02. Colours are balanced for visual consistency, so they are not calibrated reflectance values. No colour key applies. EOX states the mosaics favour visual clarity and consistency over spectral accuracy.",
+   "questions_en": [
+    "What do the colours mean in Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)?",
+    "How do I read the Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX) legend?",
+    "What do the colors of the Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX) layer mean?"
+   ],
+   "source": {
+    "label": "EOxCloudless documentation: product list",
+    "url": "https://cloudless.eox.at/documentation/product-list"
+   }
+  },
+  {
+   "id": "kb:sar-sar-nedir",
+   "topic": "sar",
+   "title": "What is SAR",
+   "text_en": "Synthetic aperture radar (SAR) is a technique that makes fine-resolution images from a radar whose own resolution is limited. The radar must be moving; it sends microwave pulses, records the echoes, and computer processing combines them as if they came from a much longer antenna.",
+   "text_tr": "Sentetik açıklıklı radar (SAR), kendi çözünürlüğü sınırlı olan bir radardan ince çözünürlüklü görüntü üreten bir tekniktir. Radarın hareket halinde olması gerekir; mikrodalga darbeleri gönderir, yankıları kaydeder ve bilgisayar işlemesi bunları çok daha uzun bir antenden gelmiş gibi birleştirir.",
+   "questions_en": [
+    "What is SAR?",
+    "What does synthetic aperture radar mean?",
+    "How does SAR make sharp images?"
+   ],
+   "questions_tr": [
+    "SAR nedir?",
+    "Sentetik açıklıklı radar ne demek?",
+    "SAR nasıl net görüntü üretir?"
+   ],
+   "source": {
+    "label": "Get to Know SAR - Overview",
+    "url": "https://science.nasa.gov/mission/nisar/get-to-know-sar/"
+   }
+  },
+  {
+   "id": "kb:sar-gece",
+   "topic": "sar",
+   "title": "Can SAR see at night",
+   "text_en": "Yes. SAR is an active sensor that transmits its own microwave radiation and does not depend on sunlight, so it can collect data both day and night.",
+   "text_tr": "Evet. SAR kendi mikrodalga ışınımını gönderen aktif bir algılayıcıdır ve güneş ışığına bağlı değildir; bu nedenle hem gündüz hem gece veri toplayabilir.",
+   "questions_en": [
+    "Can SAR see at night?",
+    "Does SAR need sunlight?",
+    "Why does radar imaging work in the dark?"
+   ],
+   "questions_tr": [
+    "SAR gece görüntü alabilir mi?",
+    "SAR güneş ışığına ihtiyaç duyar mı?",
+    "Radar karanlıkta neden çalışır?"
+   ],
+   "source": {
+    "label": "Synthetic Aperture Radar (SAR) Basics",
+    "url": "https://developers.google.com/earth-engine/tutorials/community/sar-basics"
+   }
+  },
+  {
+   "id": "kb:sar-bulut",
+   "topic": "sar",
+   "title": "Can SAR see through clouds",
+   "text_en": "At C-band (Sentinel-1) and L-band, SAR is largely insensitive to the atmosphere. The source names one exception for C-band: very dense rain cells.",
+   "text_tr": "C bandında (Sentinel-1) ve L bandında SAR atmosferden büyük ölçüde etkilenmez. Kaynak, C bandı için bir istisna belirtir: çok yoğun yağış hücreleri.",
+   "questions_en": [
+    "Can SAR see through clouds?",
+    "Does weather affect SAR images?",
+    "Does rain disturb radar measurements?"
+   ],
+   "questions_tr": [
+    "SAR bulutların arkasını görebilir mi?",
+    "Hava koşulları SAR görüntülerini etkiler mi?",
+    "Yağmur radar ölçümlerini bozar mı?"
+   ],
+   "source": {
+    "label": "Synthetic Aperture Radar (SAR) Basics",
+    "url": "https://developers.google.com/earth-engine/tutorials/community/sar-basics"
+   }
+  },
+  {
+   "id": "kb:sar-nisar",
+   "topic": "sar",
+   "title": "What is NISAR",
+   "text_en": "NISAR is a synthetic aperture radar mission run as a partnership between NASA and the Indian Space Research Organisation (ISRO), working at L-band and S-band. It monitors changes in Earth's land, water, vegetation and ice.",
+   "text_tr": "NISAR, NASA ile Hindistan Uzay Araştırma Örgütü (ISRO) ortaklığında yürütülen, L ve S bantlarında çalışan bir sentetik açıklıklı radar görevidir. Dünya'nın kara, su, bitki örtüsü ve buz alanlarındaki değişimleri izler.",
+   "questions_en": [
+    "What is NISAR?",
+    "Who built the NISAR satellite?",
+    "What does NISAR observe?"
+   ],
+   "questions_tr": [
+    "NISAR nedir?",
+    "NISAR uydusunu kim geliştirdi?",
+    "NISAR neyi gözlemler?"
+   ],
+   "source": {
+    "label": "Mission Overview - NISAR Quick Facts",
+    "url": "https://science.nasa.gov/mission/nisar/mission-overview/"
+   }
+  },
+  {
+   "id": "kb:sar-nisar-launch",
+   "topic": "sar",
+   "title": "When was NISAR launched",
+   "text_en": "NISAR was launched on July 30, 2025, from the Satish Dhawan Space Centre in India on ISRO's GSLV Mark II rocket.",
+   "text_tr": "NISAR, 30 Temmuz 2025'te Hindistan'daki Satish Dhawan Uzay Merkezi'nden ISRO'nun GSLV Mark II roketiyle fırlatıldı.",
+   "questions_en": [
+    "When was NISAR launched?",
+    "Where was NISAR launched from?",
+    "Which rocket launched NISAR?"
+   ],
+   "questions_tr": [
+    "NISAR ne zaman fırlatıldı?",
+    "NISAR nereden fırlatıldı?",
+    "NISAR hangi roketle fırlatıldı?"
+   ],
+   "source": {
+    "label": "Mission Overview - NISAR Quick Facts",
+    "url": "https://science.nasa.gov/mission/nisar/mission-overview/"
+   }
+  },
+  {
+   "id": "kb:sar-nisar-band",
+   "topic": "sar",
+   "title": "Which radar bands does NISAR use",
+   "text_en": "NISAR works at two radar wavelengths: L-band at 24 cm and S-band at 9.4 cm.",
+   "text_tr": "NISAR iki radar dalga boyunda çalışır: 24 cm dalga boylu L bandı ve 9,4 cm dalga boylu S bandı.",
+   "questions_en": [
+    "Which radar bands does NISAR use?",
+    "What wavelengths does NISAR operate at?",
+    "Is NISAR L-band or S-band?"
+   ],
+   "questions_tr": [
+    "NISAR hangi radar bantlarını kullanır?",
+    "NISAR hangi dalga boylarında çalışır?",
+    "NISAR L bant mı S bant mı?"
+   ],
+   "source": {
+    "label": "Mission Overview - NISAR Quick Facts",
+    "url": "https://science.nasa.gov/mission/nisar/mission-overview/"
+   }
+  },
+  {
+   "id": "kb:sar-sentinel",
+   "topic": "sar",
+   "title": "What is Sentinel-1",
+   "text_en": "Sentinel-1 is a C-band SAR mission whose data come from the European Union's Copernicus programme, operated with the support of the European Space Agency. Its data are released under a free and open licence.",
+   "text_tr": "Sentinel-1, verileri Avrupa Birliği'nin Copernicus programı tarafından üretilen ve Avrupa Uzay Ajansı'nın desteğiyle işletilen bir C bant SAR görevidir. Verileri ücretsiz ve açık lisansla yayımlanır.",
+   "questions_en": [
+    "What is Sentinel-1?",
+    "Which radar band does Sentinel-1 use?",
+    "Is Sentinel-1 data free?"
+   ],
+   "questions_tr": [
+    "Sentinel-1 nedir?",
+    "Sentinel-1 hangi radar bandını kullanır?",
+    "Sentinel-1 verileri ücretsiz mi?"
+   ],
+   "source": {
+    "label": "Synthetic Aperture Radar (SAR) Basics",
+    "url": "https://developers.google.com/earth-engine/tutorials/community/sar-basics"
+   }
+  },
+  {
+   "id": "kb:sar-backscatter",
+   "topic": "sar",
+   "title": "What is backscatter",
+   "text_en": "Backscatter is the part of the transmitted radar signal that bounces back to the radar. Its strength depends mainly on the roughness and electrical properties of the surface, and is also shaped by wetness, slope, how the size of surface features compares with the wavelength, and polarization.",
+   "text_tr": "Geri saçılım, gönderilen radar sinyalinin radara geri dönen kısmıdır. Gücü esas olarak yüzeyin pürüzlülüğüne ve elektriksel özelliklerine bağlıdır; ıslaklık, eğim, yüzey ayrıntılarının dalga boyuna göre boyutu ve polarizasyon da onu etkiler.",
+   "questions_en": [
+    "What is backscatter?",
+    "What controls how bright a SAR pixel is?",
+    "Why are some surfaces brighter in radar images?"
+   ],
+   "questions_tr": [
+    "Geri saçılım (backscatter) nedir?",
+    "SAR pikselinin parlaklığını ne belirler?",
+    "Radar görüntülerinde bazı yüzeyler neden daha parlak?"
+   ],
+   "source": {
+    "label": "Get to Know SAR - Overview",
+    "url": "https://science.nasa.gov/mission/nisar/get-to-know-sar/"
+   }
+  },
+  {
+   "id": "kb:sar-water-dark",
+   "topic": "sar",
+   "title": "Why does water look dark in SAR images",
+   "text_en": "Calm water and other smooth surfaces look black in SAR images because the radar pulse is reflected away from the spacecraft. Water roughened by wind can look bright when its waves are close in size to the radar wavelength.",
+   "text_tr": "Durgun su ve diğer pürüzsüz yüzeyler SAR görüntülerinde siyah görünür, çünkü radar darbesi uzay aracından uzağa yansır. Rüzgârla pürüzlenen su ise dalgalarının boyu radar dalga boyuna yakın olduğunda parlak görünebilir.",
+   "questions_en": [
+    "Why does water look dark in SAR images?",
+    "Is water always black in radar images?",
+    "How does wind change the look of water in SAR?"
+   ],
+   "questions_tr": [
+    "SAR görüntülerinde su neden koyu görünür?",
+    "Radar görüntülerinde su her zaman siyah mı?",
+    "Rüzgâr suyun SAR görünümünü nasıl değiştirir?"
+   ],
+   "source": {
+    "label": "Get to Know SAR - Overview",
+    "url": "https://science.nasa.gov/mission/nisar/get-to-know-sar/"
+   }
+  },
+  {
+   "id": "kb:sar-phase",
+   "topic": "sar",
+   "title": "What is the difference between amplitude and phase in SAR",
+   "text_en": "Each pixel of a SAR image has an amplitude and a phase. After calibration the amplitude is proportional to how reflective the surface is, while the phase depends on the distance the wave travelled, delays in the atmosphere and a contribution from the reflecting surface.",
+   "text_tr": "Bir SAR görüntüsünün her pikselinin bir genliği ve bir fazı vardır. Kalibrasyondan sonra genlik yüzeyin yansıtıcılığıyla orantılıdır; faz ise dalganın kat ettiği mesafeye, atmosferdeki gecikmelere ve yansıtan yüzeyin katkısına bağlıdır.",
+   "questions_en": [
+    "What is the difference between amplitude and phase in SAR?",
+    "What does SAR phase tell us?",
+    "What is a complex SAR image?"
+   ],
+   "questions_tr": [
+    "SAR'da genlik ile faz arasındaki fark nedir?",
+    "SAR fazı ne anlatır?",
+    "Karmaşık SAR görüntüsü nedir?"
+   ],
+   "source": {
+    "label": "Get to Know SAR - Overview",
+    "url": "https://science.nasa.gov/mission/nisar/get-to-know-sar/"
+   }
+  },
+  {
+   "id": "kb:sar-speckle",
+   "topic": "sar",
+   "title": "What is speckle in SAR images",
+   "text_en": "Speckle is noise caused by the coherent nature of SAR radiation; it gives even uniform areas such as a large crop field a salt-and-pepper look. It can be reduced in several ways but is hard to remove completely.",
+   "text_tr": "Speckle (benek gürültüsü), SAR ışınımının koherent yapısından kaynaklanan gürültüdür; büyük bir tarla gibi tekdüze alanlara bile tuz-biber görünümü verir. Çeşitli yollarla azaltılabilir, ancak tamamen gidermek zordur.",
+   "questions_en": [
+    "What is speckle in SAR images?",
+    "Why do radar images look grainy?",
+    "Can speckle be removed?"
+   ],
+   "questions_tr": [
+    "SAR görüntülerinde speckle nedir?",
+    "Radar görüntüleri neden benekli görünür?",
+    "Speckle giderilebilir mi?"
+   ],
+   "source": {
+    "label": "Synthetic Aperture Radar (SAR) Basics",
+    "url": "https://developers.google.com/earth-engine/tutorials/community/sar-basics"
+   }
+  },
+  {
+   "id": "kb:sar-polar",
+   "topic": "sar",
+   "title": "What is polarization in SAR",
+   "text_en": "The combination of polarizations used for the transmitted and the received signal has a large effect on backscatter. Choosing the right polarization can help bring out particular topographic features.",
+   "text_tr": "Gönderilen ve alınan sinyal için kullanılan polarizasyon birleşimi geri saçılımı büyük ölçüde etkiler. Doğru polarizasyon seçimi belirli topoğrafik özelliklerin öne çıkmasına yardımcı olabilir.",
+   "questions_en": [
+    "What is polarization in SAR?",
+    "Why does polarization matter for radar images?",
+    "What do VV and VH mean?"
+   ],
+   "questions_tr": [
+    "SAR'da polarizasyon nedir?",
+    "Polarizasyon radar görüntüleri için neden önemli?",
+    "VV ve VH ne demek?"
+   ],
+   "source": {
+    "label": "Get to Know SAR - Overview",
+    "url": "https://science.nasa.gov/mission/nisar/get-to-know-sar/"
+   }
+  },
+  {
+   "id": "kb:sar-incidence",
+   "topic": "sar",
+   "title": "What is the incidence angle in SAR",
+   "text_en": "SAR backscatter depends on the incidence angle, so the same target looks different in the near range (lower angle) and the far range (higher angle) of a swath. How strongly it changes depends on the target: flat dry soil drops off more with angle than forest does.",
+   "text_tr": "SAR geri saçılımı geliş açısına bağlıdır; bu yüzden aynı hedef şeridin yakın menzilinde (düşük açı) ve uzak menzilinde (yüksek açı) farklı görünür. Değişimin gücü hedefe bağlıdır: düz ve kuru toprakta açıyla düşüş ormana göre daha belirgindir.",
+   "questions_en": [
+    "What is the incidence angle in SAR?",
+    "Does the viewing angle change SAR backscatter?",
+    "Why does the same area look different across a SAR swath?"
+   ],
+   "questions_tr": [
+    "SAR'da geliş açısı nedir?",
+    "Bakış açısı SAR geri saçılımını değiştirir mi?",
+    "Aynı alan SAR şeridinde neden farklı görünür?"
+   ],
+   "source": {
+    "label": "Synthetic Aperture Radar (SAR) Basics",
+    "url": "https://developers.google.com/earth-engine/tutorials/community/sar-basics"
+   }
+  },
+  {
+   "id": "kb:sar-layover",
+   "topic": "sar",
+   "title": "What is layover in SAR",
+   "text_en": "Layover is a geometric distortion on slopes in which signals from the tops of mountains or other tall objects fall on top of other signals, so the tops appear to lean toward the sensor. Steeper slopes make it more extreme, and it shows up as bright pixels.",
+   "text_tr": "Layover (üst üste binme), eğimli alanlarda görülen bir geometrik bozulmadır: dağların veya yüksek nesnelerin tepelerinden gelen sinyaller başka sinyallerin üzerine biner ve tepeler algılayıcıya doğru yatmış görünür. Eğim dikleştikçe etki artar ve görüntüde parlak pikseller olarak belirir.",
+   "questions_en": [
+    "What is layover in SAR?",
+    "Why do mountains lean toward the sensor in radar images?",
+    "What causes geometric distortion in SAR?"
+   ],
+   "questions_tr": [
+    "SAR'da layover nedir?",
+    "Radar görüntülerinde dağlar neden algılayıcıya doğru yatık görünür?",
+    "SAR'da geometrik bozulmaya ne yol açar?"
+   ],
+   "source": {
+    "label": "Get to Know SAR - Overview",
+    "url": "https://science.nasa.gov/mission/nisar/get-to-know-sar/"
+   }
+  },
+  {
+   "id": "kb:sar-predict",
+   "topic": "sar",
+   "title": "Can earthquakes be predicted",
+   "text_en": "No. According to the USGS, no scientist has ever predicted a major earthquake, and it does not expect this to become possible in the foreseeable future; a real prediction would have to give the date and time, the location and the magnitude. What scientists can do is calculate the probability that a significant earthquake will occur in a given area within a certain number of years.",
+   "text_tr": "Hayır. USGS'e göre hiçbir bilim insanı bugüne kadar büyük bir depremi önceden tahmin edememiştir ve bunun öngörülebilir gelecekte mümkün olması beklenmemektedir; gerçek bir tahminin tarih ve saati, yeri ve büyüklüğü belirtmesi gerekir. Bilim insanlarının yapabildiği, belirli bir bölgede belirli bir yıl aralığında önemli bir deprem olma olasılığını hesaplamaktır.",
+   "questions_en": [
+    "Can earthquakes be predicted?",
+    "Can SAR or satellites predict an earthquake?",
+    "What would count as a real earthquake prediction?"
+   ],
+   "questions_tr": [
+    "Depremler önceden tahmin edilebilir mi?",
+    "SAR veya uydular depremi öngörebilir mi?",
+    "Gerçek bir deprem tahmini neyi içermelidir?"
+   ],
+   "source": {
+    "label": "Can you predict earthquakes?",
+    "url": "https://www.usgs.gov/faqs/can-you-predict-earthquakes"
+   }
+  },
+  {
+   "id": "kb:sar-glacier",
+   "topic": "sar",
+   "title": "Can NISAR monitor ice and glaciers",
+   "text_en": "NISAR monitors changes in Earth's ice. It observes land and ice-covered regions worldwide every 12 days on both ascending and descending passes, which gives a sample about every 6 days on average.",
+   "text_tr": "NISAR, Dünya'daki buzun değişimlerini izler. Kara ve buzla kaplı bölgeleri dünya genelinde hem yükselen hem alçalan geçişlerde 12 günde bir gözler; bu da ortalama yaklaşık 6 günde bir örnekleme sağlar.",
+   "questions_en": [
+    "Can NISAR monitor ice and glaciers?",
+    "How often does NISAR observe ice-covered regions?",
+    "What is NISAR's revisit time?"
+   ],
+   "questions_tr": [
+    "NISAR buz ve buzulları izleyebilir mi?",
+    "NISAR buzla kaplı bölgeleri ne sıklıkla gözler?",
+    "NISAR'ın tekrar ziyaret süresi nedir?"
+   ],
+   "source": {
+    "label": "Mission Overview - NISAR Quick Facts",
+    "url": "https://science.nasa.gov/mission/nisar/mission-overview/"
+   }
+  },
+  {
+   "id": "kb:sar-deforestation",
+   "topic": "sar",
+   "title": "Can NISAR track vegetation change",
+   "text_en": "NISAR monitors changes in Earth's vegetation, and vegetation change is one of the processes the mission is meant to help understand.",
+   "text_tr": "NISAR, Dünya'nın bitki örtüsündeki değişimleri izler; bitki örtüsü değişimi, görevin daha iyi anlaşılmasına katkı sağlamayı amaçladığı süreçlerden biridir.",
+   "questions_en": [
+    "Can NISAR track vegetation change?",
+    "Can SAR detect deforestation?",
+    "Does NISAR observe forests?"
+   ],
+   "questions_tr": [
+    "NISAR bitki örtüsü değişimini izleyebilir mi?",
+    "SAR ormansızlaşmayı tespit edebilir mi?",
+    "NISAR ormanları gözlemler mi?"
+   ],
+   "source": {
+    "label": "Mission Overview - NISAR Quick Facts",
+    "url": "https://science.nasa.gov/mission/nisar/mission-overview/"
+   }
+  },
+  {
+   "id": "kb:sar-urban",
+   "topic": "sar",
+   "title": "How do cities look in SAR images",
+   "text_en": "Buildings, bridges and other human-made objects tend to act like corner reflectors and show up as bright spots in SAR images. Buildings aligned exactly perpendicular to the flight direction give very bright returns.",
+   "text_tr": "Binalar, köprüler ve diğer insan yapımı nesneler çoğunlukla köşe yansıtıcı gibi davranır ve SAR görüntülerinde parlak noktalar olarak görünür. Uçuş doğrultusuna tam dik hizalanmış binalar çok parlak yansıma verir.",
+   "questions_en": [
+    "How do cities look in SAR images?",
+    "Why are buildings bright in radar images?",
+    "Can SAR be used to study urban areas?"
+   ],
+   "questions_tr": [
+    "Şehirler SAR görüntülerinde nasıl görünür?",
+    "Binalar radar görüntülerinde neden parlak?",
+    "SAR kentsel alanları incelemek için kullanılabilir mi?"
+   ],
+   "source": {
+    "label": "Get to Know SAR - Overview",
+    "url": "https://science.nasa.gov/mission/nisar/get-to-know-sar/"
+   }
+  },
+  {
+   "id": "kb:sar-agriculture",
+   "topic": "sar",
+   "title": "Can SAR monitor crops",
+   "text_en": "Sentinel-1 backscatter over farmland is influenced by environmental factors such as weather, land preparation and crop growth, as well as by viewing geometry and speckle. These sensor and environmental effects have to be controlled for before the observations can be interpreted.",
+   "text_tr": "Tarım arazilerinde Sentinel-1 geri saçılımı; hava koşulları, toprak hazırlığı ve ürün gelişimi gibi çevresel etkenlerin yanı sıra bakış geometrisi ve speckle tarafından da etkilenir. Gözlemlerin yorumlanabilmesi için bu algılayıcı ve çevre etkilerinin kontrol altına alınması gerekir.",
+   "questions_en": [
+    "Can SAR monitor crops?",
+    "Does crop growth change radar backscatter?",
+    "What affects SAR signals over farmland?"
+   ],
+   "questions_tr": [
+    "SAR ile tarım ürünleri izlenebilir mi?",
+    "Ürün gelişimi radar geri saçılımını değiştirir mi?",
+    "Tarım arazilerinde SAR sinyalini neler etkiler?"
+   ],
+   "source": {
+    "label": "Synthetic Aperture Radar (SAR) Basics",
+    "url": "https://developers.google.com/earth-engine/tutorials/community/sar-basics"
+   }
+  },
+  {
+   "id": "kb:sar-change",
+   "topic": "sar",
+   "title": "How is change detected with SAR",
+   "text_en": "Backscatter from the same place varies between acquisitions because of sensor effects such as orbit look direction, incidence angle and speckle, as well as real environmental change, so the sensor effects have to be controlled for before changes are interpreted. Sentinel-1 scenes with the same relative orbit number are 12 days apart and have almost the same viewing configuration.",
+   "text_tr": "Aynı yerden gelen geri saçılım, gerçek çevresel değişimin yanı sıra yörünge bakış yönü, geliş açısı ve speckle gibi algılayıcı etkileri nedeniyle de çekimden çekime değişir; bu yüzden değişimler yorumlanmadan önce algılayıcı etkilerinin kontrol altına alınması gerekir. Aynı göreli yörünge numarasına sahip Sentinel-1 sahneleri 12 gün arayla alınır ve neredeyse aynı bakış geometrisine sahiptir.",
+   "questions_en": [
+    "How is change detected with SAR?",
+    "What must be controlled before comparing two SAR images?",
+    "Why should SAR images from the same orbit be compared?"
+   ],
+   "questions_tr": [
+    "SAR ile değişim nasıl tespit edilir?",
+    "İki SAR görüntüsünü karşılaştırmadan önce neler kontrol edilmelidir?",
+    "Neden aynı yörüngeden alınan SAR görüntüleri karşılaştırılmalı?"
+   ],
+   "source": {
+    "label": "Synthetic Aperture Radar (SAR) Basics",
+    "url": "https://developers.google.com/earth-engine/tutorials/community/sar-basics"
+   }
+  },
+  {
+   "id": "kb:sar-db",
+   "topic": "sar",
+   "title": "What does dB mean in SAR data",
+   "text_en": "In Earth Engine's COPERNICUS/S1_GRD collection, Sentinel-1 backscatter values are expressed in decibels (dB), that is, on a logarithmic scale. The COPERNICUS/S1_GRD_FLOAT collection holds the same data without the log scaling.",
+   "text_tr": "Earth Engine'deki COPERNICUS/S1_GRD koleksiyonunda Sentinel-1 geri saçılım değerleri desibel (dB) cinsinden, yani logaritmik ölçekte verilir. COPERNICUS/S1_GRD_FLOAT koleksiyonu aynı veriyi logaritmik ölçekleme olmadan içerir.",
+   "questions_en": [
+    "What does dB mean in SAR data?",
+    "Are Sentinel-1 values in decibels?",
+    "What is the difference between S1_GRD and S1_GRD_FLOAT?"
+   ],
+   "questions_tr": [
+    "SAR verisinde dB ne anlama gelir?",
+    "Sentinel-1 değerleri desibel cinsinden mi?",
+    "S1_GRD ile S1_GRD_FLOAT arasındaki fark nedir?"
+   ],
+   "source": {
+    "label": "Synthetic Aperture Radar (SAR) Basics",
+    "url": "https://developers.google.com/earth-engine/tutorials/community/sar-basics"
+   }
+  },
+  {
+   "id": "kb:sar-limitations",
+   "topic": "sar",
+   "title": "What are the limitations of SAR",
+   "text_en": "Interpreting SAR images is not straightforward, partly because of the non-intuitive side-looking geometry. Slopes cause geometric distortions, and brightness changes with surface roughness, wetness, wavelength and polarization.",
+   "text_tr": "SAR görüntülerini yorumlamak kolay değildir; bunun bir nedeni sezgisel olmayan yandan bakış geometrisidir. Eğimler geometrik bozulmalara yol açar ve parlaklık yüzey pürüzlülüğüne, ıslaklığa, dalga boyuna ve polarizasyona göre değişir.",
+   "questions_en": [
+    "What are the limitations of SAR?",
+    "Why are SAR images hard to interpret?",
+    "What can go wrong when reading a radar image?"
+   ],
+   "questions_tr": [
+    "SAR'ın sınırlamaları nelerdir?",
+    "SAR görüntülerini yorumlamak neden zor?",
+    "Radar görüntüsü okurken nelere dikkat edilmeli?"
+   ],
+   "source": {
+    "label": "Get to Know SAR - Overview",
+    "url": "https://science.nasa.gov/mission/nisar/get-to-know-sar/"
+   }
+  },
+  {
+   "id": "kb:sar-weather-climate",
+   "topic": "sar",
+   "title": "What is the difference between weather and climate",
+   "text_en": "Weather is the state of the atmosphere at a particular place over the short term. Climate is the average of the weather patterns in a place over a longer period, usually 30 years or more.",
+   "text_tr": "Hava durumu, belirli bir yerde atmosferin kısa süreli halidir. İklim ise bir yerdeki hava olaylarının daha uzun bir dönemdeki, genellikle 30 yıl veya daha uzun süredeki ortalamasıdır.",
+   "questions_en": [
+    "What is the difference between weather and climate?",
+    "What is climate?",
+    "Over how many years is climate defined?"
+   ],
+   "questions_tr": [
+    "Hava durumu ile iklim arasındaki fark nedir?",
+    "İklim nedir?",
+    "İklim kaç yıllık bir dönem üzerinden tanımlanır?"
+   ],
+   "source": {
+    "label": "What's the difference between climate and weather?",
+    "url": "https://www.noaa.gov/explainers/what-s-difference-between-climate-and-weather"
+   }
+  },
+  {
+   "id": "kb:sar-prediction-vs-warning",
+   "topic": "sar",
+   "title": "What is the difference between earthquake prediction and early warning",
+   "text_en": "An earthquake prediction would state when, where and how large an earthquake will be, which is not yet possible. Early warning is different: it is a notification issued after an earthquake has started, alerting people seconds to tens of seconds before the shaking waves are expected to reach them.",
+   "text_tr": "Deprem tahmini, bir depremin ne zaman, nerede ve ne büyüklükte olacağını önceden bildirmek demektir; bu henüz mümkün değildir. Erken uyarı ise farklıdır: deprem başladıktan sonra verilen bir bildirimdir ve sarsıntı dalgalarının bulunulan yere ulaşması beklenmeden saniyeler ile onlarca saniye önce insanları uyarır.",
+   "questions_en": [
+    "What is the difference between earthquake prediction and early warning?",
+    "How does earthquake early warning work?",
+    "How much time does an earthquake early warning give?"
+   ],
+   "questions_tr": [
+    "Deprem tahmini ile erken uyarı arasındaki fark nedir?",
+    "Deprem erken uyarısı nasıl çalışır?",
+    "Deprem erken uyarısı ne kadar süre kazandırır?"
+   ],
+   "source": {
+    "label": "What is the difference between earthquake early warning, earthquake forecasts, earthquake probabilities, and earthquake prediction?",
+    "url": "https://www.usgs.gov/faqs/what-difference-between-earthquake-early-warning-earthquake-forecasts-earthquake-probabilities"
+   }
+  }
+ ]
+}

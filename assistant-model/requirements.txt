@@ -1,0 +1,7 @@
+# Training and evaluation of the Global SAR chatbot (see README.md). Python 3.11 or 3.12.
+# Install PyTorch first, with the CUDA build that matches your GPU: https://pytorch.org/get-started/locally/
+torch>=2.7
+transformers>=4.51,<5
+peft>=0.15
+accelerate>=1.5
+safetensors>=0.5

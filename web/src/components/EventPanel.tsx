@@ -174,10 +174,10 @@ function Provenance({ label, layer }: { label: string; layer: SarLayer }) {
 function AskSection({ event, before, after, onAfter }: { event: SarEvent; before: SarLayer | null; after: SarLayer | null; onAfter: (id: string) => void }) {
   const [opened, setOpened] = useState(false);
   return (
-    <details className="disclosure" onToggle={(e) => (e.currentTarget as HTMLDetailsElement).open && setOpened(true)}>
+    <details className="disclosure" data-ask onToggle={(e) => (e.currentTarget as HTMLDetailsElement).open && setOpened(true)}>
       <summary>
         <span>Ask about this investigation</span>
-        <span className="faint small">AI assistant, cites its sources</span>
+        <span className="faint small">Assistant, cites its sources</span>
       </summary>
       {opened && (
         <Suspense fallback={<p className="muted small" role="status">Loading the assistant…</p>}>

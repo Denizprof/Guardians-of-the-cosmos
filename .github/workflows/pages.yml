@@ -37,6 +37,9 @@ jobs:
       - run: npm run build
         env:
           VITE_STATIC_SITE: '1'
+          # Optional: Hugging Face repository of the chatbot model (assistant-model/README.md). Unset = the chat
+          # answers from its knowledge base only.
+          VITE_ASSISTANT_MODEL: ${{ vars.ASSISTANT_MODEL }}
       - uses: actions/configure-pages@v5
         with:
           enablement: true

@@ -1,0 +1,47 @@
+{
+ "prompt_version": "1",
+ "seed": 20261114,
+ "held_out_event": "aspen-acres-fire-2026",
+ "held_out_records": [
+  "kb:event-aspen-acres-fire-2026-happened",
+  "kb:event-aspen-acres-fire-2026-radar",
+  "kb:event-aspen-acres-fire-2026-caveats",
+  "kb:event-aspen-acres-fire-2026-pin-a-eonet",
+  "kb:app-catalogs",
+  "kb:app-compare",
+  "kb:app-assistant",
+  "kb:concept-lband",
+  "kb:event-venezuela-2026-pin-v-lake",
+  "kb:event-mozambique-floods-2026-pin-m-corumana",
+  "kb:event-krasheninnikov-2026-pin-k-sw",
+  "kb:layer-gibs-viirs-noaa20-fire-falsecolor-colours",
+  "kb:layer-umd-hansen-gfc-lossyear-v1-13-colours",
+  "kb:layer-gibs-modis-terra-lst-day-colours",
+  "kb:layer-gibs-opera-dswx-s1-colours",
+  "kb:layer-gibs-opera-dist-ann-hls-colours",
+  "kb:layer-gibs-viirs-noaa20-night-lights-colours",
+  "kb:sar-nisar-band",
+  "kb:sar-polar",
+  "kb:sar-urban",
+  "kb:sar-prediction-vs-warning"
+ ],
+ "counts": {
+  "train": 1195,
+  "val": 171,
+  "test": 212
+ },
+ "by_type": {
+  "train/answer": 614,
+  "train/view": 150,
+  "train/decline-offtopic": 198,
+  "train/decline-missing": 216,
+  "train/answer-two": 17,
+  "val/answer": 126,
+  "val/decline-missing": 45,
+  "test/answer": 98,
+  "test/decline-missing": 45,
+  "test/answer-two": 7,
+  "test/view": 40,
+  "test/decline-offtopic": 22
+ }
+}

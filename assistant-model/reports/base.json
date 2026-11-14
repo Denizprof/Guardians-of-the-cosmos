@@ -1,0 +1,140 @@
+{
+ "name": "base",
+ "base_model": "Qwen/Qwen3-1.7B",
+ "adapter": null,
+ "split": "test",
+ "examples": 212,
+ "minutes": 10.7,
+ "overall": {
+  "answerable": {
+   "n": 145,
+   "shown": 0.772,
+   "cites_right": 0.579,
+   "grounded": 0.214,
+   "wrongly_declined": 0.028,
+   "discarded": 0.2
+  },
+  "unanswerable": {
+   "n": 67,
+   "declined": 0.358,
+   "discarded": 0.149,
+   "answered_anyway": 0.493
+  }
+ },
+ "by_type": {
+  "answer": {
+   "answerable": {
+    "n": 98,
+    "shown": 0.776,
+    "cites_right": 0.612,
+    "grounded": 0.143,
+    "wrongly_declined": 0.041,
+    "discarded": 0.184
+   },
+   "unanswerable": {
+    "n": 0,
+    "declined": null,
+    "discarded": null,
+    "answered_anyway": null
+   }
+  },
+  "answer-two": {
+   "answerable": {
+    "n": 7,
+    "shown": 0.857,
+    "cites_right": 0.286,
+    "grounded": 0.286,
+    "wrongly_declined": 0,
+    "discarded": 0.143
+   },
+   "unanswerable": {
+    "n": 0,
+    "declined": null,
+    "discarded": null,
+    "answered_anyway": null
+   }
+  },
+  "decline-missing": {
+   "answerable": {
+    "n": 0,
+    "shown": null,
+    "cites_right": null,
+    "grounded": null,
+    "wrongly_declined": null,
+    "discarded": null
+   },
+   "unanswerable": {
+    "n": 45,
+    "declined": 0.111,
+    "discarded": 0.2,
+    "answered_anyway": 0.689
+   }
+  },
+  "decline-offtopic": {
+   "answerable": {
+    "n": 0,
+    "shown": null,
+    "cites_right": null,
+    "grounded": null,
+    "wrongly_declined": null,
+    "discarded": null
+   },
+   "unanswerable": {
+    "n": 22,
+    "declined": 0.864,
+    "discarded": 0.045,
+    "answered_anyway": 0.091
+   }
+  },
+  "view": {
+   "answerable": {
+    "n": 40,
+    "shown": 0.75,
+    "cites_right": 0.55,
+    "grounded": 0.375,
+    "wrongly_declined": 0,
+    "discarded": 0.25
+   },
+   "unanswerable": {
+    "n": 0,
+    "declined": null,
+    "discarded": null,
+    "answered_anyway": null
+   }
+  }
+ },
+ "by_language": {
+  "en": {
+   "answerable": {
+    "n": 123,
+    "shown": 0.78,
+    "cites_right": 0.602,
+    "grounded": 0.252,
+    "wrongly_declined": 0.024,
+    "discarded": 0.195
+   },
+   "unanswerable": {
+    "n": 47,
+    "declined": 0.362,
+    "discarded": 0.149,
+    "answered_anyway": 0.489
+   }
+  },
+  "tr": {
+   "answerable": {
+    "n": 22,
+    "shown": 0.727,
+    "cites_right": 0.455,
+    "grounded": 0,
+    "wrongly_declined": 0.045,
+    "discarded": 0.227
+   },
+   "unanswerable": {
+    "n": 20,
+    "declined": 0.35,
+    "discarded": 0.15,
+    "answered_anyway": 0.5
+   }
+  }
+ }
+}

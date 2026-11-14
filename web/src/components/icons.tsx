@@ -40,6 +40,12 @@ export const IconProbe = () => (
     <circle cx="8" cy="6.700" r="1.500" />
   </Svg>
 );
+export const IconAsk = () => (
+  <Svg>
+    <path d="M2.500 3.500h11v7.500H7.500L4.500 13.500v-2.500h-2z" />
+  </Svg>
+);
+
 export const IconInfo = () => (
   <Svg>
     <circle cx="8" cy="8" r="6" />

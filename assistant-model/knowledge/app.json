@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "app-what",
+    "title": "What Global SAR is",
+    "text_en": "Global SAR is a 3D globe for exploring real radar observations of Earth, led by NISAR, the NASA and ISRO radar satellite. It was made for the NASA Space Apps Challenge 2026, in the challenge called Dancing with the SARs.",
+    "text_tr": "Global SAR, Dünya'nın gerçek radar gözlemlerini keşfetmek için hazırlanmış üç boyutlu bir küredir; merkezinde NASA ve ISRO'nun radar uydusu NISAR vardır. NASA Space Apps Challenge 2026'nın Dancing with the SARs başlıklı görevi için yapılmıştır.",
+    "questions_en": ["What is Global SAR?", "What is this app?", "What is this website for?", "What can I do here?", "Who made this for which challenge?"],
+    "questions_tr": ["Global SAR nedir?", "Bu uygulama nedir?", "Bu site ne işe yarar?", "Burada ne yapabilirim?"]
+  },
+  {
+    "slug": "app-who",
+    "title": "Who Global SAR is for",
+    "text_en": "Global SAR is for students and teachers, journalists, people who work on disasters and the environment, and anyone curious about how our planet changes. You do not need to know anything about radar: every investigation explains what you are looking at.",
+    "text_tr": "Global SAR; öğrenciler ve öğretmenler, gazeteciler, afet ve çevre alanında çalışanlar ve gezegenimizin nasıl değiştiğini merak eden herkes içindir. Radar hakkında bir şey bilmeniz gerekmez: her inceleme neye baktığınızı açıklar.",
+    "questions_en": ["Who is this app for?", "Do I need to know radar to use this?", "Is this for students?", "Can a beginner use Global SAR?"],
+    "questions_tr": ["Bu uygulama kimler için?", "Kullanmak için radar bilmem gerekir mi?", "Öğrenciler kullanabilir mi?"]
+  },
+  {
+    "slug": "app-not",
+    "title": "What Global SAR is not",
+    "text_en": "Global SAR is not a live emergency alert system. The investigations are the project's own analysis, not official NASA products, and every layer says whether it is an observation, a measurement the project derived or an interpretation.",
+    "text_tr": "Global SAR canlı bir acil durum uyarı sistemi değildir. İncelemeler projenin kendi analizidir, resmî NASA ürünü değildir; her katman bir gözlem mi, projenin türettiği bir ölçüm mü yoksa bir yorum mu olduğunu belirtir.",
+    "questions_en": ["Is this a live alert system?", "Can I use this for emergency warnings?", "Are these official NASA products?", "Is the analysis official?", "Can I rely on this in an emergency?"],
+    "questions_tr": ["Bu canlı bir uyarı sistemi mi?", "Acil durumda buna güvenebilir miyim?", "Bunlar resmî NASA ürünü mü?"]
+  },
+  {
+    "slug": "tool-investigations",
+    "title": "The Investigations tool",
+    "text_en": "Investigations are five worked examples: an earthquake, a flood, a volcano, a forest clearing and a wildfire. Each compares radar images from before and after, with a timeline, and explains what you see at a Simple or Scientific level. Open them from the Investigations button in the top bar or from the cards at the bottom of the globe.",
+    "text_tr": "İncelemeler beş hazır örnektir: bir deprem, bir sel, bir yanardağ, bir orman kesimi ve bir orman yangını. Her biri öncesi ve sonrası radar görüntülerini bir zaman çizelgesiyle karşılaştırır ve gördüklerinizi Basit veya Bilimsel düzeyde açıklar. Üst çubuktaki Investigations düğmesinden veya kürenin altındaki kartlardan açılır.",
+    "questions_en": ["What are the investigations?", "How do I open an investigation?", "Which examples does the app have?", "How many investigations are there?", "Where do I find the before and after examples?"],
+    "questions_tr": ["İncelemeler nedir?", "Bir incelemeyi nasıl açarım?", "Uygulamada hangi örnekler var?", "Kaç inceleme var?"]
+  },
+  {
+    "slug": "tool-filters",
+    "title": "The Filters tool",
+    "text_en": "With Filters you choose which kinds of events appear on the globe, switch on catalogs of past earthquakes, tsunamis, eruptions, fires, landslides and floods, and set a range of years. Click a marker to read its record.",
+    "text_tr": "Filtreler ile kürede hangi tür olayların görüneceğini seçer, geçmiş deprem, tsunami, patlama, yangın, heyelan ve sel kataloglarını açar ve bir yıl aralığı belirlersiniz. Bir işarete tıklayarak kaydını okuyabilirsiniz.",
+    "questions_en": ["What does Filters do?", "How do I show past earthquakes on the globe?", "How do I filter events by year?", "How do I hide some kinds of events?", "What are the dots on the globe?"],
+    "questions_tr": ["Filtreler ne işe yarar?", "Geçmiş depremleri kürede nasıl gösteririm?", "Olayları yıla göre nasıl filtrelerim?", "Küredeki noktalar nedir?"]
+  },
+  {
+    "slug": "app-catalogs",
+    "title": "Event catalogs in Filters",
+    "text_en": "The Filters panel offers these catalogs of reported events: active fires of the last 24 hours (NASA FIRMS), tsunamis since 1900 (NOAA NCEI), earthquakes of magnitude 7 and above since 1900 (USGS), significant eruptions since 1900 (NOAA NCEI), flood alerts since 2000 (GDACS) and landslides (NASA Global Landslide Catalog).",
+    "text_tr": "Filtreler paneli şu bildirilmiş olay kataloglarını sunar: son 24 saatin aktif yangınları (NASA FIRMS), 1900'den beri tsunamiler (NOAA NCEI), 1900'den beri 7 ve üzeri büyüklükteki depremler (USGS), 1900'den beri önemli patlamalar (NOAA NCEI), 2000'den beri sel uyarıları (GDACS) ve heyelanlar (NASA Global Landslide Catalog).",
+    "questions_en": ["Which event catalogs are available?", "Where do the earthquake markers come from?", "What is the source of the fire markers?", "Which catalogs can I switch on?", "Where does the tsunami data come from?"],
+    "questions_tr": ["Hangi olay katalogları var?", "Deprem işaretleri nereden geliyor?", "Yangın işaretlerinin kaynağı nedir?"]
+  },
+  {
+    "slug": "tool-layers",
+    "title": "The Satellite layers tool",
+    "text_en": "Satellite layers lets you lay global satellite datasets over the globe, such as daily true-colour imagery, snow, flood water or night lights. Each layer has a colour legend that says what its colours mean and where that comes from.",
+    "text_tr": "Uydu katmanları, günlük gerçek renkli görüntüler, kar, sel suyu veya gece ışıkları gibi küresel uydu veri setlerini kürenin üzerine sermenizi sağlar. Her katmanın, renklerinin ne anlama geldiğini ve bunun nereden geldiğini söyleyen bir renk açıklaması vardır.",
+    "questions_en": ["What are satellite layers?", "How do I add a satellite layer?", "How do I see what the colours of a layer mean?", "Can I see snow or night lights?", "Where is the colour legend?"],
+    "questions_tr": ["Uydu katmanları nedir?", "Uydu katmanı nasıl eklerim?", "Bir katmanın renkleri ne anlama geliyor, nereden görürüm?"]
+  },
+  {
+    "slug": "tool-lens",
+    "title": "The SAR lens tool",
+    "text_en": "The SAR lens is a square you can move and resize. Inside it the same place is shown in radar, from recent NISAR and Sentinel-1 passes, as a mosaic of recent daily passes that can have gaps. It can be expanded to the full screen.",
+    "text_tr": "SAR merceği, taşıyıp boyutlandırabileceğiniz bir karedir. İçinde aynı yer, yakın tarihli NISAR ve Sentinel-1 geçişlerinden oluşan ve boşluklar içerebilen bir mozaik olarak radarla gösterilir. Tam ekrana genişletilebilir.",
+    "questions_en": ["What is the SAR lens?", "How do I see a place in radar?", "Why does the SAR lens have gaps?", "Can I make the SAR lens bigger?", "Which satellites does the SAR lens use?"],
+    "questions_tr": ["SAR merceği nedir?", "Bir yeri radarla nasıl görürüm?", "SAR merceğinde neden boşluklar var?", "SAR merceği hangi uyduları kullanır?"]
+  },
+  {
+    "slug": "tool-probe",
+    "title": "The Coverage probe tool",
+    "text_en": "With the Coverage probe you click anywhere on Earth to list the real NISAR products recorded over that point, and view each one on its own: its picture and its footprint. Only one product is drawn at a time. The list comes live from the ASF DAAC search API, and the pictures are NASA browse renderings, for looking, not measuring.",
+    "text_tr": "Kapsama sondası ile Dünya'da herhangi bir yere tıklayarak o nokta üzerinde kaydedilmiş gerçek NISAR ürünlerini listeler ve her birini tek tek görüntülersiniz: resmi ve kapsadığı alan. Aynı anda yalnızca bir ürün çizilir. Liste canlı olarak ASF DAAC arama servisinden gelir; resimler NASA'nın ön izleme görüntüleridir, ölçmek için değil bakmak içindir.",
+    "questions_en": ["What is the coverage probe?", "How do I check if NISAR has data for a place?", "How do I see which NISAR images exist at a point?", "Where does the coverage probe get its list?", "Can I measure from the probe pictures?"],
+    "questions_tr": ["Kapsama sondası nedir?", "Bir yer için NISAR verisi var mı, nasıl bakarım?", "Sonda listesi nereden geliyor?"]
+  },
+  {
+    "slug": "tool-search",
+    "title": "Search",
+    "text_en": "With Search in the top bar you can find a place, an investigation or a pair of coordinates and fly there.",
+    "text_tr": "Üst çubuktaki arama ile bir yer, bir inceleme veya bir koordinat çifti bulup oraya uçabilirsiniz.",
+    "questions_en": ["How do I search for a place?", "Can I enter coordinates?", "How do I go to a city?", "How do I find a location on the globe?"],
+    "questions_tr": ["Bir yeri nasıl ararım?", "Koordinat girebilir miyim?", "Bir şehre nasıl giderim?"]
+  },
+  {
+    "slug": "app-navigate",
+    "title": "Moving the globe",
+    "text_en": "Drag to turn the globe, scroll or pinch to zoom, and hold the right mouse button (or use two fingers) to tilt.",
+    "text_tr": "Küreyi döndürmek için sürükleyin, yakınlaştırmak için kaydırın veya iki parmakla sıkıştırın, eğmek için sağ fare düğmesini basılı tutun (veya iki parmak kullanın).",
+    "questions_en": ["How do I move the globe?", "How do I zoom in?", "How do I tilt the view?", "How do I rotate the Earth?"],
+    "questions_tr": ["Küreyi nasıl hareket ettiririm?", "Nasıl yakınlaştırırım?", "Görünümü nasıl eğerim?"]
+  },
+  {
+    "slug": "app-compare",
+    "title": "Comparing before and after",
+    "text_en": "Inside an investigation you can compare the Before and After images in three ways: Swipe, Side by side and Overlay. On the timeline, choose Before or After and then click a date to put that observation in that slot.",
+    "text_tr": "Bir incelemenin içinde Öncesi ve Sonrası görüntülerini üç şekilde karşılaştırabilirsiniz: Swipe (kaydırma), Side by side (yan yana) ve Overlay (üst üste). Zaman çizelgesinde Before veya After'ı seçip bir tarihe tıklayarak o gözlemi o yuvaya yerleştirirsiniz.",
+    "questions_en": ["How do I compare before and after?", "What is swipe mode?", "How do I change the before image?", "How does the timeline work?", "Can I see the two images side by side?"],
+    "questions_tr": ["Öncesi ve sonrasını nasıl karşılaştırırım?", "Zaman çizelgesi nasıl çalışır?", "Öncesi görüntüsünü nasıl değiştiririm?"]
+  },
+  {
+    "slug": "app-levels",
+    "title": "Simple and Scientific levels",
+    "text_en": "Explanations come at two levels. Simple uses plain words for a general reader; Scientific uses precise terms and gives the processing details. You can switch between them inside an investigation and in this chat.",
+    "text_tr": "Açıklamalar iki düzeyde sunulur. Basit (Simple) düzey genel okur için sade bir dil kullanır; Bilimsel (Scientific) düzey kesin terimler kullanır ve işleme ayrıntılarını verir. İkisi arasında bir incelemenin içinde ve bu sohbette geçiş yapabilirsiniz.",
+    "questions_en": ["What is the difference between Simple and Scientific?", "How do I get a more detailed explanation?", "Can you explain it more simply?", "What are the explanation levels?"],
+    "questions_tr": ["Basit ve Bilimsel arasındaki fark nedir?", "Daha ayrıntılı açıklamayı nasıl alırım?", "Açıklama düzeyleri nelerdir?"]
+  },
+  {
+    "slug": "app-evidence",
+    "title": "Evidence labels on layers",
+    "text_en": "Every layer carries an evidence label: Satellite observation, Derived measurement, Interpretation, Model output or Simulation. NASA browse renderings are labelled as observations; maps the project computed itself are labelled as derived measurements.",
+    "text_tr": "Her katman bir kanıt etiketi taşır: uydu gözlemi (Satellite observation), türetilmiş ölçüm (Derived measurement), yorum (Interpretation), model çıktısı (Model output) veya simülasyon (Simulation). NASA'nın ön izleme görüntüleri gözlem olarak, projenin kendi hesapladığı haritalar türetilmiş ölçüm olarak etiketlenir.",
+    "questions_en": ["What do observation and derived mean?", "What is a derived measurement?", "What are the evidence labels?", "How do I know if a layer is real data or an interpretation?", "What does the badge on a layer mean?"],
+    "questions_tr": ["Gözlem ve türetilmiş ne demek?", "Türetilmiş ölçüm nedir?", "Kanıt etiketleri nelerdir?"]
+  },
+  {
+    "slug": "app-tiers",
+    "title": "NISAR quality tier labels",
+    "text_en": "Each NISAR product in the app shows the quality tier NASA assigned to it: BETA, PROVISIONAL or VALIDATED. The tier appears next to each radar layer and in the Coverage probe list. Urgent Response products are tasked acquisitions and are not listed by the probe.",
+    "text_tr": "Uygulamadaki her NISAR ürünü, NASA'nın ona verdiği kalite kademesini gösterir: BETA, PROVISIONAL veya VALIDATED. Kademe her radar katmanının yanında ve kapsama sondası listesinde görünür. Urgent Response ürünleri görevlendirilmiş çekimlerdir ve sonda tarafından listelenmez.",
+    "questions_en": ["What do BETA, PROVISIONAL and VALIDATED mean?", "What is a quality tier?", "What is the BETA badge?", "Where do I see the tier of a product?"],
+    "questions_tr": ["BETA, PROVISIONAL ve VALIDATED ne demek?", "Kalite kademesi nedir?", "BETA etiketi nedir?"]
+  },
+  {
+    "slug": "app-credits",
+    "title": "Data credits",
+    "text_en": "Radar imagery is NISAR L-band from NASA/JPL-Caltech and ISRO, distributed by ASF DAAC. Context markers come from USGS and NASA EONET. The globe imagery is Sentinel-2 cloudless 2024 by EOX IT Services GmbH, terrain is Mapzen/AWS Terrain Tiles, and borders and place names are from OpenStreetMap contributors. The full list is in the About panel.",
+    "text_tr": "Radar görüntüleri NASA/JPL-Caltech ve ISRO'nun NISAR L-bant verisidir ve ASF DAAC tarafından dağıtılır. Bağlam işaretleri USGS ve NASA EONET'ten gelir. Küre görüntüsü EOX IT Services GmbH'nin Sentinel-2 cloudless 2024 ürünüdür, arazi Mapzen/AWS Terrain Tiles'tır, sınırlar ve yer adları OpenStreetMap katkıcılarındandır. Tam liste About panelindedir.",
+    "questions_en": ["Where does the data come from?", "Who provides the radar images?", "What are the data sources?", "Who made the base map?", "Where are the credits?"],
+    "questions_tr": ["Veriler nereden geliyor?", "Radar görüntülerini kim sağlıyor?", "Veri kaynakları nelerdir?"]
+  },
+  {
+    "slug": "app-intro-again",
+    "title": "Seeing the introduction again",
+    "text_en": "The introduction is shown on a first visit. To see it again, open About in the top bar and choose Show the introduction again.",
+    "text_tr": "Tanıtım ilk ziyarette gösterilir. Tekrar görmek için üst çubuktan About'u açın ve Show the introduction again seçeneğini seçin.",
+    "questions_en": ["How do I see the introduction again?", "Where is the welcome screen?", "How do I reopen the intro?", "Where is the About section?"],
+    "questions_tr": ["Tanıtımı tekrar nasıl görürüm?", "Karşılama ekranı nerede?", "About bölümü nerede?"]
+  },
+  {
+    "slug": "app-assistant",
+    "title": "How this assistant works",
+    "text_en": "This assistant answers only from a checked knowledge base and from what is open in your view, and it cites what it used. It runs in your own browser. When it has no source for a question it says so instead of guessing, and it cannot predict earthquakes or other disasters.",
+    "text_tr": "Bu asistan yalnızca kontrol edilmiş bir bilgi tabanından ve görünümünüzde açık olanlardan yanıt verir ve kullandığı kaynağı gösterir. Kendi tarayıcınızda çalışır. Bir soru için kaynağı yoksa tahmin yürütmek yerine bunu söyler; depremleri veya başka afetleri önceden bildiremez.",
+    "questions_en": ["Who are you?", "How do you work?", "Can I trust your answers?", "Where do your answers come from?", "Are you ChatGPT?", "Do you make things up?"],
+    "questions_tr": ["Sen kimsin?", "Nasıl çalışıyorsun?", "Yanıtlarına güvenebilir miyim?", "Yanıtların nereden geliyor?"]
+  }
+]

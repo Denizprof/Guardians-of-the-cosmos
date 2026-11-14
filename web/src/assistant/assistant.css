@@ -62,3 +62,19 @@ span.asst-chip { cursor: default; }
   a.asst-chip::after, button.asst-chip::after { content: ''; position: absolute; inset: -8px 0; }
   .asst-mark::after { content: ''; position: absolute; inset: -14px -12px; }
 }
+
+/* ---------- in-browser chatbot: answer mode, example questions, side-panel variant ---------- */
+.asst-mode { display: grid; gap: var(--sp-2); justify-items: start; padding: var(--sp-2) var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-2); background: var(--panel-2); }
+.asst-mode p { margin: 0; color: var(--muted); font-size: var(--fs-micro); line-height: 1.5; text-wrap: pretty; }
+.asst-mode strong { color: var(--text); font-weight: 600; }
+.asst-mode-error strong { color: var(--danger); }
+.asst-progress { width: 100%; height: 6px; accent-color: var(--sar); }
+.asst-suggest { list-style: none; margin: var(--sp-2) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.asst-suggest .asst-btn { font-size: var(--fs-small); text-align: left; }
+.asst-declined { border-style: dashed; }
+.asst-declined .asst-text { color: var(--text-2); }
+.asst-full { padding: 0; }
+.asst-full .asst-head { justify-content: flex-end; }
+.asst-full .asst-log { max-height: min(52vh, 560px); }
+.asst-cites li { min-width: 0; max-width: 100%; }
+.asst-chip-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

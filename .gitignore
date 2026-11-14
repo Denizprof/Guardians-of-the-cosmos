@@ -16,3 +16,11 @@ web/playwright-report/
 coverage/
 .coverage
 .pytest_cache/
+
+# chatbot training: generated data, downloaded weights and trained adapters are rebuilt, not committed
+assistant-model/data/*.jsonl
+assistant-model/adapters/
+assistant-model/models/
+assistant-model/export/
+assistant-model/reports/*.outputs.jsonl
+web/public/models/

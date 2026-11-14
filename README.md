@@ -77,7 +77,7 @@ That value is lost if people cannot read the data. Global SAR is designed so tha
 - **Five NISAR investigations** (earthquake, flood, volcano, deforestation, wildfire), all on real radar data.
 - **Before / after comparison** in swipe, side-by-side and overlay modes, with a timeline of radar passes and shareable URLs.
 - **Two explanation levels**, *Simple* and *Scientific*, with numbered annotation pins and legends in physical units (cm, dB).
-- **AI assistant** that answers questions about the investigation on screen and cites the data it uses.
+- **AI assistant** ("Ask") that runs in the visitor's browser, answers only from a checked knowledge base and the investigation on screen, and cites what it used. An optional fine-tuned Qwen3-1.7B model words the answers.
 - **Weather data** from Meteomatics for the selected location and date.
 - **SAR lens** to view any area through recent NISAR and Sentinel-1 radar.
 - **Live NISAR coverage probe**: select any point to list the real NISAR acquisitions over it (ASF Search API).
@@ -219,7 +219,8 @@ Then open **http://localhost:4173**.
 <summary><b>Weather and AI assistant configuration</b></summary>
 
 - **Weather:** copy `web/env.example` to `web/.env.local`, add your Meteomatics username and password, and restart. See [docs/meteomatics.md](docs/meteomatics.md).
-- **AI assistant:** start the gateway with your model endpoint (`cd assistant-gateway && ASSISTANT_MODEL_URL=<your endpoint> npm start`) and set `VITE_ASSISTANT_GATEWAY_URL=/` in `web/.env.local`. See [docs/assistant-integration.md](docs/assistant-integration.md) and the contract in `shared/assistant-contract/`.
+- **AI assistant, in the browser (default):** nothing to configure. To offer the fine-tuned model, set `VITE_ASSISTANT_MODEL` to its Hugging Face repository; see [assistant-model/README.md](assistant-model/README.md).
+- **AI assistant, your own model:** start the gateway with your model endpoint (`cd assistant-gateway && ASSISTANT_MODEL_URL=<your endpoint> npm start`) and set `VITE_ASSISTANT_GATEWAY_URL=/` in `web/.env.local`. See [docs/assistant-integration.md](docs/assistant-integration.md) and the contract in `shared/assistant-contract/`.
 </details>
 
 <details>
@@ -304,6 +305,7 @@ Guardians-of-the-cosmos/
 | [docs/final-report.md](docs/final-report.md) | Feature inventory, methods, results, tests and known limitations |
 | [docs/data-sources.md](docs/data-sources.md) | Every dataset and API used, with licences |
 | [docs/assistant-integration.md](docs/assistant-integration.md) | AI assistant integration and contract |
+| [assistant-model/README.md](assistant-model/README.md) | The in-browser chatbot: knowledge base, training, measured results, browser export |
 | [docs/meteomatics.md](docs/meteomatics.md) | Weather data configuration |
 | [docs/qa/](docs/qa/) | QA issues, code review and test report |
 

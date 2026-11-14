@@ -4,7 +4,27 @@ import { CONTRACT_VERSION, type AssistantRequest, type AssistantResponse, type H
 import { collectCitationIds } from './context';
 import { validateResponse } from './validate';
 
+/** State of an optional on-device model (assistant/local/engine.ts). */
+export interface ModelState {
+  /** unsupported = this browser cannot run it; idle = can be loaded on request. */
+  phase: 'unsupported' | 'idle' | 'loading' | 'ready' | 'error';
+  /** 0..1 while loading. */
+  progress?: number;
+  detail?: string;
+}
+export interface ModelControl {
+  /** Human-readable download size, e.g. "about 1.1 GB". */
+  size: string;
+  state(): ModelState;
+  subscribe(listener: () => void): () => void;
+  load(): Promise<void>;
+}
+
 export interface AssistantAdapter {
+  /** How answers are produced, shown to the user. Absent for a remote gateway model. */
+  readonly model?: ModelControl;
+  /** Add what the adapter knows to the request (knowledge records for this question) before it is sent. */
+  prepare?(req: AssistantRequest): Promise<AssistantRequest>;
   health(): Promise<Health>;
   /** Resolves with an AssistantResponse (status ok/error/unavailable). Rejects only on abort. */
   query(req: AssistantRequest, signal?: AbortSignal): Promise<AssistantResponse>;

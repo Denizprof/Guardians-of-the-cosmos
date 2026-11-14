@@ -87,12 +87,22 @@ export interface ContextCoverage {
   granules: ContextCoverageGranule[];
 }
 
+/** A checked statement from the app's knowledge base, retrieved for the current question (contract 1.1). */
+export interface ContextKnowledge {
+  citation_id: string; // kb:<slug>
+  title: string;
+  text: string;
+  source_label: string;
+  url: string;
+}
+
 export interface AssistantContext {
   event?: ContextEvent;
   selected_layers?: ContextLayer[];
   map_view?: ContextMapView;
   clicked_location?: { lon: number; lat: number };
   coverage?: ContextCoverage;
+  knowledge?: ContextKnowledge[];
 }
 
 export interface ConversationTurn {

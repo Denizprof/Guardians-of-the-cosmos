@@ -54,23 +54,70 @@ async function setup(page: Page) {
   await asst(page).scrollIntoViewIfNeeded();
 }
 
-test.describe('assistant: no gateway configured', () => {
-  test('shows "Assistant not connected" with setup steps, and offers no way to ask', async ({ page }) => {
+// With no gateway the app uses its in-browser chatbot (assistant/local): it answers from the checked knowledge
+// base (public/data/assistant/kb.json) and the open view, cites what it used, and declines when it has no source.
+test.describe('assistant: in-browser chatbot (no gateway configured)', () => {
+  test('answers a radar question by quoting a checked record, with a citation and a note on how it was made', async ({ page }) => {
     await setup(page);
-    await expect(asst(page).getByRole('heading', { name: 'Assistant not connected' })).toBeVisible();
-    await expect(asst(page)).toContainText('does not guess');
-    await expect(asst(page)).toContainText('VITE_ASSISTANT_GATEWAY_URL');
-    await expect(asst(page).getByRole('button', { name: 'Check again' })).toBeVisible();
-    // The prompt box is not merely disabled: it is not rendered at all (no way to type to a model that is not there).
+    await ask(page, 'What is SAR?');
+    const reply = asst(page).locator('.asst-assistant');
+    await expect(reply.locator('.asst-text')).toContainText(/radar/i);
+    await expect(reply.locator('.asst-text')).not.toContainText('[[');
+    const chip = reply.getByRole('list', { name: 'Citations' }).locator('.asst-chip');
+    await expect(chip).toHaveCount(1);
+    await expect(chip).toHaveAttribute('href', /^https:\/\//);
+    await expect(reply).toContainText('Quoted from the knowledge base');
+  });
+
+  test('"What am I looking at?" is answered from the open investigation', async ({ page }) => {
+    await setup(page);
+    await asst(page).getByRole('button', { name: 'What am I looking at?' }).click();
+    const reply = asst(page).locator('.asst-assistant');
+    await expect(reply.locator('.asst-text')).toContainText('Venezuela earthquakes');
+    await expect(reply.locator('.asst-chip')).toHaveCount(1);
+  });
+
+  test('declines a question it has no source for: no answer, no citation, not shown as an error', async ({ page }) => {
+    await setup(page);
+    await ask(page, 'Who won the football world cup?');
+    const reply = asst(page).locator('.asst-assistant');
+    await expect(reply).toHaveClass(/asst-declined/);
+    await expect(reply).not.toHaveClass(/asst-failed/);
+    await expect(reply.locator('.asst-text')).toContainText("I don't have a checked source");
+    await expect(reply.locator('.asst-chip')).toHaveCount(0);
+  });
+
+  test('a knowledge base that fails to load is reported, and nothing can be asked', async ({ page, allow }) => {
+    allow.console.push(/kb\.json|Failed to load resource/);
+    await page.route('**/data/assistant/kb.json', (r) => r.fulfill({ status: 500, body: 'boom' }));
+    await setup(page);
+    await expect(asst(page).getByRole('heading', { name: 'Assistant unavailable' })).toBeVisible();
+    await expect(asst(page)).toContainText('knowledge base could not be loaded');
     await expect(input(page)).toHaveCount(0);
     await expect(send(page)).toHaveCount(0);
   });
 
-  test('"Check again" stays in the not-connected state (no fabricated answer)', async ({ page }) => {
+  test('no AI model is offered or downloaded unless the build names one', async ({ page }) => {
+    const external: string[] = [];
+    page.on('request', (r) => { if (/huggingface\.co|jsdelivr\.net/.test(r.url())) external.push(r.url()); });
     await setup(page);
-    await asst(page).getByRole('button', { name: 'Check again' }).click();
-    await expect(asst(page).getByRole('heading', { name: 'Assistant not connected' })).toBeVisible();
-    await expect(asst(page).locator('.asst-msg')).toHaveCount(0);
+    await ask(page, 'What is SAR?');
+    await expect(asst(page).locator('.asst-assistant')).toHaveCount(1);
+    await expect(asst(page).getByRole('button', { name: 'Load the AI model' })).toHaveCount(0);
+    expect(external).toEqual([]);
+  });
+
+  test('"Ask" in the top bar opens the chat as a side panel when no investigation is open', async ({ page }) => {
+    await stubExternal(page);
+    await appReady(page);
+    await page.getByRole('button', { name: 'Ask the assistant' }).click();
+    const panel = page.locator('section.panel[aria-label="Assistant"]');
+    await expect(panel).toBeVisible();
+    await panel.getByRole('button', { name: 'Can radar predict earthquakes?' }).click();
+    await expect(panel.locator('.asst-assistant .asst-text')).toContainText(/^No\./);
+    await expect(panel.locator('.asst-assistant .asst-chip')).toHaveAttribute('href', /usgs\.gov/);
+    await panel.getByRole('button', { name: 'Close panel' }).click();
+    await expect(panel).toHaveCount(0);
   });
 
   test('simple/scientific level toggle is present and exclusive', async ({ page }) => {

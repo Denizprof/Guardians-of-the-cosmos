@@ -4,10 +4,11 @@ import SearchBox from './components/SearchBox';
 import Filters from './components/Filters';
 import EventPanel from './components/EventPanel';
 import IntroPanel from './components/IntroPanel';
+import AssistantSidePanel from './components/AssistantSidePanel';
 import ContextPanel from './components/ContextPanel';
 import Timeline from './components/Timeline';
 import SarLens, { type LensGeometry } from './components/SarLens';
-import { IconFilters, IconInfo, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
+import { IconAsk, IconFilters, IconInfo, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
 import { InvestigationStrip, InvestigationsMenu } from './components/Investigations';
 import { readHash } from './app/readHash';
 import { markIntroSeen, shouldShowIntro } from './app/introSeen';
@@ -29,7 +30,7 @@ const NO_PINS: Pin[] = [];
 const ALL_CATS: Category[] = GROUPS.flatMap((g) => g.categories);
 
 /** What the on-demand side panel shows when no investigation is open. */
-type PanelView = 'none' | 'about' | 'probe' | 'context';
+type PanelView = 'none' | 'about' | 'probe' | 'context' | 'assistant';
 type Popover = null | 'investigations' | 'filters' | 'layers';
 
 export default function App() {
@@ -468,6 +469,33 @@ export default function App() {
           )}
           <button
             className="tool"
+            aria-pressed={!selected && panelView === 'assistant'}
+            onClick={() => {
+              setPopover(null);
+              if (selected) {
+                // inside an investigation the chat lives in that panel, where it knows the event and its layers
+                const ask = appRef.current?.querySelector<HTMLDetailsElement>('section.panel details[data-ask]');
+                if (ask) {
+                  setPanelCollapsed(false);
+                  ask.open = true;
+                  ask.scrollIntoView({ block: 'start' });
+                  ask.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+                }
+                return;
+              }
+              if (panelView === 'assistant') return closePanel();
+              closePanel();
+              setPanelView('assistant');
+              setPanelCollapsed(false);
+            }}
+            title="Ask the assistant about radar, NISAR and this app"
+            aria-label="Ask the assistant"
+          >
+            <IconAsk />
+            <span className="tool-label">Ask</span>
+          </button>
+          <button
+            className="tool"
             aria-pressed={!selected && panelView === 'about'}
             onClick={() => {
               if (!selected && panelView === 'about') return; // already open: clicking again must not close it (the X and Escape do)
@@ -635,6 +663,8 @@ export default function App() {
         />
       ) : panelView === 'context' && ctxSel ? (
         <ContextPanel key={ctxSel.id} event={ctxSel} collapsed={panelCollapsed} onCheckCoverage={runCoverage} onClose={closePanel} onToggleCollapsed={toggleCollapsed} />
+      ) : panelView === 'assistant' ? (
+        <AssistantSidePanel collapsed={panelCollapsed} onToggleCollapsed={toggleCollapsed} onClose={closePanel} />
       ) : panelView === 'about' || panelView === 'probe' ? (
         <IntroPanel
           events={events}

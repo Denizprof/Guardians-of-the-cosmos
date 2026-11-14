@@ -140,6 +140,23 @@
           }
         },
         "clicked_location": { "$ref": "#/$defs/lonlat" },
+        "knowledge": {
+          "type": "array",
+          "maxItems": 8,
+          "description": "Knowledge-base records retrieved for this query (contract 1.1). Each is a checked statement with its source; citation ids start with kb:.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["citation_id", "title", "text", "source_label", "url"],
+            "properties": {
+              "citation_id": { "$ref": "#/$defs/citationId" },
+              "title": { "type": "string", "maxLength": 300 },
+              "text": { "type": "string", "maxLength": 2000 },
+              "source_label": { "type": "string", "maxLength": 300 },
+              "url": { "type": "string", "maxLength": 1000 }
+            }
+          }
+        },
         "coverage": {
           "type": "object",
           "additionalProperties": false,
