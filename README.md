@@ -64,6 +64,11 @@ npm start
 | `npm run dev` | Development server with live reload at http://localhost:5173 |
 | `npm test` | Runs the web unit tests |
 
+### Windows notes
+- **Easiest:** after cloning, double-click `start-windows.cmd`. It installs on the first run, then builds and starts the app.
+- **"running scripts is disabled on this system"** in PowerShell: that is a Windows setting, not a project error. Use `npm.cmd run setup` and `npm.cmd start` instead, or run the commands in Command Prompt (cmd).
+- **Do not clone into `C:\Windows\System32`** (where an administrator terminal opens). Use a normal folder such as `C:\dev` or Documents; short paths also avoid Windows path-length problems.
+
 ### Install it as an app
 Open the running app in Chrome or Edge and choose **Install Global SAR** (the icon at the right of the address bar, or the browser menu). It then opens in its own window with its own icon, like a desktop app. On a phone, use **Add to Home screen**. The app still needs the local server (or a hosted copy) and an internet connection, because the map imagery is loaded live.
 
