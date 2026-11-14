@@ -6,3 +6,8 @@ dist/
 build/
 __pycache__/
 *.log
+*.netrc
+.venv/
+.tools/
+web/public/vendor/
+pipeline/.cache/

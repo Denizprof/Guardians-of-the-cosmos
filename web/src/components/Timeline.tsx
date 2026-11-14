@@ -1,0 +1,106 @@
+import { useEffect, useRef, useState } from 'react';
+import type { SarEvent, SarLayer } from '../types';
+import { fmtDate, layerLabel } from '../lib';
+
+interface Props {
+  event: SarEvent;
+  before: SarLayer | null;
+  after: SarLayer | null;
+  slot: 'before' | 'after';
+  onSlot: (s: 'before' | 'after') => void;
+  onPick: (layerId: string) => void;
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const t = (iso: string) => Date.parse(iso);
+
+export default function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [w, setW] = useState(600);
+  useEffect(() => {
+    const ro = new ResizeObserver(([e]) => setW(Math.max(200, e.contentRect.width)));
+    if (ref.current) ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const spans = event.layers.map((l) => ({
+    l,
+    a: t((l.acquisition.reference || l.acquisition.start)!),
+    b: t((l.acquisition.secondary || l.acquisition.start)!),
+  }));
+  const evT = event.date ? t(event.date) : null;
+  const allT = spans.flatMap((s) => [s.a, s.b]).concat(evT ? [evT] : []);
+  const pad = (Math.max(...allT) - Math.min(...allT)) * 0.06 + 2 * 864e5;
+  const lo = Math.min(...allT) - pad, hi = Math.max(...allT) + pad;
+  const X = (v: number) => 12 + ((v - lo) / (hi - lo)) * (w - 24);
+
+  // month ticks
+  const months: number[] = [];
+  const d = new Date(lo);
+  d.setUTCDate(1);
+  d.setUTCHours(0, 0, 0, 0);
+  while (d.getTime() <= hi) {
+    if (d.getTime() >= lo) months.push(d.getTime());
+    d.setUTCMonth(d.getUTCMonth() + 1);
+  }
+  const step = Math.ceil(months.length / Math.max(1, Math.floor(w / 70)));
+
+  const isPair = spans.some((s) => s.a !== s.b);
+  const rowY = 40;
+
+  return (
+    <div className="timeline" role="group" aria-label="Observation timeline">
+      <div style={{ display: 'grid', gap: 6 }}>
+        <span className="muted" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Click a date to set</span>
+        <div className="seg" role="group" aria-label="Which slot a click sets">
+          <button aria-pressed={slot === 'before'} onClick={() => onSlot('before')}>Before</button>
+          <button aria-pressed={slot === 'after'} onClick={() => onSlot('after')}>After</button>
+        </div>
+      </div>
+      <div ref={ref} style={{ minWidth: 0 }}>
+        <svg height="72" role="img" aria-label={`${event.layers.length} NISAR observations of ${event.title}`}>
+          <line x1={0} x2={w} y1={rowY} y2={rowY} stroke="#2e3540" />
+          {months.map((m, i) =>
+            i % step === 0 ? (
+              <g key={m}>
+                <line x1={X(m)} x2={X(m)} y1={rowY - 4} y2={rowY + 4} stroke="#3a4250" />
+                <text x={X(m)} y={rowY + 22} textAnchor="middle" fontSize="10.5" fill="#8b94a1" fontFamily="var(--mono)">
+                  {MONTHS[new Date(m).getUTCMonth()]} {String(new Date(m).getUTCFullYear()).slice(2)}
+                </text>
+              </g>
+            ) : null
+          )}
+          {evT && (
+            <g>
+              <line x1={X(evT)} x2={X(evT)} y1={8} y2={rowY + 8} stroke="#ffffff" strokeDasharray="3 3" opacity={0.7} />
+              <text x={X(evT) + 4} y={14} fontSize="10.5" fill="#e7e9ec" fontFamily="var(--mono)">event {fmtDate(event.date)}</text>
+            </g>
+          )}
+          {spans.map(({ l, a, b }, i) => {
+            const isB = before?.id === l.id, isA = after?.id === l.id;
+            const stroke = isA ? '#ffffff' : isB ? '#cfd6df' : '#5d6672';
+            const y = isPair ? rowY - 10 + (i % 2) * 6 : rowY;
+            return (
+              <g key={l.id} className="tick" onClick={() => onPick(l.id)} role="button" tabIndex={0}
+                 aria-label={`${layerLabel(l)}${isB ? ', current before' : ''}${isA ? ', current after' : ''}`}
+                 onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onPick(l.id)}>
+                <title>{layerLabel(l)} · {l.provenance.tier}</title>
+                {a !== b ? (
+                  <rect x={X(a)} y={y - 3} width={Math.max(4, X(b) - X(a))} height={6} rx={3} fill={isA || isB ? stroke : '#3a4250'} stroke={stroke} strokeWidth={1} />
+                ) : (
+                  <circle cx={X(a)} cy={y} r={isA || isB ? 6 : 4.5} fill={isA || isB ? stroke : '#1b2028'} stroke={stroke} strokeWidth={1.5} />
+                )}
+                <rect x={X(a) - 8} y={y - 12} width={Math.max(16, X(b) - X(a) + 16)} height={24} fill="transparent" />
+                {(isA || isB) && (
+                  <text x={(X(a) + X(b)) / 2} y={y - 10} textAnchor="middle" fontSize="10" fontWeight={600} fill={stroke} fontFamily="var(--mono)">
+                    {isB && isA ? 'B=A' : isB ? 'B' : 'A'}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    </div>
+  );
+}
