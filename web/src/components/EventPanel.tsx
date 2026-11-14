@@ -75,7 +75,7 @@ function LegendBar({ label, layer }: { label: string; layer: SarLayer }) {
   if (lg.colormap === 'composite') {
     // QA-15: three-channel composite has no single ramp; show the channel mapping instead
     return (
-      <div style={{ marginTop: 8, fontSize: 12.5 }}>
+      <div className="legend-block">
         <div className="muted">{label}: fixed calibrated composite (same scale every date)</div>
         <div><span className="legend-swatch" style={{ background: 'linear-gradient(90deg,#000,#f0f)' }} />Red + blue = HH, −25 → 0 dB</div>
         <div><span className="legend-swatch" style={{ background: 'linear-gradient(90deg,#000,#0f0)' }} />Green = HV, −32 → −7 dB</div>
@@ -84,7 +84,7 @@ function LegendBar({ label, layer }: { label: string; layer: SarLayer }) {
   }
   if (lg.classes) {
     return (
-      <div style={{ marginTop: 8, fontSize: 12.5 }}>
+      <div className="legend-block">
         <div className="muted">{label}: {lg.units}{lg.threshold_db != null ? ` (HH < ${lg.threshold_db} dB)` : ''}</div>
         <div><span className="legend-swatch" style={{ background: 'rgba(120,170,220,0.7)' }} />{lg.classes['1']}</div>
         <div><span className="legend-swatch" style={{ background: '#28a0ff' }} />{lg.classes['2']}</div>
@@ -92,10 +92,10 @@ function LegendBar({ label, layer }: { label: string; layer: SarLayer }) {
     );
   }
   return (
-    <div style={{ marginTop: 8 }}>
-      <div className="muted" style={{ fontSize: 12 }}>{label}: {lg.units}</div>
-      <div style={{ height: 10, borderRadius: 2, background: RAMPS[lg.colormap ?? 'gray'], border: '1px solid var(--line-2)' }} />
-      <div className="row spread mono" style={{ fontSize: 11, color: 'var(--muted)' }}>
+    <div className="legend-scale">
+      <div className="muted fine">{label}: {lg.units}</div>
+      <div className="legend-scale-bar" style={{ background: RAMPS[lg.colormap ?? 'gray'] }} />
+      <div className="row spread mono muted">
         <span>{lg.vmin}</span>
         {lg.colormap === 'diverging' && <span>0</span>}
         <span>{lg.vmax}</span>
@@ -154,7 +154,7 @@ function Provenance({ label, layer }: { label: string; layer: SarLayer }) {
         <dt>Geometry</dt>
         <dd>Track {p.track} · {p.direction.toLowerCase()} · frame {p.frame}{p.polarizations ? ` · ${p.polarizations.join('/')}` : ''}</dd>
         <dt>Granule</dt>
-        <dd className="mono" style={{ fontSize: 11 }}>{p.granule}</dd>
+        <dd className="mono">{p.granule}</dd>
         <dt>Processed</dt>
         <dd className="mono">{fmtDate(p.processing_date)} by NISAR SDS</dd>
         <dt>Distributor</dt>
@@ -165,7 +165,7 @@ function Provenance({ label, layer }: { label: string; layer: SarLayer }) {
           <li key={i}>{s}</li>
         ))}
       </ol>
-      <div className="faint" style={{ fontSize: 12 }}>{p.credit}</div>
+      <div className="faint fine">{p.credit}</div>
     </details>
   );
 }

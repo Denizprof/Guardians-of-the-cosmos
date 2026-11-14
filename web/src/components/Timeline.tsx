@@ -66,24 +66,29 @@ function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
 
   const isPair = spans.some((s) => s.a !== s.b);
   const rowY = 40;
+  // The event label sits to the right of its line unless it would run past the right edge (narrow phones):
+  // then it is anchored to the left of the line, and never starts before the left edge either.
+  const EV_LABEL_W = 130; // "event 12 Jan 2026" in 12 px mono plus the 4 px gap
+  const evLabelLeft = evT !== null && X(evT) + EV_LABEL_W > w;
+  const evLabelX = evT === null ? 0 : evLabelLeft ? Math.max(X(evT) - 4, Math.min(EV_LABEL_W, w)) : X(evT) + 4;
 
   return (
     <div className="timeline" role="group" aria-label="Observation timeline">
-      <div style={{ display: 'grid', gap: 6 }}>
+      <div className="timeline-slot">
         <span className="micro">Click a date to set</span>
         <div className="seg" role="group" aria-label="Which slot a click sets">
           <button aria-pressed={slot === 'before'} onClick={() => onSlot('before')}>Before</button>
           <button aria-pressed={slot === 'after'} onClick={() => onSlot('after')}>After</button>
         </div>
       </div>
-      <div ref={ref} style={{ minWidth: 0 }}>
+      <div ref={ref} className="timeline-track">
         <svg height="72" role="group" aria-label={`${shown.length} observations of ${event.title}`}>
           <line x1={0} x2={w} y1={rowY} y2={rowY} stroke="#2e3540" />
           {months.map((m, i) =>
             i % step === 0 ? (
               <g key={m}>
                 <line x1={X(m)} x2={X(m)} y1={rowY - 4} y2={rowY + 4} stroke="#3a4250" />
-                <text x={X(m)} y={rowY + 22} textAnchor="middle" fontSize="10.5" fill="#8b94a1" fontFamily="var(--mono)">
+                <text x={X(m)} y={rowY + 22} textAnchor="middle" fontSize="12" fill="#8b94a1" fontFamily="var(--mono)">
                   {tickLabel(m)}
                 </text>
               </g>
@@ -92,7 +97,7 @@ function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
           {evT && (
             <g>
               <line x1={X(evT)} x2={X(evT)} y1={8} y2={rowY + 8} stroke="#ffffff" strokeDasharray="3 3" opacity={0.7} />
-              <text x={X(evT) + 4} y={14} fontSize="10.5" fill="#e7e9ec" fontFamily="var(--mono)">event {fmtDate(event.date)}</text>
+              <text className="ev-label" x={evLabelX} y={14} textAnchor={evLabelLeft ? 'end' : 'start'} fontSize="12" fill="#e7e9ec" fontFamily="var(--mono)">event {fmtDate(event.date)}</text>
             </g>
           )}
           {spans.map(({ l, a, b }, i) => {
@@ -109,9 +114,9 @@ function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
                 ) : (
                   <circle cx={X(a)} cy={y} r={isA || isB ? 6 : 4.5} fill={isA || isB ? stroke : '#1b2028'} stroke={stroke} strokeWidth={1.5} />
                 )}
-                <rect x={X(a) - 8} y={y - 12} width={Math.max(16, X(b) - X(a) + 16)} height={24} fill="transparent" />
+                <rect x={X(a) - 8} y={y - 12} width={Math.max(16, X(b) - X(a) + 16)} height={24} fill="transparent" className="tick-hit" />
                 {(isA || isB) && (
-                  <text x={(X(a) + X(b)) / 2} y={y - 10} textAnchor="middle" fontSize="10" fontWeight={600} fill={stroke} fontFamily="var(--mono)">
+                  <text x={(X(a) + X(b)) / 2} y={y - 10} textAnchor="middle" fontSize="12" fontWeight={600} fill={stroke} fontFamily="var(--mono)">
                     {isB && isA ? 'B=A' : isB ? 'B' : 'A'}
                   </text>
                 )}

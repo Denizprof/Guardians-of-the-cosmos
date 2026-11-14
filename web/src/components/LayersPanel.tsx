@@ -62,7 +62,7 @@ function LayersPanel({ layers, state, level, onChange, onClose, error }: Props) 
                   </div>
                   {s.on && (
                     <div className="layer-controls">
-                      {l.time && isSubDaily(l) && <span className="mono muted" style={{ fontSize: 11 }}>latest ({l.time.step.replace('PT', '')})</span>}
+                      {l.time && isSubDaily(l) && <span className="mono muted">latest ({l.time.step.replace('PT', '')})</span>}
                       {l.time && !isSubDaily(l) && (
                         <input
                           type="date"
@@ -86,7 +86,7 @@ function LayersPanel({ layers, state, level, onChange, onClose, error }: Props) 
                     <div className="layer-info">
                       <span className={`evidence ${l.kind}`}>{EVIDENCE_LABEL[l.kind]}</span>
                       <p>{level === 'scientific' ? l.description_scientific : l.description_simple}</p>
-                      <dl className="kv" style={{ gridTemplateColumns: '84px 1fr', fontSize: 12 }}>
+                      <dl className="kv">
                         <dt>Source</dt><dd>{l.provider} · {l.mission} {l.sensor}</dd>
                         <dt>Resolution</dt><dd>{l.resolution}</dd>
                         {l.time && (<><dt>Time</dt><dd className="mono">{l.time.start} → {l.time.end} ({l.time.step})</dd></>)}

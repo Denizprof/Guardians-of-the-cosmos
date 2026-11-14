@@ -1,23 +1,39 @@
-/* NASA Earthdata availability panel. Uses only the CSS variables from src/styles.css. */
-.edp { border-top: 1px solid var(--line); padding: 14px 16px; background: var(--panel); color: var(--text); }
-.edp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.edp-head h3 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
-.edp-close { background: none; border: 0; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 0 4px; }
-.edp-close:hover { color: var(--text); }
-.edp-note { margin: 6px 0 10px; color: var(--muted); font-size: 12px; }
-.edp-state { margin: 8px 0; font-size: 13px; }
-.edp-retry { background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
-.edp-retry:hover { border-color: var(--focus); }
-.edp-summary { margin: 0 0 8px; color: var(--muted); }
+/* NASA Earthdata availability panel. Uses only the tokens from src/styles.css (type scale, radii, control sizes). */
+.edp { color: var(--text); }
+/* stand-alone (not inside a panel section) it brings its own padding and rule */
+:not(.section) > .edp { border-top: 1px solid var(--line); padding: var(--sp-4); background: var(--panel); }
+.edp-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); min-height: var(--ctl-sm); }
+.edp-head h3 { margin: 0; }
+.edp-close { flex: none; min-width: var(--ctl-sm); min-height: var(--ctl-sm); background: none; border: 0; border-radius: var(--r-1); color: var(--muted); font-size: var(--fs-title); line-height: 1; cursor: pointer; padding: 0; }
+.edp-close:hover { color: var(--text); background: var(--panel-2); }
+.edp-close:active { background: var(--panel-3); }
+.edp-note { margin: var(--sp-1) 0 var(--sp-3); color: var(--muted); font-size: var(--fs-small); text-wrap: pretty; }
+.edp-state { margin: var(--sp-2) 0; font-size: var(--fs-small); }
+.edp-retry { min-height: var(--ctl-sm); background: var(--panel-2); border: 1px solid var(--line-2); border-radius: var(--r-2); padding: 0 var(--sp-3); cursor: pointer; }
+.edp-retry:hover { border-color: var(--line-3); background: var(--panel-3); }
+.edp-retry:active { background: var(--panel-4); }
+.edp-summary { margin: 0 0 var(--sp-2); color: var(--muted); }
 .edp-groups, .edp-cols { list-style: none; margin: 0; padding: 0; }
-.edp-group { border: 1px solid var(--line); border-radius: 6px; margin-bottom: 6px; background: var(--panel-2); }
-.edp-group summary { display: flex; justify-content: space-between; gap: 8px; padding: 7px 10px; cursor: pointer; }
+.edp-group { border: 1px solid var(--line); border-radius: var(--r-2); margin-bottom: 6px; background: var(--panel-2); overflow: hidden; }
+.edp-group summary { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); min-height: var(--ctl); padding: 6px var(--sp-3); cursor: pointer; border-radius: calc(var(--r-2) - 1px); }
+.edp-group summary:hover { background: var(--panel-3); }
+.edp-group summary:active { background: var(--panel-4); }
+.edp-group summary:focus-visible { outline-offset: -2px; }
 .edp-plat { font-weight: 600; }
 .edp-count { color: var(--muted); white-space: nowrap; }
-.edp-col { border-top: 1px solid var(--line); padding: 8px 10px; }
-.edp-col-top { display: flex; justify-content: space-between; gap: 8px; }
+.edp-col { border-top: 1px solid var(--line); padding: var(--sp-2) var(--sp-3); }
+.edp-col-top { display: flex; justify-content: space-between; gap: var(--sp-2); }
 .edp-short { color: var(--accent); overflow-wrap: anywhere; }
-.edp-title { font-size: 12.5px; margin-top: 2px; }
-.edp-meta { font-size: 11.5px; margin-top: 2px; }
-.edp-links { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; font-size: 12px; }
-.edp-foot { margin: 8px 0 0; font-size: 12px; }
+.edp-title { font-size: var(--fs-small); margin-top: 2px; text-wrap: pretty; }
+.edp-meta { font-size: var(--fs-micro); margin-top: 2px; }
+.edp-links { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-3); margin-top: var(--sp-1); font-size: var(--fs-micro); }
+.edp-foot { margin: var(--sp-2) 0 0; font-size: var(--fs-small); }
+@media (prefers-reduced-motion: no-preference) {
+  .edp-close, .edp-retry, .edp-group summary { transition: background-color var(--ease), border-color var(--ease), color var(--ease), transform var(--ease); }
+  .edp-close:active, .edp-retry:active { transform: scale(0.97); }
+}
+/* touch: links and rows become 44 px targets */
+@media (max-width: 820px), (pointer: coarse) {
+  .edp-links { gap: 0 var(--sp-2); margin-top: 0; }
+  .edp-links a, .edp-foot a { display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; }
+}

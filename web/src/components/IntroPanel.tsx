@@ -62,20 +62,20 @@ function Coverage({ c, onClear, selectedScene, onSelectScene }: { c: CoverageRes
           <div className="row" style={{ gap: 20, marginTop: 10 }}>
             <div>
               <div className="stat">{c.total}{c.truncated ? '+' : ''}</div>
-              <div className="muted" style={{ fontSize: 12 }}>products{c.truncated ? ' (list capped)' : ''}</div>
+              <div className="muted fine">products{c.truncated ? ' (list capped)' : ''}</div>
             </div>
             <div>
               <div className="stat">{tracks.size}</div>
-              <div className="muted" style={{ fontSize: 12 }}>orbit tracks{c.truncated ? ' (in list)' : ''}</div>
+              <div className="muted fine">orbit tracks{c.truncated ? ' (in list)' : ''}</div>
             </div>
             <div>
-              <div className="stat" style={{ fontSize: 14 }}>{fmtDate(c.granules.at(-1)?.start)}</div>
+              <div className="stat stat-date">{fmtDate(c.granules.at(-1)?.start)}</div>
               {/* with a capped list the oldest listed product is not necessarily the first acquisition */}
-              <div className="muted" style={{ fontSize: 12 }}>{c.truncated ? 'oldest listed' : 'earliest'} → {fmtDate(c.granules[0]?.start)}</div>
+              <div className="muted fine">{c.truncated ? 'oldest listed' : 'earliest'} → {fmtDate(c.granules[0]?.start)}</div>
             </div>
           </div>
           {(c.urgentResponse ?? 0) > 0 && (
-            <p className="faint" style={{ fontSize: 12, marginTop: 6 }}>{c.urgentResponse} Urgent Response product(s) here are not listed (tasked acquisitions).</p>
+            <p className="faint fine" style={{ marginTop: 6 }}>{c.urgentResponse} Urgent Response product(s) here are not listed (tasked acquisitions).</p>
           )}
           <div className="row" style={{ gap: 6, marginTop: 10 }}>
             {Object.entries(byTier).map(([t, n]) => (
@@ -101,10 +101,10 @@ function Coverage({ c, onClear, selectedScene, onSelectScene }: { c: CoverageRes
                 <p className="muted">NASA published no browse picture for this product.</p>
               )}
               <div className="mono">{fmtDate(sel.start)} <span className="faint">{sel.start.slice(11, 16)} UTC</span></div>
-              <div className="muted" style={{ fontSize: 12 }}>
+              <div className="muted fine">
                 {sel.product} · track {sel.track} {sel.direction.toLowerCase()} · frame {sel.frame} · <span className={`tier ${sel.tier.split(' ')[0]}`}>{sel.tier}</span>
               </div>
-              <p className="faint" style={{ fontSize: 12, margin: '6px 0 0' }}>
+              <p className="faint fine" style={{ margin: '6px 0 0' }}>
                 The map shows this product only: its footprint outline and this picture, placed on the footprint's bounding box (approximate, about a kilometre). NASA browse rendering: for looking, not measuring.
               </p>
             </div>
@@ -118,7 +118,7 @@ function Coverage({ c, onClear, selectedScene, onSelectScene }: { c: CoverageRes
                   {g.thumb ? <img src={g.thumb} alt="" loading="lazy" /> : <span />}
                   <span>
                     <span className="mono" style={{ display: 'block' }}>{fmtDate(g.start)} <span className="faint">{g.start.slice(11, 16)} UTC</span></span>
-                    <span className="muted" style={{ display: 'block', fontSize: 12 }}>
+                    <span className="muted fine" style={{ display: 'block' }}>
                       {g.product} · track {g.track} {g.direction.toLowerCase()} · frame {g.frame}
                     </span>
                     <span className={`tier ${g.tier.split(' ')[0]}`}>{g.tier}</span>
@@ -127,7 +127,7 @@ function Coverage({ c, onClear, selectedScene, onSelectScene }: { c: CoverageRes
               </li>
             ))}
           </ul>
-          <p className="faint" style={{ fontSize: 12, marginTop: 8 }}>
+          <p className="faint fine" style={{ marginTop: 8 }}>
             Live from the ASF DAAC search API. Pictures are NASA browse renderings of each product.
           </p>
         </>
