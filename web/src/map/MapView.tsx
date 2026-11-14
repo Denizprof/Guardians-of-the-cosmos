@@ -248,9 +248,15 @@ function makeMap(container: HTMLElement, reducedMotion: () => boolean): MlMap {
 function attachHalo(map: MlMap) {
   const HALO_SCALE = 1.35; // element half-size relative to the globe radius; matches the gradient stops in styles.css
   const cont = map.getContainer();
+  // One halo per container. The map can be created more than once on the same element (React StrictMode
+  // remount in development, hot reload, a remounted MapView); a halo left behind by an earlier map no longer
+  // follows the camera and stays frozen at its old size: when the user zoomed far out, that orphan showed as
+  // a big detached ring around a small globe.
+  cont.querySelectorAll(':scope > .globe-halo').forEach((old) => old.remove());
   const halo = document.createElement('div');
   halo.className = 'globe-halo';
   cont.prepend(halo);
+  map.once('remove', () => halo.remove());
   const rad = Math.PI / 180;
   const update = () => {
     const z = map.getZoom();
@@ -264,7 +270,8 @@ function attachHalo(map: MlMap) {
     }
     const H = cont.clientHeight;
     const h = H / 2 / Math.tan((map.getVerticalFieldOfView() * rad) / 2); // camera to map centre, px
-    const R = (512 * 2 ** z) / (2 * Math.PI * Math.cos(map.getCenter().lat * rad)); // globe radius, px
+    // globe radius, px: same as MapLibre's getGlobeRadiusPixels (latitude clamped to the Mercator limit)
+    const R = (512 * 2 ** z) / (2 * Math.PI * Math.cos(Math.min(Math.abs(map.getCenter().lat), 85.051129) * rad));
     const p = map.getPitch() * rad;
     const D = Math.sqrt(R * R + h * h + 2 * R * h * Math.cos(p)); // camera to globe centre
     const r = h * Math.tan(Math.asin(Math.min(0.999, R / D))); // silhouette radius on screen
