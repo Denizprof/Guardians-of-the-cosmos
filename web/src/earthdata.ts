@@ -13,6 +13,7 @@
  *  2. granules.json?collection_concept_id=&point=&temporal[]=&page_size=0 -> exact granule count via the
  *     CMR-Hits header (exposed to browsers). Collections with 0 granules there are dropped.
  */
+import { parseUTC } from './lib';
 
 export interface EarthdataQuery {
   lon: number;
@@ -56,6 +57,10 @@ export interface EarthdataResult {
   groups: EarthdataGroup[];
   totalCollections: number;
   totalGranules: number;
+  /** Collections whose granule count request failed: availability unknown, NOT "none". */
+  uncheckedCollections?: number;
+  /** True when CMR returned more candidate collections than were checked. */
+  truncated?: boolean;
   /** Earthdata Search link for the point + window with no collection preselected. */
   searchUrl: string;
   query: { lon: number; lat: number; start: string; end: string };
@@ -109,7 +114,7 @@ export function buildSearchUrl(opts: { lon: number; lat: number; start: string; 
 
 /** Platform family: Sentinel-1A/B/C -> "Sentinel-1", LANDSAT-8 -> "Landsat", case-insensitive merge of the rest. */
 export function platformFamily(p: string | undefined): string {
-  const name = (p ?? '').trim();
+  const name = typeof p === 'string' ? p.trim() : '';
   if (!name || /^not provided$/i.test(name)) return 'Other platforms';
   let m = /^sentinel-?(\d)/i.exec(name);
   if (m) return `Sentinel-${m[1]}`;
@@ -121,13 +126,20 @@ export function platformFamily(p: string | undefined): string {
 }
 
 function findLink(links: CmrCollectionEntry['links'], pred: (l: { rel: string; href: string }) => boolean) {
-  return (links ?? []).find(pred)?.href ?? null;
+  if (!Array.isArray(links)) return null;
+  const ok = links.filter((l): l is { rel: string; href: string } => !!l && typeof l.href === 'string' && typeof l.rel === 'string');
+  return ok.find(pred)?.href ?? null;
 }
 
 /** Parse a collections.json body into entries. Tolerates missing feed/entry. */
 export function parseCollectionEntries(json: unknown): CmrCollectionEntry[] {
   const entry = (json as { feed?: { entry?: unknown } } | null)?.feed?.entry;
-  return Array.isArray(entry) ? (entry as CmrCollectionEntry[]).filter((e) => e && typeof e.id === 'string') : [];
+  return Array.isArray(entry)
+    ? (entry as Partial<CmrCollectionEntry>[])
+        .filter((e): e is Partial<CmrCollectionEntry> & { id: string } => !!e && typeof e.id === 'string')
+        // short_name is required downstream (sorting, labels): fall back to the concept id instead of crashing
+        .map((e) => ({ ...e, short_name: typeof e.short_name === 'string' && e.short_name ? e.short_name : e.id }) as CmrCollectionEntry)
+    : [];
 }
 
 export function toCollection(e: CmrCollectionEntry, granules: number, q: { lon: number; lat: number; start: string; end: string }): EarthdataCollection {
@@ -138,7 +150,7 @@ export function toCollection(e: CmrCollectionEntry, granules: number, q: { lon: 
     shortName: e.short_name,
     version: e.version_id ?? '',
     title: e.title ?? e.dataset_id ?? e.short_name,
-    platforms: e.platforms ?? [],
+    platforms: Array.isArray(e.platforms) ? e.platforms.filter((x): x is string => typeof x === 'string') : [],
     provider: e.data_center ?? e.id.split('-').slice(1).join('-'),
     processingLevel: e.processing_level_id && e.processing_level_id !== 'Not provided' ? e.processing_level_id : null,
     granules,
@@ -216,24 +228,32 @@ export async function queryEarthdata(q: EarthdataQuery): Promise<EarthdataResult
     );
     const unique = new Map<string, CmrCollectionEntry>();
     for (const e of bodies.flat()) if (!unique.has(e.id)) unique.set(e.id, e);
-    const entries = [...unique.values()].slice(0, 90);
+    const MAX_CHECKED = 90;
+    const entries = [...unique.values()].slice(0, MAX_CHECKED);
 
-    const counted = await mapLimit(entries, 10, async (e) => {
+    // null = the count request failed: availability unknown, which must not be shown as "no data".
+    const counted = await mapLimit(entries, 10, async (e): Promise<number | null> => {
       try {
         const r = await doFetch(`${CMR}/granules.json?collection_concept_id=${encodeURIComponent(e.id)}&${spatialTemporal}&page_size=0`, { signal: t.signal });
-        if (!r.ok) return 0;
-        const hits = Number(r.headers.get('CMR-Hits'));
-        return Number.isFinite(hits) ? hits : 0;
+        if (!r.ok) return null;
+        // A missing header (stripped by a proxy, not exposed via CORS) means "unknown", never 0 granules.
+        const h = r.headers.get('CMR-Hits');
+        return h !== null && /^\d+$/.test(h.trim()) ? Number(h) : null;
       } catch (err) {
         if (t.signal.aborted) throw err;
-        return 0;
+        return null;
       }
     });
     const qq = { lon, lat, start, end };
-    const cols = entries.flatMap((e, i) => (counted[i] > 0 ? [toCollection(e, counted[i], qq)] : []));
+    const cols = entries.flatMap((e, i) => {
+      const n = counted[i];
+      return n != null && n > 0 ? [toCollection(e, n, qq)] : [];
+    });
     const groups = groupByPlatform(cols);
     return {
       groups,
+      uncheckedCollections: counted.filter((n) => n == null).length,
+      truncated: unique.size > MAX_CHECKED,
       totalCollections: cols.length,
       totalGranules: cols.reduce((s, c) => s + c.granules, 0),
       searchUrl: buildSearchUrl(qq),
@@ -250,7 +270,7 @@ export async function queryEarthdata(q: EarthdataQuery): Promise<EarthdataResult
 
 /** Window helper: date (ISO) +/- days. */
 export function windowAround(dateIso: string, days: number): { start: string; end: string } {
-  const t = Date.parse(dateIso);
+  const t = parseUTC(dateIso).getTime(); // offset-less times are UTC in this app (Date.parse would use local time)
   const ms = days * 864e5;
   const now = Date.now();
   return { start: new Date(t - ms).toISOString(), end: new Date(Math.min(t + ms, now)).toISOString() };

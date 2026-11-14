@@ -304,7 +304,7 @@ def capture(monkeypatch, tmp_path):
         seen["los"].append(arr.copy())
         return arr.copy(), [[-69.0, 11.0], [-67.0, 11.0], [-67.0, 10.0], [-69.0, 10.0]]
 
-    def fake_save(event_id, name, rgba, max_px=3072):
+    def fake_save(event_id, name, rgba, max_px=3072, categorical=False):
         seen["saved"].append((name, rgba))
         return f"data/events/{event_id}/{name}.webp"
 
@@ -431,7 +431,7 @@ def test_mozambique_water_classes_and_areas(monkeypatch, tmp_path):
     monkeypatch.setattr(process, "cached_gcov", lambda coll, gran, bbox: by_gran[gran])
     saved = {}
     monkeypatch.setattr(process, "to_mercator", lambda g, a, resampling=None: (a.astype(np.float32).copy(), [[0, 1], [1, 1], [1, 0], [0, 0]]))
-    monkeypatch.setattr(process, "save_layer", lambda ev, name, rgba, max_px=3072: saved.setdefault(name, rgba) is not None and f"data/events/{ev}/{name}.webp")
+    monkeypatch.setattr(process, "save_layer", lambda ev, name, rgba, max_px=3072, categorical=False: saved.setdefault(name, rgba) is not None and f"data/events/{ev}/{name}.webp")
     layers = {l["id"]: l for l in process.mozambique(cfg)}
     assert list(layers) == ["hh_db_before", "hh_db_after", "hh_change", "water_new"]
 
@@ -465,7 +465,7 @@ def test_mozambique_scene_wide_brightening_alone_does_not_create_water(monkeypat
     by_gran = {cfg["scenes"]["before"][1]: scenes[0], cfg["scenes"]["after"][1]: (g_after, meta)}
     monkeypatch.setattr(process, "cached_gcov", lambda coll, gran, bbox: by_gran[gran])
     monkeypatch.setattr(process, "to_mercator", lambda g, a, resampling=None: (a.astype(np.float32).copy(), [[0, 1], [1, 1], [1, 0], [0, 0]]))
-    monkeypatch.setattr(process, "save_layer", lambda ev, name, rgba, max_px=3072: f"data/events/{ev}/{name}.webp")
+    monkeypatch.setattr(process, "save_layer", lambda ev, name, rgba, max_px=3072, categorical=False: f"data/events/{ev}/{name}.webp")
     layers = {l["id"]: l for l in process.mozambique(cfg)}
     assert layers["water_new"]["legend"]["stats"]["new_water_km2"] == 0.0
 
@@ -488,7 +488,7 @@ def test_krasheninnikov_composite_uses_one_fixed_stretch_for_all_dates(monkeypat
     saved = {}
     monkeypatch.setattr(process, "cached_gcov", fake_cached)
     monkeypatch.setattr(process, "to_mercator", lambda g, a, resampling=None: (a.astype(np.float32).copy(), [[0, 1], [1, 1], [1, 0], [0, 0]]))
-    monkeypatch.setattr(process, "save_layer", lambda ev, name, rgba, max_px=3072: saved.setdefault(name, rgba) is not None and f"data/events/{ev}/{name}.webp")
+    monkeypatch.setattr(process, "save_layer", lambda ev, name, rgba, max_px=3072, categorical=False: saved.setdefault(name, rgba) is not None and f"data/events/{ev}/{name}.webp")
     layers = process.krasheninnikov(process.EVENTS["krasheninnikov-2026"])
     assert len(layers) == len(process.KRAS_DATES) + 1
     roles = [l["role"] for l in layers[:-1]]

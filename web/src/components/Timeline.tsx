@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import type { SarEvent, SarLayer } from '../types';
-import { fmtDate, layerLabel } from '../lib';
+import { fmtDate, layerLabel, parseUTC } from '../lib';
 
 interface Props {
   event: SarEvent;
@@ -12,9 +12,11 @@ interface Props {
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const t = (iso: string) => Date.parse(iso);
+// parseUTC, not Date.parse: an offset-less ISO time is LOCAL time to Date.parse, which would shift every
+// acquisition by the viewer's timezone (this app treats every date as UTC).
+const t = (iso: string) => parseUTC(iso).getTime();
 
-export default function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
+function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(600);
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function Timeline({ event, before, after, slot, onSlot, onPick }:
   return (
     <div className="timeline" role="group" aria-label="Observation timeline">
       <div style={{ display: 'grid', gap: 6 }}>
-        <span className="muted" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Click a date to set</span>
+        <span className="micro">Click a date to set</span>
         <div className="seg" role="group" aria-label="Which slot a click sets">
           <button aria-pressed={slot === 'before'} onClick={() => onSlot('before')}>Before</button>
           <button aria-pressed={slot === 'after'} onClick={() => onSlot('after')}>After</button>
@@ -122,3 +124,5 @@ export default function Timeline({ event, before, after, slot, onSlot, onPick }:
     </div>
   );
 }
+
+export default memo(Timeline);

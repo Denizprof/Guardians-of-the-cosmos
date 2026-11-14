@@ -1,6 +1,7 @@
 // Pure functions that turn app state into AssistantRequest.context. No I/O, no React.
 import type { SarEvent, SarLayer } from '../types';
 import type { CoverageResult } from '../services';
+import { evidenceOf } from '../lib';
 import {
   CONTRACT_VERSION,
   type AssistantContext,
@@ -21,28 +22,38 @@ export const referenceCitationId = (eventId: string, index: number) => `ref:${ev
 export const layerCitationId = (layerId: string) => `layer:${layerId}`;
 export const granuleCitationId = (scene: string) => `asf:${scene}`;
 
+/** Clip text to the request schema's maxLength (shared/assistant-contract): an over-long field must not get the
+ *  whole request rejected by the gateway. */
+const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+
 export function buildEventContext(event: SarEvent): ContextEvent {
   return {
     citation_id: eventCitationId(event.id),
-    id: event.id,
-    title: event.title,
-    subtitle: event.subtitle,
-    category: event.category,
-    date: event.date,
+    id: clip(event.id, 100),
+    title: clip(event.title, 300),
+    subtitle: clip(event.subtitle, 300),
+    category: clip(event.category, 30),
+    date: event.date ? clip(event.date, 40) : event.date,
     technique: event.technique,
     location: { lon: event.location.lon, lat: event.location.lat },
-    references: event.references.map((r, i) => ({ citation_id: referenceCitationId(event.id, i), label: r.label, url: r.url })),
+    references: event.references.slice(0, 20).map((r, i) => ({ citation_id: referenceCitationId(event.id, i), label: clip(r.label, 300), url: clip(r.url, 1000) })),
   };
 }
 
-/** NASA browse imagery is an observation; everything computed from the HDF5 products is derived by the team. */
-export function buildLayerContext(layer: SarLayer): ContextLayer {
+/**
+ * Same evidence rule as the UI badges (lib.ts evidenceOf): NASA browse imagery is an observation, our HDF5
+ * computations are derived. A layer the UI labels interpretation / model / simulation cannot be described
+ * truthfully with the contract's observation|derived types, so it is left out (null) rather than overstated.
+ */
+export function buildLayerContext(layer: SarLayer): ContextLayer | null {
   const p = layer.provenance;
+  const evidence = evidenceOf(layer);
+  if (evidence !== 'observation' && evidence !== 'derived') return null;
   const isBrowse = layer.kind === 'browse';
   return {
     citation_id: layerCitationId(layer.id),
     layer_id: layer.id,
-    type: isBrowse ? 'observation' : 'derived',
+    type: evidence,
     role: layer.role,
     kind: layer.kind,
     product: layer.product,
@@ -60,7 +71,7 @@ export function buildLayerContext(layer: SarLayer): ContextLayer {
       polarizations: p.polarizations,
       acquisition: { ...layer.acquisition },
       processing_date: p.processing_date,
-      processing: [...p.processing],
+      processing: p.processing.slice(0, 30).map((s) => clip(s, 600)),
       product_url: p.product_url,
       credit: p.credit,
       origin: isBrowse ? 'nasa_browse' : 'derived_by_team',
@@ -112,7 +123,8 @@ export function buildContext(input: ContextInput): AssistantContext {
   if (input.event) ctx.event = buildEventContext(input.event);
   const seen = new Set<string>();
   const layers = (input.layers ?? []).filter((l): l is SarLayer => !!l && !seen.has(l.id) && !!seen.add(l.id));
-  if (layers.length) ctx.selected_layers = layers.map(buildLayerContext);
+  const layerCtx = layers.map(buildLayerContext).filter((l): l is ContextLayer => l !== null).slice(0, 12);
+  if (layerCtx.length) ctx.selected_layers = layerCtx;
   const mv = buildMapView(input.mapView);
   if (mv) ctx.map_view = mv;
   if (input.clicked && finite(input.clicked.lon) && finite(input.clicked.lat)) ctx.clicked_location = { lon: input.clicked.lon, lat: input.clicked.lat };

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import type { CatalogLayer } from '../layers';
 import { clampDate, defaultDate, isSubDaily } from '../layers';
 import { EVIDENCE_LABEL, GROUPS } from '../lib';
+import { IconClose } from './icons';
 
 export interface LayerState {
   on: boolean;
@@ -15,31 +16,38 @@ interface Props {
   level: 'simple' | 'scientific';
   onChange: (id: string, s: LayerState) => void;
   onClose: () => void;
+  /** Why the layer catalog failed to load, if it did. */
+  error?: string | null;
 }
 
-export default function LayersPanel({ layers, state, level, onChange, onClose }: Props) {
+function LayersPanel({ layers, state, level, onChange, onClose, error }: Props) {
   const [info, setInfo] = useState<string | null>(null);
   const get = (l: CatalogLayer): LayerState => state[l.id] ?? { on: false, opacity: 0.85, date: defaultDate(l) };
 
   return (
-    <aside className="filters layers-panel" aria-label="Satellite layers">
-      <div className="row spread">
-        <h3 style={{ margin: 0 }}>Satellite layers</h3>
-        <button className="close" onClick={onClose} aria-label="Close satellite layers">×</button>
+    <aside className="popover layers-panel" aria-label="Satellite layers">
+      <div className="popover-head">
+        <h2>Satellite layers</h2>
+        <button className="close" onClick={onClose} aria-label="Close satellite layers"><IconClose /></button>
       </div>
-      <p className="muted" style={{ fontSize: 12, margin: '6px 0 8px' }}>
+      <div className="popover-body">
+      <p className="muted small">
         Global datasets from NASA, ESA and partners, each live-checked. They show conditions, not a specific event.
       </p>
-      {layers.length === 0 && <p className="muted">Layer catalog not available.</p>}
+      {error ? (
+        <p className="callout" role="alert">The layer catalog could not be loaded ({error}). Reload the page to try again.</p>
+      ) : (
+        layers.length === 0 && <p className="muted">Layer catalog not available.</p>
+      )}
       {GROUPS.map((g) => {
         const ls = layers.filter((l) => l.category === g.id);
         if (!ls.length) return null;
         return (
-          <div key={g.id} style={{ marginBottom: 8 }}>
-            <div className="row" style={{ gap: 6, marginTop: 6 }}>
+          <div key={g.id} className="layer-group">
+            <h3 className="layer-group-title">
               <span className="dot" style={{ background: g.color }} />
-              <b style={{ fontSize: 12.5 }}>{g.label}</b>
-            </div>
+              {g.label}
+            </h3>
             {ls.map((l) => {
               const s = get(l);
               return (
@@ -92,6 +100,9 @@ export default function LayersPanel({ layers, state, level, onChange, onClose }:
           </div>
         );
       })}
+      </div>
     </aside>
   );
 }
+
+export default memo(LayersPanel);

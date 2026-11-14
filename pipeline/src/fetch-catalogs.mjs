@@ -43,13 +43,40 @@ const validCoord = (lon, lat) => isNum(lon) && isNum(lat) && Math.abs(lon) <= 18
 const pad = (n, w = 2) => String(n).padStart(w, '0');
 const round = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
 
-/** ISO date from possibly-partial year/month/day/hour/min/sec parts; reports the precision. */
+const intIn = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+
+/** Strict UTC ISO string from calendar parts, or null for impossible dates (month 13, 31 Feb, hour 25 ...). */
+export function strictIso(y, mo, d, h = 0, mi = 0, s = 0) {
+  if (!Number.isInteger(y) || !intIn(mo, 1, 12) || !intIn(d, 1, 31) || !intIn(h, 0, 23) || !intIn(mi, 0, 59) || !intIn(s, 0, 59)) return null;
+  const t = new Date(0);
+  t.setUTCFullYear(y, mo - 1, d);
+  t.setUTCHours(h, mi, s, 0);
+  if (Number.isNaN(t.getTime()) || t.getUTCFullYear() !== y || t.getUTCMonth() !== mo - 1 || t.getUTCDate() !== d) return null;
+  return t.toISOString();
+}
+
+/** ISO string for a timestamp in ms, or null when it is outside the representable range. */
+export const isoFromMs = (ms) => (isNum(ms) && Math.abs(ms) <= 8.64e15 ? new Date(ms).toISOString() : null);
+
+/**
+ * ISO date from possibly-partial year/month/day/hour/min/sec parts; reports the precision.
+ * Invalid parts (wrong type, out of range, impossible calendar date) lower the precision instead of
+ * producing an unparseable string; a non-integer year gives { date: null } and the caller skips the record.
+ */
 export function isoFromParts({ year, month, day, hour, minute, second }) {
-  const precision = !month ? 'year' : !day ? 'month' : hour == null ? 'day' : 'minute';
-  const y = year;
-  const ys = y < 0 ? `-${pad(Math.abs(y), 6)}` : pad(y, 4);
-  const iso = `${ys}-${pad(month || 1)}-${pad(day || 1)}T${pad(hour || 0)}:${pad(minute || 0)}:${pad(Math.floor(second || 0))}.000Z`;
-  return { date: iso, date_precision: precision };
+  if (!Number.isInteger(year)) return { date: null, date_precision: null };
+  const sec = isNum(second) && second >= 0 && second < 60 ? Math.floor(second) : 0;
+  if (intIn(month, 1, 12) && intIn(day, 1, 31) && hour != null) {
+    const iso = strictIso(year, month, day, hour, intIn(minute, 0, 59) ? minute : 0, sec);
+    if (iso) return { date: iso, date_precision: 'minute' };
+  }
+  if (intIn(month, 1, 12) && intIn(day, 1, 31)) {
+    const iso = strictIso(year, month, day);
+    if (iso) return { date: iso, date_precision: 'day' };
+  }
+  const y = strictIso(year, intIn(month, 1, 12) ? month : 1, 1);
+  if (!y) return { date: null, date_precision: null };
+  return { date: y, date_precision: intIn(month, 1, 12) ? 'month' : 'year' };
 }
 
 /** Minimal RFC-4180 CSV parser (quoted fields, embedded commas/newlines, "" escapes). Returns array of objects. */
@@ -89,6 +116,7 @@ export function normalizeTsunamis(items, { minValidity = 2, minYear = 1900 } = {
     if (!validCoord(t.longitude, t.latitude) || !isNum(t.year) || t.year < minYear) continue;
     if ((t.eventValidity ?? 0) < minValidity) continue;
     const { date, date_precision } = isoFromParts(t);
+    if (!date) continue;
     const cause = TSUNAMI_CAUSE[t.causeCode] ?? 'Unknown';
     const place = [t.locationName, t.country].filter(Boolean).map(titleCase).join(', ');
     const notes = [
@@ -128,6 +156,7 @@ export function normalizeVolcanoes(items, { minYear = 1900 } = {}) {
   for (const v of items) {
     if (v.eruption === false || !validCoord(v.longitude, v.latitude) || !isNum(v.year) || v.year < minYear) continue;
     const { date, date_precision } = isoFromParts(v);
+    if (!date) continue;
     const ev = {
       id: `ncei-vol-${v.id}`,
       title: `${v.name ?? 'Volcano'} eruption ${v.year}${v.country ? ` — ${v.country}` : ''}`,
@@ -160,12 +189,13 @@ export function normalizeUsgs(geojson) {
   for (const f of geojson.features ?? []) {
     const [lon, lat, depth] = f.geometry?.coordinates ?? [];
     const p = f.properties ?? {};
-    if (!validCoord(lon, lat) || !isNum(p.time)) continue;
+    const date = isoFromMs(p.time);
+    if (!validCoord(lon, lat) || !date) continue;
     const ev = {
       id: `usgs-${f.id}`,
       title: p.title ?? `M ${p.mag} earthquake`,
       category: 'earthquake',
-      date: new Date(p.time).toISOString(),
+      date,
       lon, lat,
       source: 'USGS ComCat',
       url: p.url,
@@ -186,8 +216,10 @@ export function normalizeGlc(rows) {
     const lon = parseFloat(r.longitude), lat = parseFloat(r.latitude);
     const d = /^(\d{2})\/(\d{2})\/(\d{4})(?: (\d{2}):(\d{2}):(\d{2}) (AM|PM))?/.exec(r.event_date ?? '');
     if (!d || !validCoord(lon, lat)) continue;
-    let h = d[4] ? parseInt(d[4], 10) % 12 + (d[7] === 'PM' ? 12 : 0) : 0;
-    const date = `${d[3]}-${d[1]}-${d[2]}T${pad(h)}:${d[5] ?? '00'}:00.000Z`;
+    const h12 = d[4] ? parseInt(d[4], 10) : 12;
+    const h = d[4] ? (h12 % 12) + (d[7] === 'PM' ? 12 : 0) : 0;
+    const date = h12 >= 1 && h12 <= 12 ? strictIso(+d[3], +d[1], +d[2], h, d[5] ? +d[5] : 0, 0) : null;
+    if (!date) continue;
     const fatalities = parseInt(r.fatality_count, 10);
     const desc = (r.event_description || '').trim().slice(0, 110);
     const ev = {
@@ -218,12 +250,14 @@ export function normalizeGdacsFloods(features) {
   for (const f of features) {
     const p = f.properties ?? {};
     const [lon, lat] = f.geometry?.coordinates ?? [];
-    if (!validCoord(lon, lat) || !p.fromdate || seen.has(p.eventid)) continue;
+    const from = typeof p.fromdate === 'string' && /^\d{4}-\d{2}-\d{2}/.test(p.fromdate) ? p.fromdate : null;
+    const date = from ? isoFromMs(Date.parse(/(?:[zZ]|[+-]\d{2}:?\d{2})$/.test(from) ? from : `${from}Z`)) : null;
+    if (!validCoord(lon, lat) || !date || seen.has(p.eventid)) continue;
     seen.set(p.eventid, {
       id: `gdacs-fl-${p.eventid}`,
       title: `${p.name || 'Flood'}${p.alertlevel ? ` (GDACS ${p.alertlevel} alert)` : ''}`,
       category: 'flood',
-      date: new Date(`${p.fromdate}Z`).toISOString(),
+      date,
       lon, lat,
       source: 'GDACS',
       url: p.url?.report ?? 'https://www.gdacs.org/',
@@ -260,7 +294,10 @@ export function aggregateFirms(rows, label, cells = new Map(), cell = 0.5) {
     const conf = confidenceClass(r.confidence);
     if (conf === 'low') continue; // standard practice: drop low-confidence detections
     const frp = parseFloat(r.frp);
-    const t = `${r.acq_date}T${(r.acq_time ?? '0000').padStart(4, '0').slice(0, 2)}:${(r.acq_time ?? '0000').padStart(4, '0').slice(2)}:00.000Z`;
+    const dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(r.acq_date ?? '').trim());
+    const tm = /^(\d{1,2})(\d{2})$/.exec(String(r.acq_time ?? '0000').trim().padStart(4, '0'));
+    const t = dm && tm ? strictIso(+dm[1], +dm[2], +dm[3], +tm[1], +tm[2], 0) : null;
+    if (!t) continue; // unparseable acquisition time: drop the detection rather than emit a non-date
     const ix = Math.floor((lon + 180) / cell), iy = Math.floor((lat + 90) / cell);
     const k = `${ix}:${iy}`;
     let c = cells.get(k);
@@ -316,8 +353,10 @@ async function pagedHazel(base, params, perPage = 200) {
   const items = [];
   for (let page = 1; ; page++) {
     const j = await fetchJson(`${base}?${params}&itemsPerPage=${perPage}&page=${page}`);
-    items.push(...(j.items ?? []));
-    if (page >= (j.totalPages ?? 1)) break;
+    // An error body (no items array) must fail the source, not silently drop a page of events.
+    if (!Array.isArray(j?.items)) throw new Error(`${base} page ${page}: response has no items array`);
+    items.push(...j.items);
+    if (page >= (Number.isInteger(j.totalPages) ? j.totalPages : 1)) break;
   }
   return items;
 }
@@ -350,11 +389,13 @@ export const SOURCES = {
     evidence_note: 'M7.0+ earthquakes since 1900 from seismological networks. Not satellite observations.',
     async run() {
       const out = [];
-      // The service caps responses at 20000 events; M7+ since 1900 is ~1.5k, but page by decade to stay far below any limit.
+      // The service caps responses at 20000 events; M7+ since 1900 is ~1.5k, but page in 25-year windows to stay far below any limit.
       for (let y = 1900; y <= new Date().getUTCFullYear(); y += 25) {
         const end = Math.min(y + 24, new Date().getUTCFullYear());
         const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${y}-01-01&endtime=${end + 1}-01-01&minmagnitude=7&orderby=time&limit=20000`;
-        out.push(...normalizeUsgs(await fetchJson(url)));
+        const j = await fetchJson(url);
+        if (!Array.isArray(j?.features)) throw new Error(`USGS window ${y}-${end}: response has no features array`);
+        out.push(...normalizeUsgs(j));
       }
       return out;
     },
@@ -377,6 +418,7 @@ export const SOURCES = {
     async run(meta) {
       const cells = new Map();
       const used = {};
+      const failed = [];
       for (const p of FIRMS_PRODUCTS) {
         try {
           const csv = await fetchRetry(p.url, { timeout: 180000 });
@@ -385,10 +427,12 @@ export const SOURCES = {
           if (!rows.length) console.warn(`  FIRMS ${p.key}: file is empty`);
         } catch (e) {
           console.warn(`  FIRMS ${p.key} skipped: ${e.message}`);
+          failed.push(p.key);
         }
       }
       const { events, total_cells } = firmsCellsToEvents(cells);
-      meta.extra = { window: '24h', cell_deg: 0.5, detections_used: used, cells_total: total_cells, cells_kept: events.length };
+      // partial: true tells the app (and readers of the file) that a sensor feed is missing from this snapshot.
+      meta.extra = { window: '24h', cell_deg: 0.5, detections_used: used, cells_total: total_cells, cells_kept: events.length, partial: failed.length > 0, failed_products: failed };
       return events;
     },
   },
@@ -400,7 +444,8 @@ export const SOURCES = {
     async run() {
       const feats = [];
       for (let y = 2000; y <= new Date().getUTCFullYear(); y++) {
-        for (let page = 1; page < 30; page++) {
+        for (let page = 1; ; page++) {
+          if (page >= 30) throw new Error(`GDACS ${y}: more than 29 pages of 100; raise the page cap instead of truncating`);
           const j = await fetchJson(`https://gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&fromdate=${y}-01-01&todate=${y}-12-31&pagenumber=${page}&pagesize=100`);
           feats.push(...(j.features ?? []));
           if ((j.features?.length ?? 0) < 100) break;
@@ -450,6 +495,8 @@ export async function main(names = Object.keys(SOURCES)) {
   }
   console.log('\nsource            status  count    size');
   for (const r of report) console.log(`${r.name.padEnd(17)} ${(r.ok ? 'ok' : 'FAIL').padEnd(7)} ${String(r.count ?? '-').padEnd(8)} ${r.bytes ? (r.bytes / 1024).toFixed(0) + ' KB' : r.error ?? ''}`);
+  // A failed source keeps its previous file; a non-zero exit makes cron / CI notice the stale feed.
+  if (report.some((r) => !r.ok)) process.exitCode = 1;
   return report;
 }
 

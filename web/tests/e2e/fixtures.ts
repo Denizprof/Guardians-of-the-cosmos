@@ -64,14 +64,28 @@ export const test = base.extend<{ problems: Problems }>({
 
 export { expect };
 
-/** Wait until the map canvas exists and the data package has been rendered into the UI. */
+/**
+ * Wait until the map canvas exists and the data package has been rendered into the UI.
+ * The landing view is the globe, the top bar and the investigations strip: no side panel (panels are on demand).
+ */
 export async function appReady(page: Page) {
   await page.goto('/');
   await expect(page.locator('.maplibregl-canvas').first()).toBeVisible();
-  await expect(page.getByRole('heading', { level: 2 }).first()).toContainText('See what happened');
+  await expect(page.locator('.app[data-ready="true"]')).toBeVisible();
+  await expect(strip(page).getByRole('button').first()).toBeVisible();
 }
 
-export const featured = (page: Page, title: RegExp | string) => page.locator('aside.filters .featured button', { hasText: title });
+/** The landing strip of curated investigations (replaces the old left filter rail list). */
+export const strip = (page: Page) => page.getByRole('navigation', { name: 'Investigations' });
+export const featured = (page: Page, title: RegExp | string) => strip(page).getByRole('button', { name: title });
+/** Any side panel (investigation, reported event, coverage probe, about). */
+export const anyPanel = (page: Page) => page.locator('section.panel');
+export const aboutPanel = (page: Page) => page.locator('section.panel[aria-label="About Global SAR"]');
+export const probePanel = (page: Page) => page.locator('section.panel[aria-label="Coverage probe"]');
+export const openAbout = async (page: Page) => {
+  await page.getByRole('button', { name: 'About Global SAR' }).click();
+  await expect(aboutPanel(page)).toBeVisible();
+};
 export const panel = (page: Page) => page.locator('section.panel[aria-label$="investigation"]');
 export const hashOf = (page: Page) => new URL(page.url()).hash;
 export const hashParams = (page: Page) => new URLSearchParams(hashOf(page).split('?')[1] ?? '');

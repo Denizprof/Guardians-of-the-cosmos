@@ -8,7 +8,7 @@ A map-first explorer of real NASA-ISRO **NISAR** L-band radar observations, buil
 - [x] Pick challenge: Dancing with the SARs
 - [x] Define users and problem: see [docs/design-brief.md](docs/design-brief.md)
 - [x] Design concept
-- [x] Prototype: photoreal 3D globe, three NISAR investigations, quantitative layers
+- [x] Prototype: photoreal 3D globe, five NISAR investigations, quantitative layers
 - [ ] Demo and submission
 
 ## Investigations
@@ -16,8 +16,10 @@ A map-first explorer of real NASA-ISRO **NISAR** L-band radar observations, buil
 | Event | Technique | NISAR data (ASF DAAC) | Result |
 | --- | --- | --- | --- |
 | Venezuela earthquakes, 24 Jun 2026 | Interferometry (GUNW) | Track 162A frame 007: 1→13 Jun (pre-event) vs 13→25 Jun (spans the quake), PROVISIONAL | Up to about 45 cm line-of-sight motion away from the satellite along the coast; pre-event noise 3.5 cm (std) |
-| Limpopo floods, Jan 2026 | Backscatter (GCOV HH/HV) | Track 114A frame 165: 24 Dec, 5 Jan, 17 Jan, BETA | About 316–404 km² of new water around Chókwè (3,370 km² study area; range from two speckle filters) |
-| Krasheninnikov volcano, 2025–26 | Backscatter time series (GCOV) | Track 060D frame 061: 11 dates, 18 Jun – 28 Oct 2026 | NASA browse time series (full-resolution processing pending) |
+| Limpopo floods, Jan 2026 | Backscatter (GCOV HH/HV) | Track 114A frame 165: 24 Dec, 5 Jan, 17 Jan, BETA | About 322–379 km² of new water around Chókwè (3,370 km² study area; range from two speckle filters) |
+| Krasheninnikov volcano, 2025–26 | Backscatter time series (GCOV) | Track 060D frame 061: 11 dates, 18 Jun – 28 Oct 2026 | Full-resolution HH/HV time series on one fixed calibrated stretch (12 layers) |
+| União do Sul clear-cut (Mato Grosso), Oct 2026 | HV canopy change (GCOV) | Track 002A frame 172: 4 dates, 18 Sep – 24 Oct 2026 (change pair 30 Sep → 24 Oct) | 35.7 km² strong HV loss; 68 % of the INPE DETER alert box vs 11 % of the wider area |
+| Aspen Acres fire (Colorado), Jun 2026 | HV canopy change (GCOV) | Track 019A frame 021: 4 dates, 15 Jun – 14 Aug 2026 | 68 km² woody canopy loss (reported fire size 372 km²; grass/shrub burn is under-detected by L-band HV) |
 
 The globe also shows about 170 recent USGS (M6.3+) and NASA EONET events as **context only**, with no SAR analysis claimed. The coverage probe lists the real NISAR acquisitions over any clicked point, live from the ASF search API.
 
@@ -40,7 +42,7 @@ Open http://localhost:5173. The data package is already committed.
 ## Rebuild the data
 ```bash
 cd pipeline && npm install
-node src/fetch-browse.mjs && node src/fetch-context.mjs
+node src/fetch-browse.mjs && node src/fetch-context.mjs && node src/fetch-catalogs.mjs
 pip install -r python/requirements.txt
 python python/process.py
 ```

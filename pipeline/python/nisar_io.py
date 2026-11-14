@@ -11,6 +11,7 @@ import os
 import time
 import urllib.error
 import urllib.request
+from urllib.parse import urlsplit
 from collections import OrderedDict
 from dataclasses import dataclass
 
@@ -32,6 +33,21 @@ def _token() -> str | None:
             return winreg.QueryValueEx(k, "EARTHDATA_TOKEN")[0]
     except OSError:
         return None
+
+
+# Hosts allowed to receive the Earthdata bearer token (HTTPS only). Anything else -- including the
+# CloudFront/S3 host ASF redirects to -- gets no Authorization header.
+TOKEN_HOSTS = ("asf.alaska.edu", "earthdatacloud.nasa.gov", "earthdata.nasa.gov")
+
+
+def token_allowed(url: str) -> bool:
+    u = urlsplit(url)
+    host = (u.hostname or "").lower()
+    return u.scheme == "https" and any(host == h or host.endswith("." + h) for h in TOKEN_HOSTS)
+
+
+class RangeNotSupported(OSError):
+    """The server answered without Content-Range: subset reads are impossible (not retryable)."""
 
 
 class _DropAuthOnRedirect(urllib.request.HTTPRedirectHandler):
@@ -56,9 +72,12 @@ class RemoteFile(io.RawIOBase):
     """
 
     def __init__(self, url: str, token: str, block=BLOCK, max_blocks=96):
+        if not token_allowed(url):
+            raise ValueError(f"Refusing to send the Earthdata token to {urlsplit(url).hostname!r}: "
+                             f"only HTTPS hosts under {', '.join(TOKEN_HOSTS)} are allowed.")
         self.url, self.block, self.max_blocks = url, block, max_blocks
         self.headers = {"Authorization": f"Bearer {token}"}
-        # direct connection (system proxy settings broke DNS on this network)
+        # Ignore system proxy settings (ProxyHandler({})); some networks break name resolution through them.
         self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _DropAuthOnRedirect())
         self.direct: str | None = None  # signed redirect target
         self.cache: OrderedDict[int, bytes] = OrderedDict()
@@ -69,6 +88,7 @@ class RemoteFile(io.RawIOBase):
 
     def _get(self, start: int, end: int) -> tuple[bytes, int]:
         delay = 1.0
+        last: BaseException | None = None
         for attempt in range(8):
             try:
                 if self.direct:
@@ -81,13 +101,20 @@ class RemoteFile(io.RawIOBase):
                     cr = r.headers.get("Content-Range")
                     if cr is None:
                         # 200 without Content-Range = the server ignored our Range header
-                        raise OSError(f"Server ignored the HTTP Range request for {self.url} (no Content-Range); "
+                        raise RangeNotSupported(f"Server ignored the HTTP Range request for {self.url} (no Content-Range); "
                                       "subset reads are impossible against this endpoint.")
                     data = r.read()
                     total = int(cr.split("/")[-1])
+                    want = min(end, total - 1) - start + 1
+                    if want > 0 and len(data) != want:
+                        # truncated body (connection dropped mid-transfer): retry rather than hand h5py short data
+                        raise OSError(f"Short read: got {len(data)} of {want} bytes at {start}")
                     self.fetched += len(data)
                     return data, total
+            except RangeNotSupported:
+                raise
             except urllib.error.HTTPError as e:
+                last = e
                 if e.code in (401, 403) and self.direct:
                     self.direct = None  # signed URL expired: go back through ASF
                     continue
@@ -98,11 +125,11 @@ class RemoteFile(io.RawIOBase):
                         delay = max(delay, min(float(ra), 120.0))
                 elif e.code < 500:
                     raise
-            except (urllib.error.URLError, OSError, TimeoutError):
-                pass
+            except (urllib.error.URLError, OSError, TimeoutError) as e:
+                last = e
             time.sleep(delay)
             delay = min(delay * 2, 30)
-        raise OSError(f"Giving up on bytes {start}-{end} of {self.url} after retries")
+        raise OSError(f"Giving up on bytes {start}-{end} of {self.url} after retries") from last
 
     def prefetch(self, ranges: list[tuple[int, int]], workers=12):
         """Fetch exact byte ranges (offset, size) concurrently into the range cache."""
@@ -157,6 +184,8 @@ class RemoteFile(io.RawIOBase):
         while got < n:
             i, off = divmod(self.pos + got, self.block)
             chunk = self._block(i)[off: off + n - got]
+            if not chunk:
+                raise OSError(f"Empty block {i} at offset {self.pos + got} of {self.url}")
             out[got: got + len(chunk)] = chunk
             got += len(chunk)
         self.pos += n
@@ -230,11 +259,33 @@ def read_gcov(url: str, bbox, pols=("HHHH", "HVHV"), freq="A"):
         x, y = g["xCoordinates"][()], g["yCoordinates"][()]
         epsg = _epsg(g["projection"])
         rs, cs = _window(x, y, epsg, bbox)
-        data = {p: read_window(f, g[p], rs, cs).astype("float32") for p in pols if p in g}
+        missing = [p for p in pols if p not in g]
+        if missing:
+            raise KeyError(f"{url.rsplit('/', 1)[-1]}: polarization(s) {missing} not in product (has {sorted(k for k in g if k.isupper())})")
+        data = {p: read_window(f, g[p], rs, cs).astype("float32") for p in pols}
         if "mask" in g:
             data["mask"] = read_window(f, g["mask"], rs, cs)
         meta = _identification(f)
     return Grid(data, x[cs], y[rs], epsg), meta
+
+
+# GCOV `mask` semantics, from the dataset's own `description` attribute in NISAR L2 GCOV files:
+#   1..N = subswath number of a valid sample; 0 = not generated from fully-focused radar samples (invalid);
+#   255 (_FillValue) = outside the radar acquisition extent.
+MASK_INVALID, MASK_FILL = 0, 255
+
+
+def apply_validity_mask(grid: "Grid") -> tuple["Grid", float]:
+    """Set backscatter to NaN where the GCOV mask marks a sample invalid (0) or outside the swath (255).
+    Returns the grid and the fraction of pixels masked. A product without a mask is returned unchanged."""
+    m = grid.data.get("mask")
+    if m is None:
+        return grid, 0.0
+    bad = (m == MASK_INVALID) | (m == MASK_FILL)
+    for k, v in grid.data.items():
+        if k != "mask" and v.dtype.kind == "f":
+            v[bad] = np.nan
+    return grid, float(bad.mean())
 
 
 def read_gunw(url: str, bbox, pol="HH", freq="A"):

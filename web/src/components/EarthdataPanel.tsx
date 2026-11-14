@@ -1,3 +1,4 @@
+import { safeHref } from '../lib';
 import { useEffect, useState } from 'react';
 import { queryEarthdata, windowAround, type EarthdataResult } from '../earthdata';
 import './earthdata.css';
@@ -61,6 +62,12 @@ export default function EarthdataPanel({ lon, lat, date, windowDays = 3, onClose
           <p>Could not reach NASA CMR: {state.message}</p>
           <button type="button" className="edp-retry" onClick={() => setAttempt((n) => n + 1)}>Retry</button>
         </div>
+      ) : state.result.totalCollections === 0 && (state.result.uncheckedCollections ?? 0) > 0 ? (
+        // Every count request failed: that is an error, not "no data here".
+        <div className="edp-state" role="alert">
+          <p>NASA CMR did not answer the availability checks ({state.result.uncheckedCollections} collections unchecked), so we cannot say whether data exists here.</p>
+          <button type="button" className="edp-retry" onClick={() => setAttempt((n) => n + 1)}>Retry</button>
+        </div>
       ) : state.result.totalCollections === 0 ? (
         <p className="edp-state muted">No NASA collections with granules found for this point and window.</p>
       ) : (
@@ -68,6 +75,12 @@ export default function EarthdataPanel({ lon, lat, date, windowDays = 3, onClose
           <p className="edp-summary mono">
             {state.result.totalCollections} collections · {fmt.format(state.result.totalGranules)} granules · {day(state.result.query.start)} to {day(state.result.query.end)}
           </p>
+          {(state.result.uncheckedCollections ?? 0) > 0 && (
+            <p className="edp-state muted" role="status">
+              {state.result.uncheckedCollections} further collections could not be checked (NASA CMR request failed); their availability is unknown.
+            </p>
+          )}
+          {state.result.truncated && <p className="edp-state muted">Showing the first 90 candidate collections; use Earthdata Search for the full list.</p>}
           <ul className="edp-groups">
             {state.result.groups.map((g) => (
               <li key={g.platform} className="edp-group">
@@ -90,9 +103,9 @@ export default function EarthdataPanel({ lon, lat, date, windowDays = 3, onClose
                           {c.cloudHosted ? ' · cloud-hosted' : ''}
                         </div>
                         <div className="edp-links">
-                          <a href={c.searchUrl} target="_blank" rel="noopener noreferrer">Earthdata Search</a>
-                          {c.doi && <a href={c.doi} target="_blank" rel="noopener noreferrer">DOI</a>}
-                          {c.landingPage && <a href={c.landingPage} target="_blank" rel="noopener noreferrer">Product page</a>}
+                          <a href={safeHref(c.searchUrl)} target="_blank" rel="noopener noreferrer">Earthdata Search</a>
+                          {c.doi && <a href={safeHref(c.doi)} target="_blank" rel="noopener noreferrer">DOI</a>}
+                          {c.landingPage && <a href={safeHref(c.landingPage)} target="_blank" rel="noopener noreferrer">Product page</a>}
                         </div>
                       </li>
                     ))}
@@ -102,7 +115,7 @@ export default function EarthdataPanel({ lon, lat, date, windowDays = 3, onClose
             ))}
           </ul>
           <p className="edp-foot">
-            <a href={state.result.searchUrl} target="_blank" rel="noopener noreferrer">Open this point and time in Earthdata Search</a>
+            <a href={safeHref(state.result.searchUrl)} target="_blank" rel="noopener noreferrer">Open this point and time in Earthdata Search</a>
           </p>
         </>
       )}

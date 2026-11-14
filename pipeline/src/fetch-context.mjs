@@ -74,6 +74,14 @@ async function eonet() {
 }
 
 const [q, e] = await Promise.all([usgs(), eonet()]);
+// Never replace a good context file with an empty or half-empty one (an API outage must not look like
+// "no events this year"): both feeds must return something before we write.
+if (!q.length || !e.length) {
+  console.error(`Refusing to write ${OUT}: USGS returned ${q.length}, EONET ${e.length} events (previous file kept).`);
+  process.exit(1);
+}
 const events = [...q, ...e].sort((a, b) => b.date.localeCompare(a.date));
-await fs.writeFile(OUT, JSON.stringify({ generated: new Date().toISOString(), since, events }, null, 1));
+const tmp = `${OUT}.tmp`;
+await fs.writeFile(tmp, JSON.stringify({ generated: new Date().toISOString(), since, events }, null, 1));
+await fs.rename(tmp, OUT); // atomic replace: readers never see a truncated file
 console.log(`USGS ${q.length}, EONET ${e.length} -> ${OUT}`);

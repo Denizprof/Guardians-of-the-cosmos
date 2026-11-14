@@ -1,14 +1,18 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import type { Map as MlMap, GeoJSONSource, StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { Category, CompareMode, ContextEvent, SarEvent, SarLayer } from '../types';
-import { CATEGORY_COLOR, CATEGORY_LABEL, fmtDate, layerBounds } from '../lib';
+import { CATEGORY_COLOR, layerBounds } from '../lib';
 import type { CoverageResult } from '../services';
 import type { Pin } from '../content/explain';
+import { SAR_LENS_SOURCE, lensTileUrls } from './sarLens';
 
 // Untouched worker copy served from public/vendor (see vite.config.ts).
 maplibregl.setWorkerUrl(new URL('vendor/maplibre-gl-worker.mjs', document.baseURI).href);
+// Up to three maps (A, B, SAR lens) share one image queue; the lens alone stacks twelve raster sources (two products x six days).
+maplibregl.config.MAX_PARALLEL_IMAGE_REQUESTS = 32;
+maplibregl.config.MAX_PARALLEL_IMAGE_REQUESTS_PER_FRAME = 16;
 
 // ---------------------------------------------------------------------------------------------
 // "Google Earth" style: photoreal satellite globe + 3D terrain + thin borders and labels on top.
@@ -23,6 +27,8 @@ const TERRAIN = { source: 'dem', exaggeration: 1.4 };
 /** Terrain is only switched on when close enough to see relief (keeps the whole-globe view light). */
 const TERRAIN_ON_ZOOM = 6.5;
 const TERRAIN_OFF_ZOOM = 5.5;
+/** Native detail of the 10 m Sentinel-2 basemap is ~z14; allow a little overzoom, no more. */
+const MAX_ZOOM = 14.5;
 
 const NAME: any = ['coalesce', ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']];
 const IS_POINT: any = ['match', ['geometry-type'], ['MultiPoint', 'Point'], true, false];
@@ -45,11 +51,20 @@ const STYLE: StyleSpecification = {
     'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 9, 0.4, 12, 0],
   },
   sources: {
+    // Always-loaded low-resolution copy of the same imagery (z0-z3 = 85 tiles for the whole planet).
+    // It sits under the full-resolution layer, so a fast zoom-out shows slightly soft imagery for a moment
+    // instead of black holes while the right-zoom tiles load.
+    'satellite-base': {
+      type: 'raster',
+      tiles: ['https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg'],
+      tileSize: 256,
+      maxzoom: 3,
+    },
     satellite: {
       type: 'raster',
       tiles: ['https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg'],
       tileSize: 256,
-      maxzoom: 15,
+      maxzoom: 14,
       attribution:
         '<a href="https://cloudless.eox.at" target="_blank" rel="noopener">Sentinel-2 cloudless 2024</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0',
     },
@@ -58,16 +73,21 @@ const STYLE: StyleSpecification = {
       tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
       encoding: 'terrarium',
       tileSize: 256,
-      maxzoom: 13,
+      maxzoom: 11, // relief at z11 (~76 m/px at the equator) is plenty under 10 m imagery; 1/16 of the z13 DEM tile count for the same area
       attribution: 'Terrain: <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md" target="_blank" rel="noopener">Mapzen / AWS Terrain Tiles</a>',
     },
     openmaptiles: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' },
   },
   layers: [
-    { id: 'background', type: 'background', paint: { 'background-color': '#060b14' } },
+    // Deep-ocean blue rather than near-black: the last-resort colour under any not-yet-loaded tile.
+    { id: 'background', type: 'background', paint: { 'background-color': '#0b1d36' } },
+    {
+      id: 'satellite-base', type: 'raster', source: 'satellite-base',
+      paint: { 'raster-fade-duration': 0, 'raster-saturation': 0.12, 'raster-contrast': 0.06 },
+    },
     {
       id: 'satellite', type: 'raster', source: 'satellite',
-      paint: { 'raster-fade-duration': 150, 'raster-saturation': 0.12, 'raster-contrast': 0.06 },
+      paint: { 'raster-fade-duration': 100, 'raster-saturation': 0.12, 'raster-contrast': 0.06 },
     },
     {
       id: 'road-major', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', minzoom: 8,
@@ -148,18 +168,33 @@ export interface MapViewProps {
   before: SarLayer | null;
   after: SarLayer | null;
   mode: CompareMode;
-  swipeX: number; // px from the left edge of the map area
   overlayOpacity: number;
   coverage: CoverageResult | null;
   pins: Pin[];
   activePin: string | null;
   panelInset: { right: number; bottom: number };
   onSelectEvent: (id: string) => void;
+  /** A reported / catalog marker was clicked (id of the ContextEvent). */
+  onSelectContext: (id: string) => void;
   onMapClick: (lon: number, lat: number) => void;
-  onCheckCoverage: (lon: number, lat: number, date: string | null) => void;
   onPin: (id: string) => void;
   flyTo: { lon: number; lat: number; zoom?: number; bbox?: [number, number, number, number]; nonce: number } | null;
   tileOverlays?: TileOverlay[];
+  /** The point the side panel is about (reported event or coverage probe): drawn as a ring. */
+  focus: { lon: number; lat: number } | null;
+  /** SAR lens: null = off. `nisar` is the investigation layer to draw over the SAR basemap, if any. */
+  lens: { nisar: SarLayer | null } | null;
+  /** A source failed to load (tiles, NISAR image, style). Failures must be visible, never read as "no data". */
+  onMapError?: (where: 'globe' | 'lens', source: string) => void;
+}
+
+/** Turn a MapLibre error event into a short source label and report it (also logged for diagnosis). */
+function mapErrorReporter(where: 'globe' | 'lens', report: () => MapViewProps['onMapError']) {
+  return (e: { sourceId?: string; error?: { message?: string; status?: number } }) => {
+    const source = e?.sourceId ?? 'map style';
+    console.warn(`[map:${where}] ${source} failed to load`, e?.error?.status ?? '', e?.error?.message ?? '');
+    report()?.(where, source);
+  };
 }
 
 /** Enable 3D terrain when zoomed in, drop it again for the whole-globe view (with hysteresis). */
@@ -171,7 +206,7 @@ function syncTerrain(map: MlMap) {
   else if (on && z < TERRAIN_OFF_ZOOM) map.setTerrain(null);
 }
 
-function makeMap(container: HTMLElement): MlMap {
+function makeMap(container: HTMLElement, reducedMotion: () => boolean): MlMap {
   const map = new maplibregl.Map({
     container,
     style: STYLE,
@@ -181,11 +216,27 @@ function makeMap(container: HTMLElement): MlMap {
     maxPitch: 75,
     fadeDuration: 0,
     // Two terrain-enabled maps at 3x device pixels is too heavy for phones.
-    pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    pixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
+    // Sentinel-2 cloudless is 10 m/pixel (native ~z14). Deeper zoom only stretched tiles into blur
+    // with visible seams between tile levels, so stop at ~1.4x overzoom.
+    maxZoom: MAX_ZOOM,
+    refreshExpiredTiles: false,
+    // Keep tiles from more zoom levels in memory (default 5), so zooming back out reuses what was
+    // already loaded on the way in instead of re-requesting it.
+    maxTileCacheZoomLevels: 10,
+    // Ask the browser for the high-performance (discrete) GPU. A page cannot pick a GPU by index;
+    // to force one, set the browser to "High performance" in Windows Graphics settings.
+    canvasContextAttributes: { powerPreference: 'high-performance', contextType: 'webgl2', antialias: false },
   });
   map.on('style.load', () => map.setProjection({ type: 'globe' }));
   map.on('zoom', () => syncTerrain(map));
   map.on('moveend', () => syncTerrain(map));
+  // Like Google Earth: when the user zooms back out to globe scale, level the camera so the
+  // whole globe (and its atmosphere) is seen straight on.
+  map.on('zoomend', (e) => {
+    if (!(e as any).originalEvent) return; // only react to the user's own zooming, not fly-ins
+    if (map.getZoom() < 4.5 && map.getPitch() > 1) map.easeTo({ pitch: 0, duration: reducedMotion() ? 0 : 600 });
+  });
   attachHalo(map);
   return map;
 }
@@ -203,21 +254,25 @@ function attachHalo(map: MlMap) {
   const rad = Math.PI / 180;
   const update = () => {
     const z = map.getZoom();
-    const k = Math.max(0, Math.min(1, (5.5 - z) / 1.5)); // fades out as the globe outgrows the screen
+    // Fades out as the globe outgrows the screen, and while the camera is tilted: the ring is
+    // exact for a straight-down view only, so it must never float off the globe in tilted views.
+    const tilt = map.getPitch();
+    const k = Math.max(0, Math.min(1, (5.5 - z) / 1.5)) * Math.max(0, 1 - tilt / 8);
     if (k === 0) {
       halo.style.opacity = '0';
       return;
     }
-    const W = cont.clientWidth;
     const H = cont.clientHeight;
     const h = H / 2 / Math.tan((map.getVerticalFieldOfView() * rad) / 2); // camera to map centre, px
     const R = (512 * 2 ** z) / (2 * Math.PI * Math.cos(map.getCenter().lat * rad)); // globe radius, px
     const p = map.getPitch() * rad;
     const D = Math.sqrt(R * R + h * h + 2 * R * h * Math.cos(p)); // camera to globe centre
     const r = h * Math.tan(Math.asin(Math.min(0.999, R / D))); // silhouette radius on screen
-    const pad = map.getPadding(); // camera padding shifts the point the globe is centred on
-    const cx = (W + (pad.left ?? 0) - (pad.right ?? 0)) / 2;
-    const cy = (H + (pad.top ?? 0) - (pad.bottom ?? 0)) / 2 + (h * R * Math.sin(p)) / (h + R * Math.cos(p));
+    // Anchor on where the camera's centre point actually lands on screen (robust to however the
+    // projection applies camera padding), then shift for pitch: the globe's centre lies behind it.
+    const c = map.project(map.getCenter());
+    const cx = c.x;
+    const cy = c.y + (h * R * Math.sin(p)) / (h + R * Math.cos(p));
     const half = r * HALO_SCALE;
     halo.style.width = halo.style.height = `${(2 * half).toFixed(1)}px`;
     halo.style.transform = `translate(${(cx - half).toFixed(1)}px, ${(cy - half).toFixed(1)}px)`;
@@ -271,21 +326,30 @@ export interface TileOverlay {
   attribution: string;
 }
 
+/**
+ * The tile URL each overlay source was created with, per map. MapLibre only exposes a raster source's
+ * `tiles` once the source has loaded, so comparing against the live source missed URL changes made right
+ * after a layer was switched on (a new date kept the old date's tiles).
+ */
+const overlayUrls = new WeakMap<MlMap, Map<string, string>>();
+
 /** Global catalog layers (GIBS, WorldCover, forest loss...): above the satellite basemap, below borders, NISAR imagery and labels. */
 function syncTileOverlays(map: MlMap, wanted: TileOverlay[]) {
   const style = map.getStyle();
   if (!style) return;
+  let urls = overlayUrls.get(map);
+  if (!urls) overlayUrls.set(map, (urls = new Map()));
   const key = (o: TileOverlay) => `ov-${o.id}`;
   const want = new Map(wanted.map((o) => [key(o), o]));
   for (const l of style.layers) if (l.id.startsWith('ov-') && !want.has(l.id)) map.removeLayer(l.id);
   for (const id of Object.keys(style.sources)) {
     if (!id.startsWith('ov-')) continue;
     const o = want.get(id);
-    const src = map.getSource(id) as any;
-    // URL changed (e.g. a new date): drop and re-add
-    if (!o || (src?.tiles && src.tiles[0] !== o.url)) {
+    // Switched off, or its URL changed (e.g. a new date): drop the layer and the source; re-added below.
+    if (!o || urls.get(id) !== o.url) {
       if (map.getLayer(id)) map.removeLayer(id);
       map.removeSource(id);
+      urls.delete(id);
     }
   }
   const beforeId = map.getLayer('road-major') ? 'road-major' : firstSymbolId(map);
@@ -293,6 +357,7 @@ function syncTileOverlays(map: MlMap, wanted: TileOverlay[]) {
     if (!map.getSource(id)) {
       map.addSource(id, { type: 'raster', tiles: [o.url], tileSize: o.tileSize, minzoom: o.minzoom, maxzoom: o.maxzoom, attribution: o.attribution });
       map.addLayer({ id, type: 'raster', source: id, paint: { 'raster-opacity': o.opacity, 'raster-fade-duration': 150 } }, beforeId);
+      urls.set(id, o.url);
     } else {
       map.setPaintProperty(id, 'raster-opacity', o.opacity);
     }
@@ -342,6 +407,16 @@ function addMarkers(map: MlMap) {
     layout: { 'text-field': ['get', 'title'], 'text-size': 12.5, 'text-offset': [0, 1.5], 'text-anchor': 'top', 'text-font': FONT },
     paint: { 'text-color': '#ffffff', 'text-halo-color': 'rgba(4, 7, 12, 0.92)', 'text-halo-width': 1.8 },
   });
+  // Ring around the reported event / probed point that the side panel is describing.
+  map.addSource('focus', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  map.addLayer({
+    id: 'focus-ring-casing', type: 'circle', source: 'focus',
+    paint: { 'circle-color': 'rgba(0,0,0,0)', 'circle-radius': 13, 'circle-stroke-color': '#05070a', 'circle-stroke-opacity': 0.7, 'circle-stroke-width': 4.5 },
+  });
+  map.addLayer({
+    id: 'focus-ring', type: 'circle', source: 'focus',
+    paint: { 'circle-color': 'rgba(0,0,0,0)', 'circle-radius': 13, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 },
+  });
 }
 
 /** Static starfield behind the (transparent) globe canvases. */
@@ -373,12 +448,46 @@ function drawStars(canvas: HTMLCanvasElement) {
   g.globalAlpha = 1;
 }
 
-export default function MapView(p: MapViewProps) {
+/** Radar-only style for the SAR lens map: dark ground, the SAR raster stack, thin borders and a few labels for orientation. */
+function lensStyle(): StyleSpecification {
+  const src = SAR_LENS_SOURCE;
+  const urls = lensTileUrls(src);
+  const keep = new Set(['boundary-country-casing', 'boundary-country', 'label-water', 'label-city', 'label-country']);
+  return {
+    ...STYLE,
+    name: 'Global SAR lens',
+    sources: {
+      dem: STYLE.sources.dem,
+      openmaptiles: STYLE.sources.openmaptiles,
+      ...Object.fromEntries(
+        urls.map((u) => [`lens-${u.id}`, { type: 'raster', tiles: [u.url], tileSize: u.tileSize, minzoom: u.minzoom, maxzoom: u.maxzoom, attribution: src.attribution }])
+      ),
+    },
+    layers: [
+      // Dark ground: where no pass happened the lens reads as 'no radar data', not as an error.
+      { id: 'background', type: 'background', paint: { 'background-color': '#05080c' } },
+      // bottom to top: underlay first, then the primary product, each oldest day first
+      ...urls.map((u) => ({ id: `lens-${u.id}`, type: 'raster' as const, source: `lens-${u.id}`, paint: { 'raster-fade-duration': 0 } })),
+      ...STYLE.layers.filter((l) => keep.has(l.id)),
+    ],
+  };
+}
+
+const SPIN_MAX_MS = 30_000;
+const BASE_PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, 1.5);
+/** From this zoom the SAR lens renders only its square (see the lens effect); below it, a clipped full view. */
+const LENS_WINDOW_MIN_ZOOM = 5;
+const EMPTY_FC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
+
+function MapView(p: MapViewProps) {
   const aEl = useRef<HTMLDivElement>(null);
   const bEl = useRef<HTMLDivElement>(null);
+  const lensEl = useRef<HTMLDivElement>(null);
   const starsEl = useRef<HTMLCanvasElement>(null);
   const maps = useRef<{ a: MlMap; b: MlMap } | null>(null);
+  const lensMap = useRef<MlMap | null>(null);
   const [ready, setReady] = useState(0); // number of maps whose style has loaded
+  const [lensReady, setLensReady] = useState(false);
   const cb = useRef(p);
   cb.current = p;
 
@@ -388,7 +497,11 @@ export default function MapView(p: MapViewProps) {
   bActive.current = layoutClass !== 'single';
   const syncing = useRef(false);
   const spinning = useRef(true);
+  const reduced = useRef(false);
   const prevSelected = useRef<string | null>(null);
+  const lensOn = !!p.lens;
+  /** Animation duration that collapses to an instant jump when the user asked for reduced motion. */
+  const dur = (ms: number) => (reduced.current ? 0 : ms);
 
   // ---- starfield
   useEffect(() => {
@@ -402,8 +515,12 @@ export default function MapView(p: MapViewProps) {
 
   // ---- create the two camera-synced maps once
   useEffect(() => {
-    const a = makeMap(aEl.current!);
-    const b = makeMap(bEl.current!);
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reduced.current = mq.matches;
+    const a = makeMap(aEl.current!, () => reduced.current);
+    const b = makeMap(bEl.current!, () => reduced.current);
+    a.on('error', mapErrorReporter('globe', () => cb.current.onMapError));
+    b.on('error', mapErrorReporter('globe', () => cb.current.onMapError));
     a.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), 'bottom-left');
     a.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
     const sync = (src: MlMap, dst: MlMap) => () => {
@@ -414,10 +531,31 @@ export default function MapView(p: MapViewProps) {
     };
     a.on('move', sync(a, b));
     b.on('move', sync(b, a));
+
+    // While the camera moves, the secondary maps (B, SAR lens) drop to 1x device pixels; full sharpness returns at rest.
+    let lowRes = false;
+    let restoreTimer = 0;
+    a.on('movestart', () => {
+      window.clearTimeout(restoreTimer);
+      if (lowRes || BASE_PIXEL_RATIO <= 1 || !(bActive.current || lensMap.current)) return;
+      lowRes = true;
+      if (bActive.current) b.setPixelRatio(1);
+      lensMap.current?.setPixelRatio(1);
+    });
+    a.on('moveend', () => {
+      if (!lowRes) return;
+      window.clearTimeout(restoreTimer);
+      restoreTimer = window.setTimeout(() => {
+        lowRes = false;
+        b.setPixelRatio(BASE_PIXEL_RATIO);
+        lensMap.current?.setPixelRatio(BASE_PIXEL_RATIO);
+      }, 180);
+    });
+
     // 'style.load', not 'load': with satellite tiles streaming in, 'load' can take many seconds and the
     // markers must not wait for imagery.
     // On phones start with the attribution folded into its (i) button (MapLibre opens it once the first
-    // source reports its attribution); the intro panel carries the full credits.
+    // source reports its attribution); the About panel carries the full credits.
     if (window.innerWidth <= 820) {
       const fold = () => {
         const attrib = aEl.current?.querySelector('.maplibregl-ctrl-attrib');
@@ -438,23 +576,41 @@ export default function MapView(p: MapViewProps) {
       setReady((n) => n + 1);
     });
 
-    // ---- slow idle rotation of the landing globe; any interaction stops it for good
-    spinning.current = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const stopSpin = () => (spinning.current = false);
-    const stopEvents = ['pointerdown', 'wheel', 'touchstart', 'keydown'] as const;
-    const containers = [aEl.current!, bEl.current!];
-    for (const el of containers) for (const ev of stopEvents) el.addEventListener(ev, stopSpin, { passive: true, capture: true });
+    // ---- slow idle rotation of the landing globe. Any interaction stops it for good, it stops by itself
+    // after 30 s (an idle tab must not keep the GPU busy), and it never starts under reduced motion.
     let raf = 0;
     let last = 0;
+    let started = 0;
+    const stopSpin = () => {
+      spinning.current = false;
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
     const tick = (t: number) => {
+      raf = 0;
+      if (!spinning.current) return; // stopped elsewhere (event opened, search fly-to): the loop ends here
+      if (!started) started = t;
+      if (t - started > SPIN_MAX_MS || cb.current.selected) return stopSpin();
       raf = requestAnimationFrame(tick);
       const dt = last ? Math.min(100, t - last) : 0;
       last = t;
-      if (!spinning.current || cb.current.selected || a.getZoom() > 3) return;
+      if (a.getZoom() > 3) return;
       const c = a.getCenter();
       a.jumpTo({ center: [c.lng - dt * 0.002, c.lat] }); // 2°/s, Earth turning eastwards
     };
-    raf = requestAnimationFrame(tick);
+    spinning.current = !mq.matches;
+    if (spinning.current) raf = requestAnimationFrame(tick);
+    const onMotionPref = (e: MediaQueryListEvent) => {
+      reduced.current = e.matches;
+      if (e.matches) {
+        stopSpin();
+        a.stop(); // end any fly animation in progress
+      }
+    };
+    mq.addEventListener('change', onMotionPref);
+    const stopEvents = ['pointerdown', 'wheel', 'touchstart', 'keydown'] as const;
+    const containers = [aEl.current!, bEl.current!];
+    for (const el of containers) for (const ev of stopEvents) el.addEventListener(ev, stopSpin, { passive: true, capture: true });
 
     const clickable = ['sar-points', 'sar-halo', 'ctx-points', 'ctx-clusters'];
     a.on('click', (e) => {
@@ -464,28 +620,12 @@ export default function MapView(p: MapViewProps) {
       if (f.layer.id.startsWith('sar')) return cb.current.onSelectEvent(f.properties.id);
       if (f.layer.id === 'ctx-clusters') {
         (a.getSource('ctx') as GeoJSONSource).getClusterExpansionZoom(f.properties.cluster_id).then((z) => {
-          a.easeTo({ center: (f.geometry as GeoJSON.Point).coordinates as [number, number], zoom: z + 0.5 });
+          a.easeTo({ center: (f.geometry as GeoJSON.Point).coordinates as [number, number], zoom: Math.min(z + 0.5, 9), duration: reduced.current ? 0 : 700 });
         });
         return;
       }
-      const pr = f.properties as any;
-      const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
-      const el = document.createElement('div');
-      el.innerHTML = `<div class="popup-title"></div><div class="muted"></div><div class="popup-notes muted"></div><div class="callout"></div><div class="popup-actions"><button type="button">Satellite data here?</button><a target="_blank" rel="noopener">Source ↗</a></div>`;
-      el.querySelector('.popup-title')!.textContent = pr.title;
-      el.querySelector('.muted')!.textContent = `${CATEGORY_LABEL[pr.category as Category] ?? pr.category} · ${fmtDate(pr.date)} · ${pr.source}`;
-      const notes = [pr.magnitude != null ? `M${pr.magnitude}` : '', pr.deaths != null ? `${pr.deaths} deaths reported` : '', pr.notes ?? ''].filter(Boolean).join(' · ');
-      el.querySelector('.popup-notes')!.textContent = notes;
-      el.querySelector('.callout')!.textContent =
-        pr.evidence === 'observation'
-          ? 'Satellite thermal detection (FIRMS). Hot spots can also be gas flares, volcanoes or industry; not a confirmed wildfire.'
-          : 'Reported event from a catalog. Not analyzed or confirmed by satellite in this app.';
-      el.querySelector('a')!.setAttribute('href', pr.url);
-      const popup = new maplibregl.Popup({ maxWidth: '300px', offset: 8 }).setLngLat([lon, lat]).setDOMContent(el).addTo(a);
-      el.querySelector('button')!.addEventListener('click', () => {
-        popup.remove();
-        cb.current.onCheckCoverage(lon, lat, pr.date ?? null);
-      });
+      // A reported / catalog event: its full record opens in the side panel.
+      cb.current.onSelectContext(String(f.properties.id));
     });
     for (const id of clickable) {
       a.on('mouseenter', id, () => (a.getCanvas().style.cursor = 'pointer'));
@@ -497,7 +637,9 @@ export default function MapView(p: MapViewProps) {
     b.getCanvas().setAttribute('aria-label', 'Globe: after view');
     if (import.meta.env.DEV) (window as any).__gsMaps = { a, b };
     return () => {
-      cancelAnimationFrame(raf);
+      stopSpin();
+      window.clearTimeout(restoreTimer);
+      mq.removeEventListener('change', onMotionPref);
       for (const el of containers) for (const ev of stopEvents) el.removeEventListener(ev, stopSpin, { capture: true });
       a.remove();
       b.remove();
@@ -507,7 +649,8 @@ export default function MapView(p: MapViewProps) {
 
   const loaded = ready >= 2;
 
-  // ---- markers
+  // ---- marker data: only when the data or the filters change. Opening or closing an investigation must not
+  // re-serialize and re-cluster thousands of points (that is the visibility effect below).
   useEffect(() => {
     if (!loaded) return;
     const { a } = maps.current!;
@@ -522,22 +665,37 @@ export default function MapView(p: MapViewProps) {
       features: p.showContext
         ? p.context
             .filter((e) => p.visibleCategories.has(e.category))
-            .map((e) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [e.lon, e.lat] }, properties: { ...e } }))
+            // The panel looks the full record up by id, so the map only carries what it draws.
+            .map((e) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [e.lon, e.lat] }, properties: { id: e.id, category: e.category } }))
         : [],
     };
     (a.getSource('sar') as GeoJSONSource).setData(sar);
     (a.getSource('ctx') as GeoJSONSource).setData(ctx);
-    const vis = p.selected ? 'none' : 'visible';
-    for (const id of ['ctx-clusters', 'ctx-count', 'ctx-points', 'sar-labels']) a.setLayoutProperty(id, 'visibility', vis);
-  }, [loaded, p.events, p.context, p.visibleCategories, p.showContext, p.selected]);
+  }, [loaded, p.events, p.context, p.visibleCategories, p.showContext]);
 
-  // ---- global catalog tile layers (same on both maps)
+  // ---- marker visibility: context markers and labels step back while an investigation is open
+  const hasSelection = !!p.selected;
+  useEffect(() => {
+    if (!loaded) return;
+    const { a } = maps.current!;
+    const vis = hasSelection ? 'none' : 'visible';
+    for (const id of ['ctx-clusters', 'ctx-count', 'ctx-points', 'sar-labels']) a.setLayoutProperty(id, 'visibility', vis);
+  }, [loaded, hasSelection]);
+
+  // ---- focus ring: the reported event or probed point the side panel is about
+  useEffect(() => {
+    if (!loaded) return;
+    const src = maps.current!.a.getSource('focus') as GeoJSONSource;
+    src.setData(p.focus ? { type: 'Feature', geometry: { type: 'Point', coordinates: [p.focus.lon, p.focus.lat] }, properties: {} } : EMPTY_FC);
+  }, [loaded, p.focus]);
+
+  // ---- global catalog tile layers (map B only while it is on screen)
   useEffect(() => {
     if (!loaded) return;
     const { a, b } = maps.current!;
     syncTileOverlays(a, p.tileOverlays ?? []);
-    syncTileOverlays(b, p.tileOverlays ?? []);
-  }, [loaded, p.tileOverlays]);
+    if (layoutClass !== 'single') syncTileOverlays(b, p.tileOverlays ?? []);
+  }, [loaded, p.tileOverlays, layoutClass]);
 
   // ---- SAR imagery (raster layers, so they drape over the 3D terrain on both maps)
   useEffect(() => {
@@ -553,13 +711,9 @@ export default function MapView(p: MapViewProps) {
     syncImageLayers(b, B);
   }, [loaded, p.before, p.after, p.mode, p.overlayOpacity]);
 
-  // ---- swipe clip + resize on layout changes
-  useEffect(() => {
-    if (!bEl.current) return;
-    bEl.current.style.clipPath = p.mode === 'swipe' && p.selected ? `inset(0 0 0 ${p.swipeX}px)` : '';
-  }, [p.mode, p.swipeX, p.selected]);
   // Camera padding keeps the globe / target centred in the part of the map not covered by the side panel
   // (desktop) or the bottom sheet (phones). Side-by-side maps are half-size, so they get none.
+  // The swipe divider and the lens square are pure CSS (variables on .app), so they need no effect here.
   const basePad =
     layoutClass === 'side'
       ? { top: 0, left: 0, right: 0, bottom: 0 }
@@ -581,11 +735,15 @@ export default function MapView(p: MapViewProps) {
     if (!maps.current) return;
     const { a, b } = maps.current;
     requestAnimationFrame(() => {
+      if (!maps.current) return;
       // Guarded: an echo from B back to A would jumpTo() on A and cancel the fly-in that starts at the same time.
       syncing.current = true;
       a.resize();
-      b.resize();
-      b.jumpTo({ center: a.getCenter(), zoom: a.getZoom(), bearing: a.getBearing(), pitch: a.getPitch() });
+      if (bActive.current) {
+        b.resize();
+        b.jumpTo({ center: a.getCenter(), zoom: a.getZoom(), bearing: a.getBearing(), pitch: a.getPitch() });
+      }
+      lensMap.current?.resize();
       syncing.current = false;
     });
   }, [p.mode, p.selected]);
@@ -607,13 +765,12 @@ export default function MapView(p: MapViewProps) {
         },
         pitch: EVENT_PITCH,
         bearing: EVENT_BEARING,
-        duration: 3200,
+        duration: dur(1800),
         curve: 1.5,
-        essential: true,
       });
     } else if (prevSelected.current) {
       const c = a.getCenter();
-      a.flyTo({ center: [c.lng, Math.max(-30, Math.min(30, c.lat))], zoom: homeZoom(), pitch: 0, bearing: 0, duration: 2600, curve: 1.5, essential: true });
+      a.flyTo({ center: [c.lng, Math.max(-30, Math.min(30, c.lat))], zoom: homeZoom(), pitch: 0, bearing: 0, duration: dur(1500), curve: 1.5 });
     }
     prevSelected.current = p.selected?.id ?? null;
   }, [loaded, p.selected?.id]);
@@ -624,29 +781,32 @@ export default function MapView(p: MapViewProps) {
     spinning.current = false;
     if (p.flyTo.bbox) {
       const [w, n, e, s] = p.flyTo.bbox;
-      a.fitBounds([[w, s], [e, n]], { padding: 60, maxZoom: 11, duration: 1800 });
-    } else a.flyTo({ center: [p.flyTo.lon, p.flyTo.lat], zoom: p.flyTo.zoom ?? 8, duration: 1800 });
+      a.fitBounds([[w, s], [e, n]], { padding: 60, maxZoom: 11, duration: dur(1200) });
+    } else a.flyTo({ center: [p.flyTo.lon, p.flyTo.lat], zoom: p.flyTo.zoom ?? 8, duration: dur(1200) });
   }, [loaded, p.flyTo?.nonce]);
 
-  // ---- NISAR coverage footprints
+  // ---- NISAR coverage footprints (probe results; only ever shown on map A)
   useEffect(() => {
     if (!loaded) return;
     const fc: GeoJSON.FeatureCollection = {
       type: 'FeatureCollection',
       features: (p.coverage?.granules ?? []).slice(0, 80).map((g) => ({ type: 'Feature', geometry: g.footprint, properties: { scene: g.scene } })),
     };
-    for (const m of [maps.current!.a, maps.current!.b]) (m.getSource('coverage') as GeoJSONSource).setData(fc);
+    (maps.current!.a.getSource('coverage') as GeoJSONSource).setData(fc);
   }, [loaded, p.coverage]);
 
   // ---- annotation pins (on both maps so they stay visible on both sides of the swipe)
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded || !p.pins.length) return;
     const markers: maplibregl.Marker[] = [];
-    for (const m of [maps.current!.a, maps.current!.b]) {
+    const targets = layoutClass === 'single' ? [maps.current!.a] : [maps.current!.a, maps.current!.b];
+    for (const m of targets) {
       p.pins.forEach((pin, i) => {
         const el = document.createElement('button');
         el.type = 'button';
-        el.className = `pin${p.activePin === pin.id ? ' active' : ''}`;
+        el.className = 'pin';
+        el.dataset.pinId = pin.id;
+        if (m === maps.current!.b) el.tabIndex = -1; // one keyboard stop per pin (map A's copy)
         el.textContent = String(i + 1);
         el.title = pin.label;
         el.setAttribute('aria-label', `Annotation ${i + 1}: ${pin.label}`);
@@ -658,13 +818,133 @@ export default function MapView(p: MapViewProps) {
       });
     }
     return () => markers.forEach((mk) => mk.remove());
-  }, [loaded, p.pins, p.activePin]);
+  }, [loaded, p.pins, layoutClass]);
+
+  // Active state is toggled in place, so activating a pin never destroys the focused button.
+  useEffect(() => {
+    document.querySelectorAll<HTMLElement>('.pin[data-pin-id]').forEach((el) => {
+      const on = el.dataset.pinId === p.activePin;
+      el.classList.toggle('active', on);
+      el.setAttribute('aria-pressed', String(on));
+    });
+  }, [p.activePin, p.pins, layoutClass]);
+
+  // ---- SAR lens: a third, non-interactive map that exists only while the lens is on. It mirrors map A's
+  // camera (and terrain state) and is clipped to the square by CSS; see .map.lens in styles.css.
+  useEffect(() => {
+    if (!loaded || !lensOn || !lensEl.current) return;
+    const { a } = maps.current!;
+    spinning.current = false; // the reader is inspecting: a moving camera also throttles tile loading
+    const lens = new maplibregl.Map({
+      container: lensEl.current,
+      style: lensStyle(),
+      interactive: false,
+      attributionControl: false, // credited in the lens label (the square would clip a map control)
+      center: a.getCenter(),
+      zoom: a.getZoom(),
+      bearing: a.getBearing(),
+      pitch: a.getPitch(),
+      maxPitch: 75,
+      maxZoom: MAX_ZOOM,
+      fadeDuration: 0,
+      pixelRatio: BASE_PIXEL_RATIO,
+      refreshExpiredTiles: false,
+      canvasContextAttributes: { powerPreference: 'high-performance', contextType: 'webgl2', antialias: false },
+    });
+    lens.getCanvas().setAttribute('aria-label', 'Globe: SAR lens view');
+    // GIBS answers a day without a pass with a transparent 200 tile, so an error event is a real failure
+    // (network, 5xx, CORS). Report it: otherwise a failed tile looks exactly like "no radar data here".
+    lens.on('error', mapErrorReporter('lens', () => cb.current.onMapError));
+    let styled = false;
+    // Two ways to show the lens:
+    //  - 'clip':   a full-viewport map with the same camera as map A, clipped to the square by CSS. Exact at
+    //              globe scale (same perspective as the globe underneath); used full screen and below z5,
+    //              where the whole planet is only a few tiles per source anyway.
+    //  - 'window': the lens map is only as big as the square and looks at the point under its centre. At
+    //              regional zoom the perspective difference is negligible, and it requests ~1/30 of the tiles
+    //              (12 raster sources over a 320 px square instead of over the whole window).
+    const el = lensEl.current;
+    const root = el.closest('.app') as HTMLElement | null;
+    let mode: 'clip' | 'window' = 'clip';
+    let lastSize = -1;
+    let raf = 0;
+    const geom = () => {
+      const cs = getComputedStyle(root ?? document.documentElement);
+      return { x: parseFloat(cs.getPropertyValue('--lens-x')), y: parseFloat(cs.getPropertyValue('--lens-y')), s: parseFloat(cs.getPropertyValue('--lens-s')) };
+    };
+    const apply = () => {
+      raf = 0;
+      const z = a.getZoom();
+      const g = geom();
+      const full = !!root?.classList.contains('lens-full');
+      const windowed = !full && z >= LENS_WINDOW_MIN_ZOOM && [g.x, g.y, g.s].every(Number.isFinite) && g.s > 0;
+      if (windowed) {
+        el.style.cssText = `left:${g.x}px;top:${g.y}px;width:${g.s}px;height:${g.s}px;right:auto;bottom:auto;clip-path:none`;
+        if (mode !== 'window' || g.s !== lastSize) lens.resize();
+        mode = 'window';
+        lastSize = g.s;
+        const c = a.unproject([g.x + g.s / 2, g.y + g.s / 2]);
+        lens.jumpTo({ center: c, zoom: z, bearing: a.getBearing(), pitch: a.getPitch(), padding: { top: 0, right: 0, bottom: 0, left: 0 } });
+      } else {
+        if (mode !== 'clip') {
+          el.style.cssText = '';
+          lens.resize();
+          mode = 'clip';
+          lastSize = -1;
+        }
+        lens.jumpTo({ center: a.getCenter(), zoom: z, bearing: a.getBearing(), pitch: a.getPitch(), padding: a.getPadding() });
+      }
+      if (!styled) return;
+      const terrainOn = !!a.getTerrain();
+      if (terrainOn !== !!lens.getTerrain()) lens.setTerrain(terrainOn ? TERRAIN : null);
+    };
+    // at most one camera sync per animation frame (map A fires 'move' many times per frame while flying)
+    const sync = () => {
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    // dragging / resizing the lens or toggling full screen changes only CSS variables / a class on the root
+    const mo = new MutationObserver(sync);
+    if (root) mo.observe(root, { attributes: true, attributeFilter: ['style', 'class'] });
+    lens.once('style.load', () => {
+      lens.setProjection({ type: 'globe' });
+      styled = true;
+      apply();
+      setLensReady(true);
+    });
+    a.on('move', sync);
+    a.on('moveend', sync);
+    lensMap.current = lens;
+    apply();
+    if (import.meta.env.DEV && (window as any).__gsMaps) (window as any).__gsMaps.lens = lens;
+    return () => {
+      a.off('move', sync);
+      a.off('moveend', sync);
+      mo.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+      el.style.cssText = '';
+      lensMap.current = null;
+      if (import.meta.env.DEV && (window as any).__gsMaps) delete (window as any).__gsMaps.lens;
+      setLensReady(false);
+      lens.remove();
+    };
+  }, [loaded, lensOn]);
+
+  // ---- the investigation's NISAR layer inside the lens (drawn over the Sentinel-1 base)
+  const lensNisar = p.lens?.nisar ?? null;
+  useEffect(() => {
+    if (!lensReady || !lensMap.current) return;
+    syncImageLayers(lensMap.current, lensNisar ? [{ layer: lensNisar, opacity: 1 }] : []);
+  }, [lensReady, lensNisar]);
 
   return (
     <main className={`maps ${layoutClass}`} aria-label="Interactive globe">
       <canvas ref={starsEl} className="starfield" aria-hidden="true" />
       <div ref={aEl} className="map a" />
       <div ref={bEl} className="map b" aria-hidden={layoutClass === 'single'} />
+      {lensOn && <div ref={lensEl} className="map lens" aria-hidden="true" data-ready={lensReady} />}
     </main>
   );
 }
+
+export default memo(MapView);
+

@@ -18,12 +18,16 @@ import { georeference, cropBox } from './georef.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const OUT_ROOT = path.resolve(HERE, '../../web/public/data');
 const CACHE = path.resolve(HERE, '../.cache');
+/** Granules listed in events.config.mjs that ASF did not return (a transient search miss looks like "not observed"). */
+const missingGranules = [];
 
 async function download(url, dest) {
   try {
     await fs.access(dest);
     return dest; // cached
-  } catch {}
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e; // only "not cached yet" means download; permissions etc. must surface
+  }
   const res = await fetch(url, { redirect: 'follow' });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   const buf = Buffer.from(await res.arrayBuffer());
@@ -50,6 +54,7 @@ async function processEvent(ev) {
     const feat = found.get(obs.granule);
     if (!feat) {
       console.warn(`  MISSING on ASF: ${obs.granule}`);
+      missingGranules.push(obs.granule);
       continue;
     }
     const p = feat.properties;
@@ -162,11 +167,19 @@ function round(v, d) {
 }
 
 const only = process.argv[2];
+if (only && !EVENTS.some((e) => e.id === only)) {
+  console.error(`Unknown event id "${only}". Known: ${EVENTS.map((e) => e.id).join(', ')}`);
+  process.exit(1);
+}
 const manifestPath = path.join(OUT_ROOT, 'events.json');
 let manifest = { generated: null, events: [] };
 try {
   manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
-} catch {}
+} catch (e) {
+  // A missing manifest is a first run; a corrupt one must not be silently replaced (it holds the
+  // stage-2 derived layers, which would be lost).
+  if (e.code !== 'ENOENT') throw new Error(`Cannot read ${manifestPath}: ${e.message}`);
+}
 for (const ev of EVENTS.filter((e) => !only || e.id === only)) {
   const out = await processEvent(ev);
   // QA-22: keep stage-2 derived layers (process.py) when re-running stage 1.
@@ -178,5 +191,10 @@ for (const ev of EVENTS.filter((e) => !only || e.id === only)) {
 }
 manifest.events.sort((a, b) => EVENTS.findIndex((e) => e.id === a.id) - EVENTS.findIndex((e) => e.id === b.id));
 manifest.generated = new Date().toISOString();
-await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+await fs.writeFile(`${manifestPath}.tmp`, JSON.stringify(manifest, null, 2));
+await fs.rename(`${manifestPath}.tmp`, manifestPath);
 console.log(`\nWrote ${manifestPath}`);
+if (missingGranules.length) {
+  console.error(`\n${missingGranules.length} configured granule(s) were not found on ASF; their layers are missing from the manifest:\n  ${missingGranules.join('\n  ')}`);
+  process.exitCode = 1;
+}

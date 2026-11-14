@@ -193,3 +193,84 @@ test('gateway never logs request bodies or keys', async () => {
   assert.ok(!all.includes('secret-key-xyz'));
   assert.ok(!all.includes('private-question-text'));
 });
+
+// ---- hardening (ECC security review, low findings) ------------------------------------
+import { modelUrlProblem } from '../src/server.mjs';
+
+test('model URL validation: https anywhere, http only to loopback, no embedded credentials', () => {
+  assert.equal(modelUrlProblem(''), null);
+  assert.equal(modelUrlProblem('https://models.example.org/v1/answer'), null);
+  assert.equal(modelUrlProblem('http://127.0.0.1:8799/'), null);
+  assert.equal(modelUrlProblem('http://localhost:8799/'), null);
+  assert.match(modelUrlProblem('http://models.example.org/'), /https/);
+  assert.match(modelUrlProblem('file:///etc/passwd'), /https/);
+  assert.match(modelUrlProblem('not a url'), /valid absolute URL/);
+  assert.match(modelUrlProblem('https://user:pw@models.example.org/'), /credentials/);
+  assert.throws(() => createGateway({ ...configFromEnv({}), modelUrl: 'ftp://x.example/' }), /https/);
+});
+
+test('with TRUST_PROXY the right-most X-Forwarded-For entry is rate-limited (left-most is spoofable)', async () => {
+  const base = await gateway({ rateLimitPerMin: 2, trustProxy: true });
+  const codes = [];
+  // a client rotating a fake left-most address must still hit the limit for the proxy-appended address
+  for (let i = 0; i < 4; i++) codes.push((await post(base, sampleRequest(), { 'X-Forwarded-For': `10.0.0.${i}, 203.0.113.7` })).status);
+  assert.deepEqual(codes, [200, 200, 429, 429]);
+});
+
+test('oversized model response is discarded with 502 model_response_too_large', async () => {
+  const big = http.createServer((req, res) => { req.resume(); res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ pad: 'x'.repeat(5000) })); });
+  await new Promise((r) => big.listen(0, '127.0.0.1', r));
+  started.push(big);
+  const base = await gateway({ modelUrl: `http://127.0.0.1:${big.address().port}/`, maxModelResponseBytes: 1000 });
+  const res = await post(base, sampleRequest());
+  assert.equal(res.status, 502);
+  assert.equal((await res.json()).error.code, 'model_response_too_large');
+});
+
+test('oversized chunked model response (no Content-Length) is also discarded', async () => {
+  const big = http.createServer((req, res) => {
+    req.resume();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    for (let i = 0; i < 20; i++) res.write('"' + 'y'.repeat(500) + '",');
+    res.end('1');
+  });
+  await new Promise((r) => big.listen(0, '127.0.0.1', r));
+  started.push(big);
+  const base = await gateway({ modelUrl: `http://127.0.0.1:${big.address().port}/`, maxModelResponseBytes: 1000 });
+  const res = await post(base, sampleRequest());
+  assert.equal(res.status, 502);
+  assert.equal((await res.json()).error.code, 'model_response_too_large');
+});
+
+// ---- review fixes: same-origin proxy, redirects never leak the key --------------------
+import { sameOriginLoopback } from '../src/server.mjs';
+
+test('same-origin loopback requests are accepted with an empty ALLOWED_ORIGINS; rebinding hosts are not', () => {
+  assert.equal(sameOriginLoopback('http://localhost:5173', 'localhost:5173'), true);
+  assert.equal(sameOriginLoopback('http://127.0.0.1:5173', '127.0.0.1:5173'), true);
+  assert.equal(sameOriginLoopback('http://localhost:5173', '127.0.0.1:8787'), false);   // different host
+  assert.equal(sameOriginLoopback('http://evil.example:8787', 'evil.example:8787'), false); // DNS rebinding
+  assert.equal(sameOriginLoopback('null', 'localhost:5173'), false);
+  assert.equal(sameOriginLoopback('http://localhost:5173', undefined), false);
+});
+
+test('a query POST via the dev proxy (Origin = Host, loopback) is not refused as cross-origin', async () => {
+  const base = await gateway({ allowedOrigins: [] });
+  const host = new URL(base).host;
+  const res = await post(base, sampleRequest(), { Origin: `http://${host}` });
+  assert.equal(res.status, 200);
+});
+
+test('a model redirect is refused and the API key never reaches the redirect target', async () => {
+  const hits = [];
+  const target = http.createServer((req, res) => { hits.push(req.headers); res.end('{}'); });
+  await new Promise((r) => target.listen(0, '127.0.0.1', r));
+  started.push(target);
+  const redirector = http.createServer((req, res) => { req.resume(); res.writeHead(302, { Location: `http://127.0.0.1:${target.address().port}/` }); res.end(); });
+  await new Promise((r) => redirector.listen(0, '127.0.0.1', r));
+  started.push(redirector);
+  const base = await gateway({ modelUrl: `http://127.0.0.1:${redirector.address().port}/`, modelApiKey: 'TEST-KEY-NOT-REAL' });
+  const res = await post(base, sampleRequest());
+  assert.equal(res.status, 502);
+  assert.equal(hits.length, 0);
+});

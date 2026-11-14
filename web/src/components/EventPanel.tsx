@@ -1,9 +1,12 @@
 import type { CompareMode, SarEvent, SarLayer } from '../types';
-import { CATEGORY_COLOR, CATEGORY_LABEL, EVIDENCE_LABEL, evidenceOf, fmtCoord, fmtDate, fmtDateTime, layerLabel } from '../lib';
+import { CATEGORY_COLOR, CATEGORY_LABEL, EVIDENCE_LABEL, evidenceOf, safeHref, fmtCoord, fmtDate, fmtDateTime, layerLabel } from '../lib';
 import { CONCEPTS, EVENT_CONTENT } from '../content/explain';
-import { AssistantPanel } from '../assistant/AssistantPanel';
-import EarthdataPanel from './EarthdataPanel';
-import { useState } from 'react';
+import { Suspense, lazy, memo, useState } from 'react';
+import { IconChevron, IconClose } from './icons';
+
+// Both talk to live services and are only needed when the reader asks for them: keep them out of the first paint.
+const AssistantPanel = lazy(() => import('../assistant/AssistantPanel').then((m) => ({ default: m.AssistantPanel })));
+const EarthdataPanel = lazy(() => import('./EarthdataPanel'));
 
 interface Props {
   event: SarEvent;
@@ -107,12 +110,16 @@ function EarthdataSection({ lon, lat, date }: { lon: number; lat: number; date: 
     return (
       <>
         <h3>Other NASA data here</h3>
-        <p className="muted" style={{ fontSize: 13 }}>Search NASA Earthdata for every satellite dataset covering this place around the event date (optical, thermal, rain, lidar…).</p>
-        <button className="tool" onClick={() => setOpen(true)}>Search NASA Earthdata</button>
+        <p className="muted small">Every NASA dataset covering this place around the event date (optical, thermal, rain, lidar…).</p>
+        <button className="btn" onClick={() => setOpen(true)}>Search NASA Earthdata</button>
       </>
     );
   }
-  return <EarthdataPanel lon={lon} lat={lat} date={date} windowDays={7} onClose={() => setOpen(false)} />;
+  return (
+    <Suspense fallback={<p className="muted small" role="status">Loading the NASA Earthdata search…</p>}>
+      <EarthdataPanel lon={lon} lat={lat} date={date} windowDays={7} onClose={() => setOpen(false)} />
+    </Suspense>
+  );
 }
 
 function Provenance({ label, layer }: { label: string; layer: SarLayer }) {
@@ -150,7 +157,7 @@ function Provenance({ label, layer }: { label: string; layer: SarLayer }) {
         <dt>Processed</dt>
         <dd className="mono">{fmtDate(p.processing_date)} by NISAR SDS</dd>
         <dt>Distributor</dt>
-        <dd>{p.distributor} · <a href={p.browse_source} target="_blank" rel="noopener">browse image</a> · <a href={p.product_url} target="_blank" rel="noopener">full product</a> <span className="faint">(Earthdata login)</span></dd>
+        <dd>{p.distributor} · <a href={safeHref(p.browse_source)} target="_blank" rel="noopener">browse image</a> · <a href={safeHref(p.product_url)} target="_blank" rel="noopener">full product</a> <span className="faint">(Earthdata login)</span></dd>
       </dl>
       <ol>
         {p.processing.map((s, i) => (
@@ -162,7 +169,29 @@ function Provenance({ label, layer }: { label: string; layer: SarLayer }) {
   );
 }
 
-export default function EventPanel(p: Props) {
+/** The assistant checks its gateway as soon as it mounts, so it is mounted only once the reader opens it. */
+function AskSection({ event, before, after, onAfter }: { event: SarEvent; before: SarLayer | null; after: SarLayer | null; onAfter: (id: string) => void }) {
+  const [opened, setOpened] = useState(false);
+  return (
+    <details className="disclosure" onToggle={(e) => (e.currentTarget as HTMLDetailsElement).open && setOpened(true)}>
+      <summary>
+        <span>Ask about this investigation</span>
+        <span className="faint small">AI assistant, cites its sources</span>
+      </summary>
+      {opened && (
+        <Suspense fallback={<p className="muted small" role="status">Loading the assistant…</p>}>
+          <AssistantPanel event={event} before={before} after={after} onSelectLayer={(id) => (event.layers.some((l) => l.id === id) ? onAfter(id) : undefined)} />
+        </Suspense>
+      )}
+    </details>
+  );
+}
+
+/**
+ * Investigation panel. Reading order: what happened (summary) -> compare controls -> what the radar
+ * sees (explanation) -> deeper tools -> provenance and references (collapsed).
+ */
+function EventPanel(p: Props) {
   const ev = p.event;
   const c = EVENT_CONTENT[ev.id];
   const color = CATEGORY_COLOR[ev.category];
@@ -173,27 +202,33 @@ export default function EventPanel(p: Props) {
       <header className="panel-head">
         <div className="kicker">
           <span className="dot" style={{ background: color }} />
-          {CATEGORY_LABEL[ev.category]} · {ev.date ? fmtDate(ev.date) : 'date pending'} · <span className="mono">{fmtCoord(ev.location.lon, ev.location.lat)}</span>
-          <button className="close mobile-only" onClick={p.onToggleCollapsed} aria-label={p.collapsed ? 'Expand panel' : 'Collapse panel'}>{p.collapsed ? '▴' : '▾'}</button>
-          <button className="close" onClick={p.onClose} aria-label="Close investigation">×</button>
+          <span className="kicker-text">
+            {CATEGORY_LABEL[ev.category]} · {ev.date ? fmtDate(ev.date) : 'date pending'} · <span className="mono">{fmtCoord(ev.location.lon, ev.location.lat)}</span>
+          </span>
+          <button className="close mobile-only" onClick={p.onToggleCollapsed} aria-label={p.collapsed ? 'Expand panel' : 'Collapse panel'}>
+            <IconChevron up={p.collapsed} />
+          </button>
+          <button className="close" onClick={p.onClose} aria-label="Close investigation">
+            <IconClose />
+          </button>
         </div>
         <h2>{ev.title}</h2>
         <div className="sub">{ev.subtitle}</div>
       </header>
       <div className="panel-body">
         {c && (
-          <div className="section">
+          <div className="section summary">
             <h3>What happened</h3>
             <p>{c.happened.text}</p>
-            <div className="faint" style={{ fontSize: 12 }}>
-              Source: <a href={c.happened.url} target="_blank" rel="noopener">{c.happened.source}</a>
+            <div className="faint small">
+              Source: <a href={safeHref(c.happened.url)} target="_blank" rel="noopener">{c.happened.source}</a>
             </div>
           </div>
         )}
 
         <div className="section">
           <div className="row spread">
-            <h3 style={{ margin: 0 }}>Compare</h3>
+            <h3>Compare</h3>
             <div className="seg" role="group" aria-label="Comparison mode">
               {(['swipe', 'side', 'overlay'] as CompareMode[]).map((m) => (
                 <button key={m} aria-pressed={p.mode === m} onClick={() => p.onMode(m)}>
@@ -208,8 +243,8 @@ export default function EventPanel(p: Props) {
           {p.after?.legend && p.after.legend.units !== p.before?.legend?.units && <LegendBar label="After" layer={p.after} />}
           {p.after?.legend && p.after.legend.units === p.before?.legend?.units && p.after.legend.vmax !== p.before?.legend?.vmax && <LegendBar label="After" layer={p.after} />}
           {p.mode === 'overlay' && (
-            <label style={{ display: 'block', marginTop: 10 }}>
-              <span className="muted" style={{ fontSize: 12 }}>After opacity {Math.round(p.overlayOpacity * 100)}%</span>
+            <label className="opacity-control">
+              <span className="muted small">After opacity {Math.round(p.overlayOpacity * 100)}%</span>
               <input type="range" min={0} max={1} step={0.01} value={p.overlayOpacity} onChange={(e) => p.onOpacity(parseFloat(e.target.value))} />
             </label>
           )}
@@ -223,7 +258,7 @@ export default function EventPanel(p: Props) {
         {c && (
           <div className="section explain">
             <div className="row spread">
-              <h3 style={{ margin: 0 }}>What the radar sees</h3>
+              <h3>What the radar sees</h3>
               <div className="seg" role="group" aria-label="Explanation level">
                 <button aria-pressed={!sci} onClick={() => p.onLevel('simple')}>Simple</button>
                 <button aria-pressed={sci} onClick={() => p.onLevel('scientific')}>Scientific</button>
@@ -236,7 +271,7 @@ export default function EventPanel(p: Props) {
             </ul>
             <h4>Legend</h4>
             {c.legend.map((l, i) => (
-              <div key={i} style={{ fontSize: 13, margin: '3px 0' }}>
+              <div key={i} className="legend-line">
                 <span className="legend-swatch" style={{ background: l.swatch, width: l.swatch.includes('gradient') ? 40 : 12 }} />
                 {l.label}
               </div>
@@ -247,16 +282,12 @@ export default function EventPanel(p: Props) {
                 {pins.map((pin, i) => {
                   const active = p.activePin === pin.id;
                   return (
-                    <div key={pin.id} style={{ margin: '6px 0' }}>
-                      <button
-                        onClick={() => p.onPin(active ? null : pin.id)}
-                        aria-expanded={active}
-                        style={{ background: 'none', border: 0, padding: 0, cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'center', textAlign: 'left' }}
-                      >
-                        <span className={`pin${active ? ' active' : ''}`} style={{ width: 20, height: 20, fontSize: 11 }}>{i + 1}</span>
-                        <span style={{ fontWeight: 500 }}>{pin.label}</span>
+                    <div key={pin.id} className="pin-row">
+                      <button className="pin-toggle" onClick={() => p.onPin(active ? null : pin.id)} aria-expanded={active}>
+                        <span className={`pin-num${active ? ' active' : ''}`}>{i + 1}</span>
+                        <span>{pin.label}</span>
                       </button>
-                      {active && <p style={{ margin: '6px 0 0 28px' }}>{sci ? pin.scientific : pin.simple}</p>}
+                      {active && <p>{sci ? pin.scientific : pin.simple}</p>}
                     </div>
                   );
                 })}
@@ -269,27 +300,26 @@ export default function EventPanel(p: Props) {
         )}
 
         <div className="section explain">
-          <h3>Radar basics</h3>
-          {CONCEPTS.map((k) => (
-            <details key={k.id} style={{ margin: '4px 0' }}>
-              <summary style={{ cursor: 'pointer' }}>{k.title}</summary>
-              <p style={{ marginTop: 6 }}>{sci ? k.scientific : k.simple}</p>
-            </details>
-          ))}
+          <details className="disclosure">
+            <summary>
+              <span>Radar basics</span>
+              <span className="faint small">{CONCEPTS.length} short explainers</span>
+            </summary>
+            {CONCEPTS.map((k) => (
+              <details key={k.id} className="concept">
+                <summary>{k.title}</summary>
+                <p>{sci ? k.scientific : k.simple}</p>
+              </details>
+            ))}
+          </details>
         </div>
 
         <div className="section">
-          <EarthdataSection lon={ev.location.lon} lat={ev.location.lat} date={ev.date} />
+          <EarthdataSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={ev.date} />
         </div>
 
         <div className="section">
-          <h3>Ask about this investigation</h3>
-          <AssistantPanel
-            event={ev}
-            before={p.before}
-            after={p.after}
-            onSelectLayer={(id) => (ev.layers.some((l) => l.id === id) ? p.onAfter(id) : undefined)}
-          />
+          <AskSection key={ev.id} event={ev} before={p.before} after={p.after} onAfter={p.onAfter} />
         </div>
 
         <div className="section">
@@ -300,10 +330,10 @@ export default function EventPanel(p: Props) {
 
         <div className="section">
           <h3>References</h3>
-          <ul className="refs" style={{ paddingLeft: 18, margin: 0 }}>
+          <ul className="refs">
             {ev.references.map((r) => (
               <li key={r.url}>
-                <a href={r.url} target="_blank" rel="noopener">{r.label}</a>
+                <a href={safeHref(r.url)} target="_blank" rel="noopener">{r.label}</a>
               </li>
             ))}
           </ul>
@@ -312,3 +342,6 @@ export default function EventPanel(p: Props) {
     </section>
   );
 }
+
+export default memo(EventPanel);
+

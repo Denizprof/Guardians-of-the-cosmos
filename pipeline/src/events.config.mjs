@@ -2,6 +2,8 @@
 // ASF DAAC NISAR archive on 2026-11-14 (ASF SearchAPI, dataset=NISAR).
 // Event facts (time, location, magnitude) come from the cited agency pages.
 
+const gcov = (role, granule) => ({ role, product: 'GCOV', granule });
+
 export const EVENTS = [
   {
     id: 'venezuela-2026',
@@ -78,5 +80,44 @@ export const EVENTS = [
         granule: `NISAR_L2_PR_GCOV_${cycle}_060_D_061_4005_DHDH_A_${tail}`,
       };
     }),
+  },
+  {
+    id: 'uniao-do-sul-deforestation-2026',
+    title: 'Amazon clear-cut, União do Sul',
+    subtitle: 'Mato Grosso, Brazil · INPE DETER alert',
+    category: 'deforestation',
+    date: '2026-10-14T00:00:00Z', // DETER view_date (detection), clearing between 26 Sep and 14 Oct per Sentinel-2
+    date_precision: 'detection',
+    location: { lon: -54.0364, lat: -11.3613 },
+    technique: 'backscatter',
+    crop_km: 30,
+    references: [
+      { label: 'INPE DETER (TerraBrasilis), alert deter_amz.41873_curr', url: 'https://terrabrasilis.dpi.inpe.br/en/home-page/' },
+    ],
+    observations: [
+      gcov('timeline', 'NISAR_L2_PR_GCOV_031_002_A_172_2005_DHDH_A_20260918T091907_20260918T091941_P05023_F_F_J_001'),
+      gcov('before', 'NISAR_L2_PR_GCOV_032_002_A_172_2005_DHDH_A_20260930T091907_20260930T091941_P05023_N_F_J_001'),
+      gcov('timeline', 'NISAR_L2_PR_GCOV_033_002_A_172_2005_DHDH_A_20261012T091907_20261012T091941_P05023_N_F_J_001'),
+      gcov('after', 'NISAR_L2_PR_GCOV_034_002_A_172_2005_DHDH_A_20261024T091907_20261024T091942_P05036_N_F_J_001'),
+    ],
+  },
+  {
+    id: 'aspen-acres-fire-2026',
+    title: 'Aspen Acres wildfire',
+    subtitle: 'Custer County, Colorado, USA',
+    category: 'wildfire',
+    date: '2026-06-29T10:21:00Z', // NASA EONET / IRWIN record date
+    location: { lon: -105.0713, lat: 38.0193 },
+    technique: 'backscatter',
+    crop_km: 50,
+    references: [
+      { label: 'NASA EONET event EONET_21019 (IRWIN 2026-COCUX-001160)', url: 'https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21019' },
+    ],
+    observations: [
+      gcov('timeline', 'NISAR_L2_PR_GCOV_023_019_A_021_4005_DHDH_A_20260615T121118_20260615T121152_P05023_N_F_J_001'),
+      gcov('before', 'NISAR_L2_PR_GCOV_024_019_A_021_4005_DHDH_A_20260627T121117_20260627T121152_P05023_N_F_J_001'),
+      gcov('timeline', 'NISAR_L2_PR_GCOV_025_019_A_021_4005_DHDH_A_20260709T121116_20260709T121151_P05023_N_F_J_001'),
+      gcov('after', 'NISAR_L2_PR_GCOV_028_019_A_021_4005_DHDH_A_20260814T121114_20260814T121149_P05023_N_F_J_001'),
+    ],
   },
 ];

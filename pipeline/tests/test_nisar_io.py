@@ -49,7 +49,8 @@ def make_gcov(path, n_r=120, n_c=160, chunk=(40, 40)):
         p.attrs["epsg_code"] = np.uint32(EPSG)
         g.create_dataset("HHHH", data=(rr * 1000.0 + cc).astype("float32"), chunks=chunk)  # value encodes position
         g.create_dataset("HVHV", data=(rr + cc / 1000.0).astype("float32"), chunks=chunk)
-        g.create_dataset("mask", data=np.full((n_r, n_c), 255, np.uint8), chunks=chunk)
+        # NISAR GCOV mask: 1..N = subswath of a valid sample, 0 = invalid, 255 = outside the swath (dataset description)
+        g.create_dataset("mask", data=np.full((n_r, n_c), 1, np.uint8), chunks=chunk)
     return x, y
 
 
@@ -75,6 +76,36 @@ def make_gunw(path, n_r=60, n_c=80, with_iono=True):
 
 def file_bytes(path) -> bytes:
     return path.read_bytes()
+
+
+_REAL_TOKEN_ALLOWED = nisar_io.token_allowed
+
+
+@pytest.fixture(autouse=True)
+def allow_loopback_fixture_server(monkeypatch):
+    """The token allowlist is HTTPS + Earthdata/ASF hosts only; the local fixture server is plain http on
+    127.0.0.1, so tests explicitly allow exactly that loopback origin (production behaviour is tested below)."""
+    monkeypatch.setattr(nisar_io, "token_allowed", lambda url: url.startswith("http://127.0.0.1:") or _REAL_TOKEN_ALLOWED(url))
+
+
+@pytest.mark.parametrize("url,ok", [
+    ("https://nisar.asf.earthdatacloud.nasa.gov/NISAR/x.h5", True),
+    ("https://datapool.asf.alaska.edu/x.h5", True),
+    ("https://urs.earthdata.nasa.gov/x", True),
+    ("http://nisar.asf.earthdatacloud.nasa.gov/NISAR/x.h5", False),   # not HTTPS
+    ("https://asf.alaska.edu.evil.example/x.h5", False),               # suffix trick
+    ("https://evilasf.alaska.edu.example/x.h5", False),
+    ("https://d1234.cloudfront.net/x.h5", False),                     # CDN never gets the token
+    ("https://example.com/x.h5", False),
+])
+def test_token_host_allowlist(url, ok):
+    assert _REAL_TOKEN_ALLOWED(url) is ok
+
+
+def test_remote_file_refuses_to_send_token_to_unlisted_host(token, monkeypatch):
+    monkeypatch.setattr(nisar_io, "token_allowed", _REAL_TOKEN_ALLOWED)
+    with pytest.raises(ValueError, match="Refusing to send the Earthdata token"):
+        RemoteFile("https://example.com/x.h5", token)
 
 
 @pytest.fixture
@@ -197,8 +228,9 @@ def test_rate_limit_429_is_retried(make_server, token, no_sleep):
 def test_server_without_range_support_gives_a_clear_error(make_server, token, no_sleep):
     s = make_server(b"z" * 5000)
     s.ignore_range = True
-    with pytest.raises((OSError, ValueError)):
+    with pytest.raises(nisar_io.RangeNotSupported, match="ignored the HTTP Range"):
         RemoteFile(s.url, token)
+    assert len(s.log) == 1 and no_sleep == []  # a missing Range capability is permanent: no retry storm
 
 
 # ---- redirects (the Earthdata token must never reach the CDN host) -------------------
@@ -349,7 +381,9 @@ def test_read_gcov_end_to_end_over_http(make_server, token, tmp_path, monkeypatc
     assert meta["processingDateTime"] == "2026-08-11T02:08:40"
 
 
-def test_read_gcov_skips_missing_polarisations(make_server, token, tmp_path, monkeypatch):
+def test_read_gcov_missing_polarisation_is_a_clear_error(make_server, token, tmp_path, monkeypatch):
+    """A requested polarisation that the product lacks used to be skipped silently and only failed later
+    with a bare KeyError deep in processing; now it fails at the read with the file and the pols it has."""
     p = tmp_path / "g.h5"
     x, y = make_gcov(p)
     with h5py.File(p, "a") as f:
@@ -361,8 +395,10 @@ def test_read_gcov_skips_missing_polarisations(make_server, token, tmp_path, mon
     to_ll = Transformer.from_crs(EPSG, 4326, always_xy=True)
     w, sth = to_ll.transform(x[10], y[50])
     e, n = to_ll.transform(x[50], y[10])
-    grid, _ = read_gcov(s.url, (w, sth, e, n))
-    assert "HVHV" not in grid.data and "HHHH" in grid.data
+    with pytest.raises(KeyError, match=r"HVHV.*not in product.*HHHH"):
+        read_gcov(s.url, (w, sth, e, n))
+    grid, _ = read_gcov(s.url, (w, sth, e, n), pols=("HHHH",))  # asking only for what exists still works
+    assert "HHHH" in grid.data
 
 
 @pytest.mark.parametrize("with_iono", [True, False])

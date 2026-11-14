@@ -66,7 +66,7 @@ test.describe('accessibility (axe-core)', () => {
       seen.push(
         await page.evaluate(() => {
           const e = document.activeElement as HTMLElement;
-          return `${e.tagName}:${e.getAttribute('aria-label') || e.textContent?.trim().slice(0, 30) || ''}`;
+          return `${e.tagName}:${e.getAttribute('aria-label') || e.textContent?.trim().slice(0, 80) || ''}`; // 80: a strip card reads "<category><date><title>...", the title is not in the first 30 chars
         }),
       );
     }

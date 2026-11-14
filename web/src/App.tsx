@@ -1,18 +1,26 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import MapView from './map/MapView';
 import SearchBox from './components/SearchBox';
 import Filters from './components/Filters';
 import EventPanel from './components/EventPanel';
 import IntroPanel from './components/IntroPanel';
+import ContextPanel from './components/ContextPanel';
 import Timeline from './components/Timeline';
-import { CATALOGS, GROUPS, loadCatalog, loadData, layerLabel } from './lib';
+import SarLens, { type LensGeometry } from './components/SarLens';
+import { IconFilters, IconInfo, IconInvestigations, IconLayers, IconLens, IconProbe, IconClose } from './components/icons';
+import { CATALOGS, CATEGORY_COLOR, CATEGORY_LABEL, GROUPS, fmtDate, loadCatalog, loadData, layerLabel } from './lib';
 import { loadLayerCatalog, toOverlay, type CatalogLayer } from './layers';
 import LayersPanel, { type LayerState } from './components/LayersPanel';
-import { nisarCoverage, type CoverageResult } from './services';
-import { EVENT_CONTENT } from './content/explain';
+import { nisarCoverage, type CoverageResult, type GeocodeHit } from './services';
+import { EVENT_CONTENT, type Pin } from './content/explain';
+import { SAR_LENS_SOURCE, lensDateLabel } from './map/sarLens';
 import type { Category, CompareMode, ContextEvent, SarEvent } from './types';
 
+/** Stable empty list: a fresh [] per render would re-run MapView's pin effect on every App render. */
+const NO_PINS: Pin[] = [];
 const ALL_CATS: Category[] = GROUPS.flatMap((g) => g.categories);
+const PANEL_W = 424; // side panel width + gutters (see --panel-w in styles.css)
+const TECHNIQUE: Record<SarEvent['technique'], string> = { insar: 'Ground motion', backscatter: 'Surface change', timeseries: 'Time series' };
 
 // ---- URL state: #/e/<event>?mode=swipe&b=<layer>&a=<layer>&lvl=simple
 function readHash() {
@@ -43,11 +51,93 @@ function useIsMobile() {
   return m;
 }
 
+/** Window height as state, so layout insets follow rotation / resize (reading it during render went stale). */
+function useViewportHeight() {
+  const [h, setH] = useState(() => window.innerHeight);
+  useEffect(() => {
+    const f = () => setH(window.innerHeight);
+    window.addEventListener('resize', f);
+    return () => window.removeEventListener('resize', f);
+  }, []);
+  return h;
+}
+
+/** What the on-demand side panel shows when no investigation is open. */
+type PanelView = 'none' | 'about' | 'probe' | 'context';
+type Popover = null | 'investigations' | 'filters' | 'layers';
+
+function InvestigationCard({ e, onSelect }: { e: SarEvent; onSelect: (id: string) => void }) {
+  return (
+    <button type="button" className="inv-card" onClick={() => onSelect(e.id)}>
+      <span className="inv-kicker">
+        <span className="dot" style={{ background: CATEGORY_COLOR[e.category] }} />
+        {CATEGORY_LABEL[e.category]}
+        <span className="mono faint">{e.date ? fmtDate(e.date) : 'date pending'}</span>
+      </span>
+      <span className="inv-title">{e.title}</span>
+      <span className="inv-sub">
+        {TECHNIQUE[e.technique]} · {e.layers.length} NISAR layers
+      </span>
+    </button>
+  );
+}
+
+/** Landing strip: the curated investigations, one tap away, without a permanent panel. */
+const InvestigationStrip = memo(function InvestigationStrip({ events, onSelect }: { events: SarEvent[]; onSelect: (id: string) => void }) {
+  if (!events.length) return null;
+  return (
+    <nav className="inv-strip" aria-label="Investigations">
+      {events.map((e) => (
+        <InvestigationCard key={e.id} e={e} onSelect={onSelect} />
+      ))}
+    </nav>
+  );
+});
+
+const InvestigationsMenu = memo(function InvestigationsMenu({ events, selectedId, onSelect, onClose }: { events: SarEvent[]; selectedId: string | null; onSelect: (id: string) => void; onClose: () => void }) {
+  return (
+    <aside className="popover inv-menu" aria-label="Investigations list">
+      <div className="popover-head">
+        <h2>Investigations</h2>
+        <button className="close" onClick={onClose} aria-label="Close investigations list">
+          <IconClose />
+        </button>
+      </div>
+      <div className="popover-body">
+        <p className="muted small">Before and after, from real NISAR radar observations.</p>
+        {events.map((e) => (
+          <button key={e.id} type="button" className="inv-row" aria-current={e.id === selectedId ? 'true' : undefined} onClick={() => onSelect(e.id)}>
+            <span className="dot" style={{ background: CATEGORY_COLOR[e.category] }} />
+            <span className="inv-title">{e.title}</span>
+            <span className="what">
+              {CATEGORY_LABEL[e.category]} · {e.subtitle}
+            </span>
+          </button>
+        ))}
+      </div>
+    </aside>
+  );
+});
+
 export default function App() {
   const [events, setEvents] = useState<SarEvent[]>([]);
   const [context, setContext] = useState<ContextEvent[]>([]);
   const [generated, setGenerated] = useState('');
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [contextError, setContextError] = useState<string | null>(null);
+  const [layersError, setLayersError] = useState<string | null>(null);
+  const [mapErrors, setMapErrors] = useState<Set<string>>(() => new Set());
+  const onMapError = useCallback((where: 'globe' | 'lens', source: string) => {
+    const label =
+      where === 'lens' ? 'SAR lens radar tiles'
+      : source.startsWith('satellite') ? 'satellite imagery'
+      : source === 'dem' ? 'terrain'
+      : source === 'openmaptiles' ? 'labels and borders'
+      : source.startsWith('ov-') ? `satellite layer "${source.slice(3)}"`
+      : source.startsWith('sar-') ? 'NISAR investigation image'
+      : source;
+    setMapErrors((s) => (s.has(label) ? s : new Set(s).add(label)));
+  }, []);
 
   const init = useMemo(readHash, []);
   const [selectedId, setSelectedId] = useState<string | null>(init.event);
@@ -60,7 +150,9 @@ export default function App() {
   const [activePin, setActivePin] = useState<string | null>(null);
   const [visible, setVisible] = useState<Set<Category>>(new Set(ALL_CATS));
   const [showContext, setShowContext] = useState(true);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [panelView, setPanelView] = useState<PanelView>('none');
+  const [ctxSel, setCtxSel] = useState<ContextEvent | null>(null);
+  const [popover, setPopover] = useState<Popover>(null);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [coverageMode, setCoverageMode] = useState(false);
   const [coverage, setCoverage] = useState<CoverageResult | null>(null);
@@ -68,17 +160,29 @@ export default function App() {
   const [coverageError, setCoverageError] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<{ lon: number; lat: number; zoom?: number; bbox?: [number, number, number, number]; nonce: number } | null>(null);
   const isMobile = useIsMobile();
+  const viewportH = useViewportHeight();
   const [activeCatalogs, setActiveCatalogs] = useState<Set<string>>(() => new Set(CATALOGS.filter((c) => c.defaultOn).map((c) => c.id)));
   const [catalogEvents, setCatalogEvents] = useState<Record<string, ContextEvent[]>>({});
   const [catalogErrors, setCatalogErrors] = useState<Record<string, string>>({});
+  /** When each catalog snapshot was built (shown so a "last 24 h" layer is never mistaken for live data). */
+  const [catalogRetrieved, setCatalogRetrieved] = useState<Record<string, string>>({});
   const [years, setYears] = useState<[number, number]>([1900, new Date().getUTCFullYear()]);
   const [probe, setProbe] = useState<{ lon: number; lat: number; date: string | null } | null>(null);
   const [catalogLayers, setCatalogLayers] = useState<CatalogLayer[]>([]);
   const [layerState, setLayerState] = useState<Record<string, LayerState>>({});
-  const [layersOpen, setLayersOpen] = useState(false);
+  const [lensOn, setLensOn] = useState(false);
+  const [lensFull, setLensFull] = useState(false);
+  const [lensChoice, setLensChoice] = useState<'base' | 'nisar'>('base');
+  const appRef = useRef<HTMLDivElement>(null);
+  const lensGeometry = useRef<LensGeometry | null>(null);
 
   useEffect(() => {
-    loadLayerCatalog().then(setCatalogLayers).catch(() => setCatalogLayers([]));
+    loadLayerCatalog()
+      .then(setCatalogLayers)
+      .catch((e: unknown) => {
+        setCatalogLayers([]);
+        setLayersError(e instanceof Error ? e.message : 'unknown error');
+      });
   }, []);
 
   const tileOverlays = useMemo(
@@ -91,31 +195,43 @@ export default function App() {
     for (const id of activeCatalogs) {
       if (catalogEvents[id] || catalogErrors[id]) continue;
       loadCatalog(id)
-        .then((c) => setCatalogEvents((m) => ({ ...m, [id]: c.events })))
+        .then((c) => {
+          setCatalogEvents((m) => ({ ...m, [id]: c.events }));
+          if (typeof c.retrieved === 'string') setCatalogRetrieved((m) => ({ ...m, [id]: c.retrieved }));
+        })
         .catch((e) => setCatalogErrors((m) => ({ ...m, [id]: String(e.message || e) })));
     }
   }, [activeCatalogs, catalogEvents, catalogErrors]);
 
   // everything shown as reported/context markers: recent EONET/USGS + active catalogs, filtered by year
   const mapContext = useMemo(() => {
-    const all = [...(showContext ? context : []), ...[...activeCatalogs].flatMap((id) => catalogEvents[id] ?? [])];
+    // De-duplicate by id (context.json and the USGS catalog both emit usgs-<id>): one marker per event,
+    // preferring the catalog record (it carries the fuller fields), so counts and clicks are not doubled.
+    const byId = new Map<string, ContextEvent>();
+    for (const id of activeCatalogs) for (const e of catalogEvents[id] ?? []) if (!byId.has(e.id)) byId.set(e.id, e);
+    if (showContext) for (const e of context) if (!byId.has(e.id)) byId.set(e.id, e);
+    const all = [...byId.values()];
     return all.filter((e) => {
       const y = new Date(e.date).getUTCFullYear();
       return Number.isNaN(y) || (y >= years[0] && y <= years[1]);
     });
   }, [context, showContext, activeCatalogs, catalogEvents, years]);
+  const mapContextRef = useRef(mapContext);
+  mapContextRef.current = mapContext;
+  const catalogCounts = useMemo(() => Object.fromEntries(Object.entries(catalogEvents).map(([k, v]) => [k, v.length])), [catalogEvents]);
 
   useEffect(() => {
     loadData()
       .then((d) => {
         setEvents(d.events);
         setContext(d.context);
+        setContextError(d.contextError);
         setGenerated(d.generated);
       })
       .catch((e) => setLoadError(String(e.message || e)));
   }, []);
 
-  const selected = events.find((e) => e.id === selectedId) ?? null;
+  const selected = useMemo(() => events.find((e) => e.id === selectedId) ?? null, [events, selectedId]);
   const before = selected?.layers.find((l) => l.id === beforeId) ?? null;
   const after = selected?.layers.find((l) => l.id === afterId) ?? null;
 
@@ -132,6 +248,8 @@ export default function App() {
   // follow external hash changes (pasted/shared links, back/forward)
   useEffect(() => {
     const onHash = () => {
+      // In-page anchors (e.g. assistant citation links "#asst-c-1") are not app routes.
+      if (window.location.hash && !window.location.hash.startsWith('#/')) return;
       const h = readHash();
       setSelectedId(h.event);
       setBeforeId(h.b);
@@ -139,6 +257,13 @@ export default function App() {
       if (h.mode) setMode(h.mode);
       if (h.lvl) setLevel(h.lvl);
       setActivePin(null);
+      if (h.event) {
+        // a linked investigation takes the side panel over, exactly like opening it from the UI
+        setPanelView('none');
+        setCtxSel(null);
+        setPopover(null);
+        clearCoverageRef.current();
+      }
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
@@ -158,27 +283,48 @@ export default function App() {
     else history.replaceState(null, '', hash);
   }, [events.length, selected, mode, beforeId, afterId, level]);
 
+  const covAbort = useRef<AbortController | null>(null);
+  const clearCoverage = useCallback(() => {
+    covAbort.current?.abort(); // a slow probe must not bring cleared results back
+    setCoverage(null);
+    setProbe(null);
+    setCoverageState('idle');
+    setCoverageError(null);
+  }, []);
+  const clearCoverageRef = useRef(clearCoverage);
+  clearCoverageRef.current = clearCoverage;
+
   const selectEvent = useCallback((id: string | null) => {
     setSelectedId(id);
     setBeforeId(null);
     setAfterId(null);
     setActivePin(null);
     setPanelCollapsed(false);
-    if (id) setCoverageMode(false);
-  }, []);
+    if (id) {
+      // an investigation takes the side panel over; probe results must not linger (or reappear on Back)
+      setCoverageMode(false);
+      setPanelView('none');
+      setCtxSel(null);
+      setPopover(null);
+      clearCoverage();
+    }
+  }, [clearCoverage]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && (e.target as HTMLElement)?.tagName !== 'INPUT') selectEvent(null);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [selectEvent]);
+  /** Close whatever the side panel is showing. */
+  const closePanel = useCallback(() => {
+    selectEvent(null);
+    setPanelView('none');
+    setCtxSel(null);
+    clearCoverage();
+  }, [selectEvent, clearCoverage]);
 
-  const covAbort = useRef<AbortController | null>(null);
   const runCoverage = useCallback(async (lon: number, lat: number, date: string | null = null) => {
     setSelectedId(null);
+    setCtxSel(null);
+    setPanelView('probe');
+    setPopover(null);
     setProbe({ lon, lat, date });
+    setCoverage(null);
     setCoverageState('loading');
     setCoverageError(null);
     setPanelCollapsed(false);
@@ -195,40 +341,284 @@ export default function App() {
     }
   }, []);
 
-  // ---- swipe divider, in px from the left edge of the map area
-  const mapWidth = () => (isMobile ? window.innerWidth : window.innerWidth - 424);
-  const [swipeX, setSwipeX] = useState(() => Math.round((window.innerWidth - (window.innerWidth <= 820 ? 0 : 424)) / 2));
-  const dragging = useRef(false);
+  const selectContext = useCallback(
+    (id: string) => {
+      const ev = mapContextRef.current.find((e) => e.id === id);
+      if (!ev) return;
+      clearCoverage();
+      setCtxSel(ev);
+      setPanelView('context');
+      setPanelCollapsed(false);
+      setPopover(null);
+    },
+    [clearCoverage]
+  );
+
+  const panelOpen = !!selected || panelView !== 'none';
+
+  // Focus management (keyboard / screen-reader users): when the side panel opens or switches to new content,
+  // move focus to its heading; when it closes, return focus to the control that opened it (otherwise focus
+  // falls to <body> and the reader loses their place).
+  const panelKey = selected ? `e:${selected.id}` : panelView === 'context' ? `c:${ctxSel?.id ?? ''}` : panelView === 'none' ? null : `v:${panelView}`;
+  const panelReturnFocus = useRef<HTMLElement | null>(null);
+  const prevPanelKey = useRef<string | null>(null);
   useEffect(() => {
-    const move = (e: PointerEvent) => {
-      if (!dragging.current) return;
-      setSwipeX(Math.max(0, Math.min(window.innerWidth, e.clientX)));
+    const prev = prevPanelKey.current;
+    prevPanelKey.current = panelKey;
+    if (panelKey && panelKey !== prev) {
+      if (!prev) panelReturnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const t = window.setTimeout(() => {
+        const h = appRef.current?.querySelector<HTMLElement>('section.panel h2');
+        if (!h) return;
+        h.tabIndex = -1;
+        h.focus({ preventScroll: true });
+      }, 0);
+      return () => window.clearTimeout(t);
+    }
+    if (!panelKey && prev) {
+      const back = panelReturnFocus.current;
+      panelReturnFocus.current = null;
+      if (back?.isConnected && back !== document.body) back.focus({ preventScroll: true });
+      else {
+        // the opener unmounted (e.g. the investigations strip hides while a panel is open): wait for it to
+        // re-render, then land on it or, failing that, on the first toolbar control
+        const t = window.setTimeout(() => {
+          appRef.current?.querySelector<HTMLElement>('.inv-strip button, .topbar .tool')?.focus({ preventScroll: true });
+        }, 0);
+        return () => window.clearTimeout(t);
+      }
+    }
+  }, [panelKey]);
+
+  // Escape steps back one layer at a time: popover, full-screen lens, then the side panel.
+  // Only a "global" Escape counts: never from form controls, the assistant textarea, selects or date pickers.
+  const esc = useRef({ popover, lensFull, panelOpen });
+  esc.current = { popover, lensFull: lensOn && lensFull, panelOpen };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      const inControl = !!t?.closest?.('input, textarea, select, [contenteditable="true"], .maplibregl-popup');
+      if (e.key !== 'Escape' || e.defaultPrevented || inControl) return;
+      if (esc.current.popover) setPopover(null);
+      else if (esc.current.lensFull) setLensFull(false);
+      else if (esc.current.panelOpen) closePanel();
     };
-    const up = () => (dragging.current = false);
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
-    return () => {
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [closePanel]);
+
+  // ---- swipe divider. Its position is a CSS variable on .app (read by the map clip, the handle and the
+  // BEFORE/AFTER tags), written from a ref inside requestAnimationFrame: dragging re-renders nothing in React.
+  // The committed value (pointer up, arrow keys) only feeds aria-valuenow.
+  const freeWidth = useCallback(() => window.innerWidth - (isMobile ? 0 : PANEL_W), [isMobile]);
+  const swipeX = useRef(Math.round((window.innerWidth - (window.innerWidth <= 820 ? 0 : PANEL_W)) / 2));
+  const swipeRaf = useRef(0);
+  const swipeDragging = useRef(false);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const pct = useCallback((x: number) => Math.max(0, Math.min(100, Math.round((x / freeWidth()) * 100))), [freeWidth]);
+  const [swipePct, setSwipePct] = useState(() => pct(swipeX.current));
+  const paintSwipe = useCallback(() => {
+    swipeRaf.current = 0;
+    appRef.current?.style.setProperty('--swipe-x', `${swipeX.current}px`);
+    handleRef.current?.setAttribute('aria-valuenow', String(pct(swipeX.current)));
+  }, [pct]);
+  const moveSwipe = useCallback(
+    (x: number, commit: boolean) => {
+      // clamp to the visible map (not the window): past freeWidth the handle hides under the side panel
+      swipeX.current = Math.max(0, Math.min(freeWidth(), Math.round(x)));
+      if (!swipeRaf.current) swipeRaf.current = requestAnimationFrame(paintSwipe);
+      if (commit) setSwipePct(pct(swipeX.current));
+    },
+    [paintSwipe, pct, freeWidth]
+  );
+  useLayoutEffect(() => {
+    // (re)centre in the free part of the map whenever an investigation opens or the layout flips
+    if (!selectedId) return;
+    swipeX.current = Math.round(freeWidth() / 2);
+    paintSwipe();
+    setSwipePct(pct(swipeX.current));
+  }, [selectedId, freeWidth, paintSwipe, pct]);
+  useEffect(() => () => cancelAnimationFrame(swipeRaf.current), []);
+  const onSwipeDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    swipeDragging.current = true;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const onSwipeMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (swipeDragging.current) moveSwipe(e.clientX, false);
+  };
+  const onSwipeUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!swipeDragging.current) return;
+    swipeDragging.current = false;
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+    moveSwipe(swipeX.current, true);
+  };
+
+  const pins = (selected && EVENT_CONTENT[selected.id]?.pins) || NO_PINS;
+  const sheet = Math.round(viewportH * 0.52); // matches the 52vh mobile sheet in styles.css
+  const insetRight = !isMobile && panelOpen ? PANEL_W : 0;
+  const insetBottom = isMobile ? (panelOpen ? sheet + 84 : 84 + 96) : selected ? 116 : 0;
+  const panelInset = useMemo(() => ({ right: insetRight, bottom: insetBottom }), [insetRight, insetBottom]);
+
+  const focus = useMemo(() => {
+    if (selected) return null;
+    if (panelView === 'context' && ctxSel) return { lon: ctxSel.lon, lat: ctxSel.lat };
+    if (panelView === 'probe' && probe) return { lon: probe.lon, lat: probe.lat };
+    return null;
+  }, [selected, panelView, ctxSel, probe]);
+
+  // ---- SAR lens
+  const lensNisar = lensOn && lensChoice === 'nisar' && selected && after ? after : null;
+  const lensProp = useMemo(() => (lensOn ? { nisar: lensNisar } : null), [lensOn, lensNisar]);
+  const lensInfo = useMemo(() => {
+    if (lensNisar) {
+      const pr = lensNisar.provenance;
+      return {
+        label: `${pr.mission} ${lensNisar.product} (this investigation), ${layerLabel(lensNisar)}`,
+        note: 'investigation footprint only',
+        provenance: [
+          `${pr.mission} · ${pr.sensor}. Product ${lensNisar.product}, data tier ${pr.tier}.`,
+          `Granule ${pr.granule}. Track ${pr.track}, frame ${pr.frame}, ${pr.direction.toLowerCase()}.`,
+          `Distributor: ${pr.distributor}. ${pr.credit}`,
+          `Outside this footprint the lens shows ${SAR_LENS_SOURCE.label}, ${lensDateLabel(SAR_LENS_SOURCE)}.`,
+        ],
+      };
+    }
+    const date = lensDateLabel(SAR_LENS_SOURCE);
+    return {
+      label: `${SAR_LENS_SOURCE.label}${date ? `, ${date}` : ''}`,
+      note: SAR_LENS_SOURCE.partial ? SAR_LENS_SOURCE.partialNote : null,
+      provenance: SAR_LENS_SOURCE.provenance,
     };
+    // lensOn: the date range is recomputed each time the lens opens, the same moment MapView builds the
+    // lens tile URLs, so the label and the tiles always name the same days (also across a UTC midnight).
+  }, [lensNisar, lensOn]);
+  const lensChoiceProp = useMemo(
+    () => (selected && after ? { value: lensChoice, baseLabel: 'Global mosaic', nisarLabel: 'This investigation', onChange: setLensChoice } : null),
+    [selected, after, lensChoice]
+  );
+  const closeLens = useCallback(() => {
+    setLensOn(false);
+    setLensFull(false);
   }, []);
 
-  const pins = selected ? EVENT_CONTENT[selected.id]?.pins ?? [] : [];
-  const panelInset = isMobile ? { right: 0, bottom: Math.round(window.innerHeight * 0.52) + 84 } : { right: 424, bottom: 116 };
+  // ---- stable callbacks for the memoized children
+  const onMapClick = useCallback(
+    (lon: number, lat: number) => {
+      if (coverageMode && !selected) runCoverage(lon, lat);
+    },
+    [coverageMode, selected, runCoverage]
+  );
+  const onMapPin = useCallback((id: string) => setActivePin((cur) => (cur === id ? null : id)), []);
+  const onPlace = useCallback(
+    (hit: GeocodeHit) => {
+      selectEvent(null);
+      setFlyTo({ lon: hit.lon, lat: hit.lat, bbox: hit.extent, zoom: 8, nonce: Date.now() });
+      runCoverage(hit.lon, hit.lat);
+    },
+    [selectEvent, runCoverage]
+  );
+  const onToggleCatalog = useCallback((id: string) => {
+    // Toggling a failed catalog is the retry: clear its error so the load effect tries again
+    // (loadCatalog drops failed promises from its cache).
+    setCatalogErrors((m) => {
+      if (!(id in m)) return m;
+      const { [id]: _drop, ...rest } = m;
+      return rest;
+    });
+    setActiveCatalogs((s) => {
+      const n = new Set(s);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
+  }, []);
+  const onSetVisible = useCallback(
+    (cats: Category[], on: boolean) =>
+      setVisible((s) => {
+        const n = new Set(s);
+        cats.forEach((c) => (on ? n.add(c) : n.delete(c)));
+        return n;
+      }),
+    []
+  );
+  const onLayerChange = useCallback((id: string, s: LayerState) => setLayerState((m) => ({ ...m, [id]: s })), []);
+  const closePopover = useCallback(() => setPopover(null), []);
+  const toggleCollapsed = useCallback(() => setPanelCollapsed((v) => !v), []);
+  const onTimelinePick = useCallback((id: string) => (slot === 'before' ? setBeforeId(id) : setAfterId(id)), [slot]);
+  const toggle = (p: Exclude<Popover, null>) => setPopover((cur) => (cur === p ? null : p));
 
   if (loadError) {
     return (
-      <div className="app" style={{ display: 'grid', placeItems: 'center' }}>
-        <div className="panel" style={{ position: 'static', width: 420, height: 'auto', padding: 20 }}>
-          <h2 style={{ marginTop: 0 }}>Data package missing</h2>
-          <p className="muted">Could not load the event data ({loadError}). Run the pipeline first: <span className="mono">cd pipeline &amp;&amp; node src/fetch-browse.mjs</span></p>
+      <div className="app error-screen">
+        <div className="error-card">
+          <h2>Data package missing</h2>
+          <p className="muted">
+            Could not load the event data ({loadError}). Run the pipeline first: <span className="mono">cd pipeline &amp;&amp; node src/fetch-browse.mjs</span>
+          </p>
         </div>
       </div>
     );
   }
 
+  const appClass = ['app', panelOpen ? 'has-panel' : '', selected ? 'has-event' : '', coverageMode && !selected ? 'probing' : '', lensOn ? (lensFull ? 'lens-on lens-full' : 'lens-on') : '']
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <div className="app">
+    <div className={appClass} ref={appRef} data-ready={events.length > 0}>
+      <header className="topbar">
+        <h1 className="brand">
+          <b>GLOBAL SAR</b>
+          <span className="mono">Earth change explorer</span>
+        </h1>
+        <SearchBox events={events} onEvent={selectEvent} onPlace={onPlace} />
+        <div className="tools" role="toolbar" aria-label="Map tools">
+          <button className="tool" aria-expanded={popover === 'investigations'} onClick={() => toggle('investigations')} title="Curated before/after investigations" aria-label="Investigations">
+            <IconInvestigations />
+            <span className="tool-label">Investigations</span>
+          </button>
+          <button className="tool" aria-expanded={popover === 'filters'} onClick={() => toggle('filters')} title="Categories, event catalogs and years" aria-label="Filters">
+            <IconFilters />
+            <span className="tool-label">Filters</span>
+          </button>
+          <button
+            className="tool"
+            aria-expanded={popover === 'layers'}
+            onClick={() => toggle('layers')}
+            title="Global satellite layers (NASA, ESA, partners)"
+            aria-label={`Satellite layers${tileOverlays.length ? ` (${tileOverlays.length})` : ''}`}
+          >
+            <IconLayers />
+            <span className="tool-label">Satellite layers</span>
+            {tileOverlays.length > 0 && <span className="tool-count">{tileOverlays.length}</span>}
+          </button>
+          <button className="tool sar" aria-pressed={lensOn} onClick={() => (lensOn ? closeLens() : setLensOn(true))} title="A movable square that shows the same view in radar" aria-label="SAR lens">
+            <IconLens />
+            <span className="tool-label">SAR lens</span>
+          </button>
+          {!selected && (
+            <button className="tool" aria-pressed={coverageMode} onClick={() => setCoverageMode((v) => !v)} title="Click the map to list real NISAR acquisitions there" aria-label="Coverage probe">
+              <IconProbe />
+              <span className="tool-label">Coverage probe</span>
+            </button>
+          )}
+          <button
+            className="tool icon-only"
+            aria-pressed={!selected && panelView === 'about'}
+            onClick={() => {
+              if (!selected && panelView === 'about') return closePanel();
+              closePanel();
+              setPanelView('about');
+              setPanelCollapsed(false);
+              setPopover(null);
+            }}
+            title="About Global SAR, data credits"
+            aria-label="About Global SAR"
+          >
+            <IconInfo />
+          </button>
+        </div>
+      </header>
+
       <MapView
         events={events}
         context={mapContext}
@@ -238,126 +628,123 @@ export default function App() {
         before={before}
         after={after}
         mode={mode}
-        swipeX={swipeX}
         overlayOpacity={overlayOpacity}
         coverage={selected ? null : coverage}
         pins={pins}
         activePin={activePin}
         panelInset={panelInset}
         onSelectEvent={selectEvent}
-        onMapClick={(lon, lat) => {
-          if (coverageMode && !selected) runCoverage(lon, lat);
-        }}
-        onCheckCoverage={runCoverage}
-        onPin={(id) => setActivePin((cur) => (cur === id ? null : id))}
+        onSelectContext={selectContext}
+        onMapClick={onMapClick}
+        onPin={onMapPin}
         flyTo={flyTo}
         tileOverlays={tileOverlays}
+        focus={focus}
+        lens={lensProp}
+        onMapError={onMapError}
       />
+
+      {mapErrors.size > 0 && (
+        <div className="map-error" role="alert">
+          <span>Some map data failed to load: {[...mapErrors].join(', ')}. What you see may be incomplete; it does not mean there is no data.</span>
+          <button type="button" className="link" onClick={() => setMapErrors(new Set())}>Dismiss</button>
+        </div>
+      )}
 
       {selected && mode === 'swipe' && (
         <>
           <div
+            ref={handleRef}
             className="swipe-handle"
-            style={{ left: swipeX }}
-            onPointerDown={(e) => {
-              dragging.current = true;
-              (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-            }}
+            onPointerDown={onSwipeDown}
+            onPointerMove={onSwipeMove}
+            onPointerUp={onSwipeUp}
+            onPointerCancel={onSwipeUp}
             role="slider"
             aria-label="Swipe between before and after"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={Math.round((swipeX / mapWidth()) * 100)}
+            aria-valuenow={swipePct}
+            aria-valuetext={`${swipePct} percent before, ${100 - swipePct} percent after`}
+            aria-orientation="horizontal"
             tabIndex={0}
             onKeyDown={(e) => {
-              if (e.key === 'ArrowLeft') setSwipeX((x) => Math.max(0, x - 24));
-              if (e.key === 'ArrowRight') setSwipeX((x) => Math.min(window.innerWidth, x + 24));
+              const step = e.shiftKey ? 96 : 24;
+              const to =
+                e.key === 'ArrowLeft' ? swipeX.current - step
+                : e.key === 'ArrowRight' ? swipeX.current + step
+                : e.key === 'Home' ? 0
+                : e.key === 'End' ? freeWidth()
+                : null;
+              if (to === null) return;
+              e.preventDefault(); // keep the arrows from also panning the map / scrolling the page
+              moveSwipe(to, true);
             }}
           >
             <div className="grip">⇔</div>
           </div>
-          {before && <div className="map-tag" style={{ left: Math.max(12, swipeX - 250), maxWidth: 236, textAlign: 'right' }}>BEFORE · {layerLabel(before)}</div>}
-          {after && <div className="map-tag" style={{ left: swipeX + 12 }}>AFTER · {layerLabel(after)}</div>}
+          {before && <div className="map-tag swipe-before">BEFORE · {layerLabel(before)}</div>}
+          {after && <div className="map-tag swipe-after">AFTER · {layerLabel(after)}</div>}
         </>
       )}
       {selected && mode === 'side' && (
         <>
-          {before && <div className="map-tag" style={{ left: 12 }}>BEFORE · {layerLabel(before)}</div>}
-          {after && <div className="map-tag" style={{ left: isMobile ? 12 : 'calc(50% + 12px)', top: isMobile ? 'calc(50% + 12px)' : undefined }}>AFTER · {layerLabel(after)}</div>}
+          {before && <div className="map-tag side-before">BEFORE · {layerLabel(before)}</div>}
+          {after && <div className="map-tag side-after">AFTER · {layerLabel(after)}</div>}
         </>
       )}
       {selected && mode === 'overlay' && before && after && (
-        <div className="map-tag" style={{ left: 12 }}>
+        <div className="map-tag side-before">
           BEFORE {layerLabel(before)} · AFTER {layerLabel(after)} at {Math.round(overlayOpacity * 100)}%
         </div>
       )}
 
-      <div className="topbar">
-        <div className="brand">
-          <b>GLOBAL SAR</b>
-          <span className="mono">Earth change explorer</span>
-        </div>
-        <SearchBox
-          events={events}
-          onEvent={selectEvent}
-          onPlace={(hit) => {
-            selectEvent(null);
-            setFlyTo({ lon: hit.lon, lat: hit.lat, bbox: hit.extent, zoom: 8, nonce: Date.now() });
-            runCoverage(hit.lon, hit.lat);
-          }}
-        />
-        {!selected && (
-          <button className="tool" aria-pressed={coverageMode} onClick={() => setCoverageMode((v) => !v)} title="Click the map to list real NISAR acquisitions there">
-            ◎ Coverage probe
-          </button>
-        )}
-        <button className="tool" aria-pressed={layersOpen} onClick={() => setLayersOpen((v) => !v)} title="Global satellite layers (NASA, ESA, partners)">
-          ▦ Satellite layers{tileOverlays.length ? ` (${tileOverlays.length})` : ''}
-        </button>
-        <button className="tool mobile-only" aria-pressed={filtersOpen} onClick={() => setFiltersOpen((v) => !v)}>
-          Filters
-        </button>
-      </div>
-
-      {layersOpen && (
-        <LayersPanel
-          layers={catalogLayers}
-          state={layerState}
-          level={level}
-          onChange={(id, s) => setLayerState((m) => ({ ...m, [id]: s }))}
-          onClose={() => setLayersOpen(false)}
+      {lensOn && (
+        <SarLens
+          rootRef={appRef}
+          geometry={lensGeometry}
+          full={lensFull}
+          label={lensInfo.label}
+          note={lensInfo.note}
+          provenance={lensInfo.provenance}
+          attribution={SAR_LENS_SOURCE.attribution}
+          choice={lensChoiceProp}
+          insetRight={insetRight}
+          insetBottom={insetBottom}
+          onFull={setLensFull}
+          onClose={closeLens}
         />
       )}
-      {!selected && !layersOpen && (
+
+      {coverageMode && !selected && (
+        <div className="hint" role="status">
+          Coverage probe on: click anywhere on the globe
+        </div>
+      )}
+
+      {popover === 'investigations' && <InvestigationsMenu events={events} selectedId={selectedId} onSelect={selectEvent} onClose={closePopover} />}
+      {popover === 'layers' && <LayersPanel layers={catalogLayers} state={layerState} level={level} onChange={onLayerChange} onClose={closePopover} error={layersError} />}
+      {popover === 'filters' && (
         <Filters
           events={events}
           context={mapContext}
           visible={visible}
           showContext={showContext}
-          open={filtersOpen}
           activeCatalogs={activeCatalogs}
-          catalogCounts={Object.fromEntries(Object.entries(catalogEvents).map(([k, v]) => [k, v.length]))}
+          catalogCounts={catalogCounts}
           catalogErrors={catalogErrors}
-          onToggleCatalog={(id) =>
-            setActiveCatalogs((s) => {
-              const n = new Set(s);
-              n.has(id) ? n.delete(id) : n.add(id);
-              return n;
-            })
-          }
+          catalogRetrieved={catalogRetrieved}
+          contextError={contextError}
+          onToggleCatalog={onToggleCatalog}
           years={years}
           onYears={setYears}
-          onSetVisible={(cats, on) =>
-            setVisible((s) => {
-              const n = new Set(s);
-              cats.forEach((c) => (on ? n.add(c) : n.delete(c)));
-              return n;
-            })
-          }
+          onSetVisible={onSetVisible}
           onShowContext={setShowContext}
-          onSelect={selectEvent}
+          onClose={closePopover}
         />
       )}
+
+      {!panelOpen && <InvestigationStrip events={events} onSelect={selectEvent} />}
 
       {selected ? (
         <EventPanel
@@ -375,39 +762,31 @@ export default function App() {
           onOpacity={setOverlayOpacity}
           onLevel={setLevel}
           onPin={setActivePin}
-          onClose={() => selectEvent(null)}
-          onToggleCollapsed={() => setPanelCollapsed((v) => !v)}
+          onClose={closePanel}
+          onToggleCollapsed={toggleCollapsed}
         />
-      ) : (
+      ) : panelView === 'context' && ctxSel ? (
+        <ContextPanel key={ctxSel.id} event={ctxSel} collapsed={panelCollapsed} onCheckCoverage={runCoverage} onClose={closePanel} onToggleCollapsed={toggleCollapsed} />
+      ) : panelView === 'about' || panelView === 'probe' ? (
         <IntroPanel
           events={events}
           generated={generated}
-          coverage={coverage}
-          coverageState={coverageState}
+          coverage={panelView === 'probe' ? coverage : null}
+          coverageState={panelView === 'probe' ? coverageState : 'idle'}
           coverageError={coverageError}
           coverageMode={coverageMode}
-          probe={probe}
+          probe={panelView === 'probe' ? probe : null}
           collapsed={panelCollapsed}
           onSelect={selectEvent}
           onCoverageMode={setCoverageMode}
-          onClearCoverage={() => {
-            setCoverage(null);
-            setProbe(null);
-          }}
-          onToggleCollapsed={() => setPanelCollapsed((v) => !v)}
+          onClearCoverage={closePanel}
+          onToggleCollapsed={toggleCollapsed}
+          onClose={closePanel}
         />
-      )}
+      ) : null}
 
-      {selected && (
-        <Timeline
-          event={selected}
-          before={before}
-          after={after}
-          slot={slot}
-          onSlot={setSlot}
-          onPick={(id) => (slot === 'before' ? setBeforeId(id) : setAfterId(id))}
-        />
-      )}
+      {selected && <Timeline event={selected} before={before} after={after} slot={slot} onSlot={setSlot} onPick={onTimelinePick} />}
     </div>
   );
 }
+

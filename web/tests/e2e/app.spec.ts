@@ -1,4 +1,4 @@
-import { appReady, expect, featured, hashOf, hashParams, mockServices, panel, test } from './fixtures';
+import { aboutPanel, anyPanel, appReady, expect, featured, hashOf, hashParams, mockServices, openAbout, panel, probePanel, strip, test } from './fixtures';
 
 test.describe('landing page', () => {
   test('loads, shows the globe canvas, the brand and the investigations list', async ({ page }) => {
@@ -9,8 +9,10 @@ test.describe('landing page', () => {
     const box = await canvas.boundingBox();
     expect(box!.width).toBeGreaterThan(400);
     expect(box!.height).toBeGreaterThan(400);
-    // the left list offers the three curated investigations
+    // the landing strip offers the curated investigations
     for (const t of [/Venezuela earthquakes/, /Limpopo and Incomati floods/, /Krasheninnikov volcano/]) await expect(featured(page, t)).toBeVisible();
+    // panels are on demand: nothing is open on landing
+    await expect(anyPanel(page)).toHaveCount(0);
     // landing URL is the clean root state
     expect(['', '#/']).toContain(hashOf(page));
   });
@@ -31,16 +33,18 @@ test.describe('landing page', () => {
     expect(res.status()).toBe(200);
   });
 
-  test('intro panel explains the app and the data package date', async ({ page }) => {
+  test('the About panel (opened from the top bar) explains the app and the data package date', async ({ page }) => {
     await appReady(page);
-    const intro = page.locator('section[aria-label="About Global SAR"]');
+    await openAbout(page);
+    const intro = aboutPanel(page);
+    await expect(intro.getByRole('heading', { level: 2 })).toContainText('See what happened');
     await expect(intro).toContainText('NISAR');
     await expect(intro).toContainText('Data package built');
   });
 });
 
 test.describe('event selection', () => {
-  test('clicking an investigation in the left list opens its panel and sets the URL hash', async ({ page }) => {
+  test('clicking an investigation in the landing strip opens its panel and sets the URL hash', async ({ page }) => {
     await appReady(page);
     await featured(page, /Venezuela earthquakes/).click();
     await expect(panel(page).getByRole('heading', { level: 2 })).toHaveText('Venezuela earthquakes');
@@ -65,13 +69,15 @@ test.describe('event selection', () => {
     }
   });
 
-  test('Escape closes the investigation and restores the intro and a clean hash', async ({ page }) => {
+  test('Escape closes the investigation and restores the landing view and a clean hash', async ({ page }) => {
     await appReady(page);
     await featured(page, /Limpopo/).click();
     await expect(panel(page)).toBeVisible();
+    await expect(strip(page)).toHaveCount(0); // the strip steps aside while a panel is open
     await page.keyboard.press('Escape');
     await expect(panel(page)).toHaveCount(0);
-    await expect(page.locator('section[aria-label="About Global SAR"]')).toBeVisible();
+    await expect(anyPanel(page)).toHaveCount(0);
+    await expect(featured(page, /Limpopo/)).toBeVisible();
     await expect.poll(() => hashOf(page)).toBe('#/');
   });
 
@@ -99,7 +105,8 @@ test.describe('event selection', () => {
     // ISSUE-QA-07 (fixed during the audit): the app used history.replaceState, so Back left the site (about:blank).
     await expect(panel(page)).toHaveCount(0);
     await expect.poll(() => hashOf(page)).toBe('#/');
-    await expect(page.locator('section[aria-label="About Global SAR"]')).toBeVisible();
+    await expect(anyPanel(page)).toHaveCount(0);
+    await expect(featured(page, /Limpopo/)).toBeVisible();
   });
 });
 
@@ -246,8 +253,8 @@ test.describe('deep links', () => {
 
   test('an unknown event id degrades to the landing state without errors', async ({ page }) => {
     await page.goto('/#/e/does-not-exist?mode=swipe');
-    await expect(page.locator('section[aria-label="About Global SAR"]')).toBeVisible();
-    await expect(panel(page)).toHaveCount(0);
+    await expect(featured(page, /Venezuela/)).toBeVisible();
+    await expect(anyPanel(page)).toHaveCount(0);
     await expect.poll(() => hashOf(page)).toBe('#/');
   });
 
@@ -276,7 +283,7 @@ test.describe('search', () => {
     const opt = page.getByRole('option', { name: /10\.5000, -67\.2000/ });
     await expect(opt).toBeVisible();
     await box.press('Enter');
-    const intro = page.locator('section[aria-label="About Global SAR"]');
+    const intro = probePanel(page);
     await expect(intro.getByText('NISAR data at this point')).toBeVisible();
     await expect(intro).toContainText('10.5000, -67.2000');
     expect(calls.asf.length).toBe(1);
@@ -284,7 +291,8 @@ test.describe('search', () => {
     expect(calls.photon).toHaveLength(0); // coordinates never hit the geocoder
     await expect(intro.locator('.coverage-list li').first()).toBeVisible();
     await intro.getByRole('button', { name: 'Clear coverage' }).click();
-    await expect(intro.getByText('NISAR data at this point')).toHaveCount(0);
+    await expect(page.getByText('NISAR data at this point')).toHaveCount(0);
+    await expect(anyPanel(page)).toHaveCount(0); // clearing the probe closes its panel
   });
 
   test('hemisphere-letter coordinates are understood ("10.5N 67.2W")', async ({ page }) => {
@@ -368,7 +376,9 @@ test.describe('data package over HTTP', () => {
   test('the app still works when context.json is missing (events layer is optional)', async ({ page, problems }) => {
     await page.route('**/data/context.json', (r) => r.fulfill({ status: 404, body: 'nope' }));
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 2 }).first()).toContainText('See what happened');
+    await expect(featured(page, /Venezuela/)).toBeVisible();
+    await openAbout(page);
+    await expect(aboutPanel(page).getByRole('heading', { level: 2 })).toContainText('See what happened');
     problems.errors.splice(0, problems.errors.length, ...problems.errors.filter((e) => !e.includes('context.json')));
   });
 });

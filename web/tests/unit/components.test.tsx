@@ -401,8 +401,14 @@ describe('IntroPanel (coverage states)', () => {
   it('empty: explains that no public NISAR product covers the point', () => {
     const c: CoverageResult = { lon: 0, lat: 0, total: 0, granules: [] };
     render(<IntroPanel {...props({ coverage: c })} />);
-    expect(screen.getByText(/No public NISAR GCOV or GUNW products cover this point yet/)).toBeInTheDocument();
+    expect(screen.getByText(/No public routine NISAR GCOV or GUNW products cover this point yet/)).toBeInTheDocument();
     expect(screen.getByText('0.0000, 0.0000')).toBeInTheDocument();
+    expect(screen.queryByText(/Urgent Response/)).toBeNull();
+  });
+  it('empty but with Urgent Response products: says they exist instead of implying no data at all', () => {
+    const c: CoverageResult = { lon: 0, lat: 0, total: 0, granules: [], urgentResponse: 3 };
+    render(<IntroPanel {...props({ coverage: c })} />);
+    expect(screen.getByText(/3 Urgent Response product\(s\) exist here/)).toBeInTheDocument();
   });
   it('result: summarises products, tracks, tiers and lists granules from the recorded ASF response', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => asf }) as Response));
@@ -417,15 +423,25 @@ describe('IntroPanel (coverage states)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Clear coverage' }));
     expect(p.onClearCoverage).toHaveBeenCalledOnce();
   });
-  it('result: shows "250+" when the ASF page limit was hit, and caps the list at 8', () => {
+  it('result: shows "N+" and "oldest listed" when the ASF page limit was hit, and caps the list at 8', () => {
     const g = (i: number) => ({
       scene: `S${i}`, product: 'GCOV', start: `2026-01-${String((i % 28) + 1).padStart(2, '0')}T00:00:00Z`, tier: 'BETA',
       track: 1 + (i % 3), frame: 1, direction: 'ASCENDING', footprint: { type: 'Polygon', coordinates: [] } as never,
     });
-    const c: CoverageResult = { lon: 1, lat: 2, total: 250, granules: Array.from({ length: 250 }, (_, i) => g(i)) };
+    // 248 listed after dropping 2 Urgent Response rows from a capped 250-row response: still truncated
+    const c: CoverageResult = { lon: 1, lat: 2, total: 248, granules: Array.from({ length: 248 }, (_, i) => g(i)), truncated: true, urgentResponse: 2 };
     const { container } = render(<IntroPanel {...props({ coverage: c })} />);
-    expect(container.querySelector('.stat')).toHaveTextContent('250+');
+    expect(container.querySelector('.stat')).toHaveTextContent('248+');
+    expect(screen.getByText(/oldest listed/)).toBeInTheDocument();
+    expect(screen.getByText(/2 Urgent Response product\(s\) here are not listed/)).toBeInTheDocument();
     expect(container.querySelectorAll('.coverage-list li')).toHaveLength(8);
+  });
+  it('result: an exact (untruncated) count has no "+" and says "earliest"', () => {
+    const g = { scene: 'S1', product: 'GCOV', start: '2026-01-05T00:00:00Z', tier: 'BETA', track: 1, frame: 1, direction: 'ASCENDING', footprint: { type: 'Polygon', coordinates: [] } as never };
+    const c: CoverageResult = { lon: 1, lat: 2, total: 1, granules: [g], truncated: false };
+    const { container } = render(<IntroPanel {...props({ coverage: c })} />);
+    expect(container.querySelector('.stat')).toHaveTextContent(/^1$/);
+    expect(screen.getByText(/earliest/)).toBeInTheDocument();
   });
   it('coverage probe button toggles coverage mode and reflects it via aria-pressed', async () => {
     const p = props({ coverageMode: true });

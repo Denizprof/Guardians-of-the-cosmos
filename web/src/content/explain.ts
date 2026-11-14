@@ -128,7 +128,7 @@ export const EVENT_CONTENT: Record<string, EventContent> = {
     },
     readSimple: [
       'The default view is our measurement of radar brightness on 5 and 17 January around Chókwè. Dark = the pulse bounced away, which is what calm water does.',
-      'Pick “water mask” in the AFTER slot: bright blue = roughly 320–400 km² of new water on 17 January, mostly across the Limpopo floodplain and its irrigated fields. Muted blue = roughly 330–480 km² that was water on both dates (river channels, lakes, wetlands). The ranges come from two ways of smoothing the radar speckle.',
+      'Pick “water mask” in the AFTER slot: bright blue = roughly 320–380 km² of new water on 17 January, mostly across the Limpopo floodplain and its irrigated fields. Muted blue = roughly 330–480 km² that was water on both dates (river channels, lakes, wetlands). The ranges come from two ways of smoothing the radar speckle.',
       'Pick “change (dB)” to see where it got darker (blue) or brighter (red). The whole area got a little brighter, most likely because rain wetted the soil: that is why we only count new water where the ground also got much darker.',
       'Colour shows which of two radar "listening" channels was stronger: green leans to HV (vegetation), pink/magenta leans to HH (surfaces, buildings, and plants standing in water). White = both strong.',
       'Radar sees through the clouds that cover floods, which is why it is used in disasters like this.',
@@ -137,7 +137,7 @@ export const EVENT_CONTENT: Record<string, EventContent> = {
       'Product: NISAR L2 GCOV (geocoded, terrain-flattened backscatter γ⁰), dual-pol HH/HV, track 114 ascending, frame 165. Browse composite per NISAR QA defaults: R = HH, G = HV, B = HH; each channel in linear power, clipped to its own 5th–95th percentile, gamma 0.5. Because each date is stretched independently, brightness is not comparable quantitatively between dates.',
       'Open water appears as very low backscatter in both channels (specular reflection). An HH increase relative to HV in vegetated floodplains can indicate flooded vegetation via trunk–water double bounce, which L-band detects beneath canopies.',
       'Derived layers: GCOV HHHH/HVHV read for 32.75–33.35°E, 24.35–24.85°S (3,370 km²), display layers use a 5×5 boxcar on linear power, classification a 3×3 median of dB (edge-preserving). The 17 Jan HH histogram is bimodal (water peak ≈ −18 dB, land ≈ −6 dB). Otsu gave −11.4 dB, biased by the much larger land class, so we use the centre of the histogram valley, −14.75 dB, after checking bimodality.',
-      'New water = HH < −14.75 dB on 17 Jan AND 10·log10(after/before) < −3 dB: 404 km² (3×3 median); the 5×5 boxcar gives 316 km², a lower bound because averaging erodes water edges (≈ −36 % on a synthetic 400 km² test patch). Water on both dates: 482 km² (lower bound 328 km²). Scene median change +3.1 dB (land brightening from soil moisture and/or BETA calibration), hence the change criterion.',
+      'New water = HH < −14.75 dB on 17 Jan AND darkened > 3 dB relative to the scene median change AND not water-like on 5 Jan (that histogram is not bimodal, so the same −14.75 dB threshold is used for both dates): 379 km² (3×3 median); the 5×5 boxcar gives 322 km², a lower bound because averaging erodes water edges (≈ −36 % on a synthetic 400 km² test patch). Water on both dates: 482 km² (lower bound 328 km²). Scene median change +3.1 dB (land brightening from soil moisture and/or BETA calibration), hence the change criterion.',
       'The 24 Dec 2025 scene on the timeline gives a pre-flood baseline on the identical geometry.',
     ],
     legend: [
@@ -153,6 +153,63 @@ export const EVENT_CONTENT: Record<string, EventContent> = {
       'BETA data tier: NASA states these early products are not fully calibrated and not intended for science. Relative patterns are still informative.',
       'Flood areas are our heuristic classification, not field-validated. Compare with NASA’s open-water maps (SVS 5661) before quoting them.',
       'Wind-roughened water and smooth surfaces such as tarmac can mimic or hide water in radar images.',
+    ],
+  },
+  'uniao-do-sul-deforestation-2026': {
+    happened: {
+      text: 'In late September to mid-October 2026, about 6.2 km² of Amazon forest near União do Sul (Mato Grosso, Brazil) was clear-cut. Brazil’s INPE detected it with its DETER satellite alert system on 14 October 2026; Sentinel-2 imagery shows the forest still intact on 26 September, so the clearing happened between 26 September and 14 October.',
+      source: 'INPE DETER (TerraBrasilis); Sentinel-2 via Microsoft Planetary Computer',
+      url: 'https://terrabrasilis.dpi.inpe.br/en/home-page/',
+    },
+    readSimple: [
+      'Four NISAR passes, 18 September to 24 October 2026, on one fixed colour scale: green = forest (the radar echo bounces around inside the canopy), pink/dark = open ground.',
+      'Pick “change (dB)” in the AFTER slot: blue = the forest echo dropped. Inside the box around INPE’s alert, 68 % of the ground shows a strong drop, against 11 % in the wider area.',
+      'Radar sees through the clouds of the rainy season, when optical satellites often cannot.',
+    ],
+    readScientific: [
+      'NISAR L2 GCOV γ⁰ HH/HV, track 002 ascending, frame 172. HV (cross-pol) responds to canopy volume scattering; clearing removes it.',
+      'HV log-ratio on a 3×3 median of dB; the scene-wide median change (−1.19 dB, partly a calibration difference: the 24 Oct scene is VALIDATED P05036, the 30 Sep scene PROVISIONAL P05023) is removed before thresholding at −3 dB.',
+      'Strong HV loss: 35.7 km² of 336 km² analysed. Within the DETER polygon’s bounding box (16.8 km², containing the 6.2 km² polygon) 11.4 km² (68 %) show loss, versus 11 % overall: the radar change concentrates where INPE mapped the clear-cut.',
+      'Loss outside the polygon likely includes field preparation on existing farmland (soy planting season), which also lowers HV; this layer alone does not separate forest clearing from tillage.',
+    ],
+    legend: [
+      { swatch: '#7dffa0', label: 'Green = HV strong (vegetation, forest canopy)' },
+      { swatch: 'linear-gradient(90deg,#2166ac,#f7f7f7,#b2182b)', label: 'Change layer: blue = HV dropped (canopy loss), red = HV rose' },
+    ],
+    pins: [
+      { id: 'u-deter', lon: -54.0364, lat: -11.3613, label: 'INPE DETER clear-cut alert', simple: 'Centre of the area INPE flagged as freshly cleared forest (6.2 km²). The radar echo from the canopy dropped sharply here.', scientific: 'DETER clear-cut polygon deter_amz.41873_curr, view date 2026-10-14. 68 % of its bounding box shows HV loss > 3 dB below the scene median change.' },
+    ],
+    caveats: [
+      'Derived by our team; heuristic threshold, not field-validated. Before and after scenes differ in processing version (PROVISIONAL vs VALIDATED).',
+      'HV also drops with tillage and drying vegetation, so loss outside the alert polygon is not necessarily deforestation.',
+    ],
+  },
+  'aspen-acres-fire-2026': {
+    happened: {
+      text: 'The Aspen Acres fire burned in Custer County, Colorado, from late June 2026 (NASA EONET / IRWIN record dated 29 June 2026), with a reported size of 91,982 acres (about 372 km²).',
+      source: 'NASA EONET (IRWIN record)',
+      url: 'https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21019',
+    },
+    readSimple: [
+      'Four NISAR passes from 15 June to 14 August 2026, on one fixed colour scale; the before/after pair is 27 June → 14 August.',
+      'Pick “change (dB)” in the AFTER slot: blue = the vegetation echo dropped, which happens where fire destroyed trees and shrubs.',
+      'The radar shows about 68 km² of strong canopy loss. That is smaller than the 372 km² reported fire area, because grass and low shrub fires change the radar echo much less than burned forest.',
+    ],
+    readScientific: [
+      'NISAR L2 GCOV γ⁰ HH/HV, track 019 ascending, frame 021, all PROVISIONAL (P05023). Change pair 2026-06-27 → 2026-08-14.',
+      'HV log-ratio on a 3×3 median of dB, scene median (+0.37 dB) removed, threshold −3 dB: 68.1 km² of 1,539 km² analysed.',
+      'L-band HV is driven by woody volume scattering, so it maps crown-fire and woody canopy loss; surface fires in grass or shrubland are under-detected. Soil moisture from summer storms can raise γ⁰ and mask burn signals.',
+    ],
+    legend: [
+      { swatch: '#7dffa0', label: 'Green = HV strong (vegetation volume)' },
+      { swatch: 'linear-gradient(90deg,#2166ac,#f7f7f7,#b2182b)', label: 'Change layer: blue = HV dropped (vegetation loss), red = HV rose' },
+    ],
+    pins: [
+      { id: 'a-eonet', lon: -105.0713, lat: 38.0193, label: 'EONET fire location', simple: 'The reported location of the Aspen Acres fire, which the incident record describes as about 20 miles south-west of Pueblo.', scientific: 'NASA EONET event EONET_21019 (IRWIN 2026-COCUX-001160); point location, not a perimeter.' },
+    ],
+    caveats: [
+      'Derived by our team; heuristic threshold, not field-validated. No official burn perimeter was used for validation.',
+      'Reported fire area (372 km²) and radar canopy-loss area (68 km²) measure different things.',
     ],
   },
   'krasheninnikov-2026': {

@@ -1,10 +1,11 @@
 import type { Page } from '@playwright/test';
-import { appReady, expect, hashOf, hashParams, panel, test } from './fixtures';
+import { anyPanel, appReady, expect, featured, hashOf, hashParams, panel, test } from './fixtures';
 
 // iPhone-class viewport. isMobile/hasTouch make Edge report a touch phone (matchMedia, UA).
 test.use({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
 
-const introCard = (page: Page, t: RegExp) => page.locator('section[aria-label="About Global SAR"] button.obs', { hasText: t });
+// On phones the investigations are a horizontally scrolling strip at the bottom (no sheet is open on landing).
+const introCard = (page: Page, t: RegExp) => featured(page, t);
 
 test.describe('mobile 375x812', () => {
   test('landing: no horizontal page scroll, canvas fills the screen, controls are on screen', async ({ page }) => {
@@ -15,13 +16,14 @@ test.describe('mobile 375x812', () => {
     const canvas = (await page.locator('.maplibregl-canvas').first().boundingBox())!;
     expect(canvas.width).toBeGreaterThanOrEqual(370);
     await expect(page.getByRole('button', { name: 'Filters' })).toBeVisible();
+    await expect(anyPanel(page)).toHaveCount(0); // no bottom sheet until something is selected
     await expect(page.getByRole('combobox', { name: /Search places/ })).toBeVisible();
     const sb = (await page.getByRole('combobox', { name: /Search places/ }).boundingBox())!;
     expect(sb.x).toBeGreaterThanOrEqual(0);
     expect(sb.x + sb.width).toBeLessThanOrEqual(376);
   });
 
-  test('open an investigation from the intro sheet; sheet collapses/expands; Close works', async ({ page }) => {
+  test('open an investigation from the landing strip; sheet collapses/expands; Close works', async ({ page }) => {
     await appReady(page);
     await introCard(page, /Limpopo/).click();
     await expect(panel(page).getByRole('heading', { level: 2 })).toHaveText('Limpopo and Incomati floods');

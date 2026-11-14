@@ -28,9 +28,13 @@ export interface CatalogLayer {
 
 export async function loadLayerCatalog(): Promise<CatalogLayer[]> {
   const r = await fetch('data/layers.json');
-  if (!r.ok) return [];
+  // A failure is an error the panel shows, not an "empty catalog".
+  if (!r.ok) throw new Error(`layers.json: HTTP ${r.status}`);
   const j = await r.json();
-  return Array.isArray(j) ? j : j.layers ?? [];
+  const list = Array.isArray(j) ? j : j?.layers;
+  if (!Array.isArray(list)) throw new Error('layers.json has no layer list');
+  // drop entries without the fields every layer row and tile URL needs
+  return list.filter((l): l is CatalogLayer => !!l && typeof l.id === 'string' && typeof l.title === 'string' && typeof l.category === 'string');
 }
 
 const yesterday = () => new Date(Date.now() - 864e5).toISOString().slice(0, 10);

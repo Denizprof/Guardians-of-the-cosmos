@@ -58,29 +58,57 @@ export function loadCatalog(id: string): Promise<CatalogFile> {
   if (!catalogCache.has(id)) {
     catalogCache.set(
       id,
-      fetch(`data/catalogs/${id}.json`).then((r) => {
-        if (!r.ok) throw new Error(`${id}: HTTP ${r.status}`);
-        return r.json();
-      })
+      fetch(`data/catalogs/${id}.json`)
+        .then((r) => {
+          if (!r.ok) throw new Error(`${id}: HTTP ${r.status}`);
+          return r.json();
+        })
+        .then((c) => {
+          if (!c || !Array.isArray(c.events)) throw new Error(`${id}: file has no events array`);
+          return c as CatalogFile;
+        })
+        .catch((e) => {
+          catalogCache.delete(id); // a transient failure must be retryable without reloading the page
+          throw e;
+        })
     );
   }
   return catalogCache.get(id)!;
 }
 
-export async function loadData(): Promise<{ events: SarEvent[]; context: ContextEvent[]; generated: string }> {
+export async function loadData(): Promise<{ events: SarEvent[]; context: ContextEvent[]; contextError: string | null; generated: string }> {
   const [ev, ctx] = await Promise.all([
-    fetch('data/events.json').then((r) => {
+    fetch('data/events.json').then(async (r) => {
       if (!r.ok) throw new Error(`events.json: HTTP ${r.status}`);
-      return r.json();
+      const j = await r.json();
+      if (!j || !Array.isArray(j.events)) throw new Error('events.json has no events array');
+      return j;
     }),
+    // Recent context events are optional for the app to work, but a failure must be visible, never "no events".
     fetch('data/context.json')
-      .then((r) => (r.ok ? r.json() : { events: [] }))
-      .catch(() => ({ events: [] })),
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const j = await r.json();
+        if (!j || !Array.isArray(j.events)) throw new Error('file has no events array');
+        return { events: j.events as ContextEvent[], error: null as string | null };
+      })
+      .catch((e: unknown) => ({ events: [] as ContextEvent[], error: `Recent events could not be loaded (${e instanceof Error ? e.message : 'network error'}).` })),
   ]);
-  return { events: ev.events, context: ctx.events, generated: ev.generated };
+  return { events: ev.events, context: ctx.events, contextError: ctx.error, generated: ev.generated };
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Only http(s) links from external data may become hrefs (blocks javascript:, data:, etc.). */
+export function safeHref(u: unknown): string | undefined {
+  if (typeof u !== 'string') return undefined;
+  try {
+    const p = new URL(u);
+    return p.protocol === 'https:' || p.protocol === 'http:' ? p.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Parse an ISO timestamp as UTC. Strings without an offset (e.g. HDF5 "2026-08-11T02:08:40") are UTC in NISAR metadata. */
 export function parseUTC(iso: string): Date {
@@ -95,6 +123,22 @@ export function fmtDate(iso?: string | null): string {
   if (Number.isNaN(d.getTime())) return '—';
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
+
+/**
+ * Date at the precision the source actually knows. Historical catalog records known only to the year or
+ * month are stored as YYYY-01-01 / YYYY-MM-01; showing "1 Jan 2002" would invent a day.
+ */
+export function fmtDatePrecise(iso?: string | null, precision?: string | null): string {
+  if (!iso) return '—';
+  const d = parseUTC(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  if (precision === 'year') return String(d.getUTCFullYear());
+  if (precision === 'month') return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  return fmtDate(iso);
+}
+
+/** A date known only to the year or month cannot anchor a ±days satellite search window. */
+export const isCoarseDate = (precision?: string | null) => precision === 'year' || precision === 'month';
 
 export function fmtDateTime(iso?: string | null): string {
   if (!iso) return '—';
@@ -133,13 +177,17 @@ export function layerBounds(layers: SarLayer[]): [[number, number], [number, num
  */
 export function parseCoords(q: string): [number, number] | null {
   let s = q.trim().replace(/−/g, '-');
-  if (!s.includes('.')) s = s.replace(/(\d),(\d)/g, '$1.$2'); // decimal comma only when no dots are used
+  // Decimal comma only when no dots are used AND another separator (space / semicolon) splits the pair:
+  // "45,5 90,2" -> 45.5 / 90.2, but a bare "45,90" is a lat,lon pair, not the number 45.90.
+  if (!s.includes('.') && /[\s;]/.test(s)) s = s.replace(/(\d),(\d)/g, '$1.$2');
   const re = /^([NSEW])?\s*([+-]?\d+(?:\.\d+)?)\s*°?\s*([NSEW])?$/i;
   const parts = s.split(/[\s,;]+/).filter(Boolean);
   // re-join "N 10.5" style tokens where the letter is separated from its number
   const tokens: string[] = [];
   for (const p of parts) {
-    if (/^[NSEW]$/i.test(p) && tokens.length && /\d$/.test(tokens[tokens.length - 1]) && !/[NSEW]$/i.test(tokens[tokens.length - 1])) tokens[tokens.length - 1] += p;
+    const last = tokens[tokens.length - 1];
+    // a lone letter suffixes the previous number only if that number has no hemisphere yet
+    if (/^[NSEW]$/i.test(p) && tokens.length && /\d$/.test(last) && !/[NSEW]/i.test(last)) tokens[tokens.length - 1] += p;
     else if (tokens.length && /^[NSEW]$/i.test(tokens[tokens.length - 1])) tokens[tokens.length - 1] += p;
     else tokens.push(p);
   }

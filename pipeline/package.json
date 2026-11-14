@@ -12,5 +12,8 @@
   "type": "commonjs",
   "dependencies": {
     "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "fast-check": "^4.10.2"
   }
 }
