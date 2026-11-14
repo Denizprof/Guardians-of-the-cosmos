@@ -41,6 +41,8 @@ export const test = base.extend<{ problems: Problems }>({
   problems: [
     async ({ page, baseURL }, use, testInfo) => {
       const problems: Problems = { errors: [], thirdParty: [] };
+      // The first-visit introduction (components/Welcome.tsx) is covered by its own spec; every other test starts in the tool.
+      await page.addInitScript(() => { try { localStorage.setItem('global-sar.intro-seen', '2'); } catch { /* storage blocked */ } });
       const origin = new URL(baseURL ?? 'http://localhost:5173').origin;
       page.on('pageerror', (e) => problems.errors.push(`pageerror: ${e.message}`));
       page.on('console', (m) => {

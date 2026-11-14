@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Welcome from '../../src/components/Welcome';
-import { INTRO_SEEN_KEY, markIntroSeen, shouldShowIntro } from '../../src/app/introSeen';
+import { INTRO_SEEN_KEY, INTRO_VERSION, markIntroSeen, shouldShowIntro } from '../../src/app/introSeen';
 
 beforeEach(() => localStorage.clear());
 afterEach(() => vi.restoreAllMocks());
@@ -14,8 +14,12 @@ describe('first-visit memory', () => {
   });
   it('does not show it again once the visitor has seen it', () => {
     markIntroSeen();
-    expect(localStorage.getItem(INTRO_SEEN_KEY)).toBe('1');
+    expect(localStorage.getItem(INTRO_SEEN_KEY)).toBe(INTRO_VERSION);
     expect(shouldShowIntro({ event: null })).toBe(false);
+  });
+  it('shows a redesigned intro once more to someone who only saw an older version', () => {
+    localStorage.setItem(INTRO_SEEN_KEY, '1');
+    expect(shouldShowIntro({ event: null })).toBe(true);
   });
   it('a shared link to an investigation goes straight to it, even on a first visit', () => {
     expect(shouldShowIntro({ event: 'venezuela-2026' })).toBe(false);

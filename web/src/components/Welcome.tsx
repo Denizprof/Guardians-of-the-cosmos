@@ -31,6 +31,9 @@ const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabi
  * Introduction shown over the (blurred) live globe on a first visit: what the tool is, who it is for, how to
  * use it and where the data comes from, ending in "Get started". A modal dialog: focus moves in on open, stays
  * inside while it is open, and Escape closes it without reaching the app's own Escape handling.
+ *
+ * Layout: the text scrolls inside the card; "Get started" sits in a footer that is always in view. On wide
+ * screens the explanation and the tool walkthrough sit side by side (reading order is unchanged).
  */
 export default function Welcome({ onClose, onCredits }: Props) {
   const dialog = useRef<HTMLDivElement>(null);
@@ -67,43 +70,55 @@ export default function Welcome({ onClose, onCredits }: Props) {
   return (
     <div className="welcome">
       <div ref={dialog} className="welcome-card" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
-        <p className="welcome-kicker">NASA Space Apps Challenge 2026 · Dancing with the SARs</p>
-        <h1 id="welcome-title" ref={title} tabIndex={-1}>
-          Global SAR: see how Earth changes, by radar
-        </h1>
+        <div className="welcome-scroll">
+          <header className="welcome-head">
+            <p className="welcome-kicker">NASA Space Apps Challenge 2026 · Dancing with the SARs</p>
+            <h1 id="welcome-title" ref={title} tabIndex={-1}>
+              Global SAR: see how Earth changes, by radar
+            </h1>
+          </header>
 
-        <h2>What it is</h2>
-        <p>
-          Global SAR is a 3D globe for exploring real radar observations of Earth, led by NISAR, the NASA and ISRO radar satellite. Radar sends its own signal, so it sees through clouds, smoke and darkness, and it can show things an ordinary photograph cannot: ground that moved by centimetres in an earthquake, or flood water hidden under storm clouds.
-        </p>
+          <div className="welcome-cols">
+            <div className="welcome-col">
+              <h2>What it is</h2>
+              <p className="welcome-lede">
+                Global SAR is a 3D globe for exploring real radar observations of Earth, led by NISAR, the NASA and ISRO radar satellite. Radar sends its own signal, so it sees through clouds, smoke and darkness, and it can show things an ordinary photograph cannot: ground that moved by centimetres in an earthquake, or flood water hidden under storm clouds.
+              </p>
 
-        <h2>Who it is for</h2>
-        <p>
-          Students and teachers, journalists, people who work on disasters and the environment, and anyone curious about how our planet changes. You do not need to know anything about radar: every investigation explains what you are looking at.
-        </p>
-        <p className="welcome-note">
-          Please note: this is not a live emergency alert system. The investigations are our own analysis, not official NASA products, and every layer says whether it is an observation, a measurement we derived or an interpretation.
-        </p>
+              <h2>Who it is for</h2>
+              <p>
+                Students and teachers, journalists, people who work on disasters and the environment, and anyone curious about how our planet changes. You do not need to know anything about radar: every investigation explains what you are looking at.
+              </p>
+              <p className="welcome-note">
+                Please note: this is not a live emergency alert system. The investigations are our own analysis, not official NASA products, and every layer says whether it is an observation, a measurement we derived or an interpretation.
+              </p>
+            </div>
 
-        <h2>How to use it</h2>
-        <ol className="welcome-steps" aria-label="How to use the tools">
-          {STEPS.map((s) => (
-            <li key={s.name}>
-              <span className="welcome-icon" aria-hidden="true">{s.icon}</span>
-              <span>
-                <strong>{s.name}</strong>
-                <span className="welcome-step-text">{s.text}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
-        <p className="muted">Drag to turn the globe, scroll or pinch to zoom, and hold the right mouse button (or use two fingers) to tilt.</p>
+            <div className="welcome-col">
+              <h2>How to use it</h2>
+              <ol className="welcome-steps" aria-label="How to use the tools">
+                {STEPS.map((s) => (
+                  <li key={s.name}>
+                    <span className="welcome-icon" aria-hidden="true">{s.icon}</span>
+                    <span>
+                      <strong>{s.name}</strong>
+                      <span className="welcome-step-text">{s.text}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <p className="muted welcome-hint">Drag to turn the globe, scroll or pinch to zoom, and hold the right mouse button (or use two fingers) to tilt.</p>
+            </div>
+          </div>
 
-        <h2>Where the data comes from</h2>
-        <p>
-          Radar: NISAR (NASA/JPL-Caltech and ISRO), distributed by the Alaska Satellite Facility. Other layers and event records come from NASA (GIBS, FIRMS, EONET, the Global Landslide Catalog), USGS, NOAA, GDACS, the European Commission's JRC, the University of Maryland, Copernicus Sentinel imagery by EOX and OpenStreetMap.{' '}
-          <button type="button" className="link" onClick={onCredits}>See the full credits</button>
-        </p>
+          <div className="welcome-sources">
+            <h2>Where the data comes from</h2>
+            <p>
+              Radar: NISAR (NASA/JPL-Caltech and ISRO), distributed by the Alaska Satellite Facility. Other layers and event records come from NASA (GIBS, FIRMS, EONET, the Global Landslide Catalog), USGS, NOAA, GDACS, the European Commission's JRC, the University of Maryland, Copernicus Sentinel imagery by EOX and OpenStreetMap.{' '}
+              <button type="button" className="link" onClick={onCredits}>See the full credits</button>
+            </p>
+          </div>
+        </div>
 
         <div className="welcome-actions">
           <button type="button" className="btn primary welcome-start" onClick={onClose}>Get started</button>

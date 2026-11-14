@@ -2,7 +2,7 @@
 // investigation, switching compare modes, the timeline, and closing. Per the user's instruction
 // "debug all code with zillion different type tests". Keys only: no .click() / .fill() after page load.
 import type { Page } from '@playwright/test';
-import { appReady, expect, hashOf, hashParams, panel, stubExternal, test } from './helpers';
+import { appReady, expect, hashOf, hashParams, panel, strip, stubExternal, test } from './helpers';
 
 interface Focus { tag: string; role: string | null; label: string | null; text: string; pressed: string | null; inTimeline: boolean }
 const focus = (page: Page): Promise<Focus> =>
@@ -47,6 +47,8 @@ test.describe('keyboard-only', () => {
     await expect(panel(page).getByRole('heading', { level: 2 })).toHaveText('Venezuela earthquakes');
     await expect.poll(() => hashOf(page)).toMatch(/^#\/e\/venezuela-2026\?/);
     expect(hashParams(page).get('mode')).toBe('swipe');
+    // focus moves into the panel (its heading) when it opens
+    await expect.poll(async () => (await focus(page)).tag).toBe('H2');
 
     // 3. Tab to the compare-mode buttons and switch with Enter
     await tabTo(page, 'Side by side', (f) => f.text === 'Side by side');
@@ -62,18 +64,25 @@ test.describe('keyboard-only', () => {
     await page.keyboard.press('Enter');
     await expect.poll(() => hashParams(page).get('mode')).toBe('swipe');
 
-    // 4. Timeline: tab into the timeline, choose another observation with Enter
-    const before = hashParams(page).toString();
-    const tick = await tabTo(page, 'a timeline observation that is not current', (f) => f.inTimeline && f.role === 'button' && !!f.label && !/current/.test(f.label));
+    // 4. Timeline: choose which slot a click sets (Before; "After" is the default), then pick the "after" observation for it with Enter.
+    //    Venezuela has exactly two observations (before, after), so picking the other one makes both slots equal.
+    const q0 = hashParams(page);
+    expect(q0.get('a')).not.toBe(q0.get('b'));
+    await tabTo(page, 'Before slot button', (f) => f.inTimeline && f.text === 'Before' && f.tag === 'BUTTON' && f.pressed === 'false', 500);
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('group', { name: 'Which slot a click sets' }).getByRole('button', { name: 'Before' })).toHaveAttribute('aria-pressed', 'true');
+    const tick = await tabTo(page, 'the timeline observation currently used as "after"', (f) => f.inTimeline && f.role === 'button' && /current after/.test(f.label ?? ''), 20);
     expect(tick.label).toBeTruthy();
     await page.keyboard.press('Enter');
-    await expect.poll(() => hashParams(page).toString()).not.toBe(before);
+    await expect.poll(() => hashParams(page).get('b')).toBe(q0.get('a'));
 
     // 5. Escape closes (focus is not in a text input, so the global handler applies)
     await page.keyboard.press('Escape');
     await expect(panel(page)).toHaveCount(0);
     await expect.poll(() => hashOf(page)).toBe('#/');
-    await expect(page.locator('section[aria-label="About Global SAR"]')).toBeVisible();
+    await expect(strip(page)).toBeVisible(); // landing strip is back
+    // focus returns to where the journey started (the search box) instead of falling to <body>
+    await expect.poll(async () => (await focus(page)).role).toBe('combobox');
   });
 
   test('search box keys: ArrowDown/ArrowUp move the selection, Escape closes the list but not the app', async ({ page }) => {

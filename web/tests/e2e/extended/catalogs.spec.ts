@@ -13,8 +13,9 @@ const CATALOGS = [
   { id: 'nasa-glc', label: /Landslides \(NASA Global Landslide Catalog\)/, defaultOn: false },
 ];
 
-const rail = (p: Page) => p.locator('aside[aria-label="Map filters"]');
+const rail = (p: Page) => p.getByRole('complementary', { name: 'Map filters' });
 const catRow = (p: Page, label: RegExp) => rail(p).locator('label', { hasText: label });
+const openFilters = async (p: Page) => { await p.locator('.topbar .tool', { hasText: 'Filters' }).first().click(); await expect(rail(p)).toBeVisible(); };
 const yearOf = (d: string) => new Date(d).getUTCFullYear();
 const inRange = (d: string, from: number, to: number) => { const y = yearOf(d); return Number.isNaN(y) || (y >= from && y <= to); };
 
@@ -23,18 +24,29 @@ async function groupTotal(p: Page) {
   const texts = await rail(p).locator('.group-row .count').allTextContents();
   return texts.reduce((s, t) => s + Number(t), 0);
 }
+/** SAR events + visible reported events. The app de-duplicates by id (context.json and the USGS catalog both emit usgs-<id>). */
 function expectedTotal(active: string[], from: number, to: number) {
   const sar = readData('events.json').events.length;
-  const ctx = readData('context.json').events.filter((e: any) => inRange(e.date, from, to)).length;
-  const cat = active.reduce((s, id) => s + readData(`catalogs/${id}.json`).events.filter((e: any) => inRange(e.date, from, to)).length, 0);
-  return sar + ctx + cat;
+  const ids = new Set<string>();
+  for (const id of active) for (const e of readData(`catalogs/${id}.json`).events) if (inRange(e.date, from, to)) ids.add(e.id);
+  for (const e of readData('context.json').events) if (inRange(e.date, from, to)) ids.add(e.id);
+  return sar + ids.size;
 }
 
 test.describe('event catalogs', () => {
+  test('the FIRMS snapshot line is shown with its build time and an honest "not live" note', async ({ page }) => {
+    await stubExternal(page);
+    await appReady(page);
+    await openFilters(page);
+    const meta = rail(page).locator('.catalog-meta');
+    await expect(meta).toContainText('Snapshot from');
+    await expect(meta).toContainText(/(not live)|older than 24 h/);
+  });
+
   test.beforeEach(async ({ page }) => {
     await stubExternal(page);
     await appReady(page);
-    await expect(rail(page)).toBeVisible();
+    await openFilters(page);
   });
 
   test('default catalogs are on (fires, tsunamis) and show their exact counts', async ({ page }) => {
@@ -98,12 +110,12 @@ test.describe('event catalogs', () => {
     await rail(page).getByLabel('From year').fill('2011');
     await rail(page).getByLabel('To year').fill('2011');
     await expect.poll(() => groupTotal(page)).toBe(expectedTotal(active, 2011, 2011));
-    // inverted: To below From is clamped up to From (never an empty/negative window)
+    // inverted: To below From is clamped up to From when applied (the totals are the single-year window, never empty/negative)
     await rail(page).getByLabel('To year').fill('1990');
-    await expect(rail(page).getByLabel('To year')).toHaveValue('2011');
-    // From above To is clamped down to To
+    await expect.poll(() => groupTotal(page)).toBe(expectedTotal(active, 2011, 2011));
+    // From above To: clamped down to the (applied) upper bound
     await rail(page).getByLabel('From year').fill('2030');
-    await expect(rail(page).getByLabel('From year')).toHaveValue('2011');
+    await expect.poll(() => groupTotal(page)).toBe(expectedTotal(active, now, now)); // From 2030 -> capped to this year, To raised to it
     await rail(page).getByLabel('From year').fill('1900');
     await rail(page).getByLabel('To year').fill(String(now));
     await expect.poll(() => groupTotal(page)).toBe(expectedTotal(active, 1900, now));
@@ -113,19 +125,22 @@ test.describe('event catalogs', () => {
     const now = new Date().getUTCFullYear();
     const base = expectedTotal(['firms-fires', 'noaa-tsunamis'], 1900, now);
     const from = rail(page).getByLabel('From year');
-    await from.fill('abc'); // number input: browser refuses, value becomes ''
+    await expect(from).toHaveAttribute('type', 'number'); // the browser itself refuses letters
     await from.fill('');
     await expect.poll(() => groupTotal(page)).toBe(base);
   });
 
   test('a catalog that returns HTTP 500 shows "!" (and others keep working)', async ({ page, allow }) => {
-    allow.console.push(/gdacs-floods|500/);
+    allow.console.push(/HTTP 500 .*gdacs-floods|status of 500.*gdacs-floods|gdacs-floods.json/);
     // route AFTER beforeEach loaded the app; catalogs are fetched on demand when switched on
     await page.route('**/data/catalogs/gdacs-floods.json', (r) => r.fulfill({ status: 500, body: 'boom' }));
     const row = catRow(page, /Flood alerts since 2000/);
     await row.getByRole('checkbox').check();
     await expect(row.locator('.count')).toHaveText('!');
-    await expect(row).toHaveAttribute('title', /gdacs-floods: HTTP 500/);
+    // the reason is visible text with a Retry button (not a hover-only tooltip)
+    const err = rail(page).locator('.catalog-error', { hasText: /gdacs-floods: HTTP 500/ });
+    await expect(err).toBeVisible();
+    await expect(err).toHaveAttribute('role', 'alert');
     // another catalog still loads fine
     const eq = catRow(page, /Earthquakes M7\+/);
     await eq.getByRole('checkbox').check();
@@ -135,7 +150,7 @@ test.describe('event catalogs', () => {
   });
 
   test('a catalog that returns malformed JSON also surfaces "!" instead of crashing', async ({ page, allow }) => {
-    allow.console.push(/nasa-glc|Unexpected|JSON/);
+    allow.console.push(/nasa-glc/);
     await page.route('**/data/catalogs/nasa-glc.json', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{not json' }));
     const row = catRow(page, /Landslides \(NASA/);
     await row.getByRole('checkbox').check();
@@ -152,5 +167,17 @@ test.describe('event catalogs', () => {
     await expect(row.locator('.count')).toHaveText('…');
     release();
     await expect(row.locator('.count')).toHaveText(String(readData('catalogs/noaa-volcanoes.json').events.length));
+  });
+
+  test('Retry on a failed catalog reloads it once the server recovers', async ({ page, allow }) => {
+    allow.console.push(/gdacs-floods/);
+    await page.route('**/data/catalogs/gdacs-floods.json', (r) => r.fulfill({ status: 500, body: 'boom' }));
+    const row = catRow(page, /Flood alerts since 2000/);
+    await row.getByRole('checkbox').check();
+    await expect(row.locator('.count')).toHaveText('!');
+    await page.unroute('**/data/catalogs/gdacs-floods.json');
+    await rail(page).locator('.catalog-error').getByRole('button', { name: 'Retry' }).click();
+    await expect(row.locator('.count')).toHaveText(String(readData('catalogs/gdacs-floods.json').events.length));
+    await expect(rail(page).locator('.catalog-error')).toHaveCount(0);
   });
 });

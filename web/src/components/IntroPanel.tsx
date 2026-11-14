@@ -187,15 +187,13 @@ function IntroPanel(p: Props) {
 
         {!probing && (
           <>
-            {p.onShowIntro && (
-              <div className="section">
-                <button type="button" className="btn" onClick={p.onShowIntro}>Show the introduction again</button>
-              </div>
-            )}
-            <div className="section">
+            <div className="section summary">
               <p>
                 Explore how Earth’s surface changes: geohazards, fire and forests, climate and ice, water, ecosystems and human activity. Investigations compare genuine satellite observations from before and after, led by NISAR, the NASA–ISRO radar that sees through clouds and darkness every 12 days. Every layer says whether it is an observation, a derived measurement or an interpretation.
               </p>
+              {p.onShowIntro && (
+                <button type="button" className="btn" onClick={p.onShowIntro}>Show the introduction again</button>
+              )}
             </div>
             <div className="section">
               <h3>Investigations</h3>
@@ -219,8 +217,21 @@ function IntroPanel(p: Props) {
           </button>
         </div>
         {!probing && (
-          <div className="section faint small">
-            Imagery: NISAR L-band, NASA/JPL-Caltech &amp; ISRO, distributed by ASF DAAC. Context markers: USGS (earthquakes M6.3+) and NASA EONET, past 12 months. Globe imagery: Sentinel-2 cloudless 2024 – <a href="https://cloudless.eox.at" target="_blank" rel="noopener">https://cloudless.eox.at</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0. Terrain: Mapzen/AWS Terrain Tiles. Borders and place names © OpenStreetMap contributors, OpenMapTiles, served by OpenFreeMap. Data package built {fmtDate(p.generated)}.
+          <div className="section">
+            <h3>Data credits</h3>
+            <dl className="credits">
+              <dt>Radar imagery</dt>
+              <dd>NISAR L-band, NASA/JPL-Caltech &amp; ISRO, distributed by ASF DAAC.</dd>
+              <dt>Context markers</dt>
+              <dd>USGS (earthquakes M6.3+) and NASA EONET, past 12 months.</dd>
+              <dt>Globe imagery</dt>
+              <dd>Sentinel-2 cloudless 2024 – <a href="https://cloudless.eox.at" target="_blank" rel="noopener">https://cloudless.eox.at</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0.</dd>
+              <dt>Terrain</dt>
+              <dd>Mapzen/AWS Terrain Tiles.</dd>
+              <dt>Borders and place names</dt>
+              <dd>© OpenStreetMap contributors, OpenMapTiles, served by OpenFreeMap.</dd>
+            </dl>
+            <p className="faint fine credits-built">Data package built {fmtDate(p.generated)}.</p>
           </div>
         )}
       </div>

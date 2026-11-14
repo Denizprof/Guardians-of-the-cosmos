@@ -2,10 +2,12 @@
 // A per-browser convenience only: storage can be blocked (private windows), so every access is guarded and
 // the app works without it (the intro then simply shows on each visit).
 export const INTRO_SEEN_KEY = 'global-sar.intro-seen';
+/** Version of the introduction the visitor has seen. Raise it when the intro changes enough to be worth showing again. */
+export const INTRO_VERSION = '2';
 
 function seen(): boolean {
   try {
-    return localStorage.getItem(INTRO_SEEN_KEY) === '1';
+    return localStorage.getItem(INTRO_SEEN_KEY) === INTRO_VERSION;
   } catch {
     return false;
   }
@@ -13,7 +15,7 @@ function seen(): boolean {
 
 export function markIntroSeen(): void {
   try {
-    localStorage.setItem(INTRO_SEEN_KEY, '1');
+    localStorage.setItem(INTRO_SEEN_KEY, INTRO_VERSION);
   } catch {
     // storage unavailable: nothing to remember
   }

@@ -1,7 +1,7 @@
 // New spec. Behaviour under test: long-session stability. Opening and closing each investigation 10 times must not
 // grow the DOM or leak map markers, must not log console errors, and records page-load navigation metrics.
 // Per the user's instruction "debug all code with zillion different type tests".
-import { appReady, expect, featured, hashOf, panel, stubExternal, test } from './helpers';
+import { appReady, expect, featured, hashOf, panel, strip, stubExternal, test } from './helpers';
 import type { Page } from '@playwright/test';
 
 const INVESTIGATIONS = [
@@ -56,7 +56,7 @@ test.describe('long session', () => {
     test.setTimeout(480_000);
     await stubExternal(page);
     await appReady(page);
-    await expect(page.locator('aside.filters .featured button').first()).toBeVisible();
+    await expect(strip(page).getByRole('button').first()).toBeVisible();
     const idle0 = await metrics(page);
     expect(idle0.markers).toBe(0);
     const report: Record<string, unknown> = { idle0 };
@@ -111,7 +111,8 @@ test.describe('long session', () => {
     test.setTimeout(180_000);
     await stubExternal(page);
     await appReady(page);
-    const rail = page.locator('aside[aria-label="Map filters"]');
+    await page.getByRole('toolbar', { name: 'Map tools' }).getByRole('button', { name: 'Filters' }).click();
+    const rail = page.getByRole('complementary', { name: 'Map filters' });
     await expect(rail).toBeVisible();
     const before = await metrics(page);
     const boxes = rail.locator('label:has(input[type=checkbox]) input[type=checkbox]');

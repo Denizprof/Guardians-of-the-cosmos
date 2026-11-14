@@ -85,7 +85,7 @@ test.describe('assistant: no gateway configured', () => {
 
 test.describe('assistant: gateway unreachable', () => {
   test('health request failing gives the "could not be reached" state', async ({ page, allow }) => {
-    allow.console.push(/.*/);
+    allow.console.push(/Failed to load resource|net::ERR_|Failed to fetch/);
     await connectAssistantGateway(page);
     await page.route('**/api/assistant/health', (r) => r.abort('connectionrefused'));
     await setup(page);

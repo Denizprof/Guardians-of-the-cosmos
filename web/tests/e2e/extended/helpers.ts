@@ -29,6 +29,8 @@ export const test = base.extend<{ allow: Allow; pageErrors: string[] }>({
   pageErrors: [
     async ({ page, baseURL, allow }, use, testInfo) => {
       const errors: string[] = [];
+      // The first-visit introduction (components/Welcome.tsx) is covered by its own spec; every other test starts in the tool.
+      await page.addInitScript(() => { try { localStorage.setItem('global-sar.intro-seen', '2'); } catch { /* storage blocked */ } });
       const soft: string[] = [];
       const origin = new URL(baseURL ?? 'http://localhost:5173').origin;
       const tolerated = (s: string) => allow.console.some((r) => r.test(s));
@@ -82,7 +84,10 @@ export async function openInvestigation(page: Page, title: RegExp | string) {
 export async function connectAssistantGateway(page: Page) {
   await page.route('**/src/assistant/adapter.ts*', async (route) => {
     const res = await route.fetch();
-    const body = (await res.text()).replace('const url = env.VITE_ASSISTANT_GATEWAY_URL;', "const url = '/';");
+    const original = await res.text();
+    const body = original.replace('const url = env.VITE_ASSISTANT_GATEWAY_URL;', "const url = '/';");
+    // If the adapter source changes shape this patch silently does nothing and every "connected" test would test the wrong thing.
+    if (body === original) throw new Error('connectAssistantGateway: adapter.ts no longer contains the expected createAdapter line; update the patch');
     await route.fulfill({ response: res, body });
   });
 }

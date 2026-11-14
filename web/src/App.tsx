@@ -389,19 +389,7 @@ export default function App() {
   const onTimelinePick = useCallback((id: string) => (slot === 'before' ? setBeforeId(id) : setAfterId(id)), [slot]);
   const toggle = (p: Exclude<Popover, null>) => setPopover((cur) => (cur === p ? null : p));
 
-  if (loadError) {
-    return (
-      <div className="app error-screen">
-        <div className="error-card">
-          <h2>Data package missing</h2>
-          <p className="muted">
-            Could not load the event data ({loadError}). Run the pipeline first: <span className="mono">cd pipeline &amp;&amp; node src/fetch-browse.mjs</span>
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  // Hooks must all run before the early return below (a failed data load must show the error card, not crash).
   const closeIntro = useCallback(() => {
     markIntroSeen();
     setIntroOpen(false);
@@ -421,6 +409,19 @@ export default function App() {
     setPopover(null);
     setIntroOpen(true);
   }, [closePanel]);
+
+  if (loadError) {
+    return (
+      <div className="app error-screen">
+        <div className="error-card">
+          <h2>Data package missing</h2>
+          <p className="muted">
+            Could not load the event data ({loadError}). Run the pipeline first: <span className="mono">cd pipeline &amp;&amp; node src/fetch-browse.mjs</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const appClass = ['app', panelOpen ? 'has-panel' : '', selected ? 'has-event' : '', coverageMode && !selected ? 'probing' : '', lensOn ? (lensFull ? 'lens-on lens-full' : 'lens-on') : '']
     .filter(Boolean)
@@ -465,7 +466,7 @@ export default function App() {
             </button>
           )}
           <button
-            className="tool icon-only"
+            className="tool"
             aria-pressed={!selected && panelView === 'about'}
             onClick={() => {
               if (!selected && panelView === 'about') return closePanel();
@@ -478,6 +479,7 @@ export default function App() {
             aria-label="About Global SAR"
           >
             <IconInfo />
+            <span className="tool-label">About</span>
           </button>
         </div>
       </header>

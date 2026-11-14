@@ -101,14 +101,17 @@ test.describe('satellite layers panel', () => {
     await expect.poll(() => tiles.some((u) => /s2cloudless-2022_3857\/default\/g\//.test(u)), { timeout: 20_000 }).toBe(true);
   });
 
-  test('sub-daily (GOES) layer has no date picker and uses an ISO timestamp token', async ({ page }) => {
+  // A guessed timestamp 404s whenever GIBS has not published that slot yet, so the request names no time:
+  // GIBS then serves its latest image (src/layers.ts toOverlay).
+  test('sub-daily (GOES) layer has no date picker and asks GIBS for its latest image (no time in the tile URL)', async ({ page }) => {
     const { tiles } = await stubExternal(page);
     await appReady(page);
     await openLayers(page);
     await toggle(page, /Fire temperature every 10 minutes/).check();
     await expect(layersPanel(page).getByText(/latest \(10M\)/)).toBeVisible();
     await expect(layersPanel(page).getByLabel(/Fire temperature.*date/)).toHaveCount(0);
-    await expect.poll(() => tiles.some((u) => /GOES-East_ABI_FireTemp\/default\/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00Z\//.test(decodeURIComponent(u))), { timeout: 20_000 }).toBe(true);
+    await expect.poll(() => tiles.some((u) => /GOES-East_ABI_FireTemp\/default\/GoogleMapsCompatible_Level7\//.test(decodeURIComponent(u))), { timeout: 20_000 }).toBe(true);
+    expect(tiles.filter((u) => /GOES-East_ABI_FireTemp\/default\/\d{4}-/.test(decodeURIComponent(u)))).toEqual([]);
   });
 
   test('a layer without a time dimension has no date input', async ({ page }) => {
@@ -202,9 +205,7 @@ test.describe('satellite layers panel', () => {
       await openLayers(page);
       await toggle(page, /Daily true-colour Earth/).check();
       await layersPanel(page).getByLabel(/Daily true-colour Earth.*date/).fill('2024-03-15');
-      await page.waitForTimeout(4000); // when the bug hits there is no tile event to wait on; bounded wait is the assertion window
-      const sawNew = tiles.some((u) => u.includes('VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/2024-03-15/'));
-      expect(sawNew, `attempt ${attempt}: map never requested tiles for 2024-03-15 although the date input shows it`).toBe(true);
+      await expect.poll(() => tiles.some((u) => u.includes('VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/2024-03-15/')), { timeout: 10_000, message: `attempt ${attempt}: map never requested tiles for 2024-03-15 although the date input shows it` }).toBe(true);
       await page.unrouteAll({ behavior: 'ignoreErrors' });
     }
   });

@@ -125,12 +125,17 @@ test.describe('compare modes', () => {
     await expect(grip).toBeVisible();
     await expect(page.locator('.map-tag', { hasText: /^BEFORE/ })).toBeVisible();
     await expect(page.locator('.map-tag', { hasText: /^AFTER/ })).toBeVisible();
+    // the app moves focus to the panel heading shortly after the panel opens; focusing the handle before that would be undone
+    await expect(page.locator('section.panel h2')).toBeFocused();
     const v0 = Number(await handle.getAttribute('aria-valuenow'));
     await handle.focus();
     await page.keyboard.press('ArrowRight');
     await page.keyboard.press('ArrowRight');
     await expect.poll(async () => Number(await handle.getAttribute('aria-valuenow'))).toBeGreaterThan(v0);
     const v1 = Number(await handle.getAttribute('aria-valuenow'));
+    // the grip glides to its new position (CSS transition); grab it only once it has stopped moving, else the press misses it
+    let last = '';
+    await expect.poll(async () => { const cur = JSON.stringify(await grip.boundingBox()); const same = cur === last; last = cur; return same; }, { intervals: [100] }).toBe(true);
     const b = (await grip.boundingBox())!;
     await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
     await page.mouse.down();
@@ -349,7 +354,7 @@ test.describe('search', () => {
     await appReady(page);
     await page.getByRole('combobox', { name: /Search places/ }).fill('0, 0');
     await page.getByRole('option', { name: /0\.0000, 0\.0000/ }).click();
-    await expect(page.getByText(/No public NISAR GCOV or GUNW products cover this point yet/)).toBeVisible();
+    await expect(page.getByText(/No public (routine )?NISAR GCOV or GUNW products cover this point yet/)).toBeVisible();
   });
 });
 

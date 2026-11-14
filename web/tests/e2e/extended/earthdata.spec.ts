@@ -87,14 +87,15 @@ test.describe('NASA Earthdata panel', () => {
     expect(await first.getAttribute('href')).toMatch(/^https:\/\/search\.earthdata\.nasa\.gov\/search\/granules\?p=C\d+-\w+&sp%5B0%5D=/);
     await expect(edp(page).getByRole('link', { name: /Open this point and time in Earthdata Search/ })).toHaveAttribute('href', /^https:\/\/search\.earthdata\.nasa\.gov\/search\?/);
     // requests: both collection queries (general + platform-targeted) carry the event point and a +-7 day window
-    expect(log.collections).toHaveLength(2);
+    // two distinct queries (general + platform-targeted); StrictMode in dev may issue each twice (first one aborted)
+    expect(new Set(log.collections).size).toBe(2);
     for (const u of log.collections) {
       const q = new URL(u).searchParams;
       expect(q.get('has_granules')).toBe('true');
       expect(q.get('point')).toMatch(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/);
       expect(q.get('temporal[]')).toMatch(/^\d{4}-\d{2}-\d{2}T[\d:]+Z,\d{4}-\d{2}-\d{2}T[\d:]+Z$/);
     }
-    expect(log.granules.length).toBe(cmr.feed.entry.length);
+    expect(new Set(log.granules).size).toBe(cmr.feed.entry.length);
   });
 
   test('platform groups are collapsible <details>; small groups start open', async ({ page }) => {
@@ -125,7 +126,7 @@ test.describe('NASA Earthdata panel', () => {
   });
 
   test('network failure (aborted) also ends in the error state, not an endless spinner', async ({ page, allow }) => {
-    allow.console.push(/.*/);
+    allow.console.push(/Failed to load resource|net::ERR_|Failed to fetch/);
     await stubExternal(page);
     await page.route('https://cmr.earthdata.nasa.gov/search/**', (r) => r.abort('failed'));
     await open(page);
@@ -170,7 +171,8 @@ test.describe('NASA Earthdata panel', () => {
     await open(page);
     await edp(page).getByRole('button', { name: 'Close Earthdata panel' }).click();
     release();
-    await page.waitForTimeout(500); // let the (aborted) request settle; the fixture asserts no page errors
+    // let the (aborted) request settle: two animation frames plus a macrotask; the fixture asserts no page errors
+    await page.evaluate(() => new Promise<void>((res) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(res, 0)))));
     await expect(edp(page)).toHaveCount(0);
   });
 });
