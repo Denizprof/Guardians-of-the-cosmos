@@ -9,6 +9,7 @@ import type { Pin } from '../content/explain';
 import { LENS_RASTER_PAINT, SAR_LENS_SOURCE, lensTileUrls } from './sarLens';
 import { registerNodataProtocol } from './nodataKey';
 import { createTileErrorPolicy } from './tileErrors';
+import { browseBounds, coverageFeatures, trimmedBrowseUrl } from './coverageSelect';
 
 // Untouched worker copy served from public/vendor (see vite.config.ts).
 maplibregl.setWorkerUrl(new URL('vendor/maplibre-gl-worker.mjs', document.baseURI).href);
@@ -174,6 +175,8 @@ export interface MapViewProps {
   mode: CompareMode;
   overlayOpacity: number;
   coverage: CoverageResult | null;
+  /** Coverage probe: the one product drawn on the map (footprint + browse picture); null = nothing drawn. */
+  coverageScene?: string | null;
   pins: Pin[];
   activePin: string | null;
   panelInset: { right: number; bottom: number };
@@ -378,7 +381,7 @@ function syncTileOverlays(map: MlMap, wanted: TileOverlay[]) {
 function addOverlays(map: MlMap) {
   map.addSource('coverage', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
   const top = firstSymbolId(map);
-  map.addLayer({ id: 'coverage-fill', type: 'fill', source: 'coverage', paint: { 'fill-color': '#6fb3ff', 'fill-opacity': 0.07 } }, top);
+  map.addLayer({ id: 'coverage-fill', type: 'fill', source: 'coverage', paint: { 'fill-color': '#6fb3ff', 'fill-opacity': 0.04 } }, top);
   map.addLayer({ id: 'coverage-line-casing', type: 'line', source: 'coverage', paint: { 'line-color': '#04070c', 'line-width': 2.6, 'line-opacity': 0.45 } }, top);
   map.addLayer({ id: 'coverage-line', type: 'line', source: 'coverage', paint: { 'line-color': '#8cc4ff', 'line-width': 1.2, 'line-opacity': 0.85 } }, top);
 }
@@ -835,10 +838,43 @@ function MapView(p: MapViewProps) {
     if (!loaded) return;
     const fc: GeoJSON.FeatureCollection = {
       type: 'FeatureCollection',
-      features: (p.coverage?.granules ?? []).slice(0, 80).map((g) => ({ type: 'Feature', geometry: g.footprint, properties: { scene: g.scene } })),
+      // one product at a time: drawing every footprint stacked into an opaque blob (see coverageSelect.ts)
+      features: coverageFeatures(p.coverage?.granules ?? [], p.coverageScene ?? null),
     };
-    (maps.current!.a.getSource('coverage') as GeoJSONSource).setData(fc);
-  }, [loaded, p.coverage]);
+    const a = maps.current!.a;
+    (a.getSource('coverage') as GeoJSONSource).setData(fc);
+    // the selected product's NASA browse picture, under its outline
+    const g = p.coverage?.granules.find((x) => x.scene === p.coverageScene);
+    const coords = g?.browse ? browseBounds(g.footprint) : null;
+    const clear = () => {
+      if (a.getLayer('coverage-browse')) a.removeLayer('coverage-browse');
+      if (a.getSource('coverage-browse')) a.removeSource('coverage-browse');
+    };
+    clear();
+    if (!g?.browse || !coords) return;
+    // The picture has transparent margins: trim them so the data fills the footprint's bounding box.
+    const ctl = new AbortController();
+    let objectUrl: string | null = null;
+    trimmedBrowseUrl(g.browse, ctl.signal)
+      .then((u) => {
+        objectUrl = u;
+        if (ctl.signal.aborted) return;
+        clear();
+        a.addSource('coverage-browse', { type: 'image', url: u, coordinates: coords });
+        a.addLayer({ id: 'coverage-browse', type: 'raster', source: 'coverage-browse', paint: { 'raster-opacity': 0.92, 'raster-fade-duration': 0 } }, 'coverage-fill');
+      })
+      .catch((e: unknown) => {
+        if (ctl.signal.aborted) return;
+        // the outline still shows; say that the picture did not load instead of leaving a silent gap
+        console.warn('[map:globe] coverage browse picture failed', e instanceof Error ? e.message : e);
+        cb.current.onMapError?.('globe', 'coverage-browse');
+      });
+    return () => {
+      ctl.abort();
+      clear();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [loaded, p.coverage, p.coverageScene]);
 
   // ---- annotation pins (on both maps so they stay visible on both sides of the swipe)
   useEffect(() => {

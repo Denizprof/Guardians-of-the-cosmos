@@ -40,6 +40,8 @@ export interface CoverageGranule {
   frame: number;
   direction: string;
   thumb?: string;
+  /** Full NASA browse picture (north-up lat/lon PNG of the whole product); http(s) only. */
+  browse?: string;
   footprint: GeoJSON.Polygon;
 }
 
@@ -98,6 +100,7 @@ export async function nisarCoverage(lon: number, lat: number, signal?: AbortSign
         frame: p.frameNumber,
         direction: p.flightDirection ?? 'UNKNOWN',
         // http(s) only, like every other external URL that reaches the DOM
+        browse: Array.isArray(p.browse) ? safeHref(p.browse.find((u: unknown) => typeof u === 'string' && /_LATLON\.png$/i.test(u))) ?? undefined : undefined,
         thumb: Array.isArray(p.browse) ? safeHref(p.browse.find((u: unknown) => typeof u === 'string' && u.includes('thumbnail'))) ?? undefined : undefined,
         footprint: f.geometry ?? null,
       };

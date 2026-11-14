@@ -2,6 +2,7 @@ import { Suspense, lazy, memo } from 'react';
 import type { SarEvent } from '../types';
 import { CATEGORY_COLOR, CATEGORY_LABEL, fmtCoord, fmtDate } from '../lib';
 import type { CoverageResult } from '../services';
+import { stepScene } from '../map/coverageSelect';
 import { IconChevron, IconClose } from './icons';
 import WeatherSection from './WeatherSection';
 
@@ -23,6 +24,9 @@ interface Props {
   onToggleCollapsed: () => void;
   /** Close control (the panel is on demand: it is not part of the landing view). */
   onClose?: () => void;
+  /** Coverage probe: the one product currently shown on the map (null = none). */
+  selectedScene?: string | null;
+  onSelectScene?: (scene: string | null) => void;
 }
 
 const TECHNIQUE: Record<SarEvent['technique'], string> = {
@@ -31,7 +35,9 @@ const TECHNIQUE: Record<SarEvent['technique'], string> = {
   timeseries: 'Time series: change over months',
 };
 
-function Coverage({ c, onClear }: { c: CoverageResult; onClear: () => void }) {
+function Coverage({ c, onClear, selectedScene, onSelectScene }: { c: CoverageResult; onClear: () => void; selectedScene: string | null; onSelectScene: (scene: string | null) => void }) {
+  const selIndex = c.granules.findIndex((g) => g.scene === selectedScene);
+  const sel = selIndex >= 0 ? c.granules[selIndex] : null;
   const byTier = c.granules.reduce<Record<string, number>>((m, g) => ((m[g.tier] = (m[g.tier] ?? 0) + 1), m), {});
   const byProduct = c.granules.reduce<Record<string, number>>((m, g) => ((m[g.product] = (m[g.product] ?? 0) + 1), m), {});
   const tracks = new Set(c.granules.map((g) => `${g.track}${g.direction[0]}`));
@@ -77,22 +83,50 @@ function Coverage({ c, onClear }: { c: CoverageResult; onClear: () => void }) {
               <span key={t} className="badge">{t} {n}</span>
             ))}
           </div>
-          <ul className="coverage-list">
-            {c.granules.slice(0, 8).map((g) => (
+          {sel ? (
+            <div className="coverage-viewer" role="group" aria-label="Selected product">
+              <div className="row spread" style={{ flexWrap: 'nowrap' }}>
+                <span className="mono">{selIndex + 1} of {c.granules.length}</span>
+                <span className="row" style={{ gap: 6, flexWrap: 'nowrap' }}>
+                  <button type="button" className="btn" aria-label="Previous product (newer)" disabled={selIndex === 0} onClick={() => onSelectScene(stepScene(c.granules, sel.scene, -1))}>‹ Prev</button>
+                  <button type="button" className="btn" aria-label="Next product (older)" disabled={selIndex === c.granules.length - 1} onClick={() => onSelectScene(stepScene(c.granules, sel.scene, 1))}>Next ›</button>
+                  <button type="button" className="btn" aria-label="Hide this product" onClick={() => onSelectScene(null)}>Hide</button>
+                </span>
+              </div>
+              {sel.browse || sel.thumb ? (
+                <img src={sel.browse ?? sel.thumb} alt={`NASA browse picture of the NISAR ${sel.product} product acquired ${fmtDate(sel.start)}`} />
+              ) : (
+                <p className="muted">NASA published no browse picture for this product.</p>
+              )}
+              <div className="mono">{fmtDate(sel.start)} <span className="faint">{sel.start.slice(11, 16)} UTC</span></div>
+              <div className="muted" style={{ fontSize: 12 }}>
+                {sel.product} · track {sel.track} {sel.direction.toLowerCase()} · frame {sel.frame} · <span className={`tier ${sel.tier.split(' ')[0]}`}>{sel.tier}</span>
+              </div>
+              <p className="faint" style={{ fontSize: 12, margin: '6px 0 0' }}>
+                The map shows this product only: its footprint outline and this picture, placed on the footprint's bounding box (approximate, about a kilometre). NASA browse rendering: for looking, not measuring.
+              </p>
+            </div>
+          ) : (
+            <p className="callout" style={{ marginTop: 10 }}>Choose a product to see its picture and footprint on the map. Only one product is drawn at a time.</p>
+          )}
+          <ul className="coverage-list" aria-label="NISAR products at this point">
+            {c.granules.map((g) => (
               <li key={g.scene}>
-                {g.thumb ? <img src={g.thumb} alt={`NISAR ${g.product} browse thumbnail, ${fmtDate(g.start)}`} loading="lazy" /> : <span />}
-                <div>
-                  <div className="mono">{fmtDate(g.start)} <span className="faint">{g.start.slice(11, 16)} UTC</span></div>
-                  <div className="muted" style={{ fontSize: 12 }}>
-                    {g.product} · track {g.track} {g.direction.toLowerCase()} · frame {g.frame}
-                  </div>
-                  <span className={`tier ${g.tier.split(' ')[0]}`}>{g.tier}</span>
-                </div>
+                <button type="button" className="coverage-item" aria-pressed={g.scene === selectedScene} onClick={() => onSelectScene(g.scene === selectedScene ? null : g.scene)}>
+                  {g.thumb ? <img src={g.thumb} alt="" loading="lazy" /> : <span />}
+                  <span>
+                    <span className="mono" style={{ display: 'block' }}>{fmtDate(g.start)} <span className="faint">{g.start.slice(11, 16)} UTC</span></span>
+                    <span className="muted" style={{ display: 'block', fontSize: 12 }}>
+                      {g.product} · track {g.track} {g.direction.toLowerCase()} · frame {g.frame}
+                    </span>
+                    <span className={`tier ${g.tier.split(' ')[0]}`}>{g.tier}</span>
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
           <p className="faint" style={{ fontSize: 12, marginTop: 8 }}>
-            Live from the ASF DAAC search API. Blue outlines on the map are the footprints of the {Math.min(c.granules.length, 80)} most recent products.
+            Live from the ASF DAAC search API. Pictures are NASA browse renderings of each product.
           </p>
         </>
       )}
@@ -134,7 +168,7 @@ function IntroPanel(p: Props) {
             <div className="callout warn">{p.coverageError}</div>
           </div>
         )}
-        {p.coverage && p.coverageState === 'idle' && <Coverage c={p.coverage} onClear={p.onClearCoverage} />}
+        {p.coverage && p.coverageState === 'idle' && <Coverage c={p.coverage} onClear={p.onClearCoverage} selectedScene={p.selectedScene ?? null} onSelectScene={p.onSelectScene ?? (() => {})} />}
         {p.probe && (
           <div className="section">
             <Suspense fallback={<p className="muted small" role="status">Loading the NASA Earthdata search…</p>}>

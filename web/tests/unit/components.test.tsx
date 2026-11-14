@@ -417,13 +417,13 @@ describe('IntroPanel (coverage states)', () => {
     const { container } = render(<IntroPanel {...p} />);
     expect(screen.getByText('NISAR data at this point')).toBeInTheDocument();
     expect(container.querySelector('.stat')).toHaveTextContent(String(cov.total));
-    expect(container.querySelectorAll('.coverage-list li')).toHaveLength(Math.min(8, cov.total));
+    expect(container.querySelectorAll('.coverage-list li')).toHaveLength(cov.total);
     expect(container.querySelector('.coverage-list')).toHaveTextContent(/track 162 ascending · frame 7/);
     expect(container.querySelector('.tier')).toBeTruthy();
     await userEvent.click(screen.getByRole('button', { name: 'Clear coverage' }));
     expect(p.onClearCoverage).toHaveBeenCalledOnce();
   });
-  it('result: shows "N+" and "oldest listed" when the ASF page limit was hit, and caps the list at 8', () => {
+  it('result: shows "N+" and "oldest listed" when the ASF page limit was hit, and lists every product', () => {
     const g = (i: number) => ({
       scene: `S${i}`, product: 'GCOV', start: `2026-01-${String((i % 28) + 1).padStart(2, '0')}T00:00:00Z`, tier: 'BETA',
       track: 1 + (i % 3), frame: 1, direction: 'ASCENDING', footprint: { type: 'Polygon', coordinates: [] } as never,
@@ -434,7 +434,7 @@ describe('IntroPanel (coverage states)', () => {
     expect(container.querySelector('.stat')).toHaveTextContent('248+');
     expect(screen.getByText(/oldest listed/)).toBeInTheDocument();
     expect(screen.getByText(/2 Urgent Response product\(s\) here are not listed/)).toBeInTheDocument();
-    expect(container.querySelectorAll('.coverage-list li')).toHaveLength(8);
+    expect(container.querySelectorAll('.coverage-list li')).toHaveLength(248); // every product is selectable (was capped at 8)
   });
   it('result: an exact (untruncated) count has no "+" and says "earliest"', () => {
     const g = { scene: 'S1', product: 'GCOV', start: '2026-01-05T00:00:00Z', tier: 'BETA', track: 1, frame: 1, direction: 'ASCENDING', footprint: { type: 'Polygon', coordinates: [] } as never };

@@ -556,3 +556,14 @@ button.link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px
 .legend-stops li, .legend-classes li { display: flex; align-items: flex-start; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
 .layer-legend .swatch { flex: none; width: 14px; height: 14px; margin-top: 2px; border-radius: 3px; border: 1px solid rgba(255, 255, 255, 0.35); }
 @media (max-width: 520px) { .layer-legend { margin-left: 0; font-size: 13px; } }
+
+/* Coverage probe: selectable products and the single-product viewer. */
+.coverage-list { max-height: 44vh; overflow-y: auto; }
+.coverage-list li { display: block; padding: 0; }
+.coverage-item { display: grid; grid-template-columns: 56px 1fr; gap: 10px; width: 100%; padding: 6px 4px; text-align: left; background: none; border: 0; border-left: 3px solid transparent; color: inherit; font: inherit; cursor: pointer; }
+.coverage-item:hover { background: rgba(255, 255, 255, 0.04); }
+.coverage-item[aria-pressed='true'] { border-left-color: var(--focus); background: rgba(111, 179, 255, 0.1); }
+.coverage-item:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.coverage-viewer { margin-top: 10px; padding: 8px; border: 1px solid var(--line-2); border-radius: 8px; display: grid; gap: 6px; }
+.coverage-viewer img { width: 100%; max-height: 300px; object-fit: contain; background: #000; border-radius: 4px; }
+.coverage-viewer .btn { padding: 2px 8px; min-height: 28px; }

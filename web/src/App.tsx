@@ -134,6 +134,7 @@ export default function App() {
       : source === 'dem' ? 'terrain'
       : source === 'openmaptiles' ? 'labels and borders'
       : source.startsWith('ov-') ? `satellite layer "${source.slice(3)}"`
+      : source === 'coverage-browse' ? 'NISAR browse picture of the selected product'
       : source.startsWith('sar-') ? 'NISAR investigation image'
       : source;
     setMapErrors((s) => (s.has(label) ? s : new Set(s).add(label)));
@@ -156,6 +157,9 @@ export default function App() {
   const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [coverageMode, setCoverageMode] = useState(false);
   const [coverage, setCoverage] = useState<CoverageResult | null>(null);
+  /** Coverage probe: the one product shown on the map. A new probe result starts on its newest product. */
+  const [coverageScene, setCoverageScene] = useState<string | null>(null);
+  useEffect(() => setCoverageScene(coverage?.granules[0]?.scene ?? null), [coverage]);
   const [coverageState, setCoverageState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [coverageError, setCoverageError] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<{ lon: number; lat: number; zoom?: number; bbox?: [number, number, number, number]; nonce: number } | null>(null);
@@ -630,6 +634,7 @@ export default function App() {
         mode={mode}
         overlayOpacity={overlayOpacity}
         coverage={selected ? null : coverage}
+        coverageScene={coverageScene}
         pins={pins}
         activePin={activePin}
         panelInset={panelInset}
@@ -780,6 +785,8 @@ export default function App() {
           onSelect={selectEvent}
           onCoverageMode={setCoverageMode}
           onClearCoverage={closePanel}
+          selectedScene={coverageScene}
+          onSelectScene={setCoverageScene}
           onToggleCollapsed={toggleCollapsed}
           onClose={closePanel}
         />
