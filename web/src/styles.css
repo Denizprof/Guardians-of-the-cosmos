@@ -324,6 +324,13 @@ summary:active { color: var(--text); }
 .tool.sar[aria-pressed='true'] { border-color: var(--sar); }
 .tool.sar[aria-pressed='true'] .icon { color: var(--sar); }
 .tool.icon-only { width: var(--bar-h); padding: 0; justify-content: center; }
+/* EN / TR language switch */
+.lang-switch { display: inline-flex; flex: none; height: var(--bar-h); border: 1px solid var(--line); border-radius: var(--r-2); background: var(--glass); backdrop-filter: blur(8px); overflow: hidden; }
+.lang-btn { min-width: 36px; padding: 0 8px; border: 0; background: transparent; color: var(--muted); font: 600 var(--fs-micro) / 1 var(--mono); letter-spacing: 0.06em; cursor: pointer; }
+.lang-btn + .lang-btn { border-left: 1px solid var(--line); }
+.lang-btn:hover { color: var(--text); background: var(--glass-hover); }
+.lang-btn[aria-pressed='true'] { color: var(--white); background: var(--glass-active); box-shadow: inset 0 -2px 0 var(--focus); }
+.lang-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 .tool-count { font: 600 var(--fs-micro) / 16px var(--mono); font-variant-numeric: tabular-nums; min-width: 16px; text-align: center; padding: 0 4px; border-radius: 999px; background: var(--focus); color: var(--on-focus); }
 /* Labels give way before the search box does. */
 @container (max-width: 1040px) { .tool-label { display: none; } .tool { width: var(--bar-h); padding: 0; justify-content: center; } .tool:has(.tool-count) { width: auto; padding: 0 8px; } }

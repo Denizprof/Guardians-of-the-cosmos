@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import './styles.css';
+import { startDomTranslation } from './i18n/dom';
+
+startDomTranslation();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

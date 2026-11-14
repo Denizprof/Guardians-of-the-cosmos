@@ -12,6 +12,7 @@ import { InvestigationStrip, InvestigationsMenu } from './components/Investigati
 import { readHash } from './app/readHash';
 import { markIntroSeen, shouldShowIntro } from './app/introSeen';
 import Welcome from './components/Welcome';
+import LangSwitch from './components/LangSwitch';
 import { useIsMobile, useViewportHeight } from './app/viewport';
 import { useCatalogs } from './app/useCatalogs';
 import { PANEL_W, useSwipe } from './app/useSwipe';
@@ -481,6 +482,7 @@ export default function App() {
             <IconInfo />
             <span className="tool-label">About</span>
           </button>
+          <LangSwitch />
         </div>
       </header>
 

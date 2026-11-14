@@ -12,6 +12,7 @@ import { browseBounds, coverageFeatures, trimmedBrowseUrl } from './coverageSele
 import {
   EVENT_BEARING, EVENT_PITCH, HOME_CENTER, MAX_ZOOM, STYLE, TERRAIN, TERRAIN_OFF_ZOOM, TERRAIN_ON_ZOOM, homeZoom, lensStyle,
 } from './style';
+import { mapNameExpression, onLangChange } from '../i18n';
 import { attachHalo } from './halo';
 import { addOverlays, overlayUrls, syncImageLayers, syncTileOverlays } from './overlays';
 import type { TileOverlay } from './overlays';
@@ -77,6 +78,25 @@ function syncTerrain(map: MlMap) {
   else if (on && z < TERRAIN_OFF_ZOOM) map.setTerrain(null);
 }
 
+/** Keep the map's place labels in the chosen language (Turkish names where the tiles carry them). */
+function bindLabelLanguage(map: MlMap) {
+  const apply = () => {
+    let layers;
+    try {
+      layers = map.getStyle()?.layers;
+    } catch {
+      return; // style not parsed yet: 'style.load' calls again
+    }
+    const expr = mapNameExpression() as maplibregl.ExpressionSpecification;
+    for (const l of layers ?? []) {
+      if (l.type === 'symbol' && l.id.startsWith('label-')) map.setLayoutProperty(l.id, 'text-field', expr);
+    }
+  };
+  map.on('style.load', apply);
+  const off = onLangChange(apply);
+  map.once('remove', off);
+}
+
 function makeMap(container: HTMLElement, reducedMotion: () => boolean): MlMap {
   const map = new maplibregl.Map({
     container,
@@ -100,6 +120,7 @@ function makeMap(container: HTMLElement, reducedMotion: () => boolean): MlMap {
     canvasContextAttributes: { powerPreference: 'high-performance', contextType: 'webgl2', antialias: false },
   });
   map.on('style.load', () => map.setProjection({ type: 'globe' }));
+  bindLabelLanguage(map);
   map.on('zoom', () => syncTerrain(map));
   map.on('moveend', () => syncTerrain(map));
   // Like Google Earth: when the user zooms back out to globe scale, level the camera so the
@@ -557,6 +578,7 @@ function MapView(p: MapViewProps) {
       refreshExpiredTiles: false,
       canvasContextAttributes: { powerPreference: 'high-performance', contextType: 'webgl2', antialias: false },
     });
+    bindLabelLanguage(lens);
     lens.getCanvas().setAttribute('aria-label', 'Globe: SAR lens view');
     // Lens tile errors. GIBS answers a day *without a pass* with a transparent 200 tile, but a day that is
     // *not published yet* answers 404 on every tile, and GIBS occasionally returns a one-off 500. Neither is
