@@ -47,11 +47,11 @@ function RadarArt() {
 
 /** Real NISAR radar images of the Mozambique floods, before and after, split by a swipe handle. Decorative. */
 function CompareArt() {
-  const dir = `${BASE}data/events/mozambique-floods-2026/`;
+  // small copies (900 px, about 80 KB each) of the Mozambique GCOV images; the full-size ones stay in the investigation
   return (
     <div className="tour-art tour-compare" aria-hidden="true">
-      <img src={`${dir}gcov_20260105.webp`} alt="" decoding="async" />
-      <img className="tour-compare-after" src={`${dir}gcov_20260117.webp`} alt="" decoding="async" />
+      <img src={`${BASE}intro/flood-20260105.webp`} alt="" decoding="async" />
+      <img className="tour-compare-after" src={`${BASE}intro/flood-20260117.webp`} alt="" decoding="async" />
       <span className="tour-compare-tag" data-no-i18n>5 Jan</span>
       <span className="tour-compare-tag right" data-no-i18n>17 Jan</span>
       <span className="tour-compare-handle" />

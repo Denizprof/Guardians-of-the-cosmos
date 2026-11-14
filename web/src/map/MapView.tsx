@@ -14,6 +14,7 @@ import {
 } from './style';
 import { mapNameExpression, onLangChange } from '../i18n';
 import { attachHalo } from './halo';
+import { isLite, mapPixelRatio } from '../app/perf';
 import { addOverlays, overlayUrls, syncImageLayers, syncTileOverlays } from './overlays';
 import type { TileOverlay } from './overlays';
 import { addMarkers } from './markers';
@@ -71,7 +72,7 @@ function mapErrorReporter(where: 'globe' | 'lens', report: () => MapViewProps['o
 
 /** Enable 3D terrain when zoomed in, drop it again for the whole-globe view (with hysteresis). */
 function syncTerrain(map: MlMap) {
-  if (!map.getSource('dem')) return;
+  if (!map.getSource('dem') || isLite()) return; // lite mode: no 3D terrain (the costliest effect)
   const z = map.getZoom();
   const on = !!map.getTerrain();
   if (!on && z >= TERRAIN_ON_ZOOM) map.setTerrain(TERRAIN);
@@ -107,7 +108,7 @@ function makeMap(container: HTMLElement, reducedMotion: () => boolean): MlMap {
     maxPitch: 75,
     fadeDuration: 0,
     // Two terrain-enabled maps at 3x device pixels is too heavy for phones.
-    pixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
+    pixelRatio: mapPixelRatio(),
     // Sentinel-2 cloudless is 10 m/pixel (native ~z14). Deeper zoom only stretched tiles into blur
     // with visible seams between tile levels, so stop at ~1.4x overzoom.
     maxZoom: MAX_ZOOM,
@@ -119,7 +120,10 @@ function makeMap(container: HTMLElement, reducedMotion: () => boolean): MlMap {
     // to force one, set the browser to "High performance" in Windows Graphics settings.
     canvasContextAttributes: { powerPreference: 'high-performance', contextType: 'webgl2', antialias: false },
   });
-  map.on('style.load', () => map.setProjection({ type: 'globe' }));
+  map.on('style.load', () => {
+    map.setProjection({ type: 'globe' });
+    if (isLite()) map.setSky({ 'atmosphere-blend': 0, 'fog-ground-blend': 0, 'horizon-fog-blend': 0 });
+  });
   bindLabelLanguage(map);
   map.on('zoom', () => syncTerrain(map));
   map.on('moveend', () => syncTerrain(map));
@@ -129,12 +133,12 @@ function makeMap(container: HTMLElement, reducedMotion: () => boolean): MlMap {
     if (!(e as any).originalEvent) return; // only react to the user's own zooming, not fly-ins
     if (map.getZoom() < 4.5 && map.getPitch() > 1) map.easeTo({ pitch: 0, duration: reducedMotion() ? 0 : 600 });
   });
-  attachHalo(map);
+  if (!isLite()) attachHalo(map);
   return map;
 }
 
 const SPIN_MAX_MS = 30_000;
-const BASE_PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, 1.5);
+const BASE_PIXEL_RATIO = mapPixelRatio();
 /** From this zoom the SAR lens renders only its square (see the lens effect); below it, a clipped full view. */
 const LENS_WINDOW_MIN_ZOOM = 5;
 /** A stacked lens day whose tiles failed this many times is treated as unavailable and removed. */
