@@ -33,10 +33,12 @@ The globe also shows about 170 recent USGS (M6.3+) and NASA EONET events as **co
 - `docs/data-sources.md`: every dataset and API we use
 - `design/`, `src/`: reserved from the original scaffold
 
-## Publishing (not live yet)
-The repository is private, and GitHub Pages needs a public repository or a paid plan, so the site is not published. A ready workflow (`.github/workflows/pages.yml`, manual trigger) builds and deploys the static site once Pages is available; it would be served at https://denizprof.github.io/Guardians-of-the-cosmos/.
+## Live site
+https://denizprof.github.io/Guardians-of-the-cosmos/
 
-A published site has no server, so the Meteomatics weather section and the AI assistant would show "not connected" there. Everything else works: the globe, investigations, satellite layers with colour legends, the SAR lens, the coverage probe and the event catalogs.
+`.github/workflows/pages.yml` builds the web app and publishes it to GitHub Pages on every push to `main`. This needs **Settings > Pages > Source** set to **GitHub Actions** (with "Deploy from a branch", GitHub shows this README instead of the app).
+
+The published site has no server, so the Meteomatics weather section and the AI assistant show "not connected" there. Everything else works: the globe, investigations, satellite layers with colour legends, the SAR lens, the coverage probe and the event catalogs.
 
 ## Get it running
 
