@@ -38,53 +38,24 @@ const STEP_TITLES = ['Welcome', 'Investigations', 'Tools', 'Before you start'];
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 /** A radar satellite sending pulses down to the globe: the idea of the app in one picture. Decorative. */
+const BASE = import.meta.env.BASE_URL;
+
 function RadarArt() {
-  return (
-    <svg className="tour-art" viewBox="0 0 320 220" aria-hidden="true" focusable="false">
-      <defs>
-        <radialGradient id="tour-globe" cx="38%" cy="32%" r="75%">
-          <stop offset="0" stopColor="#2f6fb0" />
-          <stop offset="0.55" stopColor="#173a63" />
-          <stop offset="1" stopColor="#0b1626" />
-        </radialGradient>
-        <linearGradient id="tour-beam" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e9c46a" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#e9c46a" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <circle cx="160" cy="250" r="150" fill="url(#tour-globe)" />
-      <path d="M40 214c34-20 70-26 104-16s60 6 92-12 60-18 88-6" fill="none" stroke="#3d8c5a" strokeWidth="10" strokeLinecap="round" opacity="0.55" />
-      <path d="M186 44 L120 196 L250 196 Z" fill="url(#tour-beam)" />
-      {[0, 1, 2].map((i) => (
-        <path key={i} className="tour-pulse" style={{ animationDelay: `${i * 0.6}s` }} d="M150 150 Q186 132 222 150" fill="none" stroke="#e9c46a" strokeWidth="2.5" strokeLinecap="round" />
-      ))}
-      <g className="tour-sat" transform="translate(186 40) rotate(-14)">
-        <rect x="-34" y="-7" width="24" height="14" rx="2" fill="#6fb3ff" opacity="0.9" />
-        <rect x="10" y="-7" width="24" height="14" rx="2" fill="#6fb3ff" opacity="0.9" />
-        <rect x="-10" y="-11" width="20" height="22" rx="4" fill="#e7e9ec" />
-        <circle cx="0" cy="13" r="3" fill="#e9c46a" />
-      </g>
-      <g fill="#e7e9ec" opacity="0.8">
-        <circle cx="34" cy="30" r="1.4" /><circle cx="70" cy="70" r="1" /><circle cx="270" cy="24" r="1.6" />
-        <circle cx="292" cy="90" r="1" /><circle cx="110" cy="18" r="1" /><circle cx="250" cy="120" r="1.2" />
-      </g>
-    </svg>
-  );
+  // 3D render (three.js): NISAR's radar beam over Europe, North Africa and Türkiye
+  return <img className="tour-art tour-art-3d" src={`${BASE}intro/nisar-earth.webp`} alt="" aria-hidden="true" width={1200} height={984} decoding="async" />;
 }
 
-/** Before / after illustration: the same field, dark (flooded) after. Decorative. */
+/** Real NISAR radar images of the Mozambique floods, before and after, split by a swipe handle. Decorative. */
 function CompareArt() {
+  const dir = `${BASE}data/events/mozambique-floods-2026/`;
   return (
-    <svg className="tour-art" viewBox="0 0 320 180" aria-hidden="true" focusable="false">
-      <rect x="10" y="20" width="148" height="140" rx="10" fill="#3a4a3a" />
-      <rect x="162" y="20" width="148" height="140" rx="10" fill="#3a4a3a" />
-      <path d="M10 110c30-10 60 4 90-6s40-8 58-2v58H20a10 10 0 0 1-10-10z" fill="#566b52" />
-      <path d="M162 70c30 4 60-10 90 2s40 8 58 4v74a10 10 0 0 1-10 10H172a10 10 0 0 1-10-10z" fill="#0d1a2b" />
-      <path d="M162 70c30 4 60-10 90 2s40 8 58 4" fill="none" stroke="#3fa9ff" strokeWidth="2.5" />
-      <rect x="157" y="14" width="6" height="152" rx="3" fill="#e7e9ec" />
-      <circle cx="160" cy="90" r="13" fill="#e7e9ec" />
-      <path d="M154 90h12M154 90l3-3M154 90l3 3M166 90l-3-3M166 90l-3 3" stroke="#111419" strokeWidth="2" strokeLinecap="round" />
-    </svg>
+    <div className="tour-art tour-compare" aria-hidden="true">
+      <img src={`${dir}gcov_20260105.webp`} alt="" decoding="async" />
+      <img className="tour-compare-after" src={`${dir}gcov_20260117.webp`} alt="" decoding="async" />
+      <span className="tour-compare-tag" data-no-i18n>5 Jan</span>
+      <span className="tour-compare-tag right" data-no-i18n>17 Jan</span>
+      <span className="tour-compare-handle" />
+    </div>
   );
 }
 

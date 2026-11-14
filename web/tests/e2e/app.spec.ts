@@ -295,7 +295,7 @@ test.describe('search', () => {
     expect(new URL(calls.asf[0]).searchParams.get('intersectsWith')).toBe('POINT(-67.2000 10.5000)');
     expect(calls.photon).toHaveLength(0); // coordinates never hit the geocoder
     await expect(intro.locator('.coverage-list li').first()).toBeVisible();
-    await intro.getByRole('button', { name: 'Clear coverage' }).click();
+    await intro.getByRole('button', { name: 'Close panel' }).click();
     await expect(page.getByText('NISAR data at this point')).toHaveCount(0);
     await expect(anyPanel(page)).toHaveCount(0); // clearing the probe closes its panel
   });

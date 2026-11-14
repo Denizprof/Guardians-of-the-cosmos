@@ -420,8 +420,7 @@ describe('IntroPanel (coverage states)', () => {
     expect(container.querySelectorAll('.coverage-list li')).toHaveLength(cov.total);
     expect(container.querySelector('.coverage-list')).toHaveTextContent(/track 162 ascending · frame 7/);
     expect(container.querySelector('.tier')).toBeTruthy();
-    await userEvent.click(screen.getByRole('button', { name: 'Clear coverage' }));
-    expect(p.onClearCoverage).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('button', { name: 'Clear coverage' })).toBeNull(); // only the panel's own close button closes it
   });
   it('result: shows "N+" and "oldest listed" when the ASF page limit was hit, and lists every product', () => {
     const g = (i: number) => ({

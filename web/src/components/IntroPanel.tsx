@@ -37,7 +37,7 @@ const TECHNIQUE: Record<SarEvent['technique'], string> = {
   timeseries: 'Time series: change over months',
 };
 
-function Coverage({ c, onClear, selectedScene, onSelectScene }: { c: CoverageResult; onClear: () => void; selectedScene: string | null; onSelectScene: (scene: string | null) => void }) {
+function Coverage({ c, selectedScene, onSelectScene }: { c: CoverageResult; selectedScene: string | null; onSelectScene: (scene: string | null) => void }) {
   const selIndex = c.granules.findIndex((g) => g.scene === selectedScene);
   const sel = selIndex >= 0 ? c.granules[selIndex] : null;
   const byTier = c.granules.reduce<Record<string, number>>((m, g) => ((m[g.tier] = (m[g.tier] ?? 0) + 1), m), {});
@@ -45,10 +45,7 @@ function Coverage({ c, onClear, selectedScene, onSelectScene }: { c: CoverageRes
   const tracks = new Set(c.granules.map((g) => `${g.track}${g.direction[0]}`));
   return (
     <div className="section">
-      <div className="row spread">
-        <h3 style={{ margin: 0 }}>NISAR data at this point</h3>
-        <button className="close" onClick={onClear} aria-label="Clear coverage"><IconClose /></button>
-      </div>
+      <h3 style={{ margin: 0 }}>NISAR data at this point</h3>
       <div className="mono muted" style={{ marginTop: 4 }}>
         {c.lat.toFixed(4)}, {c.lon.toFixed(4)}
       </div>
@@ -170,7 +167,7 @@ function IntroPanel(p: Props) {
             <div className="callout warn">{p.coverageError}</div>
           </div>
         )}
-        {p.coverage && p.coverageState === 'idle' && <Coverage c={p.coverage} onClear={p.onClearCoverage} selectedScene={p.selectedScene ?? null} onSelectScene={p.onSelectScene ?? (() => {})} />}
+        {p.coverage && p.coverageState === 'idle' && <Coverage c={p.coverage} selectedScene={p.selectedScene ?? null} onSelectScene={p.onSelectScene ?? (() => {})} />}
         {p.probe && (
           <div className="section">
             <Suspense fallback={<p className="muted small" role="status">Loading the NASA Earthdata search…</p>}>

@@ -739,6 +739,16 @@ details.concept p { margin: var(--sp-1) 0 var(--sp-2); }
 @keyframes tour-pulse { 0% { opacity: 0; transform: translateY(-80px) scale(0.4); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(20px) scale(1.4); } }
 .tour-sat { animation: tour-float 6s ease-in-out infinite; }
 @keyframes tour-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+.tour-art-3d { animation: tour-float 7s ease-in-out infinite; }
+.tour-compare { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #0b1018; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.tour-compare img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tour-compare-after { clip-path: inset(0 0 0 50%); animation: tour-swipe 7s ease-in-out infinite; }
+@keyframes tour-swipe { 0%, 100% { clip-path: inset(0 0 0 50%); } 50% { clip-path: inset(0 0 0 38%); } }
+.tour-compare-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; margin-left: -1.5px; background: #e7e9ec; box-shadow: 0 0 10px rgba(0, 0, 0, 0.6); animation: tour-handle 7s ease-in-out infinite; }
+.tour-compare-handle::after { content: ''; position: absolute; top: 50%; left: 50%; width: 26px; height: 26px; margin: -13px; border-radius: 50%; background: #e7e9ec; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); }
+@keyframes tour-handle { 0%, 100% { left: 50%; } 50% { left: 38%; } }
+.tour-compare-tag { position: absolute; top: 8px; left: 8px; padding: 2px 8px; border-radius: 999px; font-size: 12px; background: rgba(0, 0, 0, 0.6); color: #e7e9ec; }
+.tour-compare-tag.right { left: auto; right: 8px; }
 
 /* step 2: investigations */
 .tour-split .tour-art { margin: var(--sp-2) 0; border-radius: var(--r-3); }
@@ -796,7 +806,7 @@ details.concept p { margin: var(--sp-1) 0 var(--sp-2); }
   .welcome-card.tour { height: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tour-step, .tour-pulse, .tour-sat { animation: none; }
+  .tour-step, .tour-pulse, .tour-sat, .tour-art-3d, .tour-compare-after, .tour-compare-handle { animation: none; }
   .tour-pulse { opacity: 0.6; }
 }
 
