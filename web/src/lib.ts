@@ -97,7 +97,7 @@ export async function loadData(): Promise<{ events: SarEvent[]; context: Context
   return { events: ev.events, context: ctx.events, contextError: ctx.error, generated: ev.generated };
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** Only http(s) links from external data may become hrefs (blocks javascript:, data:, etc.). */
 export function safeHref(u: unknown): string | undefined {

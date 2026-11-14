@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import type { SarEvent, SarLayer } from '../types';
-import { fmtDate, layerLabel, parseUTC } from '../lib';
+import { MONTHS, fmtDate, layerLabel, parseUTC } from '../lib';
 
 interface Props {
   event: SarEvent;
@@ -11,7 +11,6 @@ interface Props {
   onPick: (layerId: string) => void;
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 // parseUTC, not Date.parse: an offset-less ISO time is LOCAL time to Date.parse, which would shift every
 // acquisition by the viewer's timezone (this app treats every date as UTC).
 const t = (iso: string) => parseUTC(iso).getTime();

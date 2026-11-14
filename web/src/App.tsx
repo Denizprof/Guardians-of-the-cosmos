@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import MapView from './map/MapView';
 import SearchBox from './components/SearchBox';
 import Filters from './components/Filters';
@@ -7,8 +7,13 @@ import IntroPanel from './components/IntroPanel';
 import ContextPanel from './components/ContextPanel';
 import Timeline from './components/Timeline';
 import SarLens, { type LensGeometry } from './components/SarLens';
-import { IconFilters, IconInfo, IconInvestigations, IconLayers, IconLens, IconProbe, IconClose } from './components/icons';
-import { CATALOGS, CATEGORY_COLOR, CATEGORY_LABEL, GROUPS, fmtDate, loadCatalog, loadData, layerLabel } from './lib';
+import { IconFilters, IconInfo, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
+import { InvestigationStrip, InvestigationsMenu } from './components/Investigations';
+import { readHash } from './app/readHash';
+import { useIsMobile, useViewportHeight } from './app/viewport';
+import { useCatalogs } from './app/useCatalogs';
+import { PANEL_W, useSwipe } from './app/useSwipe';
+import { GROUPS, loadData, layerLabel } from './lib';
 import { loadLayerCatalog, toOverlay, type CatalogLayer } from './layers';
 import LayersPanel, { type LayerState } from './components/LayersPanel';
 import { nisarCoverage, type CoverageResult, type GeocodeHit } from './services';
@@ -19,105 +24,10 @@ import type { Category, CompareMode, ContextEvent, SarEvent } from './types';
 /** Stable empty list: a fresh [] per render would re-run MapView's pin effect on every App render. */
 const NO_PINS: Pin[] = [];
 const ALL_CATS: Category[] = GROUPS.flatMap((g) => g.categories);
-const PANEL_W = 424; // side panel width + gutters (see --panel-w in styles.css)
-const TECHNIQUE: Record<SarEvent['technique'], string> = { insar: 'Ground motion', backscatter: 'Surface change', timeseries: 'Time series' };
-
-// ---- URL state: #/e/<event>?mode=swipe&b=<layer>&a=<layer>&lvl=simple
-function readHash() {
-  const h = window.location.hash.replace(/^#\/?/, '');
-  const [path, qs] = h.split('?');
-  const q = new URLSearchParams(qs || '');
-  const m = path.match(/^e\/([\w-]+)/);
-  const mode = q.get('mode');
-  const lvl = q.get('lvl');
-  return {
-    event: m?.[1] ?? null,
-    // whitelist: an unknown value in a shared link must not leave the UI with no mode
-    mode: mode === 'swipe' || mode === 'side' || mode === 'overlay' ? (mode as CompareMode) : null,
-    b: q.get('b'),
-    a: q.get('a'),
-    lvl: lvl === 'simple' || lvl === 'scientific' ? (lvl as 'simple' | 'scientific') : null,
-  };
-}
-
-function useIsMobile() {
-  const [m, setM] = useState(() => window.matchMedia('(max-width: 820px)').matches);
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 820px)');
-    const f = () => setM(mq.matches);
-    mq.addEventListener('change', f);
-    return () => mq.removeEventListener('change', f);
-  }, []);
-  return m;
-}
-
-/** Window height as state, so layout insets follow rotation / resize (reading it during render went stale). */
-function useViewportHeight() {
-  const [h, setH] = useState(() => window.innerHeight);
-  useEffect(() => {
-    const f = () => setH(window.innerHeight);
-    window.addEventListener('resize', f);
-    return () => window.removeEventListener('resize', f);
-  }, []);
-  return h;
-}
 
 /** What the on-demand side panel shows when no investigation is open. */
 type PanelView = 'none' | 'about' | 'probe' | 'context';
 type Popover = null | 'investigations' | 'filters' | 'layers';
-
-function InvestigationCard({ e, onSelect }: { e: SarEvent; onSelect: (id: string) => void }) {
-  return (
-    <button type="button" className="inv-card" onClick={() => onSelect(e.id)}>
-      <span className="inv-kicker">
-        <span className="dot" style={{ background: CATEGORY_COLOR[e.category] }} />
-        {CATEGORY_LABEL[e.category]}
-        <span className="mono faint">{e.date ? fmtDate(e.date) : 'date pending'}</span>
-      </span>
-      <span className="inv-title">{e.title}</span>
-      <span className="inv-sub">
-        {TECHNIQUE[e.technique]} · {e.layers.length} NISAR layers
-      </span>
-    </button>
-  );
-}
-
-/** Landing strip: the curated investigations, one tap away, without a permanent panel. */
-const InvestigationStrip = memo(function InvestigationStrip({ events, onSelect }: { events: SarEvent[]; onSelect: (id: string) => void }) {
-  if (!events.length) return null;
-  return (
-    <nav className="inv-strip" aria-label="Investigations">
-      {events.map((e) => (
-        <InvestigationCard key={e.id} e={e} onSelect={onSelect} />
-      ))}
-    </nav>
-  );
-});
-
-const InvestigationsMenu = memo(function InvestigationsMenu({ events, selectedId, onSelect, onClose }: { events: SarEvent[]; selectedId: string | null; onSelect: (id: string) => void; onClose: () => void }) {
-  return (
-    <aside className="popover inv-menu" aria-label="Investigations list">
-      <div className="popover-head">
-        <h2>Investigations</h2>
-        <button className="close" onClick={onClose} aria-label="Close investigations list">
-          <IconClose />
-        </button>
-      </div>
-      <div className="popover-body">
-        <p className="muted small">Before and after, from real NISAR radar observations.</p>
-        {events.map((e) => (
-          <button key={e.id} type="button" className="inv-row" aria-current={e.id === selectedId ? 'true' : undefined} onClick={() => onSelect(e.id)}>
-            <span className="dot" style={{ background: CATEGORY_COLOR[e.category] }} />
-            <span className="inv-title">{e.title}</span>
-            <span className="what">
-              {CATEGORY_LABEL[e.category]} · {e.subtitle}
-            </span>
-          </button>
-        ))}
-      </div>
-    </aside>
-  );
-});
 
 export default function App() {
   const [events, setEvents] = useState<SarEvent[]>([]);
@@ -165,11 +75,6 @@ export default function App() {
   const [flyTo, setFlyTo] = useState<{ lon: number; lat: number; zoom?: number; bbox?: [number, number, number, number]; nonce: number } | null>(null);
   const isMobile = useIsMobile();
   const viewportH = useViewportHeight();
-  const [activeCatalogs, setActiveCatalogs] = useState<Set<string>>(() => new Set(CATALOGS.filter((c) => c.defaultOn).map((c) => c.id)));
-  const [catalogEvents, setCatalogEvents] = useState<Record<string, ContextEvent[]>>({});
-  const [catalogErrors, setCatalogErrors] = useState<Record<string, string>>({});
-  /** When each catalog snapshot was built (shown so a "last 24 h" layer is never mistaken for live data). */
-  const [catalogRetrieved, setCatalogRetrieved] = useState<Record<string, string>>({});
   const [years, setYears] = useState<[number, number]>([1900, new Date().getUTCFullYear()]);
   const [probe, setProbe] = useState<{ lon: number; lat: number; date: string | null } | null>(null);
   const [catalogLayers, setCatalogLayers] = useState<CatalogLayer[]>([]);
@@ -194,18 +99,7 @@ export default function App() {
     [catalogLayers, layerState]
   );
 
-  // load catalogs on demand when switched on
-  useEffect(() => {
-    for (const id of activeCatalogs) {
-      if (catalogEvents[id] || catalogErrors[id]) continue;
-      loadCatalog(id)
-        .then((c) => {
-          setCatalogEvents((m) => ({ ...m, [id]: c.events }));
-          if (typeof c.retrieved === 'string') setCatalogRetrieved((m) => ({ ...m, [id]: c.retrieved }));
-        })
-        .catch((e) => setCatalogErrors((m) => ({ ...m, [id]: String(e.message || e) })));
-    }
-  }, [activeCatalogs, catalogEvents, catalogErrors]);
+  const { activeCatalogs, catalogEvents, catalogErrors, catalogRetrieved, catalogCounts, onToggleCatalog } = useCatalogs();
 
   // everything shown as reported/context markers: recent EONET/USGS + active catalogs, filtered by year
   const mapContext = useMemo(() => {
@@ -222,7 +116,6 @@ export default function App() {
   }, [context, showContext, activeCatalogs, catalogEvents, years]);
   const mapContextRef = useRef(mapContext);
   mapContextRef.current = mapContext;
-  const catalogCounts = useMemo(() => Object.fromEntries(Object.entries(catalogEvents).map(([k, v]) => [k, v.length])), [catalogEvents]);
 
   useEffect(() => {
     loadData()
@@ -411,51 +304,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [closePanel]);
 
-  // ---- swipe divider. Its position is a CSS variable on .app (read by the map clip, the handle and the
-  // BEFORE/AFTER tags), written from a ref inside requestAnimationFrame: dragging re-renders nothing in React.
-  // The committed value (pointer up, arrow keys) only feeds aria-valuenow.
-  const freeWidth = useCallback(() => window.innerWidth - (isMobile ? 0 : PANEL_W), [isMobile]);
-  const swipeX = useRef(Math.round((window.innerWidth - (window.innerWidth <= 820 ? 0 : PANEL_W)) / 2));
-  const swipeRaf = useRef(0);
-  const swipeDragging = useRef(false);
-  const handleRef = useRef<HTMLDivElement>(null);
-  const pct = useCallback((x: number) => Math.max(0, Math.min(100, Math.round((x / freeWidth()) * 100))), [freeWidth]);
-  const [swipePct, setSwipePct] = useState(() => pct(swipeX.current));
-  const paintSwipe = useCallback(() => {
-    swipeRaf.current = 0;
-    appRef.current?.style.setProperty('--swipe-x', `${swipeX.current}px`);
-    handleRef.current?.setAttribute('aria-valuenow', String(pct(swipeX.current)));
-  }, [pct]);
-  const moveSwipe = useCallback(
-    (x: number, commit: boolean) => {
-      // clamp to the visible map (not the window): past freeWidth the handle hides under the side panel
-      swipeX.current = Math.max(0, Math.min(freeWidth(), Math.round(x)));
-      if (!swipeRaf.current) swipeRaf.current = requestAnimationFrame(paintSwipe);
-      if (commit) setSwipePct(pct(swipeX.current));
-    },
-    [paintSwipe, pct, freeWidth]
-  );
-  useLayoutEffect(() => {
-    // (re)centre in the free part of the map whenever an investigation opens or the layout flips
-    if (!selectedId) return;
-    swipeX.current = Math.round(freeWidth() / 2);
-    paintSwipe();
-    setSwipePct(pct(swipeX.current));
-  }, [selectedId, freeWidth, paintSwipe, pct]);
-  useEffect(() => () => cancelAnimationFrame(swipeRaf.current), []);
-  const onSwipeDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    swipeDragging.current = true;
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-  };
-  const onSwipeMove = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (swipeDragging.current) moveSwipe(e.clientX, false);
-  };
-  const onSwipeUp = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (!swipeDragging.current) return;
-    swipeDragging.current = false;
-    e.currentTarget.releasePointerCapture?.(e.pointerId);
-    moveSwipe(swipeX.current, true);
-  };
+  const { freeWidth, swipeX, handleRef, swipePct, moveSwipe, onSwipeDown, onSwipeMove, onSwipeUp } = useSwipe(appRef, isMobile, selectedId);
 
   const pins = (selected && EVENT_CONTENT[selected.id]?.pins) || NO_PINS;
   const sheet = Math.round(viewportH * 0.52); // matches the 52vh mobile sheet in styles.css
@@ -521,20 +370,6 @@ export default function App() {
     },
     [selectEvent, runCoverage]
   );
-  const onToggleCatalog = useCallback((id: string) => {
-    // Toggling a failed catalog is the retry: clear its error so the load effect tries again
-    // (loadCatalog drops failed promises from its cache).
-    setCatalogErrors((m) => {
-      if (!(id in m)) return m;
-      const { [id]: _drop, ...rest } = m;
-      return rest;
-    });
-    setActiveCatalogs((s) => {
-      const n = new Set(s);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
-  }, []);
   const onSetVisible = useCallback(
     (cats: Category[], on: boolean) =>
       setVisible((s) => {
