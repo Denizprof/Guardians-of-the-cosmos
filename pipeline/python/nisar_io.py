@@ -78,15 +78,25 @@ class RemoteFile(io.RawIOBase):
                 with self.opener.open(req, timeout=90) as r:
                     if not self.direct and r.geturl() != self.url:
                         self.direct = r.geturl()
+                    cr = r.headers.get("Content-Range")
+                    if cr is None:
+                        # 200 without Content-Range = the server ignored our Range header
+                        raise OSError(f"Server ignored the HTTP Range request for {self.url} (no Content-Range); "
+                                      "subset reads are impossible against this endpoint.")
                     data = r.read()
-                    total = int(r.headers["Content-Range"].split("/")[-1])
+                    total = int(cr.split("/")[-1])
                     self.fetched += len(data)
                     return data, total
             except urllib.error.HTTPError as e:
                 if e.code in (401, 403) and self.direct:
                     self.direct = None  # signed URL expired: go back through ASF
                     continue
-                if e.code < 500:
+                if e.code in (408, 425, 429):
+                    # throttled / timed out: back off, honouring Retry-After when given in seconds
+                    ra = e.headers.get("Retry-After") if e.headers else None
+                    if ra and ra.isdigit():
+                        delay = max(delay, min(float(ra), 120.0))
+                elif e.code < 500:
                     raise
             except (urllib.error.URLError, OSError, TimeoutError):
                 pass

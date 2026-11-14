@@ -21,5 +21,6 @@ export default defineConfig({
   base: './',
   plugins: [react(), maplibreWorker()],
   optimizeDeps: { exclude: ['maplibre-gl'] },
-  server: { port: 5173 },
+  // /api/assistant -> local assistant-gateway (see docs/assistant-integration.md).
+  server: { port: 5173, proxy: { '/api/assistant': 'http://127.0.0.1:8787' } },
 });

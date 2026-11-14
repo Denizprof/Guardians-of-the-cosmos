@@ -1,0 +1,373 @@
+{
+ "recorded": "2026-11-14T08:14:16.740Z",
+ "query": {
+  "lon": 139.7,
+  "lat": 35.7,
+  "start": "2026-01-01T00:00:00Z",
+  "end": "2026-01-20T00:00:00Z"
+ },
+ "note": "Trimmed from live CMR collections.json and granules.json (CMR-Hits header) responses.",
+ "feed": {
+  "entry": [
+   {
+    "id": "C1426396538-LANCEMODIS",
+    "short_name": "MOD00F",
+    "version_id": "6.1NRT",
+    "title": "MODIS/Terra L0 PDS Data 5-Min Swath - NRT",
+    "dataset_id": "MODIS/Terra L0 PDS Data 5-Min Swath - NRT",
+    "data_center": "LANCEMODIS",
+    "processing_level_id": "0",
+    "cloud_hosted": false,
+    "platforms": [
+     "Terra"
+    ],
+    "links": [
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+      "hreflang": "en-US",
+      "href": "https://www.earthdata.nasa.gov/data/instruments/modis/near-real-time-data"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://nrt3.modaps.eosdis.nasa.gov/archive/allData/61/MOD00F/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.earthdata.nasa.gov/search/granules?p=C1426396538-LANCEMODIS"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://earthdata.nasa.gov/s3fs-public/2026-04/LANCE_MODAPS_Operational_Data_Flow_Diagram_4.16.26.pdf?VersionId=auDDcXbLWd7lDM.IyBmsuVfguIP64vnr"
+     }
+    ]
+   },
+   {
+    "id": "C2105086226-LAADS",
+    "short_name": "VJ103IMG",
+    "version_id": "2.1",
+    "title": "VIIRS/JPSS1 Imagery Resolution Terrain Corrected Geolocation  L1 6-Min Swath 375 m",
+    "dataset_id": "VIIRS/JPSS1 Imagery Resolution Terrain Corrected Geolocation  L1 6-Min Swath 375 m",
+    "data_center": "LAADS",
+    "processing_level_id": "1A",
+    "cloud_hosted": true,
+    "platforms": [
+     "NOAA-20"
+    ],
+    "links": [
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+      "hreflang": "en-US",
+      "href": "https://doi.org/10.5067/VIIRS/VJ103IMG.021"
+     },
+     {
+      "length": "0KB",
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/VJ103IMG--5201"
+     },
+     {
+      "length": "0KB",
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5201/VJ103IMG/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/service#",
+      "type": "text/html",
+      "hreflang": "en-US",
+      "href": "https://ladsweb.modaps.eosdis.nasa.gov/opendap/RemoteResources/laads/allData/5201/VJ103IMG/contents.html"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/viirs/NASA_VIIRS_L1B_UG_August_2021.pdf"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/viirs/NASARevisedVIIRSGeolocationATBD2014.pdf"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.earthdata.nasa.gov/search/granules?p=C2105086226-LAADS"
+     }
+    ]
+   },
+   {
+    "id": "C2854338529-ASF",
+    "short_name": "NISAR_L2_GCOV_PROVISIONAL_V1",
+    "version_id": "1",
+    "title": "NISAR Provisional Geocoded Polarimetric Covariance Product (Version 1)",
+    "dataset_id": "NISAR Provisional Geocoded Polarimetric Covariance Product (Version 1)",
+    "data_center": "ASF",
+    "processing_level_id": "2",
+    "cloud_hosted": true,
+    "platforms": [
+     "NISAR"
+    ],
+    "links": [
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.asf.alaska.edu/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.earthdata.nasa.gov/search/granules?p=C2854338529-ASF"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+      "hreflang": "en-US",
+      "href": "https://nisar.jpl.nasa.gov/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://nisar-docs.asf.alaska.edu/gcov/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://cumulus.asf.earthdatacloud.nasa.gov/PUBLIC/DATA/NISAR/NISAR_D-102274_RevF_NASA_SDS_Product_Specification_L2_GCOV_w-esigs.pdf"
+     }
+    ]
+   },
+   {
+    "id": "C3470873558-ASF",
+    "short_name": "SENTINEL-1C_SLC",
+    "version_id": "1",
+    "title": "Sentinel-1C Single Look Complex Product",
+    "dataset_id": "Sentinel-1C Single Look Complex Product",
+    "data_center": "ASF",
+    "processing_level_id": "1",
+    "cloud_hosted": true,
+    "platforms": [
+     "Sentinel-1C"
+    ],
+    "links": [
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.asf.alaska.edu/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.earthdata.nasa.gov/search/granules?p=C3470873558-ASF"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://sentiwiki.copernicus.eu/web/sentinel-1"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://webdocs.asf.alaska.edu/Sentinel-1/Sentinel-1-User-Guide.pdf"
+     }
+    ]
+   },
+   {
+    "id": "C3326974349-NSIDC_CPRD",
+    "short_name": "ATL03",
+    "version_id": "007",
+    "title": "ATLAS/ICESat-2 L2A Global Geolocated Photon Data V007",
+    "dataset_id": "ATLAS/ICESat-2 L2A Global Geolocated Photon Data V007",
+    "data_center": "NSIDC_CPRD",
+    "processing_level_id": "2A",
+    "cloud_hosted": true,
+    "platforms": [
+     "ICESat-2"
+    ],
+    "links": [
+     {
+      "length": "0.0KB",
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.earthdata.nasa.gov/search/granules?p=C3326974349-NSIDC_CPRD"
+     },
+     {
+      "length": "0.0KB",
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://nsidc.org/data/data-access-tool/ATL03/versions/7/"
+     },
+     {
+      "length": "0.0KB",
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://cmr.earthdata.nasa.gov/virtual-directory/collections/C3326974349-NSIDC_CPRD"
+     },
+     {
+      "length": "0.0KB",
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://openaltimetry.earthdatacloud.nasa.gov/data/"
+     },
+     {
+      "length": "0.0KB",
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://earthaccess.readthedocs.io/en/stable/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+      "hreflang": "en-US",
+      "href": "https://doi.org/10.5067/ATLAS/ATL03.007"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://doi.org/10.5067/ATLAS/ATL03.007"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://nsidc.org/sites/default/files/documents/user-guide/atl03-v007-userguide.pdf"
+     }
+    ]
+   },
+   {
+    "id": "C1214470488-ASF",
+    "short_name": "SENTINEL-1A_SLC",
+    "version_id": "1",
+    "title": "Sentinel-1A Single Look Complex Product",
+    "dataset_id": "Sentinel-1A Single Look Complex Product",
+    "data_center": "ASF",
+    "processing_level_id": "1",
+    "cloud_hosted": true,
+    "platforms": [
+     "Sentinel-1A"
+    ],
+    "links": [
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.asf.alaska.edu/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.earthdata.nasa.gov/search/granules?p=C1214470488-ASF"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://sentiwiki.copernicus.eu/web/sentinel-1"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://webdocs.asf.alaska.edu/Sentinel-1/Sentinel-1-User-Guide.pdf"
+     }
+    ]
+   },
+   {
+    "id": "C1748058432-LPCLOUD",
+    "short_name": "MOD11A1",
+    "version_id": "061",
+    "title": "MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V061",
+    "dataset_id": "MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V061",
+    "data_center": "LPCLOUD",
+    "processing_level_id": "3",
+    "cloud_hosted": true,
+    "platforms": [
+     "Terra"
+    ],
+    "links": [
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+      "hreflang": "en-US",
+      "href": "https://doi.org/10.5067/MODIS/MOD11A1.061"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+      "hreflang": "en-US",
+      "href": "https://www.earthdata.nasa.gov/centers/lp-daac"
+     },
+     {
+      "length": "2MB",
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.earthdata.nasa.gov/search/granules?p=C1748058432-LPCLOUD"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://appeears.earthdatacloud.nasa.gov/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://lpdaac.usgs.gov/documents/119/MOD11_ATBD.pdf"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MOD11A1"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://modis-land.gsfc.nasa.gov/ValStatus.php?ProductID=MOD11"
+     }
+    ]
+   },
+   {
+    "id": "C2854335566-ASF",
+    "short_name": "NISAR_L2_GUNW_PROVISIONAL_V1",
+    "version_id": "1",
+    "title": "NISAR Provisional Geocoded Unwrapped Interferogram Product (Version 1)",
+    "dataset_id": "NISAR Provisional Geocoded Unwrapped Interferogram Product (Version 1)",
+    "data_center": "ASF",
+    "processing_level_id": "2",
+    "cloud_hosted": true,
+    "platforms": [
+     "NISAR"
+    ],
+    "links": [
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.asf.alaska.edu/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/data#",
+      "hreflang": "en-US",
+      "href": "https://search.earthdata.nasa.gov/search/granules?p=C2854335566-ASF"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/metadata#",
+      "hreflang": "en-US",
+      "href": "https://nisar.jpl.nasa.gov/"
+     },
+     {
+      "rel": "http://esipfed.org/ns/fedsearch/1.1/documentation#",
+      "hreflang": "en-US",
+      "href": "https://nisar-docs.asf.alaska.edu/gunw/"
+     }
+    ]
+   }
+  ]
+ },
+ "hitsByShortName": {
+  "NISAR_L2_GCOV_PROVISIONAL_V1": 5,
+  "NISAR_L2_GUNW_PROVISIONAL_V1": 8,
+  "SENTINEL-1A_SLC": 2,
+  "SENTINEL-1C_SLC": 2,
+  "ATL03": 1,
+  "MOD11A1": 21,
+  "VJ103IMG": 52,
+  "MOD00F": 0
+ }
+}

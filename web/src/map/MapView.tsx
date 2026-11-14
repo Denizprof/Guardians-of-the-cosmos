@@ -156,9 +156,10 @@ export interface MapViewProps {
   panelInset: { right: number; bottom: number };
   onSelectEvent: (id: string) => void;
   onMapClick: (lon: number, lat: number) => void;
-  onCheckCoverage: (lon: number, lat: number) => void;
+  onCheckCoverage: (lon: number, lat: number, date: string | null) => void;
   onPin: (id: string) => void;
   flyTo: { lon: number; lat: number; zoom?: number; bbox?: [number, number, number, number]; nonce: number } | null;
+  tileOverlays?: TileOverlay[];
 }
 
 /** Enable 3D terrain when zoomed in, drop it again for the whole-globe view (with hysteresis). */
@@ -256,6 +257,44 @@ function syncImageLayers(map: MlMap, wanted: { layer: SarLayer; opacity: number 
     } else {
       map.setPaintProperty(id, 'raster-opacity', opacity);
       map.moveLayer(id, beforeId);
+    }
+  }
+}
+
+export interface TileOverlay {
+  id: string;
+  url: string; // XYZ template, {time} already substituted
+  tileSize: number;
+  minzoom: number;
+  maxzoom: number;
+  opacity: number;
+  attribution: string;
+}
+
+/** Global catalog layers (GIBS, WorldCover, forest loss...): above the satellite basemap, below borders, NISAR imagery and labels. */
+function syncTileOverlays(map: MlMap, wanted: TileOverlay[]) {
+  const style = map.getStyle();
+  if (!style) return;
+  const key = (o: TileOverlay) => `ov-${o.id}`;
+  const want = new Map(wanted.map((o) => [key(o), o]));
+  for (const l of style.layers) if (l.id.startsWith('ov-') && !want.has(l.id)) map.removeLayer(l.id);
+  for (const id of Object.keys(style.sources)) {
+    if (!id.startsWith('ov-')) continue;
+    const o = want.get(id);
+    const src = map.getSource(id) as any;
+    // URL changed (e.g. a new date): drop and re-add
+    if (!o || (src?.tiles && src.tiles[0] !== o.url)) {
+      if (map.getLayer(id)) map.removeLayer(id);
+      map.removeSource(id);
+    }
+  }
+  const beforeId = map.getLayer('road-major') ? 'road-major' : firstSymbolId(map);
+  for (const [id, o] of want) {
+    if (!map.getSource(id)) {
+      map.addSource(id, { type: 'raster', tiles: [o.url], tileSize: o.tileSize, minzoom: o.minzoom, maxzoom: o.maxzoom, attribution: o.attribution });
+      map.addLayer({ id, type: 'raster', source: id, paint: { 'raster-opacity': o.opacity, 'raster-fade-duration': 150 } }, beforeId);
+    } else {
+      map.setPaintProperty(id, 'raster-opacity', o.opacity);
     }
   }
 }
@@ -432,14 +471,20 @@ export default function MapView(p: MapViewProps) {
       const pr = f.properties as any;
       const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
       const el = document.createElement('div');
-      el.innerHTML = `<div class="popup-title"></div><div class="muted"></div><div class="callout">Context only: this app has not analyzed SAR data for this event.</div><div class="popup-actions"><button type="button">NISAR data here?</button><a target="_blank" rel="noopener">Source ↗</a></div>`;
+      el.innerHTML = `<div class="popup-title"></div><div class="muted"></div><div class="popup-notes muted"></div><div class="callout"></div><div class="popup-actions"><button type="button">Satellite data here?</button><a target="_blank" rel="noopener">Source ↗</a></div>`;
       el.querySelector('.popup-title')!.textContent = pr.title;
       el.querySelector('.muted')!.textContent = `${CATEGORY_LABEL[pr.category as Category] ?? pr.category} · ${fmtDate(pr.date)} · ${pr.source}`;
+      const notes = [pr.magnitude != null ? `M${pr.magnitude}` : '', pr.deaths != null ? `${pr.deaths} deaths reported` : '', pr.notes ?? ''].filter(Boolean).join(' · ');
+      el.querySelector('.popup-notes')!.textContent = notes;
+      el.querySelector('.callout')!.textContent =
+        pr.evidence === 'observation'
+          ? 'Satellite thermal detection (FIRMS). Hot spots can also be gas flares, volcanoes or industry; not a confirmed wildfire.'
+          : 'Reported event from a catalog. Not analyzed or confirmed by satellite in this app.';
       el.querySelector('a')!.setAttribute('href', pr.url);
-      const popup = new maplibregl.Popup({ maxWidth: '280px', offset: 8 }).setLngLat([lon, lat]).setDOMContent(el).addTo(a);
+      const popup = new maplibregl.Popup({ maxWidth: '300px', offset: 8 }).setLngLat([lon, lat]).setDOMContent(el).addTo(a);
       el.querySelector('button')!.addEventListener('click', () => {
         popup.remove();
-        cb.current.onCheckCoverage(lon, lat);
+        cb.current.onCheckCoverage(lon, lat, pr.date ?? null);
       });
     });
     for (const id of clickable) {
@@ -447,6 +492,9 @@ export default function MapView(p: MapViewProps) {
       a.on('mouseleave', id, () => (a.getCanvas().style.cursor = ''));
     }
     maps.current = { a, b };
+    // two canvases must not share the same accessible name (QA-21)
+    a.getCanvas().setAttribute('aria-label', 'Globe: before view and event markers');
+    b.getCanvas().setAttribute('aria-label', 'Globe: after view');
     if (import.meta.env.DEV) (window as any).__gsMaps = { a, b };
     return () => {
       cancelAnimationFrame(raf);
@@ -482,6 +530,14 @@ export default function MapView(p: MapViewProps) {
     const vis = p.selected ? 'none' : 'visible';
     for (const id of ['ctx-clusters', 'ctx-count', 'ctx-points', 'sar-labels']) a.setLayoutProperty(id, 'visibility', vis);
   }, [loaded, p.events, p.context, p.visibleCategories, p.showContext, p.selected]);
+
+  // ---- global catalog tile layers (same on both maps)
+  useEffect(() => {
+    if (!loaded) return;
+    const { a, b } = maps.current!;
+    syncTileOverlays(a, p.tileOverlays ?? []);
+    syncTileOverlays(b, p.tileOverlays ?? []);
+  }, [loaded, p.tileOverlays]);
 
   // ---- SAR imagery (raster layers, so they drape over the 3D terrain on both maps)
   useEffect(() => {
@@ -540,7 +596,8 @@ export default function MapView(p: MapViewProps) {
     const { a } = maps.current!;
     if (p.selected) {
       spinning.current = false;
-      a.fitBounds(layerBounds(p.selected.layers), {
+      const { lon, lat } = p.selected.location;
+      a.fitBounds(layerBounds(p.selected.layers) ?? [[lon - 0.5, lat - 0.5], [lon + 0.5, lat + 0.5]], {
         // fitBounds padding is added to the camera padding set above
         padding: {
           top: 70,
@@ -604,10 +661,10 @@ export default function MapView(p: MapViewProps) {
   }, [loaded, p.pins, p.activePin]);
 
   return (
-    <div className={`maps ${layoutClass}`}>
+    <main className={`maps ${layoutClass}`} aria-label="Interactive globe">
       <canvas ref={starsEl} className="starfield" aria-hidden="true" />
       <div ref={aEl} className="map a" />
       <div ref={bEl} className="map b" aria-hidden={layoutClass === 'single'} />
-    </div>
+    </main>
   );
 }

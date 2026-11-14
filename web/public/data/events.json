@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-14T07:33:32.349332+00:00",
+  "generated": "2026-11-14T08:54:57.623Z",
   "events": [
     {
       "id": "venezuela-2026",
@@ -21,7 +21,7 @@
       "technique": "insar",
       "references": [
         {
-          "label": "NASA Earth Observatory: Where Venezuela\u2019s earthquakes shifted the ground",
+          "label": "NASA Earth Observatory: Where Venezuela’s earthquakes shifted the ground",
           "url": "https://science.nasa.gov/earth/earth-observatory/where-venezuelas-earthquakes-shifted-the-ground/"
         },
         {
@@ -83,10 +83,11 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 87 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 87 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1441 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent."
             ],
-            "georef_residual_m": 87
+            "georef_residual_m": 87,
+            "georef_uncertainty_m": 1441
           }
         },
         {
@@ -138,10 +139,11 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 87 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 87 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1441 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent."
             ],
-            "georef_residual_m": 87
+            "georef_residual_m": 87,
+            "georef_uncertainty_m": 1441
           }
         },
         {
@@ -175,14 +177,14 @@
             "units": "cm toward satellite (LOS)",
             "colormap": "diverging",
             "stats": {
-              "p1_cm": -5.0,
+              "p1_cm": -5,
               "p99_cm": 8.3,
               "std_cm": 3.5,
               "valid_fraction": 0.53,
               "wavelength_cm": 24.2
             },
-            "vmin": -50.0,
-            "vmax": 50.0
+            "vmin": -50,
+            "vmax": 50
           },
           "provenance": {
             "mission": "NISAR",
@@ -195,7 +197,7 @@
             "frame": 7,
             "direction": "ASCENDING",
             "polarizations": null,
-            "processing_date": "2026-08-11T02:08:40",
+            "processing_date": "2026-08-11T02:08:40Z",
             "browse_source": "",
             "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GUNW_PROVISIONAL_V1/NISAR_L2_PR_GUNW_021_162_A_007_022_4000_SH_20260601T100657_20260601T100731_20260613T100656_20260613T100731_P05023_N_F_J_001/NISAR_L2_PR_GUNW_021_162_A_007_022_4000_SH_20260601T100657_20260601T100731_20260613T100656_20260613T100731_P05023_N_F_J_001.h5",
             "distributor": "ASF DAAC",
@@ -243,14 +245,14 @@
             "units": "cm toward satellite (LOS)",
             "colormap": "diverging",
             "stats": {
-              "p1_cm": -45.0,
+              "p1_cm": -45,
               "p99_cm": 14.9,
-              "std_cm": 12.0,
+              "std_cm": 12,
               "valid_fraction": 0.49,
               "wavelength_cm": 24.2
             },
-            "vmin": -50.0,
-            "vmax": 50.0
+            "vmin": -50,
+            "vmax": 50
           },
           "provenance": {
             "mission": "NISAR",
@@ -263,7 +265,7 @@
             "frame": 7,
             "direction": "ASCENDING",
             "polarizations": null,
-            "processing_date": "2026-08-11T11:07:23",
+            "processing_date": "2026-08-11T11:07:23Z",
             "browse_source": "",
             "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GUNW_PROVISIONAL_V1/NISAR_L2_PR_GUNW_022_162_A_007_023_4000_SH_20260613T100656_20260613T100731_20260625T100655_20260625T100730_P05023_N_F_J_001/NISAR_L2_PR_GUNW_022_162_A_007_023_4000_SH_20260613T100656_20260613T100731_20260625T100655_20260625T100730_P05023_N_F_J_001.h5",
             "distributor": "ASF DAAC",
@@ -351,10 +353,11 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 642 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 642 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1030 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent."
             ],
-            "georef_residual_m": 641.7
+            "georef_residual_m": 641.7,
+            "georef_uncertainty_m": 1030
           }
         },
         {
@@ -407,10 +410,11 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 642 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 642 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1030 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent."
             ],
-            "georef_residual_m": 641.7
+            "georef_residual_m": 641.7,
+            "georef_uncertainty_m": 1030
           }
         },
         {
@@ -463,10 +467,11 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 642 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 642 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1030 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent."
             ],
-            "georef_residual_m": 641.7
+            "georef_residual_m": 641.7,
+            "georef_uncertainty_m": 1030
           }
         },
         {
@@ -513,7 +518,7 @@
             "frame": 165,
             "direction": "ASCENDING",
             "polarizations": null,
-            "processing_date": "2026-02-12T04:07:44",
+            "processing_date": "2026-02-12T04:07:44Z",
             "browse_source": "",
             "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_BETA_V1/NISAR_L2_PR_GCOV_009_114_A_165_4005_DHDH_A_20260105T034232_20260105T034253_X05010_N_P_J_001/NISAR_L2_PR_GCOV_009_114_A_165_4005_DHDH_A_20260105T034232_20260105T034253_X05010_N_P_J_001.h5",
             "distributor": "ASF DAAC",
@@ -569,7 +574,7 @@
             "frame": 165,
             "direction": "ASCENDING",
             "polarizations": null,
-            "processing_date": "2026-02-12T04:40:57",
+            "processing_date": "2026-02-12T04:40:57Z",
             "browse_source": "",
             "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_BETA_V1/NISAR_L2_PR_GCOV_010_114_A_165_4005_DHDH_A_20260117T034232_20260117T034254_X05010_N_P_J_001/NISAR_L2_PR_GCOV_010_114_A_165_4005_DHDH_A_20260117T034232_20260117T034254_X05010_N_P_J_001.h5",
             "distributor": "ASF DAAC",
@@ -626,7 +631,7 @@
             "frame": 165,
             "direction": "ASCENDING",
             "polarizations": null,
-            "processing_date": "2026-02-12T04:40:57",
+            "processing_date": "2026-02-12T04:40:57Z",
             "browse_source": "",
             "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_BETA_V1/NISAR_L2_PR_GCOV_010_114_A_165_4005_DHDH_A_20260117T034232_20260117T034254_X05010_N_P_J_001/NISAR_L2_PR_GCOV_010_114_A_165_4005_DHDH_A_20260117T034232_20260117T034254_X05010_N_P_J_001.h5",
             "distributor": "ASF DAAC",
@@ -674,10 +679,12 @@
               "2": "new water on 17 Jan"
             },
             "stats": {
-              "new_water_km2": 316.3,
-              "water_both_dates_km2": 328.0,
+              "new_water_km2": 404.5,
+              "new_water_km2_lower_bound": 316.3,
+              "water_both_dates_km2": 482.1,
+              "water_both_dates_km2_lower_bound": 328,
               "scene_median_change_db": 3.07,
-              "aoi_km2": 3370.0
+              "aoi_km2": 3370
             }
           },
           "provenance": {
@@ -691,7 +698,7 @@
             "frame": 165,
             "direction": "ASCENDING",
             "polarizations": null,
-            "processing_date": "2026-02-12T04:40:57",
+            "processing_date": "2026-02-12T04:40:57Z",
             "browse_source": "",
             "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_BETA_V1/NISAR_L2_PR_GCOV_010_114_A_165_4005_DHDH_A_20260117T034232_20260117T034254_X05010_N_P_J_001/NISAR_L2_PR_GCOV_010_114_A_165_4005_DHDH_A_20260117T034232_20260117T034254_X05010_N_P_J_001.h5",
             "distributor": "ASF DAAC",
@@ -699,7 +706,8 @@
             "processing": [
               "Read gamma0 HHHH and HVHV (frequency A) for the area of interest via HTTPS range requests.",
               "5x5 boxcar speckle filter on linear power; converted to dB = 10*log10(gamma0).",
-              "Water-like = HH < -14.8 dB: the valley between the water and land peaks of the 17 Jan HH histogram (smoothed, 0.5 dB bins).",
+              "Classification on a 3x3 median of HH dB (edge-preserving); the 5x5 boxcar version is reported as a lower bound because averaging erodes water edges.",
+              "Water-like = HH < -14.75 dB: the centre of the valley between the water and land peaks of the 17 Jan HH histogram (smoothed, 0.5 dB bins; bimodality checked).",
               "New water = water-like on 17 Jan AND HH darkened by more than 3 dB since 5 Jan. Water on both dates = water-like on both.",
               "Scene-wide median HH change was +3.1 dB (land brightening, likely wetter soil and/or BETA calibration), which is why a change criterion is required.",
               "Heuristic classification, not validated in the field: wind-roughened water, radar shadow, smooth tarmac and very dry sand can be misclassified."
@@ -713,7 +721,8 @@
       "title": "Krasheninnikov volcano",
       "subtitle": "Kronotsky Reserve, Kamchatka, Russia",
       "category": "volcano",
-      "date": null,
+      "date": "2025-08-02T00:00:00Z",
+      "date_precision": "day",
       "location": {
         "lon": 160.273,
         "lat": 54.593
@@ -781,11 +790,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -838,11 +848,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -895,11 +906,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -952,11 +964,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -1009,11 +1022,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -1066,11 +1080,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -1123,11 +1138,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -1180,11 +1196,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -1237,11 +1254,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -1294,11 +1312,12 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
           }
         },
         {
@@ -1351,11 +1370,676 @@
             "processing": [
               "Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).",
               "Downloaded from the public ASF browse bucket; no login required.",
-              "Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual 24 m RMS).",
+              "Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual 24 m). The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±1138 m. Measured layers derived from the HDF5 grid are exact.",
               "Pure-black background pixels set transparent.",
               "Cropped to 40 km around the event location."
             ],
-            "georef_residual_m": 24.2
+            "georef_residual_m": 24.2,
+            "georef_uncertainty_m": 1138
+          }
+        },
+        {
+          "id": "rgb_20260618",
+          "role": "before",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20260618.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-06-18T08:49:27Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_023_060_D_061_4005_DHDH_A_20260618T084927_20260618T085005_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-07-09T01:35:19Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_023_060_D_061_4005_DHDH_A_20260618T084927_20260618T085005_P05023_N_F_J_001/NISAR_L2_PR_GCOV_023_060_D_061_4005_DHDH_A_20260618T084927_20260618T085005_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20260630",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20260630.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-06-30T08:49:26Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_024_060_D_061_4005_DHDH_A_20260630T084926_20260630T085005_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-07-17T21:04:33Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_024_060_D_061_4005_DHDH_A_20260630T084926_20260630T085005_P05023_N_F_J_001/NISAR_L2_PR_GCOV_024_060_D_061_4005_DHDH_A_20260630T084926_20260630T085005_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20260712",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20260712.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-07-12T08:49:29Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_025_060_D_061_4005_DHDH_A_20260712T084929_20260712T085004_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-07-19T10:41:18Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_025_060_D_061_4005_DHDH_A_20260712T084929_20260712T085004_P05023_N_F_J_001/NISAR_L2_PR_GCOV_025_060_D_061_4005_DHDH_A_20260712T084929_20260712T085004_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20260724",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20260724.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-07-24T08:49:25Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_026_060_D_061_4005_DHDH_A_20260724T084925_20260724T085003_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-07-26T19:38:43Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_026_060_D_061_4005_DHDH_A_20260724T084925_20260724T085003_P05023_N_F_J_001/NISAR_L2_PR_GCOV_026_060_D_061_4005_DHDH_A_20260724T084925_20260724T085003_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20260817",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20260817.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-08-17T08:49:24Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_028_060_D_061_4005_DHDH_A_20260817T084924_20260817T085002_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-08-22T12:19:27Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_028_060_D_061_4005_DHDH_A_20260817T084924_20260817T085002_P05023_N_F_J_001/NISAR_L2_PR_GCOV_028_060_D_061_4005_DHDH_A_20260817T084924_20260817T085002_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20260829",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20260829.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-08-29T08:49:24Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_029_060_D_061_4005_DHDH_A_20260829T084924_20260829T085002_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-08-31T07:17:18Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_029_060_D_061_4005_DHDH_A_20260829T084924_20260829T085002_P05023_N_F_J_001/NISAR_L2_PR_GCOV_029_060_D_061_4005_DHDH_A_20260829T084924_20260829T085002_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20260910",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20260910.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-09-10T08:49:23Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_030_060_D_061_4005_DHDH_A_20260910T084923_20260910T085002_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-09-13T10:11:10Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_030_060_D_061_4005_DHDH_A_20260910T084923_20260910T085002_P05023_N_F_J_001/NISAR_L2_PR_GCOV_030_060_D_061_4005_DHDH_A_20260910T084923_20260910T085002_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20260922",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20260922.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-09-22T08:49:23Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_031_060_D_061_4005_DHDH_A_20260922T084923_20260922T085002_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-09-24T09:10:23Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_031_060_D_061_4005_DHDH_A_20260922T084923_20260922T085002_P05023_N_F_J_001/NISAR_L2_PR_GCOV_031_060_D_061_4005_DHDH_A_20260922T084923_20260922T085002_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20261004",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20261004.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-10-04T08:49:24Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_032_060_D_061_4005_DHDH_A_20261004T084924_20261004T085002_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-10-06T07:28:35Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_032_060_D_061_4005_DHDH_A_20261004T084924_20261004T085002_P05023_N_F_J_001/NISAR_L2_PR_GCOV_032_060_D_061_4005_DHDH_A_20261004T084924_20261004T085002_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20261016",
+          "role": "timeline",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20261016.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-10-16T08:49:24Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_033_060_D_061_4005_DHDH_A_20261016T084924_20261016T085002_P05023_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+            "tier": "PROVISIONAL",
+            "crid": "P05023",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-10-18T06:05:33Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_033_060_D_061_4005_DHDH_A_20261016T084924_20261016T085002_P05023_N_F_J_001/NISAR_L2_PR_GCOV_033_060_D_061_4005_DHDH_A_20261016T084924_20261016T085002_P05023_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "rgb_20261028",
+          "role": "after",
+          "kind": "backscatter",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/rgb_20261028.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "start": "2026-10-28T08:49:24Z"
+          },
+          "legend": {
+            "units": "R,B = HH -25..0 dB; G = HV -32..-7 dB (fixed for all dates)",
+            "colormap": "composite"
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_034_060_D_061_4005_DHDH_A_20261028T084924_20261028T085002_P05036_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_V1",
+            "tier": "VALIDATED",
+            "crid": "P05036",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-11-10T18:05:09Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_V1/NISAR_L2_PR_GCOV_034_060_D_061_4005_DHDH_A_20261028T084924_20261028T085002_P05036_N_F_J_001/NISAR_L2_PR_GCOV_034_060_D_061_4005_DHDH_A_20261028T084924_20261028T085002_P05036_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+              "3x3 boxcar on linear power; converted to dB.",
+              "Composite R = B = HH, G = HV, with one fixed stretch for every date (HH (-25.0, 0.0), HV (-32.0, -7.0) dB, gamma 0.8), so colours are comparable through time.",
+              "Reprojected bilinearly to Web Mercator (EPSG:3857)."
+            ]
+          }
+        },
+        {
+          "id": "hh_change_first_last",
+          "role": "change",
+          "kind": "change",
+          "product": "GCOV",
+          "url": "data/events/krasheninnikov-2026/hh_change_first_last.webp",
+          "coordinates": [
+            [
+              160.094963,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.693672
+            ],
+            [
+              160.456723,
+              54.496293
+            ],
+            [
+              160.094963,
+              54.496293
+            ]
+          ],
+          "acquisition": {
+            "reference": "2026-06-18T08:49:27Z",
+            "secondary": "2026-10-28T08:49:24Z"
+          },
+          "legend": {
+            "units": "HH change (dB), 28 Oct - 18 Jun",
+            "vmin": -8,
+            "vmax": 8,
+            "colormap": "diverging",
+            "stats": {
+              "median_change_db": 0.12
+            }
+          },
+          "provenance": {
+            "mission": "NISAR",
+            "sensor": "L-SAR (L-band, 24 cm)",
+            "granule": "NISAR_L2_PR_GCOV_034_060_D_061_4005_DHDH_A_20261028T084924_20261028T085002_P05036_N_F_J_001",
+            "collection": "NISAR_L2_GCOV_V1",
+            "tier": "VALIDATED",
+            "crid": "P05036",
+            "track": 60,
+            "frame": 61,
+            "direction": "DESCENDING",
+            "polarizations": null,
+            "processing_date": "2026-11-10T18:05:09Z",
+            "browse_source": "",
+            "product_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_V1/NISAR_L2_PR_GCOV_034_060_D_061_4005_DHDH_A_20261028T084924_20261028T085002_P05036_N_F_J_001/NISAR_L2_PR_GCOV_034_060_D_061_4005_DHDH_A_20261028T084924_20261028T085002_P05036_N_F_J_001.h5",
+            "distributor": "ASF DAAC",
+            "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
+            "processing": [
+              "Log-ratio change 10*log10(HH_28Oct / HH_18Jun) on 3x3-filtered gamma0.",
+              "Includes seasonal snow and freeze effects; not a lava map by itself."
+            ]
           }
         }
       ]

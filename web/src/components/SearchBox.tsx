@@ -20,6 +20,9 @@ export default function SearchBox({ events, onEvent, onPlace }: Props) {
   const abort = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    // Any change of query invalidates the in-flight geocoder request, so a late
+    // response can never overwrite newer results (coordinates option, cleared box).
+    abort.current?.abort();
     const query = q.trim();
     if (query.length < 2) {
       setItems([]);
@@ -35,18 +38,24 @@ export default function SearchBox({ events, onEvent, onPlace }: Props) {
       return;
     }
     setItems(local);
+    let cancelled = false;
     const t = setTimeout(async () => {
-      abort.current?.abort();
-      abort.current = new AbortController();
+      const ctrl = new AbortController();
+      abort.current = ctrl;
       try {
-        const hits = await geocode(query, abort.current.signal);
+        const hits = await geocode(query, ctrl.signal);
+        if (cancelled) return;
         setItems([...local, ...hits.map((hit) => ({ kind: 'place' as const, hit }))]);
         setErr(null);
       } catch (e: any) {
-        if (e.name !== 'AbortError') setErr('Place search is unavailable right now. Coordinates still work, e.g. "10.5, -67.2".');
+        if (!cancelled && e.name !== 'AbortError') setErr('Place search is unavailable right now. Coordinates still work, e.g. "10.5, -67.2".');
       }
     }, 300);
-    return () => clearTimeout(t);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+      abort.current?.abort();
+    };
   }, [q, events]);
 
   const choose = (it: Item) => {

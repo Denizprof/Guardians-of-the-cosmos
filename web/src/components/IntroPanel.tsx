@@ -2,6 +2,8 @@ import type { SarEvent } from '../types';
 import { CATEGORY_COLOR, CATEGORY_LABEL, fmtDate } from '../lib';
 import type { CoverageResult } from '../services';
 
+import EarthdataPanel from './EarthdataPanel';
+
 interface Props {
   events: SarEvent[];
   generated: string;
@@ -9,6 +11,7 @@ interface Props {
   coverageState: 'idle' | 'loading' | 'error';
   coverageError: string | null;
   coverageMode: boolean;
+  probe: { lon: number; lat: number; date: string | null } | null;
   collapsed: boolean;
   onSelect: (id: string) => void;
   onCoverageMode: (v: boolean) => void;
@@ -106,14 +109,19 @@ export default function IntroPanel(p: Props) {
           </div>
         )}
         {p.coverage && p.coverageState === 'idle' && <Coverage c={p.coverage} onClear={p.onClearCoverage} />}
+        {p.probe && (
+          <div className="section">
+            <EarthdataPanel key={`${p.probe.lon},${p.probe.lat},${p.probe.date}`} lon={p.probe.lon} lat={p.probe.lat} date={p.probe.date} windowDays={p.probe.date ? 7 : 3} />
+          </div>
+        )}
 
         <div className="section">
           <p>
-            NISAR, the NASA–ISRO radar satellite, scans almost all of Earth’s land every 12 days, through clouds and darkness. Pick an investigation to compare real NISAR observations from before and after an event.
+            Explore how Earth’s surface changes: geohazards, fire and forests, climate and ice, water, ecosystems and human activity. Investigations compare genuine satellite observations from before and after, led by NISAR, the NASA–ISRO radar that sees through clouds and darkness every 12 days. Every layer says whether it is an observation, a derived measurement or an interpretation.
           </p>
         </div>
         <div className="section">
-          <h3>Radar investigations</h3>
+          <h3>Investigations</h3>
           {p.events.map((e) => (
             <button
               key={e.id}

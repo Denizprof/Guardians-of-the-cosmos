@@ -1,0 +1,23 @@
+/* NASA Earthdata availability panel. Uses only the CSS variables from src/styles.css. */
+.edp { border-top: 1px solid var(--line); padding: 14px 16px; background: var(--panel); color: var(--text); }
+.edp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.edp-head h3 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+.edp-close { background: none; border: 0; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.edp-close:hover { color: var(--text); }
+.edp-note { margin: 6px 0 10px; color: var(--muted); font-size: 12px; }
+.edp-state { margin: 8px 0; font-size: 13px; }
+.edp-retry { background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
+.edp-retry:hover { border-color: var(--focus); }
+.edp-summary { margin: 0 0 8px; color: var(--muted); }
+.edp-groups, .edp-cols { list-style: none; margin: 0; padding: 0; }
+.edp-group { border: 1px solid var(--line); border-radius: 6px; margin-bottom: 6px; background: var(--panel-2); }
+.edp-group summary { display: flex; justify-content: space-between; gap: 8px; padding: 7px 10px; cursor: pointer; }
+.edp-plat { font-weight: 600; }
+.edp-count { color: var(--muted); white-space: nowrap; }
+.edp-col { border-top: 1px solid var(--line); padding: 8px 10px; }
+.edp-col-top { display: flex; justify-content: space-between; gap: 8px; }
+.edp-short { color: var(--accent); overflow-wrap: anywhere; }
+.edp-title { font-size: 12.5px; margin-top: 2px; }
+.edp-meta { font-size: 11.5px; margin-top: 2px; }
+.edp-links { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; font-size: 12px; }
+.edp-foot { margin: 8px 0 0; font-size: 12px; }

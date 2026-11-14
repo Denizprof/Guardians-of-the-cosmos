@@ -23,7 +23,11 @@ export default function Timeline({ event, before, after, slot, onSlot, onPick }:
     return () => ro.disconnect();
   }, []);
 
-  const spans = event.layers.map((l) => ({
+  // Show one layer type at a time (the type currently in the After slot) so the
+  // same date doesn't appear twice (NASA browse + our derived version).
+  const kind = after?.kind ?? before?.kind;
+  const shown = event.layers.filter((l) => !kind || l.kind === kind || l.id === before?.id || l.id === after?.id);
+  const spans = shown.map((l) => ({
     l,
     a: t((l.acquisition.reference || l.acquisition.start)!),
     b: t((l.acquisition.secondary || l.acquisition.start)!),
@@ -34,16 +38,30 @@ export default function Timeline({ event, before, after, slot, onSlot, onPick }:
   const lo = Math.min(...allT) - pad, hi = Math.max(...allT) + pad;
   const X = (v: number) => 12 + ((v - lo) / (hi - lo)) * (w - 24);
 
-  // month ticks
+  // Axis ticks: month starts for long spans, every N days for spans under ~40 days
+  // (otherwise a 12-day window would show no date labels at all).
+  const shortSpan = hi - lo < 40 * 864e5;
   const months: number[] = [];
   const d = new Date(lo);
-  d.setUTCDate(1);
   d.setUTCHours(0, 0, 0, 0);
-  while (d.getTime() <= hi) {
-    if (d.getTime() >= lo) months.push(d.getTime());
-    d.setUTCMonth(d.getUTCMonth() + 1);
+  if (shortSpan) {
+    const dayStep = Math.max(1, Math.ceil((hi - lo) / 864e5 / Math.max(2, Math.floor(w / 70))));
+    while (d.getTime() <= hi) {
+      if (d.getTime() >= lo) months.push(d.getTime());
+      d.setUTCDate(d.getUTCDate() + dayStep);
+    }
+  } else {
+    d.setUTCDate(1);
+    while (d.getTime() <= hi) {
+      if (d.getTime() >= lo) months.push(d.getTime());
+      d.setUTCMonth(d.getUTCMonth() + 1);
+    }
   }
-  const step = Math.ceil(months.length / Math.max(1, Math.floor(w / 70)));
+  const step = shortSpan ? 1 : Math.ceil(months.length / Math.max(1, Math.floor(w / 70)));
+  const tickLabel = (t: number) => {
+    const dt = new Date(t);
+    return shortSpan ? `${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]}` : `${MONTHS[dt.getUTCMonth()]} ${String(dt.getUTCFullYear()).slice(2)}`;
+  };
 
   const isPair = spans.some((s) => s.a !== s.b);
   const rowY = 40;
@@ -58,14 +76,14 @@ export default function Timeline({ event, before, after, slot, onSlot, onPick }:
         </div>
       </div>
       <div ref={ref} style={{ minWidth: 0 }}>
-        <svg height="72" role="img" aria-label={`${event.layers.length} NISAR observations of ${event.title}`}>
+        <svg height="72" role="group" aria-label={`${shown.length} observations of ${event.title}`}>
           <line x1={0} x2={w} y1={rowY} y2={rowY} stroke="#2e3540" />
           {months.map((m, i) =>
             i % step === 0 ? (
               <g key={m}>
                 <line x1={X(m)} x2={X(m)} y1={rowY - 4} y2={rowY + 4} stroke="#3a4250" />
                 <text x={X(m)} y={rowY + 22} textAnchor="middle" fontSize="10.5" fill="#8b94a1" fontFamily="var(--mono)">
-                  {MONTHS[new Date(m).getUTCMonth()]} {String(new Date(m).getUTCFullYear()).slice(2)}
+                  {tickLabel(m)}
                 </text>
               </g>
             ) : null

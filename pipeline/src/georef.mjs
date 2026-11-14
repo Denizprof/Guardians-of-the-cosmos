@@ -38,6 +38,7 @@ function imageCorners(px, w, h) {
     }
   }
   const firstRow = rowCnt.findIndex((c) => c >= 3);
+  if (firstRow < 0 || !pS0) throw new Error('georeference: image has no valid data pixels (all transparent/black)');
   const lastRow = h - 1 - [...rowCnt].reverse().findIndex((c) => c >= 3);
   const firstCol = colCnt.findIndex((c) => c >= 3);
   const lastCol = w - 1 - [...colCnt].reverse().findIndex((c) => c >= 3);
@@ -143,5 +144,8 @@ export function cropBox(geo, loc, km, w, h) {
   const top = Math.max(0, Math.floor(Math.min(...ys)));
   const right = Math.min(w, Math.ceil(Math.max(...xs)));
   const bottom = Math.min(h, Math.ceil(Math.max(...ys)));
+  if (right - left <= 0 || bottom - top <= 0) {
+    throw new Error(`cropBox: location ${loc.lon},${loc.lat} lies outside the image footprint`);
+  }
   return { left, top, width: right - left, height: bottom - top };
 }

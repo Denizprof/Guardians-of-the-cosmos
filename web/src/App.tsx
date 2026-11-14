@@ -5,12 +5,14 @@ import Filters from './components/Filters';
 import EventPanel from './components/EventPanel';
 import IntroPanel from './components/IntroPanel';
 import Timeline from './components/Timeline';
-import { loadData, layerLabel } from './lib';
+import { CATALOGS, GROUPS, loadCatalog, loadData, layerLabel } from './lib';
+import { loadLayerCatalog, toOverlay, type CatalogLayer } from './layers';
+import LayersPanel, { type LayerState } from './components/LayersPanel';
 import { nisarCoverage, type CoverageResult } from './services';
 import { EVENT_CONTENT } from './content/explain';
 import type { Category, CompareMode, ContextEvent, SarEvent } from './types';
 
-const ALL_CATS: Category[] = ['earthquake', 'flood', 'volcano', 'wildfire', 'landslide'];
+const ALL_CATS: Category[] = GROUPS.flatMap((g) => g.categories);
 
 // ---- URL state: #/e/<event>?mode=swipe&b=<layer>&a=<layer>&lvl=simple
 function readHash() {
@@ -18,12 +20,15 @@ function readHash() {
   const [path, qs] = h.split('?');
   const q = new URLSearchParams(qs || '');
   const m = path.match(/^e\/([\w-]+)/);
+  const mode = q.get('mode');
+  const lvl = q.get('lvl');
   return {
     event: m?.[1] ?? null,
-    mode: (q.get('mode') as CompareMode) || null,
+    // whitelist: an unknown value in a shared link must not leave the UI with no mode
+    mode: mode === 'swipe' || mode === 'side' || mode === 'overlay' ? (mode as CompareMode) : null,
     b: q.get('b'),
     a: q.get('a'),
-    lvl: (q.get('lvl') as 'simple' | 'scientific') || null,
+    lvl: lvl === 'simple' || lvl === 'scientific' ? (lvl as 'simple' | 'scientific') : null,
   };
 }
 
@@ -63,6 +68,42 @@ export default function App() {
   const [coverageError, setCoverageError] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<{ lon: number; lat: number; zoom?: number; bbox?: [number, number, number, number]; nonce: number } | null>(null);
   const isMobile = useIsMobile();
+  const [activeCatalogs, setActiveCatalogs] = useState<Set<string>>(() => new Set(CATALOGS.filter((c) => c.defaultOn).map((c) => c.id)));
+  const [catalogEvents, setCatalogEvents] = useState<Record<string, ContextEvent[]>>({});
+  const [catalogErrors, setCatalogErrors] = useState<Record<string, string>>({});
+  const [years, setYears] = useState<[number, number]>([1900, new Date().getUTCFullYear()]);
+  const [probe, setProbe] = useState<{ lon: number; lat: number; date: string | null } | null>(null);
+  const [catalogLayers, setCatalogLayers] = useState<CatalogLayer[]>([]);
+  const [layerState, setLayerState] = useState<Record<string, LayerState>>({});
+  const [layersOpen, setLayersOpen] = useState(false);
+
+  useEffect(() => {
+    loadLayerCatalog().then(setCatalogLayers).catch(() => setCatalogLayers([]));
+  }, []);
+
+  const tileOverlays = useMemo(
+    () => catalogLayers.filter((l) => layerState[l.id]?.on).map((l) => toOverlay(l, layerState[l.id].date, layerState[l.id].opacity)),
+    [catalogLayers, layerState]
+  );
+
+  // load catalogs on demand when switched on
+  useEffect(() => {
+    for (const id of activeCatalogs) {
+      if (catalogEvents[id] || catalogErrors[id]) continue;
+      loadCatalog(id)
+        .then((c) => setCatalogEvents((m) => ({ ...m, [id]: c.events })))
+        .catch((e) => setCatalogErrors((m) => ({ ...m, [id]: String(e.message || e) })));
+    }
+  }, [activeCatalogs, catalogEvents, catalogErrors]);
+
+  // everything shown as reported/context markers: recent EONET/USGS + active catalogs, filtered by year
+  const mapContext = useMemo(() => {
+    const all = [...(showContext ? context : []), ...[...activeCatalogs].flatMap((id) => catalogEvents[id] ?? [])];
+    return all.filter((e) => {
+      const y = new Date(e.date).getUTCFullYear();
+      return Number.isNaN(y) || (y >= years[0] && y <= years[1]);
+    });
+  }, [context, showContext, activeCatalogs, catalogEvents, years]);
 
   useEffect(() => {
     loadData()
@@ -109,7 +150,12 @@ export default function App() {
     const hash = selected
       ? `#/e/${selected.id}?${new URLSearchParams({ mode, b: beforeId ?? '', a: afterId ?? '', lvl: level })}`
       : '#/';
-    if (window.location.hash !== hash) history.replaceState(null, '', hash);
+    if (window.location.hash === hash) return;
+    // Opening/closing an investigation is a navigation (Back returns to the globe);
+    // mode/layer/level tweaks only replace the current entry.
+    const curEvent = readHash().event;
+    if (curEvent !== (selected?.id ?? null)) history.pushState(null, '', hash);
+    else history.replaceState(null, '', hash);
   }, [events.length, selected, mode, beforeId, afterId, level]);
 
   const selectEvent = useCallback((id: string | null) => {
@@ -130,8 +176,9 @@ export default function App() {
   }, [selectEvent]);
 
   const covAbort = useRef<AbortController | null>(null);
-  const runCoverage = useCallback(async (lon: number, lat: number) => {
+  const runCoverage = useCallback(async (lon: number, lat: number, date: string | null = null) => {
     setSelectedId(null);
+    setProbe({ lon, lat, date });
     setCoverageState('loading');
     setCoverageError(null);
     setPanelCollapsed(false);
@@ -184,9 +231,9 @@ export default function App() {
     <div className="app">
       <MapView
         events={events}
-        context={context}
+        context={mapContext}
         visibleCategories={visible}
-        showContext={showContext}
+        showContext={true}
         selected={selected}
         before={before}
         after={after}
@@ -204,6 +251,7 @@ export default function App() {
         onCheckCoverage={runCoverage}
         onPin={(id) => setActivePin((cur) => (cur === id ? null : id))}
         flyTo={flyTo}
+        tileOverlays={tileOverlays}
       />
 
       {selected && mode === 'swipe' && (
@@ -247,7 +295,7 @@ export default function App() {
       <div className="topbar">
         <div className="brand">
           <b>GLOBAL SAR</b>
-          <span className="mono">NISAR L-band explorer</span>
+          <span className="mono">Earth change explorer</span>
         </div>
         <SearchBox
           events={events}
@@ -263,22 +311,46 @@ export default function App() {
             ◎ Coverage probe
           </button>
         )}
+        <button className="tool" aria-pressed={layersOpen} onClick={() => setLayersOpen((v) => !v)} title="Global satellite layers (NASA, ESA, partners)">
+          ▦ Satellite layers{tileOverlays.length ? ` (${tileOverlays.length})` : ''}
+        </button>
         <button className="tool mobile-only" aria-pressed={filtersOpen} onClick={() => setFiltersOpen((v) => !v)}>
           Filters
         </button>
       </div>
 
-      {!selected && (
+      {layersOpen && (
+        <LayersPanel
+          layers={catalogLayers}
+          state={layerState}
+          level={level}
+          onChange={(id, s) => setLayerState((m) => ({ ...m, [id]: s }))}
+          onClose={() => setLayersOpen(false)}
+        />
+      )}
+      {!selected && !layersOpen && (
         <Filters
           events={events}
-          context={context}
+          context={mapContext}
           visible={visible}
           showContext={showContext}
           open={filtersOpen}
-          onToggle={(c) =>
+          activeCatalogs={activeCatalogs}
+          catalogCounts={Object.fromEntries(Object.entries(catalogEvents).map(([k, v]) => [k, v.length]))}
+          catalogErrors={catalogErrors}
+          onToggleCatalog={(id) =>
+            setActiveCatalogs((s) => {
+              const n = new Set(s);
+              n.has(id) ? n.delete(id) : n.add(id);
+              return n;
+            })
+          }
+          years={years}
+          onYears={setYears}
+          onSetVisible={(cats, on) =>
             setVisible((s) => {
               const n = new Set(s);
-              n.has(c) ? n.delete(c) : n.add(c);
+              cats.forEach((c) => (on ? n.add(c) : n.delete(c)));
               return n;
             })
           }
@@ -314,10 +386,14 @@ export default function App() {
           coverageState={coverageState}
           coverageError={coverageError}
           coverageMode={coverageMode}
+          probe={probe}
           collapsed={panelCollapsed}
           onSelect={selectEvent}
           onCoverageMode={setCoverageMode}
-          onClearCoverage={() => setCoverage(null)}
+          onClearCoverage={() => {
+            setCoverage(null);
+            setProbe(null);
+          }}
           onToggleCollapsed={() => setPanelCollapsed((v) => !v)}
         />
       )}

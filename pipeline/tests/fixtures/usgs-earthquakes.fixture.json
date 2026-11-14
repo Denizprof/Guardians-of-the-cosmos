@@ -1,0 +1,128 @@
+{
+ "recorded": "2026-11-14T08:12:20.724Z",
+ "geojson": {
+  "type": "FeatureCollection",
+  "features": [
+   {
+    "type": "Feature",
+    "properties": {
+     "mag": 7.3,
+     "place": "24 km WNW of Port-Vila, Vanuatu",
+     "time": 1734400045741,
+     "updated": 1784308867060,
+     "tz": null,
+     "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000nzf3",
+     "detail": "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us7000nzf3&format=geojson",
+     "felt": 77,
+     "cdi": 8.3,
+     "mmi": 8.716,
+     "alert": "yellow",
+     "status": "reviewed",
+     "tsunami": 1,
+     "sig": 884,
+     "net": "us",
+     "code": "7000nzf3",
+     "ids": ",at00som7n2,us7000nzf3,pt24352000,usauto7000nzf3,",
+     "sources": ",at,us,pt,usauto,",
+     "types": ",dyfi,event-sequence,finite-fault,general-text,ground-failure,impact-link,impact-text,internal-moment-tensor,internal-origin,losspager,moment-tensor,oaf,origin,phase-data,shakemap,",
+     "nst": 246,
+     "dmin": 2.386,
+     "rms": 0.64,
+     "gap": 18,
+     "magType": "mww",
+     "type": "earthquake",
+     "title": "M 7.3 - 24 km WNW of Port-Vila, Vanuatu"
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      168.0842,
+      -17.6914,
+      54.372
+     ]
+    },
+    "id": "us7000nzf3"
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "mag": 7,
+     "place": "2024 Offshore Cape Mendocino, California Earthquake",
+     "time": 1733424261110,
+     "updated": 1784306727673,
+     "tz": null,
+     "url": "https://earthquake.usgs.gov/earthquakes/eventpage/nc75095651",
+     "detail": "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=nc75095651&format=geojson",
+     "felt": 16883,
+     "cdi": 7.5,
+     "mmi": 8.05,
+     "alert": "yellow",
+     "status": "reviewed",
+     "tsunami": 1,
+     "sig": 1504,
+     "net": "nc",
+     "code": "75095651",
+     "ids": ",ew1733424270,us7000nw7b,nc75095651,at00so1aq0,usauto7000nw7b,pt24340001,",
+     "sources": ",ew,us,nc,at,usauto,pt,",
+     "types": ",dyfi,earthquake-name,event-sequence,finite-fault,focal-mechanism,general-link,general-text,ground-failure,impact-link,impact-text,internal-moment-tensor,internal-origin,losspager,moment-tensor,nearby-cities,oaf,origin,phase-data,scitech-link,shake-alert,shakemap,trump-ground-failure,trump-origin,",
+     "nst": 172,
+     "dmin": 0.5261,
+     "rms": 0.23,
+     "gap": 229,
+     "magType": "mw",
+     "type": "earthquake",
+     "title": "M 7.0 - 2024 Offshore Cape Mendocino, California Earthquake"
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      -125.021666666667,
+      40.374,
+      10
+     ]
+    },
+    "id": "nc75095651"
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "mag": 7,
+     "place": "102 km E of Petropavlovsk-Kamchatsky, Russia",
+     "time": 1723921826820,
+     "updated": 1758225414995,
+     "tz": null,
+     "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000n7n8",
+     "detail": "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us7000n7n8&format=geojson",
+     "felt": 18,
+     "cdi": 6.5,
+     "mmi": 6.177,
+     "alert": "green",
+     "status": "reviewed",
+     "tsunami": 1,
+     "sig": 766,
+     "net": "us",
+     "code": "7000n7n8",
+     "ids": ",at00sidmlg,us7000n7n8,pt24230000,usauto7000n7n8,ak024akozr4g,",
+     "sources": ",at,us,pt,usauto,ak,",
+     "types": ",dyfi,finite-fault,general-text,ground-failure,impact-link,impact-text,internal-moment-tensor,internal-origin,losspager,moment-tensor,origin,phase-data,shakemap,",
+     "nst": 146,
+     "dmin": 0.902,
+     "rms": 0.99,
+     "gap": 63,
+     "magType": "mww",
+     "type": "earthquake",
+     "title": "M 7.0 - 102 km E of Petropavlovsk-Kamchatsky, Russia"
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      160.1331,
+      52.9308,
+      29
+     ]
+    },
+    "id": "us7000n7n8"
+   }
+  ]
+ }
+}

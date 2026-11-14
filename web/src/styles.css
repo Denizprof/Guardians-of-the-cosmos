@@ -121,6 +121,40 @@ a:hover { text-decoration: underline; }
 .filters .count { margin-left: auto; color: var(--faint); font-family: var(--mono); font-size: 11px; }
 .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 .dot.ring { background: transparent !important; box-shadow: 0 0 0 2px currentColor; width: 8px; height: 8px; }
+/* QA-17: grid children must be allowed to shrink so long labels never clip the panel */
+.obs > * { min-width: 0; }
+.obs .layer-select { width: 100%; max-width: 100%; text-overflow: ellipsis; }
+.obs .what { white-space: normal; overflow-wrap: anywhere; }
+/* QA-20: touch targets >= 24x24 (WCAG 2.2 SC 2.5.8) */
+.close { min-width: 28px; min-height: 28px; display: inline-grid; place-items: center; }
+.pin { width: 26px !important; height: 26px !important; }
+.filters .expand { min-width: 24px; min-height: 24px; }
+/* QA-21: readable "faint" text (contrast >= 4.5:1 on panel) and links not distinguished by colour alone */
+.faint { color: #8f99a6; }
+.faint a, .callout a, .section p a { text-decoration: underline; text-underline-offset: 2px; }
+/* QA-19: the slider element itself carries the hit area and focus ring */
+.swipe-handle { width: 36px; margin-left: -18px; }
+.swipe-handle::before { left: 17px; }
+.swipe-handle .grip { left: 0; }
+.swipe-handle:focus-visible .grip { outline: 2px solid var(--focus); outline-offset: 2px; }
+.filters .group-row { display: flex; align-items: center; gap: 6px; }
+.filters .group-row label { flex: 1; }
+.filters .group-row .count { margin-left: 0; }
+.filters .expand { background: none; border: 1px solid var(--line-2); border-radius: 4px; color: var(--muted); width: 20px; height: 20px; line-height: 16px; padding: 0; cursor: pointer; font: 12px var(--mono); }
+.filters .subcats { padding: 2px 0 4px 22px; font-size: 13px; }
+.filters { max-height: calc(100vh - 90px); overflow-y: auto; }
+.layers-panel { width: 280px; }
+.layer-item { padding: 3px 0 3px 15px; font-size: 13px; }
+.layer-controls { display: flex; gap: 8px; align-items: center; padding: 2px 0 2px 22px; }
+.layer-info { padding: 4px 0 6px 22px; font-size: 12.5px; color: #cdd2d9; }
+.layer-info p { margin: 6px 0; }
+.filters input.year { width: 64px; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 4px; padding: 2px 6px; font: 12px var(--mono); }
+.filters .subcats label { padding: 1px 0; }
+.evidence { font: 500 10.5px var(--mono); letter-spacing: 0.04em; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line-2); color: var(--muted); }
+.evidence.observation { color: #9fd6ff; border-color: #2c4f6b; }
+.evidence.derived { color: #ffd27a; border-color: #5f4b22; }
+.evidence.interpretation { color: #e2b8ff; border-color: #4f3566; }
+.evidence.model, .evidence.simulation { color: #ff9a9a; border-color: #6b2c2c; }
 .legend-note { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 .featured { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
 .featured button {

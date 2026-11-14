@@ -1,6 +1,9 @@
 import type { CompareMode, SarEvent, SarLayer } from '../types';
-import { CATEGORY_COLOR, CATEGORY_LABEL, fmtCoord, fmtDate, fmtDateTime, layerLabel } from '../lib';
+import { CATEGORY_COLOR, CATEGORY_LABEL, EVIDENCE_LABEL, evidenceOf, fmtCoord, fmtDate, fmtDateTime, layerLabel } from '../lib';
 import { CONCEPTS, EVENT_CONTENT } from '../content/explain';
+import { AssistantPanel } from '../assistant/AssistantPanel';
+import EarthdataPanel from './EarthdataPanel';
+import { useState } from 'react';
 
 interface Props {
   event: SarEvent;
@@ -48,7 +51,8 @@ function ObsRow({ slot, layer, layers, onPick }: { slot: 'B' | 'A'; layer: SarLa
       {layer && <span className={`tier ${layer.provenance.tier}`}>{layer.provenance.tier}</span>}
       {layer && (
         <span className="what">
-          NISAR {layer.product} · track {layer.provenance.track} {layer.provenance.direction.toLowerCase()} · frame {layer.provenance.frame}
+          <span className={`evidence ${evidenceOf(layer)}`} title={EVIDENCE_LABEL[evidenceOf(layer)]}>{EVIDENCE_LABEL[evidenceOf(layer)]}</span>{' '}
+          {layer.provenance.mission} {layer.product} · track {layer.provenance.track} {layer.provenance.direction.toLowerCase()} · frame {layer.provenance.frame}
         </span>
       )}
     </div>
@@ -64,6 +68,16 @@ const RAMPS: Record<string, string> = {
 function LegendBar({ label, layer }: { label: string; layer: SarLayer }) {
   const lg = layer.legend;
   if (!lg) return null;
+  if (lg.colormap === 'composite') {
+    // QA-15: three-channel composite has no single ramp; show the channel mapping instead
+    return (
+      <div style={{ marginTop: 8, fontSize: 12.5 }}>
+        <div className="muted">{label}: fixed calibrated composite (same scale every date)</div>
+        <div><span className="legend-swatch" style={{ background: 'linear-gradient(90deg,#000,#f0f)' }} />Red + blue = HH, −25 → 0 dB</div>
+        <div><span className="legend-swatch" style={{ background: 'linear-gradient(90deg,#000,#0f0)' }} />Green = HV, −32 → −7 dB</div>
+      </div>
+    );
+  }
   if (lg.classes) {
     return (
       <div style={{ marginTop: 8, fontSize: 12.5 }}>
@@ -86,13 +100,29 @@ function LegendBar({ label, layer }: { label: string; layer: SarLayer }) {
   );
 }
 
+/** NASA CMR search is a 5–10 s live query, so it runs only when asked. */
+function EarthdataSection({ lon, lat, date }: { lon: number; lat: number; date: string | null }) {
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <>
+        <h3>Other NASA data here</h3>
+        <p className="muted" style={{ fontSize: 13 }}>Search NASA Earthdata for every satellite dataset covering this place around the event date (optical, thermal, rain, lidar…).</p>
+        <button className="tool" onClick={() => setOpen(true)}>Search NASA Earthdata</button>
+      </>
+    );
+  }
+  return <EarthdataPanel lon={lon} lat={lat} date={date} windowDays={7} onClose={() => setOpen(false)} />;
+}
+
 function Provenance({ label, layer }: { label: string; layer: SarLayer }) {
   const p = layer.provenance;
   return (
     <details className="prov">
       <summary>
         {label}: {layerLabel(layer)}{' '}
-        {layer.kind === 'browse' ? <span className="badge raw">NASA browse</span> : <span className="badge derived">derived by team</span>}
+        <span className={`evidence ${evidenceOf(layer)}`}>{EVIDENCE_LABEL[evidenceOf(layer)]}</span>{' '}
+        {layer.kind === 'browse' ? <span className="badge raw">NASA browse rendering</span> : <span className="badge derived">computed by team</span>}
       </summary>
       <dl className="kv" style={{ marginTop: 8 }}>
         <dt>Mission</dt>
@@ -246,6 +276,20 @@ export default function EventPanel(p: Props) {
               <p style={{ marginTop: 6 }}>{sci ? k.scientific : k.simple}</p>
             </details>
           ))}
+        </div>
+
+        <div className="section">
+          <EarthdataSection lon={ev.location.lon} lat={ev.location.lat} date={ev.date} />
+        </div>
+
+        <div className="section">
+          <h3>Ask about this investigation</h3>
+          <AssistantPanel
+            event={ev}
+            before={p.before}
+            after={p.after}
+            onSelectLayer={(id) => (ev.layers.some((l) => l.id === id) ? p.onAfter(id) : undefined)}
+          />
         </div>
 
         <div className="section">

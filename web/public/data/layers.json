@@ -1,0 +1,698 @@
+{
+ "generated": "2026-11-14",
+ "source": "docs/research/layer-catalog.proposed.json",
+ "layers": [
+  {
+   "id": "gibs-viirs-noaa20-truecolor",
+   "title": "Daily true-colour Earth (VIIRS NOAA-20)",
+   "category": "geohazards",
+   "subcategories": [
+    "volcanoes",
+    "floods",
+    "landslides",
+    "context imagery"
+   ],
+   "kind": "observation",
+   "provider": "NASA GIBS (LANCE / EOSDIS)",
+   "mission": "NOAA-20 (JPSS-1)",
+   "sensor": "VIIRS (bands I1, M4, M3 corrected reflectance)",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 9,
+   "time": {
+    "start": "2018-01-05",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-13"
+   },
+   "resolution": "375 m (VIIRS I-band); served at GIBS Level 9",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA Global Imagery Browse Services (GIBS), part of NASA ESDIS. Data: NASA LANCE, NOAA-20 VIIRS.",
+   "description_simple": "What the whole planet looked like on a given day, in natural colours. Good for spotting volcanic plumes, large floods and smoke.",
+   "description_scientific": "Daily global composite of VIIRS corrected reflectance (Rayleigh-corrected TOA, true-colour band combination) from swath L1B (VJ102IMG). Daytime ascending passes only.",
+   "limitations": "One image per day; clouds hide the surface; 375 m is too coarse for buildings or small landslides. Swath gaps near the equator. GetCapabilities lists internal date gaps (e.g. 2019-12-31/2020-01-02, 2022-01-12/2022-01-14) that return HTTP 404. Note the GIBS REST path order is {z}/{y}/{x} (TileMatrix/TileRow/TileCol); the template already uses that order.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/2026-11-13/GoogleMapsCompatible_Level9/3/3/2.jpg",
+    "status": 200,
+    "content_type": "image/jpeg",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-opera-rtc-s1",
+   "title": "Radar backscatter, Sentinel-1 (OPERA RTC-S1)",
+   "category": "geohazards",
+   "subcategories": [
+    "landslides",
+    "floods",
+    "volcanoes",
+    "surface change"
+   ],
+   "kind": "observation",
+   "provider": "NASA JPL OPERA (data at ASF DAAC), tiles by NASA GIBS",
+   "mission": "Copernicus Sentinel-1",
+   "sensor": "C-SAR (C-band, 5.6 cm)",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1/default/{time}/GoogleMapsCompatible_Level12/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 12,
+   "time": {
+    "start": "2025-01-10",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-13"
+   },
+   "resolution": "30 m",
+   "license": "NASA EOSDIS open data; contains modified Copernicus Sentinel data",
+   "attribution": "Imagery: NASA GIBS. Data: NASA JPL OPERA RTC-S1 (ASF DAAC), contains modified Copernicus Sentinel-1 data.",
+   "description_simple": "A radar picture that sees through clouds and works at night. Bright means rough or built-up ground, dark means smooth surfaces such as calm water.",
+   "description_scientific": "False-colour rendering of terrain-flattened gamma0 backscatter (OPERA_L2_RTC-S1_V1, CMR C2777436413-ASF). Each date shows only the Sentinel-1 swaths acquired that day.",
+   "limitations": "C-band, not NISAR L-band: less penetration into vegetation. The tile is an 8-bit visualization, not calibrated dB values. Spatial coverage follows the OPERA production footprint (not verified here) and the 12-day Sentinel-1 revisit; most dates show only a few swaths. Many internal date gaps in GetCapabilities.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1/default/2026-11-13/GoogleMapsCompatible_Level12/3/3/2.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-viirs-noaa20-fire-falsecolor",
+   "title": "Fire and burn-scar false colour (VIIRS M11-I2-I1)",
+   "category": "fire-forest",
+   "subcategories": [
+    "active fire",
+    "burned area",
+    "post-fire change"
+   ],
+   "kind": "observation",
+   "provider": "NASA GIBS (LANCE / EOSDIS)",
+   "mission": "NOAA-20 (JPSS-1)",
+   "sensor": "VIIRS (bands M11 2.25 um, I2 0.86 um, I1 0.64 um)",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 9,
+   "time": {
+    "start": "2018-01-05",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-13"
+   },
+   "resolution": "375 m (I-bands), 750 m (M11)",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS, part of NASA ESDIS. Data: NASA LANCE, NOAA-20 VIIRS.",
+   "description_simple": "A false-colour view where fresh burn scars look dark brown or red and healthy vegetation looks green. Smoke becomes nearly transparent.",
+   "description_scientific": "Shortwave-infrared / near-infrared / red composite. Burned surfaces have low NIR and higher SWIR reflectance; active flaming fronts can saturate M11.",
+   "limitations": "Not a fire-detection product: use thermal anomalies (FIRMS) or GOES Fire Temperature for active fire. 375-750 m pixels miss small fires. Clouds block the view. Date gaps exist (e.g. 2025-08-31/2025-09-02).",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1/default/2026-11-13/GoogleMapsCompatible_Level9/3/4/5.jpg",
+    "status": 200,
+    "content_type": "image/jpeg",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-goes-east-firetemp",
+   "title": "Fire temperature every 10 minutes (GOES-East ABI)",
+   "category": "fire-forest",
+   "subcategories": [
+    "active fire"
+   ],
+   "kind": "observation",
+   "provider": "NASA GIBS (data NOAA)",
+   "mission": "GOES-East (geostationary)",
+   "sensor": "ABI (Advanced Baseline Imager)",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GOES-East_ABI_FireTemp/default/{time}/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 7,
+   "time": {
+    "start": "2026-11-10",
+    "end": "present",
+    "step": "PT10M",
+    "default": "2026-11-14T06:50:00Z"
+   },
+   "resolution": "2 km at nadir (ABI IR); GIBS Level 7",
+   "license": "NOAA / NASA open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS. Data: NOAA GOES-East ABI.",
+   "description_simple": "A weather-satellite view of hot spots over the Americas, refreshed every 10 minutes. Very hot fires glow yellow to white.",
+   "description_scientific": "Fire Temperature RGB (ABI 3.9, 2.2 and 1.6 um channels) from the geostationary GOES-East disk. Highlights high-temperature sources day and night.",
+   "limitations": "{time} must be a full UTC timestamp on a 10-minute boundary (YYYY-MM-DDThh:mm:00Z), not a date. Rolling retention: GetCapabilities on 2026-11-14 listed only ~4 days (from 2026-11-10T02:10Z) with sub-hourly gaps. Americas/Atlantic disk only; 2 km pixels; sun glint and hot bare ground can mimic fire.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GOES-East_ABI_FireTemp/default/2026-11-14T06:50:00Z/GoogleMapsCompatible_Level7/3/3/2.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-opera-dist-alert-hls",
+   "title": "Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)",
+   "category": "fire-forest",
+   "subcategories": [
+    "deforestation",
+    "degradation",
+    "burned area",
+    "post-fire change"
+   ],
+   "kind": "derived",
+   "provider": "NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS",
+   "mission": "Landsat 8/9 and Sentinel-2A/B/C (Harmonized Landsat Sentinel-2)",
+   "sensor": "OLI / OLI-2 and MSI",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OPERA_L3_DIST-ALERT-HLS_Color_Index/default/{time}/GoogleMapsCompatible_Level12/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 12,
+   "time": {
+    "start": "2023-01-01",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-05"
+   },
+   "resolution": "30 m",
+   "license": "NASA EOSDIS open data; contains modified Copernicus Sentinel data",
+   "attribution": "Imagery: NASA GIBS. Data: NASA JPL OPERA DIST-ALERT-HLS (LP DAAC), built from USGS Landsat and Copernicus Sentinel-2 data.",
+   "description_simple": "Flags places where plants have recently been lost, for example after a fire, logging or clearing. Red means more than half of the vegetation cover is gone.",
+   "description_scientific": "OPERA_L3_DIST-ALERT-HLS_V1 (CMR C2746980408-LPCLOUD): per-pixel vegetation cover loss relative to a multi-year baseline. Classes (GIBS colormap): 0 no disturbance; 1-3 first/provisional/confirmed <50% loss; 4-6 first/provisional/confirmed >=50% loss; 7-8 confirmed and finished.",
+   "limitations": "Disturbance is not the same as deforestation: fire, drought, harvest and flooding also trigger it. Optical, so cloud cover leaves gaps (the Amazon wet season especially). Each date only shows granules processed for that day. We saw intermittent HTTP 500 responses on some tiles and dates (e.g. 2026-06-20 and 2026-09-15 at z9-z11), so the client should retry.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OPERA_L3_DIST-ALERT-HLS_Color_Index/default/2026-11-05/GoogleMapsCompatible_Level12/3/3/2.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "umd-hansen-gfc-lossyear-v1-13",
+   "title": "Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)",
+   "category": "fire-forest",
+   "subcategories": [
+    "deforestation",
+    "forest loss",
+    "degradation"
+   ],
+   "kind": "derived",
+   "provider": "University of Maryland GLAD / Google (tiles on Google Cloud Storage)",
+   "mission": "Landsat 5, 7, 8, 9",
+   "sensor": "TM / ETM+ / OLI / OLI-2",
+   "url": "https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.13/loss_year/{z}/{x}/{y}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 12,
+   "time": null,
+   "resolution": "1 arc-second (~30 m)",
+   "license": "CC BY 4.0",
+   "attribution": "Source: Hansen/UMD/Google/USGS/NASA",
+   "description_simple": "Where trees were lost between 2001 and 2025. The colour shows the year the loss was detected.",
+   "description_scientific": "Global Forest Change 2000-2025 v1.13 'lossyear' layer: stand-replacement disturbance (canopy removal) at Landsat scale, rendered as an RGB colour ramp by year. Reference: Hansen et al. 2013, Science 342:850-853.",
+   "limitations": "This tile path is not listed on the GFC download page; it is the path used by the GLAD web viewer, so it could change without notice (v1.11 and v1.12 paths also still respond). Tiles are RGB only, with no legend or values. Gross loss includes fire, plantation harvest and storms, not only deforestation. The provider warns against pixel-count area estimates and notes inconsistencies before and after 2011/2013. z13 returns 404.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.13/loss_year/3/5/3.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-modis-terra-ndsi-snow",
+   "title": "Daily snow cover (MODIS Terra NDSI)",
+   "category": "climate",
+   "subcategories": [
+    "snow cover",
+    "glaciers (context)",
+    "drought (snow drought)"
+   ],
+   "kind": "derived",
+   "provider": "NASA GIBS (data NSIDC / LANCE)",
+   "mission": "Terra",
+   "sensor": "MODIS",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDSI_Snow_Cover/default/{time}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 8,
+   "time": {
+    "start": "2000-02-24",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-13"
+   },
+   "resolution": "500 m",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS. Data: MODIS/Terra Snow Cover MOD10_L2 (NSIDC DAAC / LANCE).",
+   "description_simple": "Where the ground is covered by snow on a given day.",
+   "description_scientific": "Normalized Difference Snow Index snow cover from MOD10_L2 (V061 standard, 6.1 NRT). Daytime swath product mapped daily.",
+   "limitations": "Optical: no retrievals under cloud or polar night. Snow under dense forest is underestimated. Terra is in an extended mission; record continuity relies on VIIRS successors. Some multi-day gaps in the record (see GetCapabilities).",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDSI_Snow_Cover/default/2026-11-13/GoogleMapsCompatible_Level8/3/2/1.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-ghrsst-mur-sea-ice",
+   "title": "Sea ice concentration (GHRSST MUR L4)",
+   "category": "climate",
+   "subcategories": [
+    "sea ice"
+   ],
+   "kind": "derived",
+   "provider": "NASA GIBS (data NASA JPL PO.DAAC, MUR v4.1)",
+   "mission": "Multi-mission analysis (passive microwave sea-ice input)",
+   "sensor": "Multi-sensor L4 analysis",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GHRSST_L4_MUR_Sea_Ice_Concentration/default/{time}/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 7,
+   "time": {
+    "start": "2002-06-01",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-12"
+   },
+   "resolution": "0.01 degree analysis grid (the underlying sea-ice input is coarser; not verified)",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS. Data: GHRSST Level 4 MUR v4.1 (NASA JPL, PO.DAAC).",
+   "description_simple": "How much of the polar ocean is covered by floating sea ice each day.",
+   "description_scientific": "Sea-ice fraction field distributed with the MUR-JPL-L4-GLOB-v4.1 foundation SST analysis (CMR C1996881146-POCLOUD). Gap-free daily analysis.",
+   "limitations": "This is an analysis (interpolated), not a direct image. About a 2-day latency (latest on 2026-11-14 was 2026-11-12). Not suitable for individual floes or leads; SAR (NISAR, Sentinel-1) is needed for those. For climate-record sea-ice extent, prefer the NSIDC Sea Ice Index (not reachable from our network).",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GHRSST_L4_MUR_Sea_Ice_Concentration/default/2026-11-12/GoogleMapsCompatible_Level7/2/0/1.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-modis-terra-lst-day",
+   "title": "Daytime land surface temperature (MODIS Terra)",
+   "category": "climate",
+   "subcategories": [
+    "heat",
+    "drought",
+    "desertification (context)",
+    "urban heat (context)"
+   ],
+   "kind": "derived",
+   "provider": "NASA GIBS (data LP DAAC / LANCE)",
+   "mission": "Terra",
+   "sensor": "MODIS (thermal infrared)",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Land_Surface_Temp_Day/default/{time}/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 7,
+   "time": {
+    "start": "2000-02-24",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-13"
+   },
+   "resolution": "1 km",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS. Data: MODIS/Terra LST/Emissivity MOD11_L2 (LP DAAC / LANCE).",
+   "description_simple": "How hot the ground surface was in the late morning, measured from its heat glow.",
+   "description_scientific": "Split-window land surface temperature from MOD11_L2 (around 10:30 local solar time, descending). Clear-sky only.",
+   "limitations": "Surface skin temperature, not air temperature. No data under cloud. 1 km pixels mix land-cover types. SAR is not a substitute: thermal IR is the correct observation.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Land_Surface_Temp_Day/default/2026-11-13/GoogleMapsCompatible_Level7/3/3/4.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-smap-l4-root-zone-soil-moisture",
+   "title": "Root-zone soil moisture (SMAP L4)",
+   "category": "climate",
+   "subcategories": [
+    "drought",
+    "desertification (context)",
+    "flood preconditioning"
+   ],
+   "kind": "model",
+   "provider": "NASA GIBS (data NASA GMAO / NSIDC DAAC)",
+   "mission": "SMAP (assimilated into a land-surface model)",
+   "sensor": "L-band radiometer (+ model)",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/SMAP_L4_Analyzed_Root_Zone_Soil_Moisture/default/{time}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 6,
+   "time": {
+    "start": "2015-03-31",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-10"
+   },
+   "resolution": "9 km (EASE-Grid 2.0)",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS. Data: SMAP L4 Surface and Root Zone Soil Moisture Analysis Update SPL4SMAU V008 (NSIDC DAAC).",
+   "description_simple": "How wet the soil is down to about 1 metre: a model guided by satellite measurements. Useful for drought.",
+   "description_scientific": "SPL4SMAU (CMR C3480440639-NSIDC_CPRD) 12z instantaneous root-zone (0-100 cm) soil moisture from the GEOS land model with SMAP brightness-temperature assimilation.",
+   "limitations": "This is a model product (kind = model), not a direct observation. 9 km. About a 4-day latency. Several short gaps in 2026 (e.g. 2026-08-09/2026-08-16) per GetCapabilities.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/SMAP_L4_Analyzed_Root_Zone_Soil_Moisture/default/2026-11-10/GoogleMapsCompatible_Level6/3/3/4.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-modis-flood-2day",
+   "title": "Flood water, 2-day composite (MODIS Terra + Aqua)",
+   "category": "water",
+   "subcategories": [
+    "floods"
+   ],
+   "kind": "derived",
+   "provider": "NASA GIBS (data NASA LANCE MCDWD)",
+   "mission": "Terra and Aqua",
+   "sensor": "MODIS",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_Flood_2-Day/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 9,
+   "time": {
+    "start": "2021-01-01",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-13"
+   },
+   "resolution": "250 m",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS. Data: MODIS/Aqua+Terra Global Flood Product MCDWD_L3_NRT (NASA LANCE).",
+   "description_simple": "Water seen where it is not normally present, combining two days of observations to see past some clouds.",
+   "description_scientific": "MCDWD L3 NRT 2-day flood product: surface water from MODIS water detection, compared against a reference water mask to flag unusual water.",
+   "limitations": "Optical: persistent cloud during storms hides floods; SAR (NISAR, Sentinel-1/OPERA DSWx-S1) is better during events. Cloud shadow and terrain shadow can be misclassified as water. MODIS is near end of mission; a VIIRS equivalent (VIIRS_Combined_Flood_2-Day, from 2025-06-03) exists in GIBS.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Combined_Flood_2-Day/default/2026-11-13/GoogleMapsCompatible_Level9/3/3/4.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-opera-dswx-s1",
+   "title": "Surface water from radar (OPERA DSWx-S1)",
+   "category": "water",
+   "subcategories": [
+    "floods",
+    "lakes/reservoirs",
+    "wetlands",
+    "river course change"
+   ],
+   "kind": "derived",
+   "provider": "NASA JPL OPERA (data at PO.DAAC), tiles by NASA GIBS",
+   "mission": "Copernicus Sentinel-1",
+   "sensor": "C-SAR (C-band)",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OPERA_L3_Dynamic_Surface_Water_Extent-Sentinel-1/default/{time}/GoogleMapsCompatible_Level12/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 12,
+   "time": {
+    "start": "2023-12-15",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-13"
+   },
+   "resolution": "30 m",
+   "license": "NASA EOSDIS open data; contains modified Copernicus Sentinel data",
+   "attribution": "Imagery: NASA GIBS. Data: NASA JPL OPERA DSWx-S1 (PO.DAAC), contains modified Copernicus Sentinel-1 data.",
+   "description_simple": "Open water mapped by radar, so it works through clouds: useful during floods.",
+   "description_scientific": "OPERA_L3_DSWX-S1_V1 (CMR C2949811996-POCLOUD): water and no-water classification from RTC-S1 backscatter, with partial-surface-water and inundated-vegetation classes per the product legend.",
+   "limitations": "C-band: misses water under dense canopy (L-band NISAR is better there). Wind-roughened water and dry sand can be misclassified. Coverage follows Sentinel-1 swaths, so each date shows only that day's acquisitions. Several date gaps in the record.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OPERA_L3_Dynamic_Surface_Water_Extent-Sentinel-1/default/2026-11-13/GoogleMapsCompatible_Level12/3/3/2.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "jrc-gsw-occurrence-v1-5",
+   "title": "Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)",
+   "category": "water",
+   "subcategories": [
+    "lakes/reservoirs",
+    "river course change",
+    "wetland loss",
+    "dams"
+   ],
+   "kind": "derived",
+   "provider": "European Commission Joint Research Centre (JRC) / Google",
+   "mission": "Landsat 5, 7, 8, 9",
+   "sensor": "TM / ETM+ / OLI / OLI-2",
+   "url": "https://storage.googleapis.com/water-world/tiles2024/occurrence/{z}/{x}/{y}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 13,
+   "time": null,
+   "resolution": "30 m",
+   "license": "Copernicus Programme data, free of charge without restriction of use (per the JRC download page)",
+   "attribution": "Source: EC JRC/Google",
+   "description_simple": "How often each place was covered by water over four decades. Dark blue means permanently wet, light means only sometimes.",
+   "description_scientific": "Percentage of valid Landsat observations classified as water, 1984-2024 (GSW v1.5). Pekel et al. 2016, Nature 540:418-422, doi:10.1038/nature20584.",
+   "limitations": "RGB visualization tiles, for display not analysis. Static summary with no time slider. The v1.5 seasonality, monthly and yearly assets cover only 2022-2024 (merge with v1.4 for full history). z14 returns 404. Clouds and terrain shadow reduce valid observations in some regions.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://storage.googleapis.com/water-world/tiles2024/occurrence/3/4/3.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "jrc-gsw-transitions-v1-5",
+   "title": "Water gained and lost 1984-2024 (JRC GSW transitions)",
+   "category": "water",
+   "subcategories": [
+    "dams",
+    "lakes/reservoirs",
+    "coastal erosion",
+    "wetland loss",
+    "land reclamation"
+   ],
+   "kind": "derived",
+   "provider": "European Commission Joint Research Centre (JRC) / Google",
+   "mission": "Landsat 5, 7, 8, 9",
+   "sensor": "TM / ETM+ / OLI / OLI-2",
+   "url": "https://storage.googleapis.com/water-world/tiles2024/transitions/{z}/{x}/{y}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 13,
+   "time": null,
+   "resolution": "30 m",
+   "license": "Copernicus Programme data, free of charge without restriction of use (per the JRC download page)",
+   "attribution": "Source: EC JRC/Google",
+   "description_simple": "Shows where new lakes or reservoirs appeared, where water disappeared, and where it became seasonal, between the first and last years of the record.",
+   "description_scientific": "Categorical transitions between first-year and last-year water class (permanent, seasonal, new, lost, seasonal-to-permanent, and so on) from the GSW v1.5 time series. Legend per the JRC Data Users Guide.",
+   "limitations": "Compares only the start and end of the record; intermediate changes are hidden. RGB display tiles only. Reservoir-filling and land-reclamation signals are robust; small or narrow channels below 30 m are not resolved.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://storage.googleapis.com/water-world/tiles2024/transitions/3/4/3.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-opera-dist-ann-hls",
+   "title": "Annual vegetation disturbance (OPERA DIST-ANN, HLS)",
+   "category": "ecosystems",
+   "subcategories": [
+    "land degradation",
+    "habitat loss",
+    "agricultural conversion",
+    "fragmentation"
+   ],
+   "kind": "derived",
+   "provider": "NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS",
+   "mission": "Landsat 8/9 and Sentinel-2A/B/C (HLS)",
+   "sensor": "OLI / OLI-2 and MSI",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OPERA_L3_DIST-ANN-HLS_Color_Index/default/{time}/GoogleMapsCompatible_Level12/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 12,
+   "time": {
+    "start": "2023-01-01",
+    "end": "2025-01-01",
+    "step": "P1Y",
+    "default": "2025-01-01"
+   },
+   "resolution": "30 m",
+   "license": "NASA EOSDIS open data; contains modified Copernicus Sentinel data",
+   "attribution": "Imagery: NASA GIBS. Data: NASA JPL OPERA DIST-ANN-HLS (LP DAAC), built from USGS Landsat and Copernicus Sentinel-2 data.",
+   "description_simple": "A yearly summary of where vegetation was lost or damaged.",
+   "description_scientific": "OPERA_L3_DIST-ANN-HLS_V1 (CMR C2519119034-LPCLOUD): annual roll-up of DIST-ALERT vegetation-loss status. GetCapabilities lists annual values for 2023, 2024 and 2025.",
+   "limitations": "Same cause ambiguity as DIST-ALERT (fire, harvest and clearing are not separated). Annual granularity. The 2026 annual value was not yet published on 2026-11-14.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OPERA_L3_DIST-ANN-HLS_Color_Index/default/2025-01-01/GoogleMapsCompatible_Level12/3/3/2.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-modis-terra-ndvi-16day",
+   "title": "Vegetation greenness, 16-day (MODIS Terra NDVI)",
+   "category": "ecosystems",
+   "subcategories": [
+    "vegetation change",
+    "agricultural expansion and irrigation",
+    "drought",
+    "desertification"
+   ],
+   "kind": "derived",
+   "provider": "NASA GIBS (data LP DAAC)",
+   "mission": "Terra",
+   "sensor": "MODIS",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_L3_NDVI_16Day/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 9,
+   "time": {
+    "start": "2000-03-05",
+    "end": "present",
+    "step": "P16D",
+    "default": "2026-10-16"
+   },
+   "resolution": "250 m",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS. Data: MODIS/Terra Vegetation Indices 16-Day L3 Global 250m MOD13Q1 V061 (LP DAAC).",
+   "description_simple": "How green and leafy the land is, averaged over 16 days. It shows crops, droughts and seasons.",
+   "description_scientific": "MOD13Q1 V061 NDVI composite (best-quality pixel over 16 days).",
+   "limitations": "Valid {time} values are the composite start dates, which restart each 1 January (e.g. 2026-01-01, 2026-01-17 ... 2026-10-16). Use the GetCapabilities list; other dates are not guaranteed. Latency is about a month. NDVI saturates over dense forest.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_L3_NDVI_16Day/default/2026-10-16/GoogleMapsCompatible_Level9/3/4/2.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-landsat-hbase-2010",
+   "title": "Built-up and settlement extent 2010 (HBASE, Landsat)",
+   "category": "human-activity",
+   "subcategories": [
+    "urban expansion",
+    "industrial zones",
+    "roads/railways/airports (large)"
+   ],
+   "kind": "derived",
+   "provider": "NASA SEDAC / CIESIN (Columbia University), tiles by NASA GIBS",
+   "mission": "Landsat (Global Land Survey 2010)",
+   "sensor": "TM / ETM+",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_Human_Built-up_And_Settlement_Extent/default/GoogleMapsCompatible_Level12/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 12,
+   "time": null,
+   "resolution": "30 m",
+   "license": "NASA SEDAC open data (CC BY 4.0 per SEDAC policy; not verified this session)",
+   "attribution": "Imagery: NASA GIBS. Data: Global Human Built-up And Settlement Extent (HBASE) v1, NASA SEDAC / CIESIN.",
+   "description_simple": "Where buildings and settlements were around 2010: a baseline to compare against today's imagery.",
+   "description_scientific": "HBASE v1 (CMR C3550193482-ESDIS): built-up/settlement probability-derived extent from Landsat GLS 2010.",
+   "limitations": "A single epoch (circa 2010), so it shows no change by itself. Compare with recent Sentinel-2 or EOX annual mosaics or with NISAR backscatter. For multi-epoch built-up, GHSL (JRC) is the better source but no browser tile service was found (unverified).",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_Human_Built-up_And_Settlement_Extent/default/GoogleMapsCompatible_Level12/3/3/4.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "gibs-viirs-noaa20-night-lights",
+   "title": "Night lights, daily (VIIRS Day/Night Band, NOAA-20)",
+   "category": "human-activity",
+   "subcategories": [
+    "urban expansion",
+    "energy",
+    "industrial zones",
+    "war/conflict and disaster outage context"
+   ],
+   "kind": "observation",
+   "provider": "NASA GIBS (data NASA LANCE Black Marble)",
+   "mission": "NOAA-20 (JPSS-1)",
+   "sensor": "VIIRS Day/Night Band",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance/default/{time}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 8,
+   "time": {
+    "start": "2024-03-25",
+    "end": "present",
+    "step": "P1D",
+    "default": "2026-11-13"
+   },
+   "resolution": "15 arc-second grid (~500 m); DNB native ~750 m",
+   "license": "NASA EOSDIS open data, no restrictions",
+   "attribution": "Imagery: NASA GIBS. Data: NASA LANCE Black Marble VJ146A1 NRT (NOAA-20 VIIRS DNB).",
+   "description_simple": "Lights at night seen from space: cities, roads, gas flares and fishing fleets. Outages after disasters show up as missing lights.",
+   "description_scientific": "Daily gridded at-sensor DNB radiance (VJ146A1/VJ146A1G NRT, night descending passes).",
+   "limitations": "At-sensor radiance, not corrected for moonlight, clouds or atmosphere (the standard Black Marble VNP46A2 product does this). Summer twilight blanks high latitudes. Light is a proxy for activity, not a measurement of buildings or damage.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_DayNightBand_At_Sensor_Radiance/default/2026-11-13/GoogleMapsCompatible_Level8/3/3/4.png",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "*"
+   }
+  },
+  {
+   "id": "eox-s2cloudless-annual",
+   "title": "Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)",
+   "category": "human-activity",
+   "subcategories": [
+    "urban expansion",
+    "mining/quarries",
+    "land reclamation and coastal construction",
+    "construction",
+    "agricultural expansion",
+    "dams and reservoirs"
+   ],
+   "kind": "observation",
+   "provider": "EOX IT Services GmbH",
+   "mission": "Copernicus Sentinel-2",
+   "sensor": "MSI",
+   "url": "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-{time}_3857/default/g/{z}/{y}/{x}.jpg",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 17,
+   "time": {
+    "start": "2017-01-01",
+    "end": "2025-12-31",
+    "step": "P1Y",
+    "default": "2025-01-01",
+    "format": "YYYY"
+   },
+   "resolution": "10 m (Sentinel-2 visible bands)",
+   "license": "CC BY-NC-SA 4.0 for non-commercial use; commercial use needs an EOX licence",
+   "attribution": "Sentinel-2 cloudless - https://cloudless.eox.at by EOX IT Services GmbH (Contains modified Copernicus Sentinel data <year>)",
+   "description_simple": "One cloud-free picture of Earth per year. Flip between years to watch cities, mines and new coastlines grow.",
+   "description_scientific": "Annual cloudless true-colour mosaics compiled from Sentinel-2 L1C/L2A scenes. Layer identifiers s2cloudless-2017_3857 ... s2cloudless-2025_3857 (2016 is 's2cloudless_3857').",
+   "limitations": "Substitute only the 4-digit year (YYYY) for {time}, not a full date. Mosaics blend many dates in each year, so they suit year-to-year change but not exact dating. Licence is non-commercial (CC BY-NC-SA 4.0). CORS echoes the request origin instead of '*'. Tested to z17 over Cairo; deeper zooms were not tested.",
+   "verified": {
+    "date": "2026-11-14",
+    "sample_tile": "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2025_3857/default/g/3/3/4.jpg",
+    "status": 200,
+    "content_type": "image/jpeg",
+    "cors": "http://localhost:5173 (echoes request Origin)"
+   }
+  }
+ ]
+}

@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-14T05:54:21.816Z",
+ "generated": "2026-11-14T08:51:51.643Z",
  "since": "2025-11-14",
  "events": [
   {
@@ -815,6 +815,96 @@
    "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1033801"
   },
   {
+   "id": "eonet-EONET_6320",
+   "title": "Iceberg A81",
+   "category": "sea-ice",
+   "date": "2026-11-06T00:00:00Z",
+   "lon": -35.52,
+   "lat": -55.81,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_12618",
+   "title": "Iceberg A84",
+   "category": "sea-ice",
+   "date": "2026-11-06T00:00:00Z",
+   "lon": -89.73,
+   "lat": -69.02,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_2736",
+   "title": "Iceberg B22A",
+   "category": "sea-ice",
+   "date": "2026-11-06T00:00:00Z",
+   "lon": 163.59,
+   "lat": -69.59,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_6474",
+   "title": "Iceberg D35",
+   "category": "sea-ice",
+   "date": "2026-11-06T00:00:00Z",
+   "lon": -44.72,
+   "lat": -60.15,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_12716",
+   "title": "Iceberg A85",
+   "category": "sea-ice",
+   "date": "2026-11-06T00:00:00Z",
+   "lon": -45.13,
+   "lat": -56.46,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_25990",
+   "title": "Iceberg B22K",
+   "category": "sea-ice",
+   "date": "2026-10-30T00:00:00Z",
+   "lon": 163.35,
+   "lat": -69.76,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_6051",
+   "title": "Iceberg C39",
+   "category": "sea-ice",
+   "date": "2026-10-30T00:00:00Z",
+   "lon": 55.55,
+   "lat": -65.58,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_6424",
+   "title": "Iceberg D33B",
+   "category": "sea-ice",
+   "date": "2026-10-30T00:00:00Z",
+   "lon": -42.25,
+   "lat": -55.87,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_6523",
+   "title": "Iceberg A83",
+   "category": "sea-ice",
+   "date": "2026-10-30T00:00:00Z",
+   "lon": -49.52,
+   "lat": -59.61,
+   "source": "NASA EONET",
+   "url": "https://earthobservatory.nasa.gov/images/152848/antarctic-ice-shelf-spawns-iceberg-a-83"
+  },
+  {
    "id": "usgs-us7000ttxz",
    "title": "M 6.4 - southeast of Easter Island",
    "category": "earthquake",
@@ -861,6 +951,26 @@
    "depth_km": 18,
    "source": "USGS",
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000u43g"
+  },
+  {
+   "id": "eonet-EONET_5359",
+   "title": "Iceberg A76C",
+   "category": "sea-ice",
+   "date": "2026-10-22T00:00:00Z",
+   "lon": -23.74,
+   "lat": -56.87,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/Products/AntarcIcebergs"
+  },
+  {
+   "id": "eonet-EONET_6288",
+   "title": "Iceberg D32",
+   "category": "sea-ice",
+   "date": "2026-10-22T00:00:00Z",
+   "lon": -39.35,
+   "lat": -56.65,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
   },
   {
    "id": "usgs-us6000u3jl",
@@ -935,6 +1045,16 @@
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000u18k"
   },
   {
+   "id": "eonet-EONET_25268",
+   "title": "Iceberg B52",
+   "category": "sea-ice",
+   "date": "2026-10-09T00:00:00Z",
+   "lon": -130.24,
+   "lat": -74.4,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
    "id": "usgs-us6000u0xi",
    "title": "M 6.3 - 117 km NE of Norsup, Vanuatu",
    "category": "earthquake",
@@ -947,6 +1067,16 @@
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000u0xi"
   },
   {
+   "id": "eonet-EONET_10212",
+   "title": "Iceberg B22F",
+   "category": "sea-ice",
+   "date": "2026-10-01T00:00:00Z",
+   "lon": -174.86,
+   "lat": -67.65,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
    "id": "usgs-us6000txpi",
    "title": "M 6.7 - 74 km ENE of Tadine, New Caledonia",
    "category": "earthquake",
@@ -957,6 +1087,16 @@
    "depth_km": 10,
    "source": "USGS",
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000txpi"
+  },
+  {
+   "id": "eonet-EONET_6510",
+   "title": "Iceberg D33C",
+   "category": "sea-ice",
+   "date": "2026-09-24T00:00:00Z",
+   "lon": -54.38,
+   "lat": -61.95,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
   },
   {
    "id": "usgs-us7000tiqc",
@@ -1091,6 +1231,16 @@
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000tgb9"
   },
   {
+   "id": "eonet-EONET_20822",
+   "title": "Iceberg D33D",
+   "category": "sea-ice",
+   "date": "2026-07-23T00:00:00Z",
+   "lon": -55.47,
+   "lat": -63.78,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
    "id": "usgs-us7000t1cc",
    "title": "M 6.4 - 96 km SW of Puerto Madero, Mexico",
    "category": "earthquake",
@@ -1211,6 +1361,16 @@
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000sui3"
   },
   {
+   "id": "eonet-EONET_6423",
+   "title": "Iceberg D33A",
+   "category": "sea-ice",
+   "date": "2026-06-18T00:00:00Z",
+   "lon": -55.79,
+   "lat": -64.24,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
    "id": "usgs-us7000stti",
    "title": "M 6.6 - central Mid-Atlantic Ridge",
    "category": "earthquake",
@@ -1255,6 +1415,16 @@
    "lat": -36.868,
    "source": "NASA EONET",
    "url": "https://volcano.si.edu/volcano.cfm?vn=357070"
+  },
+  {
+   "id": "eonet-EONET_14284",
+   "title": "Iceberg B22H",
+   "category": "sea-ice",
+   "date": "2026-06-12T00:00:00Z",
+   "lon": 164.3,
+   "lat": -70.23,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
   },
   {
    "id": "usgs-us7000srcg",
@@ -1367,6 +1537,26 @@
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000sxwq"
   },
   {
+   "id": "eonet-EONET_20220",
+   "title": "Iceberg B51",
+   "category": "sea-ice",
+   "date": "2026-05-15T00:00:00Z",
+   "lon": -130.63,
+   "lat": -74.22,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_20221",
+   "title": "Iceberg D15D",
+   "category": "sea-ice",
+   "date": "2026-05-15T00:00:00Z",
+   "lon": 79.31,
+   "lat": -67.28,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
    "id": "eonet-EONET_20413",
    "title": "Langila Volcano, Papua New Guinea",
    "category": "volcano",
@@ -1395,6 +1585,26 @@
    "lat": 11.9844,
    "source": "NASA EONET",
    "url": "https://volcano.si.edu/volcano.cfm?vn=344100"
+  },
+  {
+   "id": "eonet-EONET_18592",
+   "title": "Iceberg D15C",
+   "category": "sea-ice",
+   "date": "2026-04-24T00:00:00Z",
+   "lon": 79.82,
+   "lat": -67.09,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_15852",
+   "title": "Iceberg C18C",
+   "category": "sea-ice",
+   "date": "2026-04-24T00:00:00Z",
+   "lon": 39.08,
+   "lat": -68.47,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
   },
   {
    "id": "usgs-us6000sri7",
@@ -1515,6 +1725,36 @@
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000shlp"
   },
   {
+   "id": "eonet-EONET_4133",
+   "title": "Iceberg C18B",
+   "category": "sea-ice",
+   "date": "2026-03-20T00:00:00Z",
+   "lon": 47.55,
+   "lat": -66.77,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_4089",
+   "title": "Iceberg C36",
+   "category": "sea-ice",
+   "date": "2026-03-13T00:00:00Z",
+   "lon": 147.04,
+   "lat": -67.76,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_2734",
+   "title": "Iceberg A23A",
+   "category": "sea-ice",
+   "date": "2026-03-13T00:00:00Z",
+   "lon": -31.79,
+   "lat": -48.95,
+   "source": "NASA EONET",
+   "url": "https://www.earthdata.nasa.gov/worldview/worldview-image-archive/iceberg-A32a-antarctica-27-feb-2024"
+  },
+  {
    "id": "eonet-EONET_19906",
    "title": "Akan Volcano, Japan",
    "category": "volcano",
@@ -1523,6 +1763,16 @@
    "lat": 43.384,
    "source": "NASA EONET",
    "url": "https://volcano.si.edu/volcano.cfm?vn=285070"
+  },
+  {
+   "id": "eonet-EONET_4125",
+   "title": "Iceberg B15AB",
+   "category": "sea-ice",
+   "date": "2026-03-06T00:00:00Z",
+   "lon": -33.75,
+   "lat": -53.33,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
   },
   {
    "id": "usgs-us7000s211",
@@ -1547,6 +1797,26 @@
    "depth_km": 579,
    "source": "USGS",
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000s16b"
+  },
+  {
+   "id": "eonet-EONET_10213",
+   "title": "Iceberg B22G",
+   "category": "sea-ice",
+   "date": "2026-02-26T00:00:00Z",
+   "lon": -159.71,
+   "lat": -68.77,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_14285",
+   "title": "Iceberg B22I",
+   "category": "sea-ice",
+   "date": "2026-02-26T00:00:00Z",
+   "lon": -178.37,
+   "lat": -69.52,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
   },
   {
    "id": "usgs-us6000sasz",
@@ -1583,6 +1853,16 @@
    "url": "https://volcano.si.edu/volcano.cfm?vn=344100"
   },
   {
+   "id": "eonet-EONET_6080",
+   "title": "Iceberg A74A",
+   "category": "sea-ice",
+   "date": "2026-02-13T00:00:00Z",
+   "lon": -18.62,
+   "lat": -57.66,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
    "id": "eonet-EONET_19920",
    "title": "Heard Volcano, Australia",
    "category": "volcano",
@@ -1601,6 +1881,26 @@
    "lat": -23.37,
    "source": "NASA EONET",
    "url": "https://volcano.si.edu/volcano.cfm?vn=355100"
+  },
+  {
+   "id": "eonet-EONET_15494",
+   "title": "Iceberg B22J",
+   "category": "sea-ice",
+   "date": "2026-01-30T00:00:00Z",
+   "lon": -178.22,
+   "lat": -68.62,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
+   "id": "eonet-EONET_17386",
+   "title": "Iceberg A23J",
+   "category": "sea-ice",
+   "date": "2026-01-16T00:00:00Z",
+   "lon": -41.72,
+   "lat": -52.86,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
   },
   {
    "id": "usgs-us7000rnwd",
@@ -1703,6 +2003,16 @@
    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000rwgh"
   },
   {
+   "id": "eonet-EONET_5906",
+   "title": "Iceberg A77",
+   "category": "sea-ice",
+   "date": "2025-12-18T00:00:00Z",
+   "lon": -40.08,
+   "lat": -49.39,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
    "id": "usgs-us6000ruc4",
    "title": "M 6.7 - 117 km NE of Kuji, Japan",
    "category": "earthquake",
@@ -1801,6 +2111,16 @@
    "url": "https://volcano.si.edu/volcano.cfm?vn=260010"
   },
   {
+   "id": "eonet-EONET_15488",
+   "title": "Iceberg A23G",
+   "category": "sea-ice",
+   "date": "2025-11-28T00:00:00Z",
+   "lon": -38.63,
+   "lat": -50.92,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
+  },
+  {
    "id": "usgs-us7000re2g",
    "title": "M 6.4 - 54 km WNW of Sinabang, Indonesia",
    "category": "earthquake",
@@ -1821,6 +2141,16 @@
    "lat": 13.5111,
    "source": "NASA EONET",
    "url": "https://science.nasa.gov/earth/earth-observatory/hayli-gubbis-explosive-first-impression/"
+  },
+  {
+   "id": "eonet-EONET_15851",
+   "title": "Iceberg A23J",
+   "category": "sea-ice",
+   "date": "2025-11-21T00:00:00Z",
+   "lon": -37.62,
+   "lat": -51.49,
+   "source": "NASA EONET",
+   "url": "https://usicecenter.gov/pub/Iceberg_Tabular.csv"
   }
  ]
 }

@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://global-sar.local/schemas/assistant-request.schema.json",
+  "title": "AssistantRequest",
+  "description": "Request sent by the Global SAR web app (via the gateway) to the owner AI model. Contract version 1.x.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "query", "locale", "explanation_level", "context"],
+  "properties": {
+    "version": { "type": "string", "pattern": "^1\\.[0-9]+$", "description": "Contract version. Major must be 1." },
+    "query": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "locale": { "type": "string", "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$", "description": "BCP 47 tag, e.g. en or en-US." },
+    "explanation_level": { "enum": ["simple", "scientific"] },
+    "context": { "$ref": "#/$defs/context" },
+    "conversation": {
+      "type": "array",
+      "maxItems": 20,
+      "description": "Previous turns, oldest first, excluding the current query.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "content"],
+        "properties": {
+          "role": { "enum": ["user", "assistant"] },
+          "content": { "type": "string", "maxLength": 8000 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "citationId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:/#-]{1,200}$",
+      "description": "Stable id of a context item. A response may cite only ids that appear in this request context."
+    },
+    "lonlat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lon", "lat"],
+      "properties": {
+        "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 }
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "ISO 8601 timestamps of the radar acquisition(s). GCOV uses start/stop; GUNW uses reference/secondary.",
+      "properties": {
+        "start": { "type": "string", "maxLength": 40 },
+        "stop": { "type": "string", "maxLength": 40 },
+        "reference": { "type": "string", "maxLength": 40 },
+        "secondary": { "type": "string", "maxLength": 40 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mission", "granule", "tier", "acquisition", "processing", "origin"],
+      "properties": {
+        "mission": { "type": "string", "maxLength": 100 },
+        "sensor": { "type": "string", "maxLength": 200 },
+        "granule": { "type": "string", "maxLength": 300 },
+        "collection": { "type": "string", "maxLength": 200 },
+        "tier": { "enum": ["BETA", "PROVISIONAL", "VALIDATED", "URGENT RESPONSE"] },
+        "crid": { "type": ["string", "null"], "maxLength": 50 },
+        "track": { "type": "integer" },
+        "frame": { "type": "integer" },
+        "direction": { "type": "string", "maxLength": 30 },
+        "polarizations": { "type": ["array", "null"], "maxItems": 8, "items": { "type": "string", "maxLength": 10 } },
+        "acquisition": { "$ref": "#/$defs/acquisition" },
+        "processing_date": { "type": "string", "maxLength": 40 },
+        "processing": { "type": "array", "maxItems": 30, "items": { "type": "string", "maxLength": 600 }, "description": "Processing steps applied, in order." },
+        "product_url": { "type": "string", "maxLength": 1000 },
+        "credit": { "type": "string", "maxLength": 300 },
+        "origin": { "enum": ["nasa_browse", "derived_by_team"], "description": "nasa_browse = NASA image as published; derived_by_team = computed by this project from NISAR data." }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["citation_id", "layer_id", "type", "role", "kind", "product", "provenance"],
+      "properties": {
+        "citation_id": { "$ref": "#/$defs/citationId" },
+        "layer_id": { "type": "string", "maxLength": 200 },
+        "type": { "enum": ["observation", "derived"] },
+        "role": { "type": "string", "maxLength": 30 },
+        "kind": { "type": "string", "maxLength": 30 },
+        "product": { "type": "string", "maxLength": 30 },
+        "legend": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": { "units": { "type": "string", "maxLength": 50 } }
+        },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "event": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["citation_id", "id", "title", "category", "technique", "location"],
+          "properties": {
+            "citation_id": { "$ref": "#/$defs/citationId" },
+            "id": { "type": "string", "maxLength": 100 },
+            "title": { "type": "string", "maxLength": 300 },
+            "subtitle": { "type": "string", "maxLength": 300 },
+            "category": { "type": "string", "maxLength": 30 },
+            "date": { "type": ["string", "null"], "maxLength": 40 },
+            "technique": { "enum": ["insar", "backscatter", "timeseries"] },
+            "location": { "$ref": "#/$defs/lonlat" },
+            "references": {
+              "type": "array",
+              "maxItems": 20,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["citation_id", "label", "url"],
+                "properties": {
+                  "citation_id": { "$ref": "#/$defs/citationId" },
+                  "label": { "type": "string", "maxLength": 300 },
+                  "url": { "type": "string", "maxLength": 1000 }
+                }
+              }
+            }
+          }
+        },
+        "selected_layers": { "type": "array", "maxItems": 12, "items": { "$ref": "#/$defs/layer" } },
+        "map_view": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["center", "zoom", "bbox"],
+          "properties": {
+            "center": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" }, "description": "[lon, lat]" },
+            "zoom": { "type": "number", "minimum": -2, "maximum": 30 },
+            "bbox": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "number" }, "description": "[west, south, east, north]" }
+          }
+        },
+        "clicked_location": { "$ref": "#/$defs/lonlat" },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lon", "lat", "total", "granules"],
+          "description": "Real NISAR acquisitions over the clicked point (ASF search). granules may be truncated; total is the full count.",
+          "properties": {
+            "lon": { "type": "number" },
+            "lat": { "type": "number" },
+            "total": { "type": "integer", "minimum": 0 },
+            "granules": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["citation_id", "scene", "product", "start", "tier", "track", "frame", "direction"],
+                "properties": {
+                  "citation_id": { "$ref": "#/$defs/citationId" },
+                  "scene": { "type": "string", "maxLength": 300 },
+                  "product": { "type": "string", "maxLength": 30 },
+                  "start": { "type": "string", "maxLength": 40 },
+                  "tier": { "type": "string", "maxLength": 30 },
+                  "track": { "type": "integer" },
+                  "frame": { "type": "integer" },
+                  "direction": { "type": "string", "maxLength": 30 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

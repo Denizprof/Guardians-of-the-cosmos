@@ -77,18 +77,23 @@ def colorize(v: np.ndarray, vmin: float, vmax: float, table: np.ndarray, alpha_m
 
 
 # ------------------------------------------------------------- reprojection
+def apply_affine(t, col: float, row: float) -> tuple[float, float]:
+    """Pixel (col, row) -> map (x, y) without the deprecated `Affine * tuple` form."""
+    return t.a * col + t.b * row + t.c, t.d * col + t.e * row + t.f
+
+
 def to_mercator(grid: Grid, arr: np.ndarray, resampling=Resampling.bilinear):
     src_crs = CRS.from_epsg(grid.epsg)
     dst_crs = CRS.from_epsg(3857)
     h, w = arr.shape
-    left, top = grid.transform * (0, 0)
-    right, bottom = grid.transform * (w, h)
+    left, top = apply_affine(grid.transform, 0, 0)
+    right, bottom = apply_affine(grid.transform, w, h)
     tr, dw, dh = calculate_default_transform(src_crs, dst_crs, w, h, left, bottom, right, top)
     dst = np.full((dh, dw), np.nan, np.float32)
     reproject(arr.astype(np.float32), dst, src_transform=grid.transform, src_crs=src_crs,
               dst_transform=tr, dst_crs=dst_crs, resampling=resampling, src_nodata=np.nan, dst_nodata=np.nan)
     to_ll = Transformer.from_crs(3857, 4326, always_xy=True)
-    corners = [tr * (0, 0), tr * (dw, 0), tr * (dw, dh), tr * (0, dh)]
+    corners = [apply_affine(tr, c, r) for c, r in ((0, 0), (dw, 0), (dw, dh), (0, dh))]
     lonlat = [list(map(lambda v: round(v, 6), to_ll.transform(x, y))) for x, y in corners]
     return dst, lonlat
 
@@ -104,6 +109,25 @@ def save_layer(event_id: str, name: str, rgba: np.ndarray, max_px=3072) -> str:
     return f"data/events/{event_id}/{name}.webp"
 
 
+def tier_of(collection: str) -> str:
+    """Same rules as pipeline/src/asf.mjs tierOf and web/src/services.ts tierOf."""
+    if collection.startswith("NISAR_UR"):
+        return "URGENT RESPONSE"
+    if "_BETA_" in collection:
+        return "BETA"
+    if "_PROVISIONAL_" in collection:
+        return "PROVISIONAL"
+    return "VALIDATED"
+
+
+def utc_iso(ts):
+    """NISAR HDF5 timestamps are UTC but carry no offset; make that explicit for browsers."""
+    if not ts:
+        return ts
+    ts = str(ts).split(".")[0]
+    return ts if ts.endswith("Z") or "+" in ts[10:] else ts + "Z"
+
+
 def name_parts(granule: str) -> dict:
     """Track/direction/frame/timestamps from the NISAR file name (JPL D-102255)."""
     p = granule.split("_")
@@ -117,13 +141,13 @@ def name_parts(granule: str) -> dict:
 
 
 def provenance(collection: str, granule: str, meta: dict, steps: list[str]) -> dict:
-    tier = "BETA" if "_BETA_" in collection else "PROVISIONAL" if "_PROVISIONAL_" in collection else "VALIDATED"
+    tier = tier_of(collection)
     n = name_parts(granule)
     return {
         "mission": "NISAR", "sensor": "L-SAR (L-band, 24 cm)", "granule": granule, "collection": collection,
         "tier": tier, "crid": granule.split("_")[-5],
         "track": n["track"], "frame": n["frame"], "direction": n["direction"],
-        "polarizations": None, "processing_date": meta.get("processingDateTime"),
+        "polarizations": None, "processing_date": utc_iso(meta.get("processingDateTime")),
         "browse_source": "", "product_url": f"{ASF}/{collection}/{granule}/{granule}.h5",
         "distributor": "ASF DAAC",
         "credit": "NISAR L-band data: NASA/JPL-Caltech & ISRO, distributed by ASF DAAC. Derived layer computed by the Global SAR team.",
@@ -216,22 +240,39 @@ def cached_gcov(coll: str, gran: str, bbox):
     return out
 
 
-def histogram_valley(v_db: np.ndarray, fallback=-15.0) -> float:
-    """Threshold at the lowest point of the smoothed histogram BETWEEN the water peak
-    (searched in -26..-13 dB) and the land peak (-12..-2 dB)."""
+def histogram_valley(v_db: np.ndarray, fallback=-15.0, min_peak_frac=0.005, max_valley_ratio=0.8) -> float:
+    """Threshold at the centre of the lowest run of the smoothed histogram BETWEEN the water peak
+    (searched in -26..-13 dB) and the land peak (-12..-2 dB).
+
+    Falls back to `fallback` unless the histogram is genuinely bimodal: both peaks must hold at
+    least `min_peak_frac` of the samples and the valley must be <= `max_valley_ratio` x the smaller peak.
+    """
     v = v_db[np.isfinite(v_db)]
+    if v.size == 0:
+        return fallback
     h, e = np.histogram(v, bins=np.arange(-35, 5.01, 0.5))
     hs = np.convolve(h, np.ones(5) / 5, mode="same")
     c = (e[:-1] + e[1:]) / 2
     w = np.where((c >= -26) & (c <= -13))[0]
     l = np.where((c >= -12) & (c <= -2))[0]
-    if not len(w) or not len(l):
-        return fallback
     iw, il = w[np.argmax(hs[w])], l[np.argmax(hs[l])]
-    if il - iw < 3:
+    if il - iw < 3 or min(hs[iw], hs[il]) < min_peak_frac * v.size:
         return fallback
     between = np.arange(iw, il + 1)
-    return float(c[between[np.argmin(hs[between])]])
+    vmin = hs[between].min()
+    if vmin > max_valley_ratio * min(hs[iw], hs[il]):
+        return fallback
+    run = between[hs[between] == vmin]
+    return float(c[run].mean())  # centre of the minimal run, not its first bin
+
+
+def median_db(p: np.ndarray, k=3) -> np.ndarray:
+    """Edge-preserving speckle reduction for classification: k x k median of dB (NaN-safe)."""
+    from scipy.ndimage import median_filter
+    d = db(p)
+    filled = np.where(np.isfinite(d), d, -40.0)
+    out = median_filter(filled, size=k)
+    return np.where(np.isfinite(d), out, np.nan)
 
 
 def mozambique(cfg) -> list[dict]:
@@ -255,15 +296,25 @@ def mozambique(cfg) -> list[dict]:
         })
     # same geometry (track 114 frame 165): grids align pixel for pixel
     change = hh["after"] - hh["before"]
-    thr = histogram_valley(hh["after"])
-    # New water needs BOTH: water-like on 17 Jan and a significant darkening (> 3 dB).
-    # A plain threshold alone would be fooled by the scene-wide +3 dB brightening (wet soil / BETA calibration).
-    water_a = hh["after"] < thr
-    new_water = water_a & (change < -3.0)
-    perm_water = water_a & (hh["before"] < thr)
+    # Classification uses a 3x3 MEDIAN of dB (edge-preserving). The 5x5 boxcar used for display
+    # blurs water edges and biased flooded area low by ~2 px per boundary (QA-16); it is kept
+    # only as a lower bound so the published area is a range, not a falsely precise number.
+    cls = {r: median_db(grids[r].data["HHHH"]) for r in ("before", "after")}
+    thr = histogram_valley(cls["after"])
+
+    def classify(b, a):
+        # New water needs BOTH: water-like on 17 Jan and a significant darkening (> 3 dB).
+        # A plain threshold alone would be fooled by the scene-wide +3 dB brightening (wet soil / BETA calibration).
+        wa = a < thr
+        return wa & ((a - b) < -3.0), wa & (b < thr)
+
+    new_water, perm_water = classify(cls["before"], cls["after"])
+    new_lo, perm_lo = classify(hh["before"], hh["after"])
     px_km2 = abs(float(grids["after"].x[1] - grids["after"].x[0]) * float(grids["after"].y[0] - grids["after"].y[1])) / 1e6
     area = {"new_water_km2": round(float(new_water.sum()) * px_km2, 1),
+            "new_water_km2_lower_bound": round(float(new_lo.sum()) * px_km2, 1),
             "water_both_dates_km2": round(float(perm_water.sum()) * px_km2, 1),
+            "water_both_dates_km2_lower_bound": round(float(perm_lo.sum()) * px_km2, 1),
             "scene_median_change_db": round(float(np.nanmedian(change)), 2),
             "aoi_km2": round(float(np.isfinite(change).sum()) * px_km2, 0)}
     print(f"  threshold {thr:.2f} dB, {area}", flush=True)
@@ -287,7 +338,8 @@ def mozambique(cfg) -> list[dict]:
         "coordinates": corners, "acquisition": {"reference": name_parts(cfg["scenes"]["before"][1])["start"], "secondary": name_parts(cfg["scenes"]["after"][1])["start"]},
         "legend": {"units": "water mask", "threshold_db": round(thr, 2), "classes": {"1": "water on both dates", "2": "new water on 17 Jan"}, "stats": area},
         "provenance": provenance(coll, gran, metas["after"], base_steps + [
-            f"Water-like = HH < {thr:.1f} dB: the valley between the water and land peaks of the 17 Jan HH histogram (smoothed, 0.5 dB bins).",
+            "Classification on a 3x3 median of HH dB (edge-preserving); the 5x5 boxcar version is reported as a lower bound because averaging erodes water edges.",
+            f"Water-like = HH < {thr:.2f} dB: the centre of the valley between the water and land peaks of the 17 Jan HH histogram (smoothed, 0.5 dB bins; bimodality checked).",
             "New water = water-like on 17 Jan AND HH darkened by more than 3 dB since 5 Jan. Water on both dates = water-like on both.",
             f"Scene-wide median HH change was {area['scene_median_change_db']:+.1f} dB (land brightening, likely wetter soil and/or BETA calibration), which is why a change criterion is required.",
             "Heuristic classification, not validated in the field: wind-roughened water, radar shadow, smooth tarmac and very dry sand can be misclassified."]),
@@ -295,9 +347,75 @@ def mozambique(cfg) -> list[dict]:
     return layers
 
 
+KRAS_DATES = [  # track 060 descending, frame 061: identical geometry on every date
+    ("20260618T084927_20260618T085005_P05023_N_F_J_001", "023"), ("20260630T084926_20260630T085005_P05023_N_F_J_001", "024"),
+    ("20260712T084929_20260712T085004_P05023_N_F_J_001", "025"), ("20260724T084925_20260724T085003_P05023_N_F_J_001", "026"),
+    ("20260817T084924_20260817T085002_P05023_N_F_J_001", "028"), ("20260829T084924_20260829T085002_P05023_N_F_J_001", "029"),
+    ("20260910T084923_20260910T085002_P05023_N_F_J_001", "030"), ("20260922T084923_20260922T085002_P05023_N_F_J_001", "031"),
+    ("20261004T084924_20261004T085002_P05023_N_F_J_001", "032"), ("20261016T084924_20261016T085002_P05023_N_F_J_001", "033"),
+    ("20261028T084924_20261028T085002_P05036_N_F_J_001", "034"),
+]
+
+
+def krasheninnikov(cfg) -> list[dict]:
+    """Full-resolution HH/HV composite per date with ONE fixed calibrated stretch,
+    so colours are comparable between dates (unlike NASA's per-image browse stretch)."""
+    layers = []
+    HH_RANGE, HV_RANGE = (-25.0, 0.0), (-32.0, -7.0)
+    first_hh = None
+    for i, (tail, cycle) in enumerate(KRAS_DATES):
+        coll = "NISAR_L2_GCOV_V1" if "_P05036_" in tail else "NISAR_L2_GCOV_PROVISIONAL_V1"
+        gran = f"NISAR_L2_PR_GCOV_{cycle}_060_D_061_4005_DHDH_A_{tail}"
+        g, meta = cached_gcov(coll, gran, cfg["bbox"])
+        hh, hv = db(boxcar(g.data["HHHH"], 3)), db(boxcar(g.data["HVHV"], 3))
+        if first_hh is None:
+            first_hh, first_grid, first_gran, first_meta = hh, g, gran, meta
+        mh, corners = to_mercator(g, hh)
+        mv, _ = to_mercator(g, hv)
+        # NaN (no data) -> 0 before the uint8 cast; those pixels are made transparent via alpha below.
+        norm = lambda v, r: np.nan_to_num(np.clip((v - r[0]) / (r[1] - r[0]), 0, 1), nan=0.0)
+        rgba = np.zeros(mh.shape + (4,), np.uint8)
+        r = (norm(mh, HH_RANGE) ** 0.8 * 255).astype(np.uint8)
+        gch = (norm(mv, HV_RANGE) ** 0.8 * 255).astype(np.uint8)
+        rgba[..., 0], rgba[..., 1], rgba[..., 2] = r, gch, r
+        rgba[..., 3] = np.where(np.isfinite(mh) & np.isfinite(mv), 255, 0)
+        n = name_parts(gran)
+        role = "before" if i == 0 else "after" if i == len(KRAS_DATES) - 1 else "timeline"
+        name = f"rgb_{n['start'][:10].replace('-', '')}"
+        layers.append({
+            "id": name, "role": role, "kind": "backscatter", "product": "GCOV",
+            "url": save_layer("krasheninnikov-2026", name, rgba),
+            "coordinates": corners, "acquisition": {"start": n["start"]},
+            "legend": {"units": f"R,B = HH {HH_RANGE[0]:.0f}..{HH_RANGE[1]:.0f} dB; G = HV {HV_RANGE[0]:.0f}..{HV_RANGE[1]:.0f} dB (fixed for all dates)", "colormap": "composite"},
+            "provenance": provenance(coll, gran, meta, [
+                "Read gamma0 HHHH and HVHV (frequency A) for a ~22 x 20 km box around the summit via HTTPS range requests.",
+                "3x3 boxcar on linear power; converted to dB.",
+                f"Composite R = B = HH, G = HV, with one fixed stretch for every date (HH {HH_RANGE}, HV {HV_RANGE} dB, gamma 0.8), so colours are comparable through time.",
+                "Reprojected bilinearly to Web Mercator (EPSG:3857).",
+            ]),
+        })
+        print(f"  {name}: HH median {np.nanmedian(hh):.1f} dB, HV median {np.nanmedian(hv):.1f} dB", flush=True)
+    # Change from first to last date (same geometry): seasonal effects included, see caveats.
+    change = hh - first_hh
+    mc, corners = to_mercator(g, change)
+    layers.append({
+        "id": "hh_change_first_last", "role": "change", "kind": "change", "product": "GCOV",
+        "url": save_layer("krasheninnikov-2026", "hh_change_first_last", colorize(mc, -8, 8, DIVERGING)),
+        "coordinates": corners,
+        "acquisition": {"reference": name_parts(first_gran)["start"], "secondary": name_parts(gran)["start"]},
+        "legend": {"units": "HH change (dB), 28 Oct - 18 Jun", "vmin": -8, "vmax": 8, "colormap": "diverging",
+                   "stats": {"median_change_db": round(float(np.nanmedian(change)), 2)}},
+        "provenance": provenance(coll, gran, meta, [
+            "Log-ratio change 10*log10(HH_28Oct / HH_18Jun) on 3x3-filtered gamma0.",
+            "Includes seasonal snow and freeze effects; not a lava map by itself."]),
+    })
+    print(f"  change median {np.nanmedian(change):+.2f} dB", flush=True)
+    return layers
+
+
 def run(event_id: str):
     cfg = EVENTS[event_id]
-    fn = {"venezuela-2026": venezuela, "mozambique-floods-2026": mozambique}.get(event_id)
+    fn = {"venezuela-2026": venezuela, "mozambique-floods-2026": mozambique, "krasheninnikov-2026": krasheninnikov}.get(event_id)
     if not fn:
         print(f"{event_id}: stage 2 not implemented yet")
         return

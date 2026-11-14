@@ -11,3 +11,8 @@ __pycache__/
 .tools/
 web/public/vendor/
 pipeline/.cache/
+web/test-results/
+web/playwright-report/
+coverage/
+.coverage
+.pytest_cache/

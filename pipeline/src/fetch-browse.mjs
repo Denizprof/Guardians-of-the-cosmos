@@ -127,18 +127,33 @@ async function processEvent(ev) {
         processing: [
           'Official NISAR browse image produced by the NISAR science data system (8-bit visualization, not calibrated values).',
           'Downloaded from the public ASF browse bucket; no login required.',
-          `Georeferenced by an affine fit of the image data corners to the ASF granule footprint (residual ${geo.residualMeters.toFixed(0)} m RMS).`,
+          `Georeferenced approximately: affine fit of the image's data corners to the ASF granule footprint (corner-fit residual ${geo.residualMeters.toFixed(0)} m). ` +
+            `The residual is NOT the positional accuracy; corner detection is uncertain by several pixels, so the estimated positional uncertainty is about ±${uncertaintyM(geo).toFixed(0)} m. Measured layers derived from the HDF5 grid are exact.`,
           'Pure-black background pixels set transparent.',
           ...(ev.crop_km ? [`Cropped to ${ev.crop_km} km around the event location.`] : []),
         ],
         georef_residual_m: round(geo.residualMeters, 1),
+        georef_uncertainty_m: round(uncertaintyM(geo), 0),
       },
     });
-    console.log(`  ${obs.role.padEnd(8)} ${fileName}  residual=${geo.residualMeters.toFixed(0)} m  tier=${tierOf(p.collectionName)}`);
+    console.log(`  ${obs.role.padEnd(8)} ${fileName}  residual=${geo.residualMeters.toFixed(0)} m  uncertainty~${uncertaintyM(geo).toFixed(0)} m  tier=${tierOf(p.collectionName)}`);
   }
   layers.sort((a, b) => (a.acquisition.start || a.acquisition.reference).localeCompare(b.acquisition.start || b.acquisition.reference));
   const { observations, ...rest } = ev;
   return { ...rest, layers };
+}
+
+/**
+ * Honest positional uncertainty for a browse overlay (QA-12). The affine residual only measures
+ * how consistent the 4 corner matches are; synthetic tests show the real corner error is ~6 px
+ * for typical frame tilts, so we report max(residual, 6 px x pixel size).
+ */
+const CORNER_ERROR_PX = 6;
+function uncertaintyM(geo) {
+  const [lon0, lat0] = geo.toLonLat(0, 0);
+  const [lon1, lat1] = geo.toLonLat(1, 0);
+  const pxM = Math.hypot((lon1 - lon0) * 111320 * Math.cos((lat0 * Math.PI) / 180), (lat1 - lat0) * 111320);
+  return Math.max(geo.residualMeters, CORNER_ERROR_PX * pxM);
 }
 
 function round(v, d) {
@@ -154,6 +169,11 @@ try {
 } catch {}
 for (const ev of EVENTS.filter((e) => !only || e.id === only)) {
   const out = await processEvent(ev);
+  // QA-22: keep stage-2 derived layers (process.py) when re-running stage 1.
+  const prev = manifest.events.find((e) => e.id === out.id);
+  const derived = (prev?.layers ?? []).filter((l) => l.kind !== 'browse');
+  if (derived.length) console.log(`  kept ${derived.length} derived layers from the previous manifest`);
+  out.layers = out.layers.concat(derived);
   manifest.events = manifest.events.filter((e) => e.id !== out.id).concat(out);
 }
 manifest.events.sort((a, b) => EVENTS.findIndex((e) => e.id === a.id) - EVENTS.findIndex((e) => e.id === b.id));

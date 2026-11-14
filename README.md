@@ -16,7 +16,7 @@ A map-first explorer of real NASA-ISRO **NISAR** L-band radar observations, buil
 | Event | Technique | NISAR data (ASF DAAC) | Result |
 | --- | --- | --- | --- |
 | Venezuela earthquakes, 24 Jun 2026 | Interferometry (GUNW) | Track 162A frame 007: 1→13 Jun (pre-event) vs 13→25 Jun (spans the quake), PROVISIONAL | Up to about 45 cm line-of-sight motion away from the satellite along the coast; pre-event noise 3.5 cm (std) |
-| Limpopo floods, Jan 2026 | Backscatter (GCOV HH/HV) | Track 114A frame 165: 24 Dec, 5 Jan, 17 Jan, BETA | About 316 km² of new water around Chókwè (3,370 km² study area) |
+| Limpopo floods, Jan 2026 | Backscatter (GCOV HH/HV) | Track 114A frame 165: 24 Dec, 5 Jan, 17 Jan, BETA | About 316–404 km² of new water around Chókwè (3,370 km² study area; range from two speckle filters) |
 | Krasheninnikov volcano, 2025–26 | Backscatter time series (GCOV) | Track 060D frame 061: 11 dates, 18 Jun – 28 Oct 2026 | NASA browse time series (full-resolution processing pending) |
 
 The globe also shows about 170 recent USGS (M6.3+) and NASA EONET events as **context only**, with no SAR analysis claimed. The coverage probe lists the real NISAR acquisitions over any clicked point, live from the ASF search API.

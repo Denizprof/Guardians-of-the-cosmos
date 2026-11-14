@@ -1,0 +1,13 @@
+{
+  "name": "global-sar-assistant-gateway",
+  "version": "1.0.0",
+  "description": "Thin gateway between the Global SAR web app and a model you provide. No model is bundled.",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/index.mjs",
+    "test": "node --test test/",
+    "test:contract": "node --test contract/"
+  }
+}

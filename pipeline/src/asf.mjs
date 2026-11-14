@@ -6,7 +6,7 @@ export async function searchGranules(names) {
   const out = new Map();
   for (let i = 0; i < names.length; i += 20) {
     const chunk = names.slice(i, i + 20);
-    const url = `${API}?dataset=NISAR&output=geojson&granule_list=${chunk.join(',')}`;
+    const url = `${API}?${new URLSearchParams({ dataset: 'NISAR', output: 'geojson', granule_list: chunk.join(',') })}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`ASF SearchAPI HTTP ${res.status}`);
     const json = await res.json();

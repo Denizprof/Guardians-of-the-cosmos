@@ -1,4 +1,26 @@
-export type Category = 'earthquake' | 'flood' | 'volcano' | 'wildfire' | 'landslide' | 'glacier' | 'subsidence';
+/** Top-level analysis groups (the project owner's taxonomy). */
+export type CategoryGroup = 'geohazards' | 'fire-forest' | 'climate' | 'water' | 'ecosystems' | 'human-activity';
+
+/** Event / activity types. Each belongs to exactly one group (see CATEGORY_GROUP in lib.ts). */
+export type Category =
+  // geohazards
+  | 'earthquake' | 'volcano' | 'landslide' | 'subsidence' | 'tsunami'
+  // fire & forests
+  | 'wildfire' | 'deforestation' | 'vegetation'
+  // climate & cryosphere
+  | 'glacier' | 'sea-ice' | 'permafrost' | 'coastal-change' | 'drought' | 'desertification'
+  // water
+  | 'flood' | 'reservoir' | 'river-change' | 'wetland'
+  // ecosystems
+  | 'habitat-loss' | 'land-degradation' | 'agri-conversion'
+  // human activity
+  | 'urban' | 'industrial' | 'mining' | 'agriculture' | 'infrastructure' | 'energy' | 'reclamation' | 'conflict-damage' | 'human-other';
+
+/**
+ * What a layer IS, scientifically. Shown as a badge on every layer so users never
+ * confuse an observation with an interpretation or a model.
+ */
+export type EvidenceClass = 'observation' | 'derived' | 'interpretation' | 'model' | 'simulation';
 
 export type LonLat = [number, number];
 
@@ -32,6 +54,8 @@ export interface SarLayer {
   url: string;
   coordinates: [LonLat, LonLat, LonLat, LonLat]; // TL, TR, BR, BL
   acquisition: { start?: string; stop?: string; reference?: string; secondary?: string };
+  /** Scientific nature of the layer; defaults by kind (browse = observation, else derived). */
+  evidence?: EvidenceClass;
   /** Present on derived (stage-2) layers: what the colours mean. */
   legend?: { units: string; vmin?: number; vmax?: number; colormap?: string; threshold_db?: number; classes?: Record<string, string> };
   provenance: Provenance;
@@ -67,6 +91,24 @@ export interface ContextEvent {
   depth_km?: number;
   source: string;
   url: string;
+  /** 'reported' (catalog record) or 'observation' (e.g. a FIRMS satellite fire detection). */
+  evidence?: 'reported' | 'observation';
+  notes?: string;
+  size?: { value: number; unit: string };
+  deaths?: number;
+  date_precision?: string;
+  count?: number;
+}
+
+export interface CatalogFile {
+  source: string;
+  provider: string;
+  url: string;
+  license: string;
+  retrieved: string;
+  count: number;
+  evidence_note?: string;
+  events: ContextEvent[];
 }
 
 export type CompareMode = 'swipe' | 'side' | 'overlay';
