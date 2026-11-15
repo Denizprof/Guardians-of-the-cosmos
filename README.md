@@ -74,15 +74,19 @@ That value is lost if people cannot read the data. Global SAR is designed so tha
 ## Features
 
 - **Photoreal 3D globe** with Sentinel-2 cloudless imagery, terrain, atmosphere and fly-to navigation.
+- **Close-up photo imagery.** Zoom in and Esri World Imagery fades in over Sentinel-2, sharp enough to read building details in cities. Where Esri has no photos the grey "no data" tiles are detected and hidden, so the 10 m Sentinel-2 view stays underneath. The closest zoom is capped so the scale bar never reads below 50 m, at any latitude.
+- **Guided first visit.** A front page explains each tool step by step with real screenshots, and an interactive tutorial has the visitor use each tool. The About panel has a way back to the front page.
+- **Language switch (EN / TR)** with a full Turkish translation, and Turkey labelled as Türkiye.
+- **Lite mode** for weak or software-only GPUs (`?lite=1`, chosen automatically on a software renderer): no terrain, halo or sky shading, pixel ratio 1 and smaller images, about 3x faster where the GPU is slow.
 - **Five NISAR investigations** (earthquake, flood, volcano, deforestation, wildfire), all on real radar data.
 - **Before / after comparison** in swipe, side-by-side and overlay modes, with a timeline of radar passes and shareable URLs.
 - **Two explanation levels**, *Simple* and *Scientific*, with numbered annotation pins and legends in physical units (cm, dB).
-- **AI assistant** ("Ask") that runs in the visitor's browser, answers only from a checked knowledge base and the investigation on screen, and cites what it used. An optional fine-tuned Qwen3-1.7B model words the answers.
+- **AI assistant** ("Ask") that runs in the visitor's browser, answers only from a checked knowledge base and the investigation on screen, and cites what it used. It understands differently-worded questions in English and Turkish (paraphrases, synonyms, typo fixing) and declines off-topic ones; this is measured on a held-out stress set with a unit test. An optional fine-tuned Qwen3-1.7B model words the answers. The training scripts also run on a 4 GB GPU (4-bit QLoRA).
 - **Weather data** from Meteomatics for the selected location and date.
 - **SAR lens** to view any area through recent NISAR and Sentinel-1 radar.
 - **Live NISAR coverage probe**: select any point to list the real NISAR acquisitions over it (ASF Search API).
 - **NASA Earthdata search** (CMR) for other NASA datasets available at a location.
-- **19 global satellite layers** (NASA GIBS, UMD, JRC, EOX) with per-layer dates and colour legends.
+- **Global satellite layers** (NASA GIBS, UMD, JRC, EOX, ESA WorldCereal farmland and crop types) with per-layer dates and colour legends.
 - **Event catalogs for context**: about 170 recent USGS (M6.3+) and NASA EONET events, plus tsunamis, eruptions, FIRMS fires, landslides and flood alerts, with a six-group taxonomy and filters. No SAR analysis is claimed for catalog events.
 - **Evidence badges** (observation, derived, interpretation, model, simulation) on every layer.
 - **Installable web app (PWA)** with a dedicated mobile layout.
@@ -326,6 +330,7 @@ Built for the **NASA Space Apps Challenge 2026**, challenge *Dancing with the SA
 - **Satellite layers:** NASA GIBS, University of Maryland, JRC, EOX.
 - **Weather data:** Meteomatics.
 - **Globe imagery:** Sentinel-2 cloudless 2024 by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0.
+- **Close-up imagery:** Esri World Imagery (Esri, Maxar, Earthstar Geographics and the GIS User Community), shown when zoomed in.
 - **Terrain:** Mapzen / AWS Terrain Tiles. **Labels:** © OpenStreetMap contributors, OpenFreeMap, OpenMapTiles. **Geocoding:** Photon.
 - **NASA resources:** [Space Apps Challenge](https://www.spaceappschallenge.org) · [NISAR documentation](https://nisar-docs.asf.alaska.edu/) · [Earthdata](https://www.earthdata.nasa.gov)
 
@@ -335,7 +340,7 @@ Built for the **NASA Space Apps Challenge 2026**, challenge *Dancing with the SA
 
 The code in this repository is released under the [MIT License](LICENSE).
 
-Third-party data and imagery keep their own licences, listed under Credits. For example, the Sentinel-2 cloudless imagery by EOX is CC BY-NC-SA 4.0 and may not be used commercially.
+Third-party data and imagery keep their own licences, listed under Credits. For example, the Sentinel-2 cloudless imagery by EOX is CC BY-NC-SA 4.0 and may not be used commercially. Esri World Imagery is used under Esri's terms with attribution; a commercial deployment needs its own Esri agreement.
 
 <div align="center">
 
