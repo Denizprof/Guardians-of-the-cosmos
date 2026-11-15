@@ -26,20 +26,20 @@
   "kb:sar-prediction-vs-warning"
  ],
  "counts": {
-  "train": 1195,
-  "val": 171,
-  "test": 212
+  "train": 2764,
+  "val": 176,
+  "test": 356
  },
  "by_type": {
-  "train/answer": 614,
-  "train/view": 150,
+  "train/answer": 1765,
   "train/decline-offtopic": 198,
-  "train/decline-missing": 216,
+  "train/decline-missing": 634,
+  "train/view": 150,
   "train/answer-two": 17,
   "val/answer": 126,
-  "val/decline-missing": 45,
-  "test/answer": 98,
-  "test/decline-missing": 45,
+  "val/decline-missing": 50,
+  "test/answer": 209,
+  "test/decline-missing": 78,
   "test/answer-two": 7,
   "test/view": 40,
   "test/decline-offtopic": 22

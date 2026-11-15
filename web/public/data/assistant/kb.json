@@ -1,6 +1,6 @@
 {
  "version": "1",
- "generated": "2026-11-14",
+ "generated": "2026-11-15",
  "counts": {
   "total": 112,
   "app": 18,
@@ -19,13 +19,30 @@
     "What is this app?",
     "What is this website for?",
     "What can I do here?",
-    "Who made this for which challenge?"
+    "Who made this for which challenge?",
+    "what am I looking at on this page",
+    "give me a quick overview of the app",
+    "what's the purpose of this website",
+    "tell me what globalsar does",
+    "explain this tool to a beginner",
+    "so what is this thing exactly",
+    "what features does this site have",
+    "whats this for",
+    "introduce yourself and the app",
+    "what is this project about",
+    "is this a map app"
    ],
    "questions_tr": [
     "Global SAR nedir?",
     "Bu uygulama nedir?",
     "Bu site ne işe yarar?",
-    "Burada ne yapabilirim?"
+    "Burada ne yapabilirim?",
+    "bu sayfa ne",
+    "bu araç ne işe yarıyor",
+    "uygulama hakkında kısa bilgi ver",
+    "burada neler var",
+    "bu proje ne hakkında",
+    "siteyi bana tanıt"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -42,12 +59,26 @@
     "Who is this app for?",
     "Do I need to know radar to use this?",
     "Is this for students?",
-    "Can a beginner use Global SAR?"
+    "Can a beginner use Global SAR?",
+    "who is this app made for",
+    "is it meant for students",
+    "can a non scientist use it",
+    "who are the users of this site",
+    "is this for experts only",
+    "would a teacher find this useful",
+    "do I need a background in remote sensing",
+    "target audience of global sar",
+    "can kids use this"
    ],
    "questions_tr": [
     "Bu uygulama kimler için?",
     "Kullanmak için radar bilmem gerekir mi?",
-    "Öğrenciler kullanabilir mi?"
+    "Öğrenciler kullanabilir mi?",
+    "bu uygulama kimler için",
+    "öğrenci olarak kullanabilir miyim",
+    "uzman olmam gerekiyor mu",
+    "gazeteciler kullanabilir mi",
+    "kimler faydalanabilir"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -65,12 +96,26 @@
     "Can I use this for emergency warnings?",
     "Are these official NASA products?",
     "Is the analysis official?",
-    "Can I rely on this in an emergency?"
+    "Can I rely on this in an emergency?",
+    "should I rely on this for emergencies",
+    "can this warn me about a disaster happening now",
+    "is this app live",
+    "does it show real time events",
+    "can I use it to decide whether to evacuate",
+    "is it an official alert service",
+    "what are the limits of this app",
+    "does this replace official warnings",
+    "will it tell me when the next flood comes"
    ],
    "questions_tr": [
     "Bu canlı bir uyarı sistemi mi?",
     "Acil durumda buna güvenebilir miyim?",
-    "Bunlar resmî NASA ürünü mü?"
+    "Bunlar resmî NASA ürünü mü?",
+    "acil durumlarda buna güvenebilir miyim",
+    "canlı veri gösteriyor mu",
+    "tahliye kararı için kullanılır mı",
+    "resmi bir uyarı sistemi mi",
+    "bu uygulama neyi yapmaz"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -88,13 +133,28 @@
     "How do I open an investigation?",
     "Which examples does the app have?",
     "How many investigations are there?",
-    "Where do I find the before and after examples?"
+    "Where do I find the before and after examples?",
+    "what are the investigations",
+    "show me the examples",
+    "how do I open an investigation",
+    "list the case studies",
+    "what events can I explore",
+    "which stories are included",
+    "start with a sample event",
+    "where do I find the featured events",
+    "what's in the investigations menu",
+    "pick a demo"
    ],
    "questions_tr": [
     "İncelemeler nedir?",
     "Bir incelemeyi nasıl açarım?",
     "Uygulamada hangi örnekler var?",
-    "Kaç inceleme var?"
+    "Kaç inceleme var?",
+    "incelemeler nedir",
+    "örnek olayları göster",
+    "bir incelemeyi nasıl açarım",
+    "hangi olaylar var",
+    "örnek vakalar nerede"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -112,13 +172,27 @@
     "How do I show past earthquakes on the globe?",
     "How do I filter events by year?",
     "How do I hide some kinds of events?",
-    "What are the dots on the globe?"
+    "What are the dots on the globe?",
+    "how do I narrow down the events on the globe",
+    "filter events by type",
+    "can I show only floods",
+    "how do I limit events to a year",
+    "hide some event types",
+    "what does the filters button do",
+    "restrict the earthquakes by magnitude",
+    "how can I search events by category",
+    "sort out which markers are shown"
    ],
    "questions_tr": [
     "Filtreler ne işe yarar?",
     "Geçmiş depremleri kürede nasıl gösteririm?",
     "Olayları yıla göre nasıl filtrelerim?",
-    "Küredeki noktalar nedir?"
+    "Küredeki noktalar nedir?",
+    "olayları nasıl filtrelerim",
+    "sadece depremleri göster",
+    "filtre ne işe yarar",
+    "olay türlerini nasıl gizlerim",
+    "yıla göre sınırlandır"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -136,12 +210,25 @@
     "Where do the earthquake markers come from?",
     "What is the source of the fire markers?",
     "Which catalogs can I switch on?",
-    "Where does the tsunami data come from?"
+    "Where does the tsunami data come from?",
+    "where do the event markers come from",
+    "what event databases are used",
+    "which catalogs does the filter list",
+    "are the earthquakes from usgs",
+    "what data sources are the events from",
+    "which agencies report these events",
+    "what are the dots on the map",
+    "event list sources"
    ],
    "questions_tr": [
     "Hangi olay katalogları var?",
     "Deprem işaretleri nereden geliyor?",
-    "Yangın işaretlerinin kaynağı nedir?"
+    "Yangın işaretlerinin kaynağı nedir?",
+    "olaylar nereden geliyor",
+    "hangi katalogları kullanıyor",
+    "haritadaki noktalar ne",
+    "deprem verileri nereden",
+    "olay kaynakları neler"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -159,12 +246,27 @@
     "How do I add a satellite layer?",
     "How do I see what the colours of a layer mean?",
     "Can I see snow or night lights?",
-    "Where is the colour legend?"
+    "Where is the colour legend?",
+    "how do I add a map layer",
+    "what are satellite layers",
+    "can I display other datasets on the globe",
+    "show me snow or temperature on the map",
+    "how many layers are there",
+    "what does the layers button do",
+    "turn on an extra data layer",
+    "how can I change the opacity of a layer",
+    "stack several datasets",
+    "where can I choose what data to overlay"
    ],
    "questions_tr": [
     "Uydu katmanları nedir?",
     "Uydu katmanı nasıl eklerim?",
-    "Bir katmanın renkleri ne anlama geliyor, nereden görürüm?"
+    "Bir katmanın renkleri ne anlama geliyor, nereden görürüm?",
+    "katman nasıl eklenir",
+    "uydu katmanları nedir",
+    "haritaya başka veri koyabilir miyim",
+    "katman şeffaflığını nasıl ayarlarım",
+    "hangi katmanlar var"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -182,13 +284,27 @@
     "How do I see a place in radar?",
     "Why does the SAR lens have gaps?",
     "Can I make the SAR lens bigger?",
-    "Which satellites does the SAR lens use?"
+    "Which satellites does the SAR lens use?",
+    "what is the sar lens",
+    "how do I use the lens tool",
+    "can I look at radar through a movable window",
+    "what is the draggable square for",
+    "how do I resize the lens",
+    "compare radar under the optical map",
+    "peek through the map to see radar",
+    "what's the magnifier like thing",
+    "lens full screen how"
    ],
    "questions_tr": [
     "SAR merceği nedir?",
     "Bir yeri radarla nasıl görürüm?",
     "SAR merceğinde neden boşluklar var?",
-    "SAR merceği hangi uyduları kullanır?"
+    "SAR merceği hangi uyduları kullanır?",
+    "sar merceği nedir",
+    "mercek aracı nasıl kullanılır",
+    "taşınabilir kare ne işe yarar",
+    "merceği nasıl büyütürüm",
+    "radar görüntüsünü harita altında nasıl görürüm"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -206,12 +322,26 @@
     "How do I check if NISAR has data for a place?",
     "How do I see which NISAR images exist at a point?",
     "Where does the coverage probe get its list?",
-    "Can I measure from the probe pictures?"
+    "Can I measure from the probe pictures?",
+    "what does the coverage probe do",
+    "how do I check which NISAR scenes cover a location",
+    "list satellite data over a point",
+    "has nisar scanned this spot",
+    "how to check data availability for a place",
+    "click the globe to see products",
+    "find nisar passes over my area",
+    "what data exists at these coordinates",
+    "is there radar data for where I live"
    ],
    "questions_tr": [
     "Kapsama sondası nedir?",
     "Bir yer için NISAR verisi var mı, nasıl bakarım?",
-    "Sonda listesi nereden geliyor?"
+    "Sonda listesi nereden geliyor?",
+    "kapsama sondası ne yapar",
+    "bir yerde NISAR verisi var mı nasıl öğrenirim",
+    "bu noktada hangi uydu verileri var",
+    "haritaya tıklayınca ne olur",
+    "benim bölgemde radar verisi var mı"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -228,12 +358,26 @@
     "How do I search for a place?",
     "Can I enter coordinates?",
     "How do I go to a city?",
-    "How do I find a location on the globe?"
+    "How do I find a location on the globe?",
+    "how do I search for a location",
+    "can I find a city by name",
+    "search bar usage",
+    "how do I go to a specific place",
+    "can I look up a lat lon",
+    "type an address to fly there",
+    "find an investigation by name",
+    "what can I type in the search box",
+    "how to jump to coordinates"
    ],
    "questions_tr": [
     "Bir yeri nasıl ararım?",
     "Koordinat girebilir miyim?",
-    "Bir şehre nasıl giderim?"
+    "Bir şehre nasıl giderim?",
+    "arama nasıl yapılır",
+    "şehir adı yazarak bulabilir miyim",
+    "belirli bir yere nasıl giderim",
+    "koordinat girebilir miyim",
+    "arama kutusuna ne yazabilirim"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -250,12 +394,27 @@
     "How do I move the globe?",
     "How do I zoom in?",
     "How do I tilt the view?",
-    "How do I rotate the Earth?"
+    "How do I rotate the Earth?",
+    "how do I move around the map",
+    "how to zoom in and out",
+    "how do I change the viewing angle",
+    "mouse controls for the globe",
+    "how do I use it on a phone with touch",
+    "how can I tilt and rotate",
+    "controls",
+    "i cant figure out how to navigate",
+    "how to spin the planet",
+    "keyboard shortcuts for the map"
    ],
    "questions_tr": [
     "Küreyi nasıl hareket ettiririm?",
     "Nasıl yakınlaştırırım?",
-    "Görünümü nasıl eğerim?"
+    "Görünümü nasıl eğerim?",
+    "haritada nasıl gezinirim",
+    "nasıl yakınlaştırırım",
+    "bakış açısını nasıl değiştiririm",
+    "telefonda nasıl kullanılır",
+    "kontroller neler"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -273,12 +432,26 @@
     "What is swipe mode?",
     "How do I change the before image?",
     "How does the timeline work?",
-    "Can I see the two images side by side?"
+    "Can I see the two images side by side?",
+    "how do I compare before and after",
+    "what is the swipe tool",
+    "can I see two dates side by side",
+    "how do I switch between before and after images",
+    "compare images from different dates",
+    "drag the divider to see change",
+    "show me the change over time",
+    "what is the timeline slider",
+    "before after toggle where"
    ],
    "questions_tr": [
     "Öncesi ve sonrasını nasıl karşılaştırırım?",
     "Zaman çizelgesi nasıl çalışır?",
-    "Öncesi görüntüsünü nasıl değiştiririm?"
+    "Öncesi görüntüsünü nasıl değiştiririm?",
+    "önce ve sonra nasıl karşılaştırılır",
+    "kaydırma aracı ne",
+    "iki tarihi yan yana görebilir miyim",
+    "zaman çizelgesi nedir",
+    "değişimi nasıl görürüm"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -295,12 +468,26 @@
     "What is the difference between Simple and Scientific?",
     "How do I get a more detailed explanation?",
     "Can you explain it more simply?",
-    "What are the explanation levels?"
+    "What are the explanation levels?",
+    "what's the difference between simple and scientific",
+    "can I switch the explanation level",
+    "make the text easier to read",
+    "I want more technical detail",
+    "how do I change the reading level",
+    "what does the simple scientific toggle do",
+    "plain words explanation option",
+    "more advanced explanation please",
+    "toggle for expert mode"
    ],
    "questions_tr": [
     "Basit ve Bilimsel arasındaki fark nedir?",
     "Daha ayrıntılı açıklamayı nasıl alırım?",
-    "Açıklama düzeyleri nelerdir?"
+    "Açıklama düzeyleri nelerdir?",
+    "basit ve bilimsel arasındaki fark ne",
+    "açıklama düzeyini nasıl değiştiririm",
+    "daha teknik anlatım istiyorum",
+    "metni daha kolay yapabilir miyim",
+    "uzman modu var mı"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -318,12 +505,26 @@
     "What is a derived measurement?",
     "What are the evidence labels?",
     "How do I know if a layer is real data or an interpretation?",
-    "What does the badge on a layer mean?"
+    "What does the badge on a layer mean?",
+    "what do the evidence labels mean",
+    "difference between observation and derived layers",
+    "how do I know if a layer is official",
+    "what does 'satellite observation' label mean",
+    "what does derived by team mean",
+    "who made this layer",
+    "is this product from nasa itself",
+    "how much should I trust a layer",
+    "what are the badges on the layers"
    ],
    "questions_tr": [
     "Gözlem ve türetilmiş ne demek?",
     "Türetilmiş ölçüm nedir?",
-    "Kanıt etiketleri nelerdir?"
+    "Kanıt etiketleri nelerdir?",
+    "kanıt etiketleri ne anlama gelir",
+    "gözlem ile türetilmiş arasındaki fark ne",
+    "bu katman resmi mi",
+    "rozetler ne demek",
+    "bu katmana ne kadar güvenmeliyim"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -340,12 +541,26 @@
     "What do BETA, PROVISIONAL and VALIDATED mean?",
     "What is a quality tier?",
     "What is the BETA badge?",
-    "Where do I see the tier of a product?"
+    "Where do I see the tier of a product?",
+    "what are the quality tiers",
+    "nisar product maturity levels",
+    "what does beta mean for data",
+    "difference between provisional and validated",
+    "how good is the nisar data quality",
+    "what does the tier label on a scene mean",
+    "is this nisar product final",
+    "are early nisar products reliable",
+    "what does a tier like beta say"
    ],
    "questions_tr": [
     "BETA, PROVISIONAL ve VALIDATED ne demek?",
     "Kalite kademesi nedir?",
-    "BETA etiketi nedir?"
+    "BETA etiketi nedir?",
+    "kalite seviyeleri nedir",
+    "beta veri ne demek",
+    "geçici ve doğrulanmış arasındaki fark ne",
+    "NISAR verisi ne kadar güvenilir",
+    "bu ürün kesin mi"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -363,12 +578,27 @@
     "Who provides the radar images?",
     "What are the data sources?",
     "Who made the base map?",
-    "Where are the credits?"
+    "Where are the credits?",
+    "who gets credit for the data",
+    "data attribution",
+    "which agencies provide the imagery",
+    "who are the data providers",
+    "where are the images from",
+    "licence and credits",
+    "give me the acknowledgements",
+    "who made the radar pictures",
+    "sources and credits please",
+    "copyright of the images"
    ],
    "questions_tr": [
     "Veriler nereden geliyor?",
     "Radar görüntülerini kim sağlıyor?",
-    "Veri kaynakları nelerdir?"
+    "Veri kaynakları nelerdir?",
+    "veriler kimin",
+    "kaynak ve atıflar neler",
+    "görüntüleri hangi kurumlar sağlıyor",
+    "lisans bilgisi",
+    "teşekkür ve krediler"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -385,12 +615,26 @@
     "How do I see the introduction again?",
     "Where is the welcome screen?",
     "How do I reopen the intro?",
-    "Where is the About section?"
+    "Where is the About section?",
+    "how do I reopen the welcome tour",
+    "show the tutorial again",
+    "replay the introduction",
+    "i skipped the intro, how to see it",
+    "where is the onboarding",
+    "restart the guided tour",
+    "can I view the walkthrough once more",
+    "show me the intro screen",
+    "how to bring back the first screen"
    ],
    "questions_tr": [
     "Tanıtımı tekrar nasıl görürüm?",
     "Karşılama ekranı nerede?",
-    "About bölümü nerede?"
+    "About bölümü nerede?",
+    "tanıtım turunu tekrar nasıl açarım",
+    "eğitimi tekrar göster",
+    "girişi atladım nasıl görebilirim",
+    "rehberi yeniden başlat",
+    "başlangıç ekranını geri getir"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -409,13 +653,32 @@
     "Can I trust your answers?",
     "Where do your answers come from?",
     "Are you ChatGPT?",
-    "Do you make things up?"
+    "Do you make things up?",
+    "how does the chatbot work",
+    "where do your answers come from",
+    "are you an AI",
+    "can you make mistakes",
+    "do you search the internet",
+    "are your answers checked",
+    "what are you",
+    "can I trust what you say",
+    "how were you trained",
+    "do you run on my computer",
+    "are you hallucinating",
+    "is the model on my device"
    ],
    "questions_tr": [
     "Sen kimsin?",
     "Nasıl çalışıyorsun?",
     "Yanıtlarına güvenebilir miyim?",
-    "Yanıtların nereden geliyor?"
+    "Yanıtların nereden geliyor?",
+    "sohbet botu nasıl çalışıyor",
+    "cevapların nereden geliyor",
+    "sen bir yapay zeka mısın",
+    "hata yapabilir misin",
+    "internette arama yapıyor musun",
+    "sana güvenebilir miyim",
+    "sen neysin"
    ],
    "source": {
     "label": "Global SAR app guide",
@@ -431,14 +694,32 @@
    "questions_en": [
     "What is synthetic aperture radar?",
     "What is SAR?",
-    "What is synthetic aperture radar?",
     "How does a radar satellite work?",
-    "How can radar see at night and through clouds?"
+    "How can radar see at night and through clouds?",
+    "how does radar imaging from space work",
+    "what is SAR in simple words",
+    "explain synthetic aperture radar",
+    "how does a radar satellite see the earth",
+    "what kind of camera is a radar satellite",
+    "how can a satellite see in the dark",
+    "what does SAR stand for",
+    "how do radar satellites make pictures",
+    "radar vs optical satellites",
+    "tell me about radar remote sensing",
+    "why use radar instead of a camera"
    ],
    "source": {
     "label": "Global SAR radar explainer",
     "url": "https://globalsar.earth/"
-   }
+   },
+   "questions_tr": [
+    "uzaydan radar görüntüleme nasıl çalışır",
+    "SAR nedir basitçe anlat",
+    "sentetik açıklıklı radar nedir",
+    "radar uydusu dünyayı nasıl görür",
+    "radar ile kamera arasındaki fark ne",
+    "SAR neyin kısaltması"
+   ]
   },
   {
    "id": "kb:concept-backscatter",
@@ -451,12 +732,28 @@
     "What is backscatter?",
     "Why is water black in radar images?",
     "Why are cities bright in radar images?",
-    "What do bright and dark mean in a radar image?"
+    "What do bright and dark mean in a radar image?",
+    "what do bright pixels mean in radar",
+    "why do cities look bright",
+    "what does a dark area mean in a sar image",
+    "explain radar brightness",
+    "what makes radar returns strong or weak",
+    "how to interpret grey levels in radar images",
+    "bright and dark in radar",
+    "why do rough surfaces look bright",
+    "what does the pixel value represent"
    ],
    "source": {
     "label": "Global SAR radar explainer",
     "url": "https://globalsar.earth/"
-   }
+   },
+   "questions_tr": [
+    "radarda parlak pikseller ne demek",
+    "şehirler neden parlak görünür",
+    "koyu alanlar ne anlama gelir",
+    "radar parlaklığı nasıl yorumlanır",
+    "pürüzlü yüzeyler neden parlak"
+   ]
   },
   {
    "id": "kb:concept-polarization",
@@ -469,12 +766,28 @@
     "What is polarization?",
     "What do HH and HV mean?",
     "What is the difference between HH and HV?",
-    "Why is HV good for vegetation?"
+    "Why is HV good for vegetation?",
+    "what is polarisation",
+    "meaning of HH",
+    "meaning of HV",
+    "what are polarization channels",
+    "why does nisar use two polarizations",
+    "horizontal vs vertical radar waves",
+    "which polarization is best for forests",
+    "co-pol and cross-pol difference",
+    "explain the HV channel"
    ],
    "source": {
     "label": "Global SAR radar explainer",
     "url": "https://globalsar.earth/"
-   }
+   },
+   "questions_tr": [
+    "polarizasyon nedir",
+    "HH ne demek",
+    "HV ne anlama gelir",
+    "polarizasyon kanalları neler",
+    "ormanlar için hangi polarizasyon iyi"
+   ]
   },
   {
    "id": "kb:concept-insar",
@@ -487,12 +800,29 @@
     "What is interferometry?",
     "What is InSAR?",
     "What are the rainbow fringes?",
-    "How does radar measure ground motion?"
+    "How does radar measure ground motion?",
+    "what is insar",
+    "how does radar interferometry work",
+    "how do you measure millimetre ground motion",
+    "explain the fringe patterns",
+    "what is an interferogram",
+    "how can satellites measure subsidence or uplift",
+    "colour bands around an earthquake meaning",
+    "how is deformation measured with radar",
+    "what is phase difference used for"
    ],
    "source": {
     "label": "Global SAR radar explainer",
     "url": "https://globalsar.earth/"
-   }
+   },
+   "questions_tr": [
+    "InSAR nedir",
+    "radar interferometrisi nasıl çalışır",
+    "yer hareketi milimetre ölçeğinde nasıl ölçülür",
+    "girişim desenleri ne demek",
+    "interferogram nedir",
+    "yer çökmesi nasıl ölçülür"
+   ]
   },
   {
    "id": "kb:concept-coherence",
@@ -505,12 +835,29 @@
     "What is coherence?",
     "Why is there noise over water in an interferogram?",
     "Why does the radar lose track?",
-    "What does low coherence mean?"
+    "What does low coherence mean?",
+    "what is coherence in insar",
+    "why do some areas have no fringes",
+    "why is the interferogram speckled in vegetation",
+    "what causes decorrelation",
+    "when does interferometry fail",
+    "what does low coherence tell me",
+    "why did the radar lose track of the ground",
+    "meaning of coherence map",
+    "why are forests noisy in interferometry"
    ],
    "source": {
     "label": "Global SAR radar explainer",
     "url": "https://globalsar.earth/"
-   }
+   },
+   "questions_tr": [
+    "koherens nedir",
+    "bazı yerlerde neden girişim deseni yok",
+    "bitki örtüsünde neden gürültü var",
+    "dekorelasyon nedir",
+    "düşük koherens ne anlama gelir",
+    "interferometri ne zaman başarısız olur"
+   ]
   },
   {
    "id": "kb:concept-lband",
@@ -523,12 +870,28 @@
     "Why does L-band matter?",
     "What is L-band?",
     "Why does NISAR use a long wavelength?",
-    "What is special about NISAR radar?"
+    "What is special about NISAR radar?",
+    "what is special about l-band",
+    "why does nisar use 24 cm waves",
+    "L band vs C band",
+    "why long wavelength radar matters",
+    "what does l band penetrate",
+    "benefits of longer radar wavelength",
+    "what is l band good for",
+    "why is nisar better for vegetation than sentinel",
+    "how deep does l band radar see into the canopy"
    ],
    "source": {
     "label": "Global SAR radar explainer",
     "url": "https://globalsar.earth/"
-   }
+   },
+   "questions_tr": [
+    "L bandı neden önemli",
+    "NISAR neden uzun dalga boyu kullanıyor",
+    "L bandı ile C bandı farkı",
+    "uzun dalga boyu ne işe yarar",
+    "L bandı bitki örtüsünü nasıl geçer"
+   ]
   },
   {
    "id": "kb:event-venezuela-2026-happened",
@@ -540,12 +903,27 @@
     "Tell me about the Venezuela earthquakes.",
     "When did the Venezuela earthquakes happen?",
     "Where was the Venezuela earthquakes?",
-    "What is the Venezuela earthquakes investigation about?"
+    "What is the Venezuela earthquakes investigation about?",
+    "venezuela",
+    "caracas",
+    "lake valencia",
+    "the june quakes",
+    "south america earthquake 2026",
+    "m7 quake",
+    "the venezuelan seismic event",
+    "valencia earthquake"
    ],
    "source": {
     "label": "USGS; NASA Earth Observatory",
     "url": "https://science.nasa.gov/earth/earth-observatory/where-venezuelas-earthquakes-shifted-the-ground/"
-   }
+   },
+   "questions_tr": [
+    "venezuela depremi",
+    "karakas",
+    "güney amerika depremi",
+    "haziran depremleri",
+    "venezuela'daki sarsıntı"
+   ]
   },
   {
    "id": "kb:event-venezuela-2026-radar",
@@ -654,12 +1032,27 @@
     "Tell me about the Limpopo and Incomati floods.",
     "When did the Limpopo and Incomati floods happen?",
     "Where was the Limpopo and Incomati floods?",
-    "What is the Limpopo and Incomati floods investigation about?"
+    "What is the Limpopo and Incomati floods investigation about?",
+    "mozambique",
+    "limpopo",
+    "incomati",
+    "chokwe",
+    "southern africa floods",
+    "africa flooding january 2026",
+    "maputo region flood",
+    "gaza province flood"
    ],
    "source": {
     "label": "NASA Scientific Visualization Studio",
     "url": "https://svs.gsfc.nasa.gov/5661"
-   }
+   },
+   "questions_tr": [
+    "mozambik",
+    "limpopo nehri taşkını",
+    "afrika seli",
+    "ocak ayındaki sel",
+    "güney afrika taşkını"
+   ]
   },
   {
    "id": "kb:event-mozambique-floods-2026-radar",
@@ -736,12 +1129,27 @@
     "Tell me about the Krasheninnikov volcano.",
     "When did the Krasheninnikov volcano happen?",
     "Where was the Krasheninnikov volcano?",
-    "What is the Krasheninnikov volcano investigation about?"
+    "What is the Krasheninnikov volcano investigation about?",
+    "kamchatka",
+    "krasheninnikov",
+    "russian volcano",
+    "volcano in russia",
+    "kronotsky",
+    "volcanic activity 2026",
+    "lava field",
+    "far east russia volcano"
    ],
    "source": {
     "label": "Smithsonian GVP / KVERT weekly reports; NASA JPL; NASA SVS",
     "url": "https://svs.gsfc.nasa.gov/5675"
-   }
+   },
+   "questions_tr": [
+    "kamçatka",
+    "krasheninnikov yanardağı",
+    "rusya'daki volkan",
+    "volkanik aktivite",
+    "lav alanı"
+   ]
   },
   {
    "id": "kb:event-krasheninnikov-2026-radar",
@@ -834,12 +1242,29 @@
     "Tell me about the Amazon clear-cut, União do Sul.",
     "When did the Amazon clear-cut, União do Sul happen?",
     "Where was the Amazon clear-cut, União do Sul?",
-    "What is the Amazon clear-cut, União do Sul investigation about?"
+    "What is the Amazon clear-cut, União do Sul investigation about?",
+    "amazon",
+    "brazil",
+    "deforestation",
+    "mato grosso",
+    "clear cut",
+    "rainforest loss",
+    "logging",
+    "forest cleared by radar",
+    "amazon rainforest destruction"
    ],
    "source": {
     "label": "INPE DETER (TerraBrasilis); Sentinel-2 via Microsoft Planetary Computer",
     "url": "https://terrabrasilis.dpi.inpe.br/en/home-page/"
-   }
+   },
+   "questions_tr": [
+    "amazon",
+    "brezilya",
+    "ormansızlaşma",
+    "yağmur ormanı kaybı",
+    "orman kesimi",
+    "amazon'daki ağaç kaybı"
+   ]
   },
   {
    "id": "kb:event-uniao-do-sul-deforestation-2026-radar",
@@ -900,12 +1325,27 @@
     "Tell me about the Aspen Acres wildfire.",
     "When did the Aspen Acres wildfire happen?",
     "Where was the Aspen Acres wildfire?",
-    "What is the Aspen Acres wildfire investigation about?"
+    "What is the Aspen Acres wildfire investigation about?",
+    "colorado",
+    "custer county",
+    "wildfire",
+    "forest fire",
+    "burn scar",
+    "fire in the us",
+    "wildfire in the mountains",
+    "burned area from radar"
    ],
    "source": {
     "label": "NASA EONET (IRWIN record)",
     "url": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21019"
-   }
+   },
+   "questions_tr": [
+    "colorado",
+    "orman yangını",
+    "yanık izi",
+    "amerika'daki yangın",
+    "yangın sonrası radar"
+   ]
   },
   {
    "id": "kb:event-aspen-acres-fire-2026-radar",
@@ -967,12 +1407,24 @@
     "What is Daily true-colour Earth (VIIRS NOAA-20)?",
     "What are the limitations of Daily true-colour Earth (VIIRS NOAA-20)?",
     "Where does the Daily true-colour Earth (VIIRS NOAA-20) data come from?",
-    "What is the resolution of Daily true-colour Earth (VIIRS NOAA-20)?"
+    "What is the resolution of Daily true-colour Earth (VIIRS NOAA-20)?",
+    "natural colour photo of earth",
+    "what the planet looks like each day",
+    "daily satellite photo",
+    "true color imagery",
+    "earth as seen by the eye",
+    "viirs picture of today"
    ],
    "source": {
     "label": "NASA GIBS (LANCE / EOSDIS)",
     "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/viirs/noaa20/VIIRS_NOAA20_CorrectedReflectance_TrueColor.md"
-   }
+   },
+   "questions_tr": [
+    "dünyanın günlük doğal renkli görüntüsü",
+    "günlük uydu fotoğrafı",
+    "gerçek renkli görüntü",
+    "gezegen bugün nasıl görünüyor"
+   ]
   },
   {
    "id": "kb:layer-gibs-viirs-noaa20-truecolor-colours",
@@ -1001,12 +1453,24 @@
     "What is Radar backscatter, Sentinel-1 (OPERA RTC-S1)?",
     "What are the limitations of Radar backscatter, Sentinel-1 (OPERA RTC-S1)?",
     "Where does the Radar backscatter, Sentinel-1 (OPERA RTC-S1) data come from?",
-    "What is the resolution of Radar backscatter, Sentinel-1 (OPERA RTC-S1)?"
+    "What is the resolution of Radar backscatter, Sentinel-1 (OPERA RTC-S1)?",
+    "sentinel-1 radar layer",
+    "radar picture of the ground",
+    "opera rtc radar",
+    "radar backscatter map",
+    "radar that sees through clouds layer",
+    "sar imagery layer"
    ],
    "source": {
     "label": "NASA JPL OPERA (data at ASF DAAC), tiles by NASA GIBS",
     "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/multi-mission/opera/OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1.md"
-   }
+   },
+   "questions_tr": [
+    "Sentinel-1 radar katmanı",
+    "yerin radar görüntüsü",
+    "radar geri saçılım haritası",
+    "bulutların arkasını gören radar katmanı"
+   ]
   },
   {
    "id": "kb:layer-gibs-opera-rtc-s1-colours",
@@ -1035,12 +1499,25 @@
     "What is Fire and burn-scar false colour (VIIRS M11-I2-I1)?",
     "What are the limitations of Fire and burn-scar false colour (VIIRS M11-I2-I1)?",
     "Where does the Fire and burn-scar false colour (VIIRS M11-I2-I1) data come from?",
-    "What is the resolution of Fire and burn-scar false colour (VIIRS M11-I2-I1)?"
+    "What is the resolution of Fire and burn-scar false colour (VIIRS M11-I2-I1)?",
+    "burn scar layer",
+    "where did it burn",
+    "fire damage false colour",
+    "burned area map",
+    "viirs fire layer",
+    "scorched land from space"
    ],
    "source": {
     "label": "NASA GIBS (LANCE / EOSDIS)",
     "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/viirs/noaa20/VIIRS_NOAA20_CorrectedReflectance_BandsM11-I2-I1.md"
-   }
+   },
+   "questions_tr": [
+    "yanık izi katmanı",
+    "nerede yanmış",
+    "yangın hasarı yanlış renkli",
+    "yanmış alan haritası",
+    "yangın katmanı"
+   ]
   },
   {
    "id": "kb:layer-gibs-viirs-noaa20-fire-falsecolor-colours",
@@ -1069,12 +1546,25 @@
     "What is Fire temperature every 10 minutes (GOES-East ABI)?",
     "What are the limitations of Fire temperature every 10 minutes (GOES-East ABI)?",
     "Where does the Fire temperature every 10 minutes (GOES-East ABI) data come from?",
-    "What is the resolution of Fire temperature every 10 minutes (GOES-East ABI)?"
+    "What is the resolution of Fire temperature every 10 minutes (GOES-East ABI)?",
+    "active fire hotspots",
+    "live fires over america",
+    "hot spots every ten minutes",
+    "goes fire layer",
+    "real time fire map",
+    "fire temperature layer"
    ],
    "source": {
     "label": "NASA GIBS (data NOAA)",
     "url": "https://github.com/nasa-gibs/worldview/blob/main/config/default/common/config/metadata/layers/goes/GOES-East_ABI_FireTemp.md"
-   }
+   },
+   "questions_tr": [
+    "aktif yangın noktaları",
+    "amerika üzerindeki yangınlar",
+    "on dakikada bir sıcak noktalar",
+    "GOES yangın katmanı",
+    "yangın sıcaklığı katmanı"
+   ]
   },
   {
    "id": "kb:layer-gibs-goes-east-firetemp-colours",
@@ -1103,12 +1593,24 @@
     "What is Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)?",
     "What are the limitations of Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)?",
     "Where does the Vegetation disturbance alerts (OPERA DIST-ALERT, HLS) data come from?",
-    "What is the resolution of Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)?"
+    "What is the resolution of Vegetation disturbance alerts (OPERA DIST-ALERT, HLS)?",
+    "vegetation loss alerts",
+    "where were plants recently lost",
+    "disturbance alerts",
+    "forest loss alert layer",
+    "dist alert",
+    "new clearing warnings"
    ],
    "source": {
     "label": "NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Vegetation_Disturbance_Status.xml"
-   }
+   },
+   "questions_tr": [
+    "bitki örtüsü kaybı uyarıları",
+    "bitkiler nerede yakın zamanda kaybolmuş",
+    "bozulma uyarıları",
+    "orman kaybı uyarı katmanı"
+   ]
   },
   {
    "id": "kb:layer-gibs-opera-dist-alert-hls-colours",
@@ -1137,12 +1639,27 @@
     "What is Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)?",
     "What are the limitations of Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)?",
     "Where does the Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13) data come from?",
-    "What is the resolution of Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)?"
+    "What is the resolution of Tree cover loss year 2001-2025 (Hansen / UMD GFC v1.13)?",
+    "tree cover loss",
+    "hansen forest change",
+    "global forest change layer",
+    "when was forest lost",
+    "which year were trees cut",
+    "forest loss since 2001",
+    "gfc map"
    ],
    "source": {
     "label": "University of Maryland GLAD / Google (tiles on Google Cloud Storage)",
     "url": "https://earthenginepartners.appspot.com/science-2013-global-forest"
-   }
+   },
+   "questions_tr": [
+    "ağaç örtüsü kaybı",
+    "hansen orman değişimi",
+    "küresel orman değişimi katmanı",
+    "orman ne zaman kaybedildi",
+    "hangi yıl ağaçlar kesildi",
+    "2001'den beri orman kaybı"
+   ]
   },
   {
    "id": "kb:layer-umd-hansen-gfc-lossyear-v1-13-colours",
@@ -1171,12 +1688,25 @@
     "What is Daily snow cover (MODIS Terra NDSI)?",
     "What are the limitations of Daily snow cover (MODIS Terra NDSI)?",
     "Where does the Daily snow cover (MODIS Terra NDSI) data come from?",
-    "What is the resolution of Daily snow cover (MODIS Terra NDSI)?"
+    "What is the resolution of Daily snow cover (MODIS Terra NDSI)?",
+    "snow map",
+    "is there snow here",
+    "where is the ground white",
+    "snow extent layer",
+    "modis snow cover",
+    "snowy areas from space"
    ],
    "source": {
     "label": "NASA GIBS (data NSIDC / LANCE)",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_NDSI_Snow_Cover.xml"
-   }
+   },
+   "questions_tr": [
+    "kar haritası",
+    "burada kar var mı",
+    "kar örtüsü katmanı",
+    "MODIS kar örtüsü",
+    "uzaydan karlı alanlar"
+   ]
   },
   {
    "id": "kb:layer-gibs-modis-terra-ndsi-snow-colours",
@@ -1205,12 +1735,26 @@
     "What is Sea ice concentration (GHRSST MUR L4)?",
     "What are the limitations of Sea ice concentration (GHRSST MUR L4)?",
     "Where does the Sea ice concentration (GHRSST MUR L4) data come from?",
-    "What is the resolution of Sea ice concentration (GHRSST MUR L4)?"
+    "What is the resolution of Sea ice concentration (GHRSST MUR L4)?",
+    "arctic ice layer",
+    "polar ice cover",
+    "frozen sea map",
+    "how much ice on the ocean",
+    "ice concentration",
+    "ice at the poles"
    ],
    "source": {
     "label": "NASA GIBS (data NASA JPL PO.DAAC, MUR v4.1)",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/GHRSST_Sea_Ice_Concentration.xml"
-   }
+   },
+   "questions_tr": [
+    "arktik buz katmanı",
+    "kutup buz örtüsü",
+    "donmuş deniz haritası",
+    "okyanusta ne kadar buz var",
+    "buz yoğunluğu",
+    "kutuplardaki buz"
+   ]
   },
   {
    "id": "kb:layer-gibs-ghrsst-mur-sea-ice-colours",
@@ -1239,12 +1783,27 @@
     "What is Daytime land surface temperature (MODIS Terra)?",
     "What are the limitations of Daytime land surface temperature (MODIS Terra)?",
     "Where does the Daytime land surface temperature (MODIS Terra) data come from?",
-    "What is the resolution of Daytime land surface temperature (MODIS Terra)?"
+    "What is the resolution of Daytime land surface temperature (MODIS Terra)?",
+    "land temperature map",
+    "how hot is the ground",
+    "surface heat layer",
+    "daytime temperature of the land",
+    "heat map of earth",
+    "lst layer",
+    "where is it hottest"
    ],
    "source": {
     "label": "NASA GIBS (data LP DAAC / LANCE)",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_Land_Surface_Temp.xml"
-   }
+   },
+   "questions_tr": [
+    "kara sıcaklığı haritası",
+    "zemin ne kadar sıcak",
+    "yüzey ısısı katmanı",
+    "gündüz kara sıcaklığı",
+    "dünyanın ısı haritası",
+    "en sıcak yer neresi"
+   ]
   },
   {
    "id": "kb:layer-gibs-modis-terra-lst-day-colours",
@@ -1273,12 +1832,25 @@
     "What is Root-zone soil moisture (SMAP L4)?",
     "What are the limitations of Root-zone soil moisture (SMAP L4)?",
     "Where does the Root-zone soil moisture (SMAP L4) data come from?",
-    "What is the resolution of Root-zone soil moisture (SMAP L4)?"
+    "What is the resolution of Root-zone soil moisture (SMAP L4)?",
+    "soil moisture layer",
+    "how wet is the ground",
+    "drought map",
+    "dry or wet soil",
+    "smap layer",
+    "ground water content of soil"
    ],
    "source": {
     "label": "NASA GIBS (data NASA GMAO / NSIDC DAAC)",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/SMAP_Analyzed_Soil_Moisture.xml"
-   }
+   },
+   "questions_tr": [
+    "toprak nemi katmanı",
+    "zemin ne kadar ıslak",
+    "kuraklık haritası",
+    "kuru mu ıslak mı toprak",
+    "SMAP katmanı"
+   ]
   },
   {
    "id": "kb:layer-gibs-smap-l4-root-zone-soil-moisture-colours",
@@ -1307,12 +1879,25 @@
     "What is Flood water, 2-day composite (MODIS Terra + Aqua)?",
     "What are the limitations of Flood water, 2-day composite (MODIS Terra + Aqua)?",
     "Where does the Flood water, 2-day composite (MODIS Terra + Aqua) data come from?",
-    "What is the resolution of Flood water, 2-day composite (MODIS Terra + Aqua)?"
+    "What is the resolution of Flood water, 2-day composite (MODIS Terra + Aqua)?",
+    "flood layer",
+    "where is it flooded",
+    "flood detection map",
+    "flood water from modis",
+    "inundation map",
+    "flooded areas"
    ],
    "source": {
     "label": "NASA GIBS (data NASA LANCE MCDWD)",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_Flood.xml"
-   }
+   },
+   "questions_tr": [
+    "sel katmanı",
+    "nerede su baskını var",
+    "sel tespit haritası",
+    "taşkın alanları",
+    "su altında kalan yerler"
+   ]
   },
   {
    "id": "kb:layer-gibs-modis-flood-2day-colours",
@@ -1341,12 +1926,25 @@
     "What is Surface water from radar (OPERA DSWx-S1)?",
     "What are the limitations of Surface water from radar (OPERA DSWx-S1)?",
     "Where does the Surface water from radar (OPERA DSWx-S1) data come from?",
-    "What is the resolution of Surface water from radar (OPERA DSWx-S1)?"
+    "What is the resolution of Surface water from radar (OPERA DSWx-S1)?",
+    "surface water from radar",
+    "water map from sentinel-1",
+    "open water layer",
+    "dswx",
+    "radar water detection",
+    "where is water through the clouds"
    ],
    "source": {
     "label": "NASA JPL OPERA (data at PO.DAAC), tiles by NASA GIBS",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Dynamic_Surface_Water_Extent_S1.xml"
-   }
+   },
+   "questions_tr": [
+    "radardan yüzey suyu",
+    "Sentinel-1 su haritası",
+    "açık su katmanı",
+    "radar ile su tespiti",
+    "bulutlarda gizli su nerede"
+   ]
   },
   {
    "id": "kb:layer-gibs-opera-dswx-s1-colours",
@@ -1375,12 +1973,27 @@
     "What is Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)?",
     "What are the limitations of Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)?",
     "Where does the Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5) data come from?",
-    "What is the resolution of Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)?"
+    "What is the resolution of Surface water occurrence 1984-2024 (JRC Global Surface Water v1.5)?",
+    "water history",
+    "how long has there been water",
+    "permanent water map",
+    "water frequency over 40 years",
+    "lakes and rivers over time",
+    "global surface water occurrence",
+    "jrc water"
    ],
    "source": {
     "label": "European Commission Joint Research Centre (JRC) / Google",
     "url": "https://storage.googleapis.com/water-world/downloads_ancillary/DataUsersGuidev2024_v.5.pdf"
-   }
+   },
+   "questions_tr": [
+    "su geçmişi",
+    "burada ne zamandır su var",
+    "kalıcı su haritası",
+    "40 yılda su sıklığı",
+    "zaman içinde göller ve nehirler",
+    "küresel yüzey suyu oluşumu"
+   ]
   },
   {
    "id": "kb:layer-jrc-gsw-occurrence-v1-5-colours",
@@ -1409,12 +2022,27 @@
     "What is Water gained and lost 1984-2024 (JRC GSW transitions)?",
     "What are the limitations of Water gained and lost 1984-2024 (JRC GSW transitions)?",
     "Where does the Water gained and lost 1984-2024 (JRC GSW transitions) data come from?",
-    "What is the resolution of Water gained and lost 1984-2024 (JRC GSW transitions)?"
+    "What is the resolution of Water gained and lost 1984-2024 (JRC GSW transitions)?",
+    "new lakes",
+    "where did water disappear",
+    "water change map",
+    "reservoirs built",
+    "lakes that dried up",
+    "water gain and loss",
+    "surface water change over decades"
    ],
    "source": {
     "label": "European Commission Joint Research Centre (JRC) / Google",
     "url": "https://storage.googleapis.com/global-surface-water/downloads_ancillary/transitions_deuteranopia.qml"
-   }
+   },
+   "questions_tr": [
+    "yeni göller",
+    "su nerede kayboldu",
+    "su değişim haritası",
+    "yapılan barajlar",
+    "kuruyan göller",
+    "su kazanımı ve kaybı"
+   ]
   },
   {
    "id": "kb:layer-jrc-gsw-transitions-v1-5-colours",
@@ -1443,12 +2071,25 @@
     "What is Annual vegetation disturbance (OPERA DIST-ANN, HLS)?",
     "What are the limitations of Annual vegetation disturbance (OPERA DIST-ANN, HLS)?",
     "Where does the Annual vegetation disturbance (OPERA DIST-ANN, HLS) data come from?",
-    "What is the resolution of Annual vegetation disturbance (OPERA DIST-ANN, HLS)?"
+    "What is the resolution of Annual vegetation disturbance (OPERA DIST-ANN, HLS)?",
+    "yearly vegetation damage",
+    "annual disturbance",
+    "dist ann",
+    "year summary of plant loss",
+    "vegetation damage per year",
+    "annual vegetation loss layer"
    ],
    "source": {
     "label": "NASA JPL OPERA (data at LP DAAC), tiles by NASA GIBS",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/OPERA_Vegetation_Disturbance_Annual.xml"
-   }
+   },
+   "questions_tr": [
+    "yıllık bitki hasarı",
+    "yıllık bozulma",
+    "bitki kaybının yıllık özeti",
+    "yıl bazında bitki hasarı",
+    "yıllık bitki örtüsü kaybı katmanı"
+   ]
   },
   {
    "id": "kb:layer-gibs-opera-dist-ann-hls-colours",
@@ -1477,12 +2118,27 @@
     "What is Vegetation greenness, 16-day (MODIS Terra NDVI)?",
     "What are the limitations of Vegetation greenness, 16-day (MODIS Terra NDVI)?",
     "Where does the Vegetation greenness, 16-day (MODIS Terra NDVI) data come from?",
-    "What is the resolution of Vegetation greenness, 16-day (MODIS Terra NDVI)?"
+    "What is the resolution of Vegetation greenness, 16-day (MODIS Terra NDVI)?",
+    "ndvi",
+    "greenness map",
+    "how healthy is the vegetation",
+    "plant health layer",
+    "green leafy land",
+    "vegetation index",
+    "is the land green"
    ],
    "source": {
     "label": "NASA GIBS (data LP DAAC)",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_L3_NDVI.xml"
-   }
+   },
+   "questions_tr": [
+    "NDVI",
+    "yeşillik haritası",
+    "bitki örtüsü ne kadar sağlıklı",
+    "bitki sağlığı katmanı",
+    "bitki indeksi",
+    "arazi yeşil mi"
+   ]
   },
   {
    "id": "kb:layer-gibs-modis-terra-ndvi-16day-colours",
@@ -1511,12 +2167,27 @@
     "What is Built-up and settlement extent 2010 (HBASE, Landsat)?",
     "What are the limitations of Built-up and settlement extent 2010 (HBASE, Landsat)?",
     "Where does the Built-up and settlement extent 2010 (HBASE, Landsat) data come from?",
-    "What is the resolution of Built-up and settlement extent 2010 (HBASE, Landsat)?"
+    "What is the resolution of Built-up and settlement extent 2010 (HBASE, Landsat)?",
+    "built-up areas",
+    "settlement map",
+    "where are towns and buildings",
+    "urban extent 2010",
+    "human settlements layer",
+    "hbase",
+    "city footprint"
    ],
    "source": {
     "label": "NASA SEDAC / CIESIN (Columbia University), tiles by NASA GIBS",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/Landsat_Human_Built-up_And_Settlement_Extent.xml"
-   }
+   },
+   "questions_tr": [
+    "yapılaşmış alanlar",
+    "yerleşim haritası",
+    "kasaba ve binalar nerede",
+    "2010 kentsel alan",
+    "insan yerleşimleri katmanı",
+    "şehir ayak izi"
+   ]
   },
   {
    "id": "kb:layer-gibs-landsat-hbase-2010-colours",
@@ -1545,12 +2216,27 @@
     "What is Night lights, daily (VIIRS Day/Night Band, NOAA-20)?",
     "What are the limitations of Night lights, daily (VIIRS Day/Night Band, NOAA-20)?",
     "Where does the Night lights, daily (VIIRS Day/Night Band, NOAA-20) data come from?",
-    "What is the resolution of Night lights, daily (VIIRS Day/Night Band, NOAA-20)?"
+    "What is the resolution of Night lights, daily (VIIRS Day/Night Band, NOAA-20)?",
+    "lights at night",
+    "city lights from space",
+    "night time earth",
+    "nightlights",
+    "where is it lit at night",
+    "light pollution map",
+    "gas flares"
    ],
    "source": {
     "label": "NASA GIBS (data NASA LANCE Black Marble)",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/VIIRS_DayNightBand_At_Sensor_Radiance.xml"
-   }
+   },
+   "questions_tr": [
+    "geceleri ışıklar",
+    "uzaydan şehir ışıkları",
+    "gece dünya",
+    "gece ışıkları",
+    "geceleri nerede aydınlık",
+    "ışık kirliliği haritası"
+   ]
   },
   {
    "id": "kb:layer-gibs-viirs-noaa20-night-lights-colours",
@@ -1579,12 +2265,27 @@
     "What is Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)?",
     "What are the limitations of Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)?",
     "Where does the Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX) data come from?",
-    "What is the resolution of Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)?"
+    "What is the resolution of Cloud-free Sentinel-2 yearly mosaics 2017-2025 (EOX)?",
+    "sentinel-2 yearly mosaic",
+    "cloud free earth picture",
+    "satellite photo of each year",
+    "compare years of the land",
+    "annual satellite imagery",
+    "s2 cloudless",
+    "flip between years"
    ],
    "source": {
     "label": "EOX IT Services GmbH",
     "url": "https://cloudless.eox.at/documentation/product-list"
-   }
+   },
+   "questions_tr": [
+    "Sentinel-2 yıllık mozaik",
+    "bulutsuz dünya görüntüsü",
+    "her yılın uydu fotoğrafı",
+    "yıllara göre arazi karşılaştırması",
+    "yıllık uydu görüntüsü",
+    "yıllar arasında geçiş"
+   ]
   },
   {
    "id": "kb:layer-eox-s2cloudless-annual-colours",
@@ -1611,12 +2312,25 @@
    "questions_en": [
     "What is SAR?",
     "What does synthetic aperture radar mean?",
-    "How does SAR make sharp images?"
+    "How does SAR make sharp images?",
+    "define synthetic aperture radar",
+    "what is sar technology",
+    "how does sar achieve high resolution",
+    "what does a SAR sensor do",
+    "basics of SAR",
+    "can you describe SAR for me",
+    "what is SAR used for"
    ],
    "questions_tr": [
     "SAR nedir?",
     "Sentetik açıklıklı radar ne demek?",
-    "SAR nasıl net görüntü üretir?"
+    "SAR nasıl net görüntü üretir?",
+    "SAR tanımı nedir",
+    "SAR teknolojisi nedir",
+    "SAR yüksek çözünürlüğü nasıl sağlar",
+    "SAR sensörü ne yapar",
+    "SAR neler için kullanılır",
+    "sentetik açıklıklı radar ne demek"
    ],
    "source": {
     "label": "Get to Know SAR - Overview",
@@ -1632,12 +2346,25 @@
    "questions_en": [
     "Can SAR see at night?",
     "Does SAR need sunlight?",
-    "Why does radar imaging work in the dark?"
+    "Why does radar imaging work in the dark?",
+    "does radar need daylight",
+    "can SAR work in darkness",
+    "is sar active or passive",
+    "can SAR take pictures at night",
+    "does SAR work 24 hours",
+    "do you need the sun for SAR",
+    "why can radar see after sunset"
    ],
    "questions_tr": [
     "SAR gece görüntü alabilir mi?",
     "SAR güneş ışığına ihtiyaç duyar mı?",
-    "Radar karanlıkta neden çalışır?"
+    "Radar karanlıkta neden çalışır?",
+    "radar gün ışığına ihtiyaç duyar mı",
+    "SAR karanlıkta çalışır mı",
+    "SAR aktif mi pasif mi",
+    "SAR geceleri görüntü alabilir mi",
+    "radar için güneş gerekir mi",
+    "gece de çekim yapabilir mi"
    ],
    "source": {
     "label": "Synthetic Aperture Radar (SAR) Basics",
@@ -1653,12 +2380,25 @@
    "questions_en": [
     "Can SAR see through clouds?",
     "Does weather affect SAR images?",
-    "Does rain disturb radar measurements?"
+    "Does rain disturb radar measurements?",
+    "can sar see through clouds",
+    "does weather affect radar images",
+    "can radar see in storms",
+    "is SAR affected by clouds",
+    "why is radar good for cloudy regions",
+    "does fog stop radar",
+    "can radar penetrate clouds"
    ],
    "questions_tr": [
     "SAR bulutların arkasını görebilir mi?",
     "Hava koşulları SAR görüntülerini etkiler mi?",
-    "Yağmur radar ölçümlerini bozar mı?"
+    "Yağmur radar ölçümlerini bozar mı?",
+    "SAR bulutların arkasını görür mü",
+    "hava durumu radar görüntülerini etkiler mi",
+    "radar fırtınada çalışır mı",
+    "bulutlu bölgelerde radar neden iyi",
+    "sis radarı engeller mi",
+    "bulut radarı etkiler mi"
    ],
    "source": {
     "label": "Synthetic Aperture Radar (SAR) Basics",
@@ -1674,12 +2414,27 @@
    "questions_en": [
     "What is NISAR?",
     "Who built the NISAR satellite?",
-    "What does NISAR observe?"
+    "What does NISAR observe?",
+    "what is the nisar mission",
+    "tell me about nisar",
+    "which agencies run nisar",
+    "who are the partners of nisar",
+    "NASA ISRO radar satellite details",
+    "what is NISAR for",
+    "what does the acronym nisar stand for",
+    "describe the NISAR satellite",
+    "what will nisar measure"
    ],
    "questions_tr": [
     "NISAR nedir?",
     "NISAR uydusunu kim geliştirdi?",
-    "NISAR neyi gözlemler?"
+    "NISAR neyi gözlemler?",
+    "NISAR görevi nedir",
+    "NISAR hakkında bilgi ver",
+    "NISAR'ı hangi kurumlar yürütüyor",
+    "NASA ISRO radar uydusu",
+    "NISAR ne için",
+    "NISAR neyin kısaltması"
    ],
    "source": {
     "label": "Mission Overview - NISAR Quick Facts",
@@ -1695,12 +2450,24 @@
    "questions_en": [
     "When was NISAR launched?",
     "Where was NISAR launched from?",
-    "Which rocket launched NISAR?"
+    "Which rocket launched NISAR?",
+    "nisar launch date",
+    "when was the nisar satellite sent into orbit",
+    "where was nisar launched from",
+    "how was nisar launched",
+    "launch of nisar",
+    "what rocket carried nisar",
+    "which year did nisar start flying"
    ],
    "questions_tr": [
     "NISAR ne zaman fırlatıldı?",
     "NISAR nereden fırlatıldı?",
-    "NISAR hangi roketle fırlatıldı?"
+    "NISAR hangi roketle fırlatıldı?",
+    "NISAR fırlatma tarihi",
+    "NISAR yörüngeye ne zaman gönderildi",
+    "NISAR nereden fırlatıldı",
+    "NISAR'ı hangi roket taşıdı",
+    "NISAR hangi yıl uzaya çıktı"
    ],
    "source": {
     "label": "Mission Overview - NISAR Quick Facts",
@@ -1716,12 +2483,25 @@
    "questions_en": [
     "Which radar bands does NISAR use?",
     "What wavelengths does NISAR operate at?",
-    "Is NISAR L-band or S-band?"
+    "Is NISAR L-band or S-band?",
+    "what frequency does nisar use",
+    "does nisar have s-band",
+    "L and S band of nisar",
+    "nisar radar wavelength",
+    "which two radar bands are on nisar",
+    "what bands are on the satellite",
+    "how many radars does nisar have",
+    "nisar sensors and bands"
    ],
    "questions_tr": [
     "NISAR hangi radar bantlarını kullanır?",
     "NISAR hangi dalga boylarında çalışır?",
-    "NISAR L bant mı S bant mı?"
+    "NISAR L bant mı S bant mı?",
+    "NISAR hangi frekansı kullanıyor",
+    "NISAR'da S bandı var mı",
+    "NISAR'ın L ve S bandı",
+    "NISAR radar dalga boyu",
+    "NISAR'da hangi bantlar var"
    ],
    "source": {
     "label": "Mission Overview - NISAR Quick Facts",
@@ -1737,12 +2517,24 @@
    "questions_en": [
     "What is Sentinel-1?",
     "Which radar band does Sentinel-1 use?",
-    "Is Sentinel-1 data free?"
+    "Is Sentinel-1 data free?",
+    "what is sentinel 1",
+    "tell me about the sentinel-1 satellites",
+    "who operates sentinel 1",
+    "what band is sentinel-1",
+    "is sentinel-1 free data",
+    "sentinel 1 mission information",
+    "esa radar satellite"
    ],
    "questions_tr": [
     "Sentinel-1 nedir?",
     "Sentinel-1 hangi radar bandını kullanır?",
-    "Sentinel-1 verileri ücretsiz mi?"
+    "Sentinel-1 verileri ücretsiz mi?",
+    "Sentinel-1 nedir",
+    "Sentinel-1 uyduları hakkında bilgi",
+    "Sentinel-1'i kim işletiyor",
+    "Sentinel-1 hangi bantta",
+    "ESA radar uydusu"
    ],
    "source": {
     "label": "Synthetic Aperture Radar (SAR) Basics",
@@ -1758,12 +2550,24 @@
    "questions_en": [
     "What is backscatter?",
     "What controls how bright a SAR pixel is?",
-    "Why are some surfaces brighter in radar images?"
+    "Why are some surfaces brighter in radar images?",
+    "define backscatter",
+    "what is radar backscatter coefficient",
+    "what does backscatter mean",
+    "radar returns explained",
+    "how much signal returns to the satellite",
+    "what is sigma nought",
+    "what affects the amount of backscatter"
    ],
    "questions_tr": [
     "Geri saçılım (backscatter) nedir?",
     "SAR pikselinin parlaklığını ne belirler?",
-    "Radar görüntülerinde bazı yüzeyler neden daha parlak?"
+    "Radar görüntülerinde bazı yüzeyler neden daha parlak?",
+    "geri saçılım tanımı",
+    "radar geri saçılım katsayısı nedir",
+    "geri saçılım ne demek",
+    "uyduya ne kadar sinyal döner",
+    "geri saçılımı ne etkiler"
    ],
    "source": {
     "label": "Get to Know SAR - Overview",
@@ -1779,12 +2583,24 @@
    "questions_en": [
     "Why does water look dark in SAR images?",
     "Is water always black in radar images?",
-    "How does wind change the look of water in SAR?"
+    "How does wind change the look of water in SAR?",
+    "why are lakes black in sar",
+    "why does water appear dark",
+    "why do rivers look dark in radar images",
+    "smooth surfaces look dark why",
+    "why does the sea look black in a radar picture",
+    "how can I spot water in radar imagery",
+    "why is flat ground dark in radar"
    ],
    "questions_tr": [
     "SAR görüntülerinde su neden koyu görünür?",
     "Radar görüntülerinde su her zaman siyah mı?",
-    "Rüzgâr suyun SAR görünümünü nasıl değiştirir?"
+    "Rüzgâr suyun SAR görünümünü nasıl değiştirir?",
+    "göller SAR'da neden siyah",
+    "su neden koyu görünür",
+    "nehirler radar görüntüsünde neden koyu",
+    "düz yüzeyler neden koyu",
+    "radar görüntüsünde suyu nasıl ayırt ederim"
    ],
    "source": {
     "label": "Get to Know SAR - Overview",
@@ -1800,12 +2616,24 @@
    "questions_en": [
     "What is the difference between amplitude and phase in SAR?",
     "What does SAR phase tell us?",
-    "What is a complex SAR image?"
+    "What is a complex SAR image?",
+    "what is phase in a SAR image",
+    "amplitude vs phase",
+    "what information is in the phase",
+    "how is phase used",
+    "what is the SAR phase for",
+    "difference between magnitude and phase in radar",
+    "why does phase matter"
    ],
    "questions_tr": [
     "SAR'da genlik ile faz arasındaki fark nedir?",
     "SAR fazı ne anlatır?",
-    "Karmaşık SAR görüntüsü nedir?"
+    "Karmaşık SAR görüntüsü nedir?",
+    "SAR görüntüsünde faz nedir",
+    "genlik ve faz farkı",
+    "fazda hangi bilgi var",
+    "faz ne için kullanılır",
+    "faz neden önemli"
    ],
    "source": {
     "label": "Get to Know SAR - Overview",
@@ -1821,12 +2649,24 @@
    "questions_en": [
     "What is speckle in SAR images?",
     "Why do radar images look grainy?",
-    "Can speckle be removed?"
+    "Can speckle be removed?",
+    "why do SAR images look grainy",
+    "what is speckle noise",
+    "how to reduce speckle",
+    "why is there noise in radar pictures",
+    "salt and pepper noise in radar",
+    "what causes speckle",
+    "speckle filter why"
    ],
    "questions_tr": [
     "SAR görüntülerinde speckle nedir?",
     "Radar görüntüleri neden benekli görünür?",
-    "Speckle giderilebilir mi?"
+    "Speckle giderilebilir mi?",
+    "SAR görüntüleri neden tanecikli",
+    "benek gürültüsü nedir",
+    "benek nasıl azaltılır",
+    "radar görüntülerinde neden gürültü var",
+    "benek neden oluşur"
    ],
    "source": {
     "label": "Synthetic Aperture Radar (SAR) Basics",
@@ -1842,12 +2682,24 @@
    "questions_en": [
     "What is polarization in SAR?",
     "Why does polarization matter for radar images?",
-    "What do VV and VH mean?"
+    "What do VV and VH mean?",
+    "what is the polarization in sar images",
+    "vv vh hh hv meaning",
+    "what does vv mean",
+    "which polarization does sentinel-1 use",
+    "co polarized and cross polarized",
+    "why do polarizations matter for the image",
+    "what polarizations are available"
    ],
    "questions_tr": [
     "SAR'da polarizasyon nedir?",
     "Polarizasyon radar görüntüleri için neden önemli?",
-    "VV ve VH ne demek?"
+    "VV ve VH ne demek?",
+    "SAR görüntülerinde polarizasyon nedir",
+    "VV VH HH HV ne anlama gelir",
+    "VV ne demek",
+    "Sentinel-1 hangi polarizasyonu kullanır",
+    "polarizasyon neden önemli"
    ],
    "source": {
     "label": "Get to Know SAR - Overview",
@@ -1863,12 +2715,23 @@
    "questions_en": [
     "What is the incidence angle in SAR?",
     "Does the viewing angle change SAR backscatter?",
-    "Why does the same area look different across a SAR swath?"
+    "Why does the same area look different across a SAR swath?",
+    "what is incidence angle",
+    "how does viewing angle affect backscatter",
+    "why does the same surface look different at another angle",
+    "radar look angle",
+    "does the angle change brightness",
+    "what does incidence angle do to a radar image"
    ],
    "questions_tr": [
     "SAR'da geliş açısı nedir?",
     "Bakış açısı SAR geri saçılımını değiştirir mi?",
-    "Aynı alan SAR şeridinde neden farklı görünür?"
+    "Aynı alan SAR şeridinde neden farklı görünür?",
+    "geliş açısı nedir",
+    "bakış açısı geri saçılımı nasıl etkiler",
+    "aynı yüzey neden farklı açıda farklı görünür",
+    "radar bakış açısı",
+    "açı parlaklığı değiştirir mi"
    ],
    "source": {
     "label": "Synthetic Aperture Radar (SAR) Basics",
@@ -1884,12 +2747,25 @@
    "questions_en": [
     "What is layover in SAR?",
     "Why do mountains lean toward the sensor in radar images?",
-    "What causes geometric distortion in SAR?"
+    "What causes geometric distortion in SAR?",
+    "what is layover",
+    "radar geometric distortion on slopes",
+    "why do hills look distorted in SAR",
+    "what is foreshortening",
+    "why are mountains tricky for radar",
+    "slope distortion in sar",
+    "radar shadow and layover"
    ],
    "questions_tr": [
     "SAR'da layover nedir?",
     "Radar görüntülerinde dağlar neden algılayıcıya doğru yatık görünür?",
-    "SAR'da geometrik bozulmaya ne yol açar?"
+    "SAR'da geometrik bozulmaya ne yol açar?",
+    "bindirme (layover) nedir",
+    "radarda eğimlerde geometrik bozulma",
+    "tepeler SAR'da neden bozuk görünür",
+    "kısalma nedir",
+    "dağlar radar için neden zor",
+    "radar gölgesi ve layover"
    ],
    "source": {
     "label": "Get to Know SAR - Overview",
@@ -1905,12 +2781,25 @@
    "questions_en": [
     "Can earthquakes be predicted?",
     "Can SAR or satellites predict an earthquake?",
-    "What would count as a real earthquake prediction?"
+    "What would count as a real earthquake prediction?",
+    "can anyone forecast earthquakes",
+    "is it possible to predict when a quake hits",
+    "does nisar warn before an earthquake",
+    "can radar predict quakes",
+    "has an earthquake ever been predicted",
+    "can satellites foresee earthquakes",
+    "predicting earthquakes possible?"
    ],
    "questions_tr": [
     "Depremler önceden tahmin edilebilir mi?",
     "SAR veya uydular depremi öngörebilir mi?",
-    "Gerçek bir deprem tahmini neyi içermelidir?"
+    "Gerçek bir deprem tahmini neyi içermelidir?",
+    "depremi kimse önceden tahmin edebilir mi",
+    "deprem ne zaman olacak bilinebilir mi",
+    "NISAR depremden önce uyarır mı",
+    "radar depremi tahmin edebilir mi",
+    "uydular depremi önceden görebilir mi",
+    "deprem tahmini mümkün mü"
    ],
    "source": {
     "label": "Can you predict earthquakes?",
@@ -1926,12 +2815,24 @@
    "questions_en": [
     "Can NISAR monitor ice and glaciers?",
     "How often does NISAR observe ice-covered regions?",
-    "What is NISAR's revisit time?"
+    "What is NISAR's revisit time?",
+    "can nisar see ice sheets",
+    "does nisar track glacier movement",
+    "ice monitoring with nisar",
+    "how is ice change measured by radar",
+    "can sar measure ice flow",
+    "can radar monitor polar ice",
+    "nisar and the cryosphere"
    ],
    "questions_tr": [
     "NISAR buz ve buzulları izleyebilir mi?",
     "NISAR buzla kaplı bölgeleri ne sıklıkla gözler?",
-    "NISAR'ın tekrar ziyaret süresi nedir?"
+    "NISAR'ın tekrar ziyaret süresi nedir?",
+    "NISAR buz tabakalarını görebilir mi",
+    "NISAR buzul hareketini izler mi",
+    "NISAR ile buz izleme",
+    "radar buz akışını ölçebilir mi",
+    "radar kutup buzlarını izleyebilir mi"
    ],
    "source": {
     "label": "Mission Overview - NISAR Quick Facts",
@@ -1947,12 +2848,25 @@
    "questions_en": [
     "Can NISAR track vegetation change?",
     "Can SAR detect deforestation?",
-    "Does NISAR observe forests?"
+    "Does NISAR observe forests?",
+    "can radar detect deforestation",
+    "does nisar monitor forests and vegetation",
+    "tracking vegetation change with radar",
+    "can sar see tree cover loss",
+    "radar for forest monitoring",
+    "how does radar help with vegetation",
+    "can radar measure biomass"
    ],
    "questions_tr": [
     "NISAR bitki örtüsü değişimini izleyebilir mi?",
     "SAR ormansızlaşmayı tespit edebilir mi?",
-    "NISAR ormanları gözlemler mi?"
+    "NISAR ormanları gözlemler mi?",
+    "radar ormansızlaşmayı tespit edebilir mi",
+    "NISAR ormanları ve bitki örtüsünü izler mi",
+    "radarla bitki örtüsü değişimi",
+    "SAR ağaç kaybını görebilir mi",
+    "orman izleme için radar",
+    "radar biyokütleyi ölçebilir mi"
    ],
    "source": {
     "label": "Mission Overview - NISAR Quick Facts",
@@ -1968,12 +2882,25 @@
    "questions_en": [
     "How do cities look in SAR images?",
     "Why are buildings bright in radar images?",
-    "Can SAR be used to study urban areas?"
+    "Can SAR be used to study urban areas?",
+    "how do towns appear in radar images",
+    "why are buildings bright in SAR",
+    "what do man made objects look like in radar",
+    "can you see cities in sar",
+    "radar view of urban areas",
+    "why do bridges and towers glow in radar",
+    "double bounce urban"
    ],
    "questions_tr": [
     "Şehirler SAR görüntülerinde nasıl görünür?",
     "Binalar radar görüntülerinde neden parlak?",
-    "SAR kentsel alanları incelemek için kullanılabilir mi?"
+    "SAR kentsel alanları incelemek için kullanılabilir mi?",
+    "kasabalar radar görüntüsünde nasıl görünür",
+    "binalar SAR'da neden parlak",
+    "insan yapımı nesneler radarda nasıl görünür",
+    "SAR'da şehirler görülür mü",
+    "kentsel alanların radar görüntüsü",
+    "köprüler ve kuleler radarda neden parlıyor"
    ],
    "source": {
     "label": "Get to Know SAR - Overview",
@@ -1989,12 +2916,25 @@
    "questions_en": [
     "Can SAR monitor crops?",
     "Does crop growth change radar backscatter?",
-    "What affects SAR signals over farmland?"
+    "What affects SAR signals over farmland?",
+    "can radar be used for agriculture",
+    "monitoring farmland with sentinel-1",
+    "crop monitoring from radar",
+    "does SAR help farmers",
+    "what does SAR say about crops",
+    "can sar tell crop types apart",
+    "radar for farming"
    ],
    "questions_tr": [
     "SAR ile tarım ürünleri izlenebilir mi?",
     "Ürün gelişimi radar geri saçılımını değiştirir mi?",
-    "Tarım arazilerinde SAR sinyalini neler etkiler?"
+    "Tarım arazilerinde SAR sinyalini neler etkiler?",
+    "radar tarımda kullanılabilir mi",
+    "Sentinel-1 ile tarım arazisi izleme",
+    "radar ile ürün izleme",
+    "SAR çiftçilere yardımcı olur mu",
+    "SAR ürün türlerini ayırt edebilir mi",
+    "tarım için radar"
    ],
    "source": {
     "label": "Synthetic Aperture Radar (SAR) Basics",
@@ -2010,12 +2950,25 @@
    "questions_en": [
     "How is change detected with SAR?",
     "What must be controlled before comparing two SAR images?",
-    "Why should SAR images from the same orbit be compared?"
+    "Why should SAR images from the same orbit be compared?",
+    "how do I detect change using radar images",
+    "change detection with SAR",
+    "compare two sar acquisitions",
+    "how to see what changed on the ground",
+    "how does radar show changes over time",
+    "method to spot differences between radar dates",
+    "what is change detection"
    ],
    "questions_tr": [
     "SAR ile değişim nasıl tespit edilir?",
     "İki SAR görüntüsünü karşılaştırmadan önce neler kontrol edilmelidir?",
-    "Neden aynı yörüngeden alınan SAR görüntüleri karşılaştırılmalı?"
+    "Neden aynı yörüngeden alınan SAR görüntüleri karşılaştırılmalı?",
+    "radar görüntüleriyle değişim nasıl tespit edilir",
+    "SAR ile değişim tespiti",
+    "iki SAR çekimini karşılaştırma",
+    "yerde ne değişti nasıl görürüm",
+    "radar zaman içindeki değişimi nasıl gösterir",
+    "değişim tespiti nedir"
    ],
    "source": {
     "label": "Synthetic Aperture Radar (SAR) Basics",
@@ -2031,12 +2984,25 @@
    "questions_en": [
     "What does dB mean in SAR data?",
     "Are Sentinel-1 values in decibels?",
-    "What is the difference between S1_GRD and S1_GRD_FLOAT?"
+    "What is the difference between S1_GRD and S1_GRD_FLOAT?",
+    "what does decibel mean in sar",
+    "why is backscatter in dB",
+    "what are the units of sentinel 1 pixels",
+    "how do I read dB values",
+    "what is a typical dB value for water",
+    "dB scale in radar images",
+    "what does negative db mean"
    ],
    "questions_tr": [
     "SAR verisinde dB ne anlama gelir?",
     "Sentinel-1 değerleri desibel cinsinden mi?",
-    "S1_GRD ile S1_GRD_FLOAT arasındaki fark nedir?"
+    "S1_GRD ile S1_GRD_FLOAT arasındaki fark nedir?",
+    "SAR'da desibel ne demek",
+    "geri saçılım neden dB cinsinden",
+    "Sentinel-1 piksellerinin birimi ne",
+    "dB değerleri nasıl okunur",
+    "radar görüntülerinde dB ölçeği",
+    "negatif dB ne demek"
    ],
    "source": {
     "label": "Synthetic Aperture Radar (SAR) Basics",
@@ -2052,12 +3018,25 @@
    "questions_en": [
     "What are the limitations of SAR?",
     "Why are SAR images hard to interpret?",
-    "What can go wrong when reading a radar image?"
+    "What can go wrong when reading a radar image?",
+    "what are the downsides of SAR",
+    "why is SAR hard to interpret",
+    "problems with radar images",
+    "what are SAR's weaknesses",
+    "challenges in using SAR data",
+    "when is SAR not reliable",
+    "drawbacks of radar satellites"
    ],
    "questions_tr": [
     "SAR'ın sınırlamaları nelerdir?",
     "SAR görüntülerini yorumlamak neden zor?",
-    "Radar görüntüsü okurken nelere dikkat edilmeli?"
+    "Radar görüntüsü okurken nelere dikkat edilmeli?",
+    "SAR'ın dezavantajları neler",
+    "SAR yorumlamak neden zor",
+    "radar görüntülerinin sorunları",
+    "SAR'ın zayıf yönleri",
+    "SAR verisi kullanmanın zorlukları",
+    "SAR ne zaman güvenilir değil"
    ],
    "source": {
     "label": "Get to Know SAR - Overview",
@@ -2073,12 +3052,23 @@
    "questions_en": [
     "What is the difference between weather and climate?",
     "What is climate?",
-    "Over how many years is climate defined?"
+    "Over how many years is climate defined?",
+    "weather versus climate",
+    "how is climate different from weather",
+    "difference between climate and weather",
+    "is a hot day climate change",
+    "what is climate vs weather",
+    "weather and climate explained"
    ],
    "questions_tr": [
     "Hava durumu ile iklim arasındaki fark nedir?",
     "İklim nedir?",
-    "İklim kaç yıllık bir dönem üzerinden tanımlanır?"
+    "İklim kaç yıllık bir dönem üzerinden tanımlanır?",
+    "hava durumu ile iklim farkı",
+    "iklim hava durumundan nasıl ayrılır",
+    "iklim ile hava arasındaki fark",
+    "sıcak bir gün iklim değişikliği mi",
+    "hava ve iklim nedir"
    ],
    "source": {
     "label": "What's the difference between climate and weather?",
@@ -2094,12 +3084,22 @@
    "questions_en": [
     "What is the difference between earthquake prediction and early warning?",
     "How does earthquake early warning work?",
-    "How much time does an earthquake early warning give?"
+    "How much time does an earthquake early warning give?",
+    "is an earthquake warning the same as a prediction",
+    "early warning vs forecast of earthquakes",
+    "how is quake early warning different from prediction",
+    "difference between predicting and warning",
+    "can early warning systems predict quakes"
    ],
    "questions_tr": [
     "Deprem tahmini ile erken uyarı arasındaki fark nedir?",
     "Deprem erken uyarısı nasıl çalışır?",
-    "Deprem erken uyarısı ne kadar süre kazandırır?"
+    "Deprem erken uyarısı ne kadar süre kazandırır?",
+    "deprem uyarısı tahminle aynı mı",
+    "erken uyarı ile deprem tahmini farkı",
+    "erken uyarı tahminden nasıl farklı",
+    "tahmin ile uyarı arasındaki fark",
+    "erken uyarı sistemleri depremi tahmin eder mi"
    ],
    "source": {
     "label": "What is the difference between earthquake early warning, earthquake forecasts, earthquake probabilities, and earthquake prediction?",

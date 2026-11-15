@@ -123,6 +123,32 @@ export async function buildKb() {
     });
   }
 
+  // --- more ways to ask (knowledge/paraphrases.json): slang, indirect, Turkish, keywords. They only help find the
+  //     record; the answer text is never touched. An alias key covers a record and its sibling records
+  //     (an investigation's "what happened / radar / limits / markers", a layer and its colours).
+  const parPath = path.join(here, 'knowledge/paraphrases.json');
+  if (fs.existsSync(parPath)) {
+    const par = readJson(parPath);
+    const ids = new Set(records.map((r) => r.id));
+    for (const [slug, p] of Object.entries(par.records)) {
+      const r = records.find((x) => x.id === `kb:${slug}`);
+      if (!r) throw new Error(`paraphrases.json: no record kb:${slug}`);
+      r.questions_en = [...new Set([...r.questions_en, ...(p.en ?? [])])];
+      if (p.tr?.length) r.questions_tr = [...new Set([...(r.questions_tr ?? []), ...p.tr])];
+    }
+    for (const [prefix, p] of Object.entries(par.aliases)) {
+      const group = records.filter((r) => r.id === `kb:${prefix}` || r.id.startsWith(`kb:${prefix}-`));
+      if (!group.length) throw new Error(`paraphrases.json: no records for alias ${prefix}`);
+      for (const r of group) {
+        const isMain = r.id === `kb:${prefix}` || r.id === `kb:${prefix}-happened`;
+        if (!isMain) continue; // keywords point at the main record only; the others keep their own, more specific questions
+        r.questions_en = [...new Set([...r.questions_en, ...(p.en ?? [])])];
+        if (p.tr?.length) r.questions_tr = [...new Set([...(r.questions_tr ?? []), ...p.tr])];
+      }
+    }
+    void ids;
+  }
+
   // --- checks: ids unique and well formed, no empty text, every source an http(s) link
   const seen = new Set();
   for (const r of records) {
