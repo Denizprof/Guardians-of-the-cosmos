@@ -233,6 +233,8 @@ function IntroPanel(p: Props) {
               <dd>USGS (earthquakes M6.3+) and NASA EONET, past 12 months.</dd>
               <dt>Globe imagery</dt>
               <dd>Sentinel-2 cloudless 2024 – <a href="https://cloudless.eox.at" target="_blank" rel="noopener">https://cloudless.eox.at</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0.</dd>
+              <dt>Close-up imagery</dt>
+              <dd>Esri World Imagery (Esri, Maxar, Earthstar Geographics and the GIS User Community), shown when zoomed in close.</dd>
               <dt>Terrain</dt>
               <dd>Mapzen/AWS Terrain Tiles.</dd>
               <dt>Borders and place names</dt>

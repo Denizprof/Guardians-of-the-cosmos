@@ -14,8 +14,8 @@ export const TERRAIN = { source: 'dem', exaggeration: 1.4 };
 /** Terrain is only switched on when close enough to see relief (keeps the whole-globe view light). */
 export const TERRAIN_ON_ZOOM = 6.5;
 export const TERRAIN_OFF_ZOOM = 5.5;
-/** Native detail of the 10 m Sentinel-2 basemap is ~z14; allow a little overzoom, no more. */
-export const MAX_ZOOM = 14.5;
+/** Sentinel-2 (10 m) ends near z14; the Esri close-up imagery layered over it is sharp to z19. */
+export const MAX_ZOOM = 19;
 
 // Turkey is shown under its official name, Türkiye (the tiles carry the English exonym 'Turkey').
 const NAME: any = ['match', ['get', 'name_en'], 'Turkey', 'Türkiye', ['coalesce', ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']]];
@@ -56,6 +56,16 @@ export const STYLE: StyleSpecification = {
       attribution:
         '<a href="https://cloudless.eox.at" target="_blank" rel="noopener">Sentinel-2 cloudless 2024</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0',
     },
+    // Close-up photo imagery (sub-metre in cities), faded in once Sentinel-2's 10 m pixels run out (~z13).
+    'satellite-hires': {
+      type: 'raster',
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+      tileSize: 256,
+      minzoom: 10,
+      maxzoom: 19,
+      attribution:
+        'Close-up imagery: <a href="https://www.esri.com" target="_blank" rel="noopener">Esri, Maxar, Earthstar Geographics and the GIS User Community</a>',
+    },
     dem: {
       type: 'raster-dem',
       tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
@@ -76,6 +86,10 @@ export const STYLE: StyleSpecification = {
     {
       id: 'satellite', type: 'raster', source: 'satellite',
       paint: { 'raster-fade-duration': 100, 'raster-saturation': 0.12, 'raster-contrast': 0.06 },
+    },
+    {
+      id: 'satellite-hires', type: 'raster', source: 'satellite-hires', minzoom: 12.5,
+      paint: { 'raster-fade-duration': 150, 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 12.5, 0, 14, 1] },
     },
     {
       id: 'road-major', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', minzoom: 8,
