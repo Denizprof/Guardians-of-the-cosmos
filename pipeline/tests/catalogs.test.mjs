@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  parseCsv, normalizeTsunamis, normalizeVolcanoes, normalizeUsgs, normalizeGlc, normalizeGdacsFloods,
+  parseCsv, normalizeTsunamis, tsunamiTitle, normalizeVolcanoes, normalizeUsgs, normalizeGlc, normalizeGdacsFloods,
   aggregateFirms, firmsCellsToEvents, confidenceClass, isoFromParts,
 } from '../src/fetch-catalogs.mjs';
 
@@ -117,4 +117,25 @@ test('FIRMS drops low-confidence detections', () => {
   ], 'VIIRS', cells);
   assert.equal(used, 1);
   assert.equal([...cells.values()][0].maxFrp, 9);
+});
+
+// Regression: a tsunami caused by an earthquake was titled only "Tsunami 2026 — Panama", so on the globe a major
+// earthquake read as "a tsunami" and the earthquake itself was never named.
+test('tsunami titles name what caused the tsunami, and do not repeat the country', () => {
+  assert.equal(tsunamiTitle({ year: 2026, causeCode: 1, magnitude: 7.7, locationName: 'ISLA CAÑAS, PANAMA', country: 'PANAMA' }), 'Tsunami after M 7.7 earthquake, 2026 — Isla Cañas, Panama');
+  assert.equal(tsunamiTitle({ year: 1946, causeCode: 3, magnitude: 8.6, locationName: 'UNIMAK ISLAND, AK', country: 'USA' }), 'Tsunami after M 8.6 earthquake, 1946 — Unimak Island, Ak, Usa');
+  assert.equal(tsunamiTitle({ year: 1905, causeCode: 1, locationName: 'CALABRIA', country: 'ITALY' }), 'Tsunami after an earthquake, 1905 — Calabria, Italy');
+  assert.equal(tsunamiTitle({ year: 2018, causeCode: 5, locationName: 'ANAK KRAKATAU', country: 'INDONESIA' }), 'Tsunami after a volcanic eruption, 2018 — Anak Krakatau, Indonesia');
+  assert.equal(tsunamiTitle({ year: 1958, causeCode: 7, locationName: 'LITUYA BAY', country: 'USA' }), 'Tsunami after a landslide, 1958 — Lituya Bay, Usa');
+  assert.equal(tsunamiTitle({ year: 2020, causeCode: 8, locationName: 'MENORCA', country: 'SPAIN' }), 'Meteotsunami (weather-driven), 2020 — Menorca, Spain');
+  // a questionable or unknown cause is not presented as an earthquake
+  assert.equal(tsunamiTitle({ year: 1930, causeCode: 2, magnitude: 7, locationName: 'X', country: 'Y' }), 'Tsunami 1930 — X, Y');
+  assert.equal(tsunamiTitle({ year: 1930, causeCode: 0 }), 'Tsunami 1930');
+});
+
+test('the tsunami normalizer uses those titles', () => {
+  const ev = normalizeTsunamis(fx('noaa-tsunamis').items);
+  const quakeCaused = ev.filter((e) => /^Cause: (Earthquake|Volcano and earthquake|Earthquake and landslide|Volcano, earthquake and landslide)./.test(e.notes));
+  assert.ok(quakeCaused.length > 0);
+  assert.ok(quakeCaused.every((e) => /^Tsunami after (M [0-9.]+|an) earthquake, /.test(e.title)), quakeCaused.map((e) => e.title).join(' | '));
 });

@@ -33,7 +33,8 @@ export function buildEventContext(event: SarEvent): ContextEvent {
     title: clip(event.title, 300),
     subtitle: clip(event.subtitle, 300),
     category: clip(event.category, 30),
-    date: event.date ? clip(event.date, 40) : event.date,
+    // a date known only to the month or year is sent as "2026-01" / "2026", so the assistant cannot quote a day nobody recorded
+    date: event.date ? clip(event.date_precision === 'month' ? event.date.slice(0, 7) : event.date_precision === 'year' ? event.date.slice(0, 4) : event.date, 40) : event.date,
     technique: event.technique,
     location: { lon: event.location.lon, lat: event.location.lat },
     references: event.references.slice(0, 20).map((r, i) => ({ citation_id: referenceCitationId(event.id, i), label: clip(r.label, 300), url: clip(r.url, 1000) })),

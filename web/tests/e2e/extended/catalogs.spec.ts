@@ -7,11 +7,15 @@ import type { Page } from '@playwright/test';
 const CATALOGS = [
   { id: 'firms-fires', label: /Active fires, last 24 h/, defaultOn: true },
   { id: 'noaa-tsunamis', label: /Tsunamis since 1900/, defaultOn: true },
-  { id: 'usgs-earthquakes', label: /Earthquakes M7\+ since 1900/, defaultOn: false },
+  { id: 'usgs-earthquakes', label: /Earthquakes M7\+ since 1900/, defaultOn: true },
   { id: 'noaa-volcanoes', label: /Significant eruptions since 1900/, defaultOn: false },
   { id: 'gdacs-floods', label: /Flood alerts since 2000/, defaultOn: false },
   { id: 'nasa-glc', label: /Landslides \(NASA Global Landslide Catalog\)/, defaultOn: false },
 ];
+
+/** On when the app opens. Earthquakes are among them: otherwise a large earthquake appears on the globe only as the
+ *  NOAA record of the tsunami it caused, and reads as "a tsunami". */
+const DEFAULT_ON = CATALOGS.filter((c) => c.defaultOn).map((c) => c.id);
 
 const rail = (p: Page) => p.getByRole('complementary', { name: 'Map filters' });
 const catRow = (p: Page, label: RegExp) => rail(p).locator('label', { hasText: label });
@@ -49,7 +53,7 @@ test.describe('event catalogs', () => {
     await openFilters(page);
   });
 
-  test('default catalogs are on (fires, tsunamis) and show their exact counts', async ({ page }) => {
+  test('default catalogs are on (fires, tsunamis, earthquakes) and show their exact counts', async ({ page }) => {
     for (const c of CATALOGS) {
       const row = catRow(page, c.label);
       if (c.defaultOn) {
@@ -69,7 +73,7 @@ test.describe('event catalogs', () => {
       await row.getByRole('checkbox').check();
       const n = readData(`catalogs/${c.id}.json`).events.length;
       await expect(row.locator('.count')).toHaveText(String(n));
-      await expect.poll(() => groupTotal(page)).toBe(expectedTotal(['firms-fires', 'noaa-tsunamis', c.id], 1900, new Date().getUTCFullYear()));
+      await expect.poll(() => groupTotal(page)).toBe(expectedTotal([...DEFAULT_ON, c.id], 1900, new Date().getUTCFullYear()));
       expect(await groupTotal(page)).toBeGreaterThan(before - 1);
       await row.getByRole('checkbox').uncheck();
       await expect(row.locator('.count')).toHaveText('');
@@ -87,12 +91,15 @@ test.describe('event catalogs', () => {
   test('the "recent events" context checkbox toggles the context markers out of the totals', async ({ page }) => {
     const before = await groupTotal(page);
     await rail(page).getByRole('checkbox', { name: /Recent events, 12 months/ }).uncheck();
-    const n = readData('context.json').events.length;
-    await expect.poll(() => groupTotal(page)).toBe(before - n);
+    const now = new Date().getUTCFullYear();
+    const sar = readData('events.json').events.length;
+    const withoutContext = new Set<string>();
+    for (const id of DEFAULT_ON) for (const e of readData(`catalogs/${id}.json`).events) if (inRange(e.date, 1900, now)) withoutContext.add(e.id);
+    expect(before).toBe(expectedTotal(DEFAULT_ON, 1900, now));
+    await expect.poll(() => groupTotal(page)).toBe(sar + withoutContext.size);
   });
 
   test('year range: narrowing "From year" drops older events, exactly', async ({ page }) => {
-    await catRow(page, /Earthquakes M7\+/).getByRole('checkbox').check();
     await catRow(page, /Significant eruptions/).getByRole('checkbox').check();
     const now = new Date().getUTCFullYear();
     const active = ['firms-fires', 'noaa-tsunamis', 'usgs-earthquakes', 'noaa-volcanoes'];
@@ -104,7 +111,6 @@ test.describe('event catalogs', () => {
   });
 
   test('year range: a single-year window and an inverted range are handled', async ({ page }) => {
-    await catRow(page, /Earthquakes M7\+/).getByRole('checkbox').check();
     const now = new Date().getUTCFullYear();
     const active = ['firms-fires', 'noaa-tsunamis', 'usgs-earthquakes'];
     await rail(page).getByLabel('From year').fill('2011');
@@ -123,7 +129,7 @@ test.describe('event catalogs', () => {
 
   test('year range inputs reject garbage (non-numeric) without breaking the totals', async ({ page }) => {
     const now = new Date().getUTCFullYear();
-    const base = expectedTotal(['firms-fires', 'noaa-tsunamis'], 1900, now);
+    const base = expectedTotal(DEFAULT_ON, 1900, now);
     const from = rail(page).getByLabel('From year');
     await expect(from).toHaveAttribute('type', 'number'); // the browser itself refuses letters
     await from.fill('');
@@ -143,7 +149,7 @@ test.describe('event catalogs', () => {
     await expect(err).toHaveAttribute('role', 'alert');
     // another catalog still loads fine
     const eq = catRow(page, /Earthquakes M7\+/);
-    await eq.getByRole('checkbox').check();
+    await expect(eq.getByRole('checkbox')).toBeChecked();
     await expect(eq.locator('.count')).toHaveText(String(readData('catalogs/usgs-earthquakes.json').events.length));
     // the failed catalog contributes nothing to totals
     await expect.poll(() => groupTotal(page)).toBe(expectedTotal(['firms-fires', 'noaa-tsunamis', 'usgs-earthquakes'], 1900, new Date().getUTCFullYear()));

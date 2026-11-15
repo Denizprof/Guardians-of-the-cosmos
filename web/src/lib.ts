@@ -47,7 +47,7 @@ export function evidenceOf(l: SarLayer): EvidenceClass {
 export const CATALOGS: { id: string; label: string; defaultOn: boolean }[] = [
   { id: 'firms-fires', label: 'Active fires, last 24 h (NASA FIRMS)', defaultOn: true },
   { id: 'noaa-tsunamis', label: 'Tsunamis since 1900 (NOAA NCEI)', defaultOn: true },
-  { id: 'usgs-earthquakes', label: 'Earthquakes M7+ since 1900 (USGS)', defaultOn: false },
+  { id: 'usgs-earthquakes', label: 'Earthquakes M7+ since 1900 (USGS)', defaultOn: true },
   { id: 'noaa-volcanoes', label: 'Significant eruptions since 1900 (NOAA NCEI)', defaultOn: false },
   { id: 'gdacs-floods', label: 'Flood alerts since 2000 (GDACS)', defaultOn: false },
   { id: 'nasa-glc', label: 'Landslides (NASA Global Landslide Catalog)', defaultOn: false },
@@ -135,6 +135,11 @@ export function fmtDatePrecise(iso?: string | null, precision?: string | null): 
   if (precision === 'year') return String(d.getUTCFullYear());
   if (precision === 'month') return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
   return fmtDate(iso);
+}
+
+/** An investigation's date as precisely as its record knows it ("Jan 2026" when only the month is known). */
+export function fmtEventDate(e: { date?: string | null; date_precision?: string | null }): string {
+  return fmtDatePrecise(e.date, e.date_precision);
 }
 
 /** A date known only to the year or month cannot anchor a ±days satellite search window. */

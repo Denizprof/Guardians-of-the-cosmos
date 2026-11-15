@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { IconClose } from './icons';
-import { CATEGORY_COLOR, CATEGORY_LABEL, fmtDate } from '../lib';
+import { CATEGORY_COLOR, CATEGORY_LABEL, fmtEventDate } from '../lib';
 import type { SarEvent } from '../types';
 
 const TECHNIQUE: Record<SarEvent['technique'], string> = { insar: 'Ground motion', backscatter: 'Surface change', timeseries: 'Time series' };
@@ -11,7 +11,7 @@ function InvestigationCard({ e, onSelect }: { e: SarEvent; onSelect: (id: string
       <span className="inv-kicker">
         <span className="dot" style={{ background: CATEGORY_COLOR[e.category] }} />
         {CATEGORY_LABEL[e.category]}
-        <span className="mono faint">{e.date ? fmtDate(e.date) : 'date pending'}</span>
+        <span className="mono faint">{e.date ? fmtEventDate(e) : 'date pending'}</span>
       </span>
       <span className="inv-title">{e.title}</span>
       <span className="inv-sub">

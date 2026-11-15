@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import type { SarEvent, SarLayer } from '../types';
-import { MONTHS, fmtDate, layerLabel, parseUTC } from '../lib';
+import { MONTHS, fmtEventDate, layerLabel, parseUTC } from '../lib';
 
 interface Props {
   event: SarEvent;
@@ -97,7 +97,7 @@ function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
           {evT && (
             <g>
               <line x1={X(evT)} x2={X(evT)} y1={8} y2={rowY + 8} stroke="#ffffff" strokeDasharray="3 3" opacity={0.7} />
-              <text className="ev-label" x={evLabelX} y={14} textAnchor={evLabelLeft ? 'end' : 'start'} fontSize="12" fill="#e7e9ec" fontFamily="var(--mono)">event {fmtDate(event.date)}</text>
+              <text className="ev-label" x={evLabelX} y={14} textAnchor={evLabelLeft ? 'end' : 'start'} fontSize="12" fill="#e7e9ec" fontFamily="var(--mono)">event {fmtEventDate(event)}</text>
             </g>
           )}
           {spans.map(({ l, a, b }, i) => {

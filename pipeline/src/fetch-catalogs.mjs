@@ -109,6 +109,27 @@ const TSUNAMI_CAUSE = {
 };
 const TSUNAMI_VALIDITY = { '-1': 'erroneous', 0: 'event only', 1: 'very doubtful', 2: 'questionable', 3: 'probable', 4: 'definite' };
 
+/** Cause codes whose cause is established and involves an earthquake (2 = "questionable earthquake" is not). */
+const QUAKE_CAUSES = new Set([1, 3, 4, 6]);
+
+/**
+ * Title of a tsunami record. It names what caused the tsunami: most records in the NCEI database are small
+ * tsunamis that followed a large earthquake, and a bare "Tsunami 2026 — Panama" made a major earthquake read
+ * as if it had been a tsunami only. The record stays a tsunami record (that is what NCEI catalogued).
+ */
+export function tsunamiTitle(t) {
+  const loc = t.locationName ? titleCase(String(t.locationName)) : '';
+  const country = t.country ? titleCase(String(t.country)) : '';
+  // NCEI often repeats the country inside the location name ("ISLA CAÑAS, PANAMA" + "PANAMA")
+  const place = loc && country && loc.toLowerCase().endsWith(country.toLowerCase()) ? loc : [loc, country].filter(Boolean).join(', ');
+  const where = place ? ` — ${place}` : '';
+  if (QUAKE_CAUSES.has(t.causeCode)) return `Tsunami after ${isNum(t.magnitude) ? `M ${t.magnitude}` : 'an'} earthquake, ${t.year}${where}`;
+  if (t.causeCode === 5) return `Tsunami after a volcanic eruption, ${t.year}${where}`;
+  if (t.causeCode === 7) return `Tsunami after a landslide, ${t.year}${where}`;
+  if (t.causeCode === 8) return `Meteotsunami (weather-driven), ${t.year}${where}`;
+  return `Tsunami ${t.year}${where}`;
+}
+
 /** NOAA NCEI Global Historical Tsunami Database (hazel API) source events. Keeps validity >= 2. */
 export function normalizeTsunamis(items, { minValidity = 2, minYear = 1900 } = {}) {
   const out = [];
@@ -118,7 +139,6 @@ export function normalizeTsunamis(items, { minValidity = 2, minYear = 1900 } = {
     const { date, date_precision } = isoFromParts(t);
     if (!date) continue;
     const cause = TSUNAMI_CAUSE[t.causeCode] ?? 'Unknown';
-    const place = [t.locationName, t.country].filter(Boolean).map(titleCase).join(', ');
     const notes = [
       `Cause: ${cause}`,
       `Validity: ${TSUNAMI_VALIDITY[t.eventValidity] ?? 'n/a'}`,
@@ -128,7 +148,7 @@ export function normalizeTsunamis(items, { minValidity = 2, minYear = 1900 } = {
     ].filter(Boolean).join('. ');
     const ev = {
       id: `ncei-tsu-${t.id}`,
-      title: `Tsunami ${t.year}${place ? ` — ${place}` : ''}`,
+      title: tsunamiTitle({ year: t.year, causeCode: t.causeCode, magnitude: t.eqMagnitude, locationName: t.locationName, country: t.country }),
       category: 'tsunami',
       date,
       date_precision,

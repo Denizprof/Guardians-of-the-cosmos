@@ -1,5 +1,5 @@
 import type { CompareMode, SarEvent, SarLayer } from '../types';
-import { CATEGORY_COLOR, CATEGORY_LABEL, EVIDENCE_LABEL, evidenceOf, safeHref, fmtCoord, fmtDate, fmtDateTime, layerLabel } from '../lib';
+import { CATEGORY_COLOR, CATEGORY_LABEL, EVIDENCE_LABEL, evidenceOf, safeHref, fmtCoord, fmtDate, fmtDateTime, fmtEventDate, layerLabel } from '../lib';
 import { CONCEPTS, EVENT_CONTENT } from '../content/explain';
 import { Suspense, lazy, memo, useState } from 'react';
 import { IconChevron, IconClose } from './icons';
@@ -204,7 +204,7 @@ function EventPanel(p: Props) {
         <div className="kicker">
           <span className="dot" style={{ background: color }} />
           <span className="kicker-text">
-            {CATEGORY_LABEL[ev.category]} · {ev.date ? fmtDate(ev.date) : 'date pending'} · <span className="mono">{fmtCoord(ev.location.lon, ev.location.lat)}</span>
+            {CATEGORY_LABEL[ev.category]} · {ev.date ? fmtEventDate(ev) : 'date pending'} · <span className="mono">{fmtCoord(ev.location.lon, ev.location.lat)}</span>
           </span>
           <button className="close mobile-only" onClick={p.onToggleCollapsed} aria-label={p.collapsed ? 'Expand panel' : 'Collapse panel'}>
             <IconChevron up={p.collapsed} />
