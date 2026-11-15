@@ -46,13 +46,15 @@ use_bf16 = device == "cuda" and torch.cuda.is_bf16_supported()
 amp_dtype = torch.bfloat16 if use_bf16 else torch.float16
 if args.qlora:
     # 4-bit base weights (about 1.2 GB for Qwen3-1.7B) so training fits a 4 GB GPU. The LoRA adapter itself stays in fp32.
-    from peft import prepare_model_for_kbit_training
     from transformers import BitsAndBytesConfig
     model = AutoModelForCausalLM.from_pretrained(
-        args.base, device_map={"": 0},
+        args.base, device_map={"": 0}, torch_dtype=amp_dtype, low_cpu_mem_usage=True,
         quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=amp_dtype),
     )
-    model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
+    # prepare_model_for_kbit_training would upcast the 600 MB embedding matrix to fp32 (does not fit 4 GB); do the
+    # two things that matter by hand: gradient checkpointing and gradients that can reach the adapter.
+    model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    model.enable_input_require_grads()
 else:
     model = AutoModelForCausalLM.from_pretrained(args.base, torch_dtype=amp_dtype if device == "cuda" else torch.float32)
     model.to(device)
@@ -76,12 +78,23 @@ def encode(example: dict) -> dict:
     return {"input_ids": ids, "labels": labels}
 
 
+def answer_loss(batch: dict) -> torch.Tensor:
+    """Cross-entropy on the answer tokens only. The model computes logits for just the last positions (the answer
+    sits at the end of each example, batch size 1 has no padding), because logits for all ~900 positions over a
+    152k-word vocabulary alone need more memory than a 4 GB GPU has."""
+    labels = batch["labels"][0]
+    n = int((labels != -100).sum().item())
+    out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], logits_to_keep=n + 1)
+    logits = out.logits[0, :-1].float()
+    return torch.nn.functional.cross_entropy(logits, batch["input_ids"][0, -n:])
+
+
 def batches(rows: list[dict], size: int):
     for i in range(0, len(rows), size):
         chunk = rows[i:i + size]
         # round the length up to a multiple of 128: a handful of tensor shapes instead of hundreds keeps the GPU
         # memory pool from fragmenting (see the note at the empty_cache call in the training loop)
-        width = -(-max(len(r["input_ids"]) for r in chunk) // 128) * 128
+        width = max(len(r["input_ids"]) for r in chunk) if size == 1 else -(-max(len(r["input_ids"]) for r in chunk) // 128) * 128
         pad = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
         yield {
             "input_ids": torch.tensor([r["input_ids"] + [pad] * (width - len(r["input_ids"])) for r in chunk], device=device),
@@ -109,7 +122,7 @@ def val_loss() -> float:
     total, count = 0.0, 0
     for batch in batches(val, args.batch):
         with torch.autocast(device_type=device, dtype=amp_dtype, enabled=device == "cuda"):
-            total += model(**batch).loss.item()
+            total += (answer_loss(batch) if args.batch == 1 else model(**batch).loss).item()
         count += 1
     model.train()
     return total / max(1, count)
@@ -127,7 +140,7 @@ while step < total_steps:
     for n, batch in enumerate(batches(rows, args.batch), start=1):
         began = time.time()
         with torch.autocast(device_type=device, dtype=amp_dtype, enabled=device == "cuda"):
-            loss = model(**batch).loss
+            loss = answer_loss(batch) if args.batch == 1 else model(**batch).loss
         scaler.scale(loss / args.accum).backward()
         running += loss.item()
         # Examples of different lengths fragment PyTorch's memory pool. On Windows the pool then quietly spills into

@@ -49,7 +49,7 @@ if args.qlora:
     # 4-bit base so it fits a 4 GB GPU; the adapter is applied on top without merging
     from transformers import BitsAndBytesConfig
     model = AutoModelForCausalLM.from_pretrained(
-        args.base, device_map={"": 0},
+        args.base, device_map={"": 0}, torch_dtype=half, low_cpu_mem_usage=True,
         quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=half),
     )
 else:

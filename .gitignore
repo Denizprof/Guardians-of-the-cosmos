@@ -30,3 +30,5 @@ assistant-model/.venv/
 assistant-model/*.log
 assistant-model/*.err
 assistant-model/adapters/
+assistant-model/base/
+assistant-model/dl*.ps1
