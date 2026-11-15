@@ -161,11 +161,12 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["lon", "lat", "total", "granules"],
-          "description": "Real NISAR acquisitions over the clicked point (ASF search). granules may be truncated; total is the full count.",
+          "description": "Real NISAR acquisitions over the clicked point (ASF search). granules may be cut to the newest few; total is the number of products listed; when truncated is true the search hit its row limit and more exist.",
           "properties": {
             "lon": { "type": "number" },
             "lat": { "type": "number" },
             "total": { "type": "integer", "minimum": 0 },
+            "truncated": { "type": "boolean" },
             "granules": {
               "type": "array",
               "maxItems": 50,

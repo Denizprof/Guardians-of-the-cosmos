@@ -2,7 +2,8 @@
  * Turkish translations, keyed by the exact English text the app renders (whitespace collapsed).
  * A string missing here stays in English. Proper names, product codes and data citations are kept as they are.
  */
-export const TR: Record<string, string> = {
+// No prototype: a lookup such as TR['constructor'] must miss, not return an inherited Object member.
+export const TR: Record<string, string> = Object.assign(Object.create(null) as Record<string, string>, {
   // ---- App shell and top bar
   'Earth change explorer': 'Dünya değişim gezgini',
   'Investigations': 'Araştırmalar',
@@ -276,6 +277,8 @@ export const TR: Record<string, string> = {
   'Simulation': 'Simülasyon',
   'PROVISIONAL': 'GEÇİCİ',
   'VALIDATED': 'DOĞRULANMIŞ',
+  'UNKNOWN': 'BİLİNMİYOR',
+  'unknown': 'bilinmiyor',
   'BETA': 'BETA',
   'WHAT HAPPENED': 'NE OLDU',
   'WHAT THE RADAR SEES': 'RADARIN GÖRDÜĞÜ',
@@ -308,7 +311,6 @@ export const TR: Record<string, string> = {
   '· water mask': '· su maskesi',
   'now': 'şu anda',
   'NISAR layers': 'NISAR katmanı',
-  'NISAR scenes': 'NISAR sahnesi',
   'at': '·',
   'Set': 'Ayarlayın:',
   'with the Vite proxy, or': 'Vite vekil sunucusuyla, ya da',
@@ -452,6 +454,8 @@ export const TR: Record<string, string> = {
   'not available': 'mevcut değil',
   'Weather service returned an unexpected response': 'Hava durumu servisi beklenmeyen bir yanıt döndürdü',
   'Weather request failed': 'Hava durumu isteği başarısız oldu',
+  'Could not get weather data:': 'Hava durumu verileri alınamadı:',
+  'The weather service returned no values for this place and time': 'Hava durumu servisi bu yer ve zaman için hiçbir değer döndürmedi',
   'Open-Meteo historical weather (ECMWF ERA5 reanalysis)': 'Open-Meteo geçmiş hava durumu (ECMWF ERA5 yeniden analizi)',
   'Open-Meteo weather forecast models': 'Open-Meteo hava tahmin modelleri',
   'Meteomatics Weather API': 'Meteomatics Hava Durumu API’si',
@@ -693,6 +697,7 @@ export const TR: Record<string, string> = {
   'Earthquake and landslide': 'Deprem ve heyelan',
   'Volcano and earthquake': 'Yanardağ ve deprem',
   'Volcano, earthquake and landslide': 'Yanardağ, deprem ve heyelan',
+  'Volcano and landslide': 'Yanardağ ve heyelan',
   'Meteorological': 'Meteorolojik',
   'Explosion': 'Patlama',
   'Astronomical tide': 'Astronomik gelgit',
@@ -870,8 +875,8 @@ export const TR: Record<string, string> = {
     'Bildirilen yangın alanı (372 km²) ile radarla ölçülen ağaç örtüsü kaybı alanı (68 km²) farklı şeyleri ölçer.',
 
   // ---- Krasheninnikov (explain.ts)
-  'Eleven NISAR passes on the same orbit, 12 days apart, from 18 June to 28 October 2026, processed by us at full resolution (about 20 m). Step through them on the timeline.':
-    '18 Haziran – 28 Ekim 2026 arasında, aynı yörüngede, 12 gün arayla on bir NISAR geçişi; tarafımızdan tam çözünürlükte (yaklaşık 20 m) işlendi. Zaman çizelgesinde aralarında gezinin.',
+  'Eleven NISAR passes on the same orbit from 18 June to 28 October 2026, 12 days apart except for one 24-day gap (24 July to 17 August), processed by us at full resolution (about 20 m). Step through them on the timeline.':
+    '18 Haziran – 28 Ekim 2026 arasında, aynı yörüngede on bir NISAR geçişi; 24 günlük tek bir boşluk (24 Temmuz – 17 Ağustos) dışında 12 gün arayla; tarafımızdan tam çözünürlükte (yaklaşık 20 m) işlendi. Zaman çizelgesinde aralarında gezinin.',
   'Look at the pale fan on the east side of the summit cone: that is where the Kamchatka volcano observatory (KVERT) reported lava flowing.':
     'Zirve konisinin doğu tarafındaki soluk yelpazeye bakın: Kamçatka yanardağ gözlemevinin (KVERT) lav aktığını bildirdiği yer orası.',
   'Radar keeps watching through cloud and polar night, which is common over Kamchatka.':
@@ -898,6 +903,15 @@ export const TR: Record<string, string> = {
   "on the event day": "olay gününde",
   "This section could not be loaded. Check your connection and try again.": "Bu bölüm yüklenemedi. Bağlantınızı denetleyip yeniden deneyin.",
   "The event date is not known to the day, so there is no time window to search.": "Olayın tarihi gün düzeyinde bilinmiyor, bu yüzden aranacak bir zaman aralığı yok.",
+  // ---- Second audit round: day-precision weather, timeline event marker
+  'Precipitation, event day (UTC)': 'Yağış, olay günü (UTC)',
+  'This event is dated to the day only. Rain is the total for that UTC day; temperature, wind and pressure are one sample at the end of that day.':
+    'Bu olayın tarihi yalnızca gün düzeyinde biliniyor. Yağış, o UTC gününün toplamıdır; sıcaklık, rüzgâr ve basınç ise o günün sonunda alınmış tek bir örnektir.',
+  '(off scale)': '(ölçek dışı)',
+  'The event date is before the first pass shown. Its line at the edge is not drawn to scale.': 'Olay tarihi, gösterilen ilk geçişten önce. Kenardaki çizgisi ölçeğe göre çizilmemiştir.',
+  'The event date is after the last pass shown. Its line at the edge is not drawn to scale.': 'Olay tarihi, gösterilen son geçişten sonra. Kenardaki çizgisi ölçeğe göre çizilmemiştir.',
+  'The event date is known only to the month. The band covers the whole month.': 'Olay tarihi yalnızca ay düzeyinde biliniyor. Bant, ayın tamamını kapsar.',
+  'The event date is known only to the year. The band covers the whole year.': 'Olay tarihi yalnızca yıl düzeyinde biliniyor. Bant, yılın tamamını kapsar.',
   // ---- Interactive tutorial (components/Tutorial.tsx)
   'Close': 'Kapat',
   "Interactive tutorial": "Etkileşimli eğitim",
@@ -1153,25 +1167,34 @@ export const TR: Record<string, string> = {
     'Bulutları temizlenmiş bir yıllık Sentinel-2 görüntüsünden yapılmış renkli bir arazi resmi. Bir renk ölçeği yok: bilginin kendisi resimdir.',
   'No colour key applies. EOX states the mosaics favour visual clarity and consistency over spectral accuracy.':
     'Renk anahtarı yok. EOX, mozaiklerin spektral doğruluk yerine görsel netliği ve tutarlılığı öne çıkardığını belirtiyor.',
-};
+});
 
-/** Rules for text that carries numbers or names. First match wins. */
+/**
+ * Rules for text that carries numbers or names. First match wins.
+ * The three label rules ("N observations of X", "About X", "X investigation") apply only when X is a known
+ * title, so ordinary sentences that happen to have that shape are left as they are.
+ */
 export const TR_PATTERNS: [RegExp, string | ((...m: string[]) => string)][] = [
   [/^Wildfire in (.+?) (\d+)$/, 'Orman yangını, $1 $2'],
   [/^Wildfire in (.+)$/, 'Orman yangını, $1'],
   [/^Prescribed Fire (.+)$/, 'Kontrollü yakma $1'],
   [/^(\d+) NISAR layers?$/, '$1 NISAR katmanı'],
-  [/^(\d+) NISAR scenes?$/, '$1 NISAR sahnesi'],
+  [/^(.+) · (.+) · (\d+) NISAR layers?$/, (_a, k, t, n) => `${TR[k] ?? k} · ${TR[t] ?? t} · ${n} NISAR katmanı`],
   [/^(.+) · (\d+) NISAR layers?$/, (_a, k, n) => `${TR[k] ?? k} · ${n} NISAR katmanı`],
-  [/^(.+) · (.+) · (\d+) NISAR scenes?$/, (_a, k, t, n) => `${TR[k] ?? k} · ${TR[t] ?? t} · ${n} NISAR sahnesi`],
+  [/^The linked investigation "(.+)" was not found\.$/, 'Bağlantıdaki "$1" araştırması bulunamadı.'],
+  // live NCEI tsunami record: "Volcano and landslide (code 7)"
+  [/^(.+) \(code (\d+)\)$/, (a, x, n) => (TR[x] ? `${TR[x]} (kod ${n})` : a)],
+  [/^(.+) request timed out$/, '$1 isteği zaman aşımına uğradı'],
+  [/^Could not reach the ASF search service \((.+)\)\. The curated investigations still work offline\.$/,
+    (_a, m) => `ASF arama servisine ulaşılamadı (${m.replace(/^ASF search timed out after (\d+) s$/, 'ASF araması $1 sn sonra zaman aşımına uğradı').replace(/^ASF search failed \(HTTP (\d+)\)$/, 'ASF araması başarısız oldu (HTTP $1)')}). Seçilmiş araştırmalar çevrimdışı da çalışır.`],
   [/^Satellite layers \((\d+)\)$/, 'Uydu katmanları ($1)'],
   [/^After opacity (\d+)%$/, 'Sonraki görüntünün saydamlığı %$1'],
-  [/^(\d+) observations? of (.+)$/, (_a, n, x) => `${TR[x] ?? x}: ${n} gözlem`],
-  [/^About (.+)$/, (_a, x) => `${TR[x] ?? x} hakkında`],
+  [/^(\d+) observations? of (.+)$/, (a, n, x) => (TR[x] ? `${TR[x]}: ${n} gözlem` : a)],
+  [/^About (.+)$/, (a, x) => (TR[x] ? `${TR[x]} hakkında` : a)],
   [/^Colour legend: (.+)$/, (_a, x) => `Renk açıklaması: ${TR[x] ?? x}`],
   [/^Annotation (\d+): (.+)$/, (_a, n, x) => `Not ${n}: ${TR[x] ?? x}`],
   [/^Show (.+) types$/, (_a, x) => `${TR[x] ?? x} türlerini göster`],
-  [/^(.+) investigation$/, (_a, x) => `${TR[x] ?? x} araştırması`],
+  [/^(.+) investigation$/, (a, x) => (TR[x] ? `${TR[x]} araştırması` : a)],
   [/^(.+) (date|opacity)$/, (_a, x, k) => (TR[x] ? `${TR[x]} ${k === 'date' ? 'tarihi' : 'saydamlığı'}` : `${x} ${k}`)],
   [/^GCOV validity mask applied: samples flagged 0 \(not from fully-focused radar samples\) or 255 \(outside the swath\) set to no-data \(([\d.]+) % of pixels\)\.$/,
     'GCOV geçerlilik maskesi uygulandı: 0 (tam odaklanmış radar örneklerinden değil) ya da 255 (tarama şeridinin dışında) işaretli örnekler veri yok olarak ayarlandı (piksellerin %$1’i).'],

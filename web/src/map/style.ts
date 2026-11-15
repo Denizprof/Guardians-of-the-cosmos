@@ -1,6 +1,7 @@
 import type { StyleSpecification } from 'maplibre-gl';
 import { HIRES_URL } from './hires';
 import { LENS_RASTER_PAINT, SAR_LENS_SOURCE, lensTileUrls } from './sarLens';
+import { withLensLoader } from './lensTiles';
 
 // ---------------------------------------------------------------------------------------------
 // "Google Earth" style: photoreal satellite globe + 3D terrain + thin borders and labels on top.
@@ -181,7 +182,7 @@ export function lensStyle(): StyleSpecification {
       dem: STYLE.sources.dem,
       openmaptiles: STYLE.sources.openmaptiles,
       ...Object.fromEntries(
-        urls.map((u) => [`lens-${u.id}`, { type: 'raster', tiles: [u.url], tileSize: u.tileSize, minzoom: u.minzoom, maxzoom: u.maxzoom, attribution: src.attribution }])
+        urls.map((u) => [`lens-${u.id}`, { type: 'raster', tiles: [withLensLoader(u.url)], tileSize: u.tileSize, minzoom: u.minzoom, maxzoom: u.maxzoom, attribution: src.attribution }])
       ),
     },
     layers: [

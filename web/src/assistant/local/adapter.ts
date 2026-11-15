@@ -35,7 +35,11 @@ export interface Engine {
 const SELF_ID = 'kb:app-assistant';
 /** Words that point at what is on screen ("what is this?", "what does the radar show here?"). */
 const DEICTIC = /\b(this|these|here|looking at|shown|am i seeing|bu|bunu|buna|burada|burasi|gordugum)\b/;
-const GREETING = /^(hi|hello|hey|good (morning|afternoon|evening)|thanks|thank you|merhaba|selam|gunaydin|iyi (gunler|aksamlar)|tesekkurler|tesekkur ederim|sag ol)\b[\s!.,]*$/;
+/** A question that names the app or the assistant ("what is this app?", "bu uygulama nedir?") is about the app,
+ *  not about what is on screen. tokens() maps app, website, site, page, tool, uygulama, sayfa... to "app". */
+const namesApp = (q: string) => tokens(q).some((x) => x === 'app' || x === 'assistant' || x === 'chatbot' || x === 'asistan');
+const pointsAtView = (q: string) => DEICTIC.test(fold(q)) && !namesApp(q);
+const GREETING =/^(hi|hello|hey|good (morning|afternoon|evening)|thanks|thank you|merhaba|selam|gunaydin|iyi (gunler|aksamlar)|tesekkurler|tesekkur ederim|sag ol)\b[\s!.,]*$/;
 
 const TEXT = {
   en: {
@@ -103,11 +107,11 @@ export class LocalAssistantAdapter implements AssistantAdapter {
   async prepare(req: AssistantRequest): Promise<AssistantRequest> {
     let index: KbIndex;
     try { index = await this.kb(); } catch { return req; }
-    const lang = detectLang(req.query);
+    const lang = detectLang(req.query, req.locale);
     const greeting = GREETING.test(fold(req.query.trim()));
     let hits = greeting ? index.docs.filter((d) => d.record.id === SELF_ID).map((d) => ({ record: d.record, score: 0 })) : retrieve(index, req.query, 3);
     const eventId = req.context.event?.id;
-    if (!greeting && eventId && DEICTIC.test(fold(req.query))) {
+    if (!greeting && eventId && pointsAtView(req.query)) {
       // A question about "this" while an investigation is open is about that investigation: use its own records
       // (what the radar shows, the limits of the analysis...), or none, so the open investigation itself answers.
       const prefix = `kb:event-${eventId}-`;
@@ -123,7 +127,7 @@ export class LocalAssistantAdapter implements AssistantAdapter {
   }
 
   async query(req: AssistantRequest, signal?: AbortSignal): Promise<AssistantResponse> {
-    const lang: Lang = detectLang(req.query);
+    const lang: Lang = detectLang(req.query, req.locale);
     const t = TEXT[lang];
     const kb: Source[] = (req.context.knowledge ?? []).map((k) => ({ id: k.citation_id, text: k.text, label: `${k.title} (${k.source_label})`, url: k.url, type: 'reference' }));
     const view = rankView(contextSources(req.context), req.query, !!req.context.event);
@@ -135,7 +139,7 @@ export class LocalAssistantAdapter implements AssistantAdapter {
     // Without a model, an item of the view may answer only a question that is about the view: one that points
     // at it ("what is this?") or shares a word with it. Otherwise an unrelated question would get the open
     // investigation's description as its "answer".
-    const aboutView = DEICTIC.test(fold(req.query)) || viewOverlap(view[0], req.query) > 0;
+    const aboutView = pointsAtView(req.query) ||viewOverlap(view[0], req.query) > 0;
     const quoted = quote(kb, aboutView ? view : []);
     const respond = (p: Parsed, note: string): AssistantResponse => ({
       version: CONTRACT_VERSION,

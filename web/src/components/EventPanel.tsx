@@ -334,7 +334,7 @@ function EventPanel(p: Props) {
 
         <div className="section">
           {/* a date known only to the year/month cannot give a weather time: ask for current conditions instead */}
-          <WeatherSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={coarseDate ? null : ev.date} />
+          <WeatherSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={coarseDate ? null : ev.date} precision={ev.date_precision} />
         </div>
 
         <div className="section">

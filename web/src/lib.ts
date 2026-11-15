@@ -205,7 +205,7 @@ export function parseCoords(q: string): [number, number] | null {
   for (const p of parts) {
     const last = tokens[tokens.length - 1];
     // a lone letter suffixes the previous number only if that number has no hemisphere yet
-    if (/^[NSEW]$/i.test(p) && tokens.length && /\d$/.test(last) && !/[NSEW]/i.test(last)) tokens[tokens.length - 1] += p;
+    if (/^[NSEW]$/i.test(p) && tokens.length && /\d°?$/.test(last) && !/[NSEW]/i.test(last)) tokens[tokens.length - 1] += p;
     else if (tokens.length && /^[NSEW]$/i.test(tokens[tokens.length - 1])) tokens[tokens.length - 1] += p;
     else tokens.push(p);
   }

@@ -17,7 +17,8 @@ interface Props {
   coverageState: 'idle' | 'loading' | 'error';
   coverageError: string | null;
   coverageMode: boolean;
-  probe: { lon: number; lat: number; date: string | null } | null;
+  /** `precision` is the date_precision of the record the probe was started from (absent for a click on the map). */
+  probe: { lon: number; lat: number; date: string | null; precision?: string | null } | null;
   collapsed: boolean;
   onSelect: (id: string) => void;
   onCoverageMode: (v: boolean) => void;
@@ -47,7 +48,8 @@ function Coverage({ c, selectedScene, onSelectScene }: { c: CoverageResult; sele
   const sel = selIndex >= 0 ? c.granules[selIndex] : null;
   const byTier = c.granules.reduce<Record<string, number>>((m, g) => ((m[g.tier] = (m[g.tier] ?? 0) + 1), m), {});
   const byProduct = c.granules.reduce<Record<string, number>>((m, g) => ((m[g.product] = (m[g.product] ?? 0) + 1), m), {});
-  const tracks = new Set(c.granules.map((g) => `${g.track}${g.direction[0]}`));
+  // a product whose track number was unusable (services.ts leaves it empty) is not an orbit track of its own
+  const tracks = new Set(c.granules.filter((g) => g.track != null).map((g) => `${g.track}${g.direction[0]}`));
   return (
     <div className="section">
       <h3 style={{ margin: 0 }}>NISAR data at this point</h3>
@@ -104,7 +106,7 @@ function Coverage({ c, selectedScene, onSelectScene }: { c: CoverageResult; sele
               )}
               <div className="mono">{fmtDate(sel.start)} <span className="faint">{sel.start.slice(11, 16)} UTC</span></div>
               <div className="muted fine">
-                {sel.product} · track {sel.track} {sel.direction.toLowerCase()} · frame {sel.frame} · <span className={`tier ${sel.tier.split(' ')[0]}`}>{sel.tier}</span>
+                {sel.product} · track {sel.track ?? '–'} {sel.direction.toLowerCase()} · frame {sel.frame ?? '–'} · <span className={`tier ${sel.tier.split(' ')[0]}`}>{sel.tier}</span>
               </div>
               <p className="faint fine" style={{ margin: '6px 0 0' }}>
                 The map shows this product only: its footprint outline and this picture, placed on the footprint's bounding box (approximate, about a kilometre). NASA browse rendering: for looking, not measuring.
@@ -121,7 +123,7 @@ function Coverage({ c, selectedScene, onSelectScene }: { c: CoverageResult; sele
                   <span>
                     <span className="mono" style={{ display: 'block' }}>{fmtDate(g.start)} <span className="faint">{g.start.slice(11, 16)} UTC</span></span>
                     <span className="muted fine" style={{ display: 'block' }}>
-                      {g.product} · track {g.track} {g.direction.toLowerCase()} · frame {g.frame}
+                      {g.product} · track {g.track ?? '–'} {g.direction.toLowerCase()} · frame {g.frame ?? '–'}
                     </span>
                     <span className={`tier ${g.tier.split(' ')[0]}`}>{g.tier}</span>
                   </span>
@@ -185,7 +187,7 @@ function IntroPanel(p: Props) {
 
         {p.probe && (
           <div className="section">
-            <WeatherSection key={`${p.probe.lon},${p.probe.lat},${p.probe.date}`} lon={p.probe.lon} lat={p.probe.lat} date={p.probe.date} />
+            <WeatherSection key={`${p.probe.lon},${p.probe.lat},${p.probe.date},${p.probe.precision ?? ''}`} lon={p.probe.lon} lat={p.probe.lat} date={p.probe.date} precision={p.probe.precision} />
           </div>
         )}
 
@@ -212,7 +214,7 @@ function IntroPanel(p: Props) {
                   <span className="dot" style={{ background: CATEGORY_COLOR[e.category] }} />
                   <span className="inv-title">{e.title}</span>
                   <span className="what">
-                    {CATEGORY_LABEL[e.category]} · {TECHNIQUE[e.technique]} · {e.layers.length} NISAR scenes
+                    {CATEGORY_LABEL[e.category]} · {TECHNIQUE[e.technique]} · {e.layers.length} NISAR layers
                   </span>
                 </button>
               ))}

@@ -25,7 +25,8 @@ function matchesType(v, t) {
 
 function resolveRef(root, ref) {
   if (!ref.startsWith('#/')) throw new Error(`Unsupported $ref ${ref}`);
-  return ref.slice(2).split('/').reduce((n, k) => n?.[k], root);
+  // Own properties only: "#/$defs/constructor" must not resolve to an Object.prototype member.
+  return ref.slice(2).split('/').reduce((n, k) => (n !== null && typeof n === 'object' && Object.hasOwn(n, k) ? n[k] : undefined), root);
 }
 
 export function validate(schema, value, root = schema, path = '', errors = []) {
@@ -62,12 +63,13 @@ export function validate(schema, value, root = schema, path = '', errors = []) {
   }
   if (typeOf(value) === 'object') {
     for (const key of schema.required ?? []) {
-      if (!(key in value)) errors.push(`${path ? path + '.' : ''}${key}: required`);
+      if (!Object.hasOwn(value, key)) errors.push(`${path ? path + '.' : ''}${key}: required`);
     }
     const props = schema.properties ?? {};
     for (const [key, v] of Object.entries(value)) {
       const p = path ? `${path}.${key}` : key;
-      if (key in props) validate(props[key], v, root, p, errors);
+      // Own properties only: `in` would treat "constructor", "toString" or "__proto__" as declared.
+      if (Object.hasOwn(props, key)) validate(props[key], v, root, p, errors);
       else if (schema.additionalProperties === false) errors.push(`${p}: unknown property`);
       else if (typeof schema.additionalProperties === 'object') validate(schema.additionalProperties, v, root, p, errors);
     }

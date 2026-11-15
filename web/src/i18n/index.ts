@@ -44,6 +44,8 @@ export function onLangChange(f: (l: Lang) => void): () => void {
   return () => listeners.delete(f);
 }
 
+const MISSING_CAP = 500;
+
 const TR_MONTHS: Record<string, string> = {
   Jan: 'Oca', Feb: 'Şub', Mar: 'Mar', Apr: 'Nis', May: 'May', Jun: 'Haz',
   Jul: 'Tem', Aug: 'Ağu', Sep: 'Eyl', Oct: 'Eki', Nov: 'Kas', Dec: 'Ara',
@@ -71,9 +73,13 @@ export function translate(text: string, lang: Lang = current): string {
     if (d !== core) out = d;
   }
   if (out === undefined) {
-    // Untranslated text stays English; collect it so missing entries are easy to find (window.__i18nMissing).
-    const w = globalThis as { __i18nMissing?: Set<string> };
-    (w.__i18nMissing ??= new Set()).add(core);
+    // Untranslated text stays English. In development only, the first MISSING_CAP distinct strings are
+    // collected so missing entries are easy to find (window.__i18nMissing). Nothing is kept in a production build.
+    if (import.meta.env.DEV) {
+      const w = globalThis as { __i18nMissing?: Set<string> };
+      const missing = (w.__i18nMissing ??= new Set());
+      if (missing.size < MISSING_CAP) missing.add(core);
+    }
     return text;
   }
   return m[1] + out + m[3];

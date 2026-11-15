@@ -36,7 +36,10 @@ export function createEngine(cfg: EngineConfig, makeWorker: () => Worker = () =>
       loading = new Promise<void>((resolve, reject) => {
         set({ phase: 'loading', progress: 0 });
         try { worker = makeWorker(); } catch (e) { loading = null; set({ phase: 'error', detail: 'The model could not be started in this browser.' }); return reject(e as Error); }
-        worker.onmessage = (ev: MessageEvent<WorkerOut>) => {
+        // Handlers belong to this worker only: a late message from a worker that was already replaced is ignored.
+        const w = worker;
+        w.onmessage = (ev: MessageEvent<WorkerOut>) => {
+          if (w !== worker) return;
           const m = ev.data;
           if (m.type === 'progress') set({ phase: 'loading', progress: m.progress, detail: m.detail });
           else if (m.type === 'ready') { set({ phase: 'ready' }); resolve(); }
@@ -49,11 +52,15 @@ export function createEngine(cfg: EngineConfig, makeWorker: () => Worker = () =>
             pending.delete(m.id);
           }
         };
-        worker.onerror = (ev) => {
+        w.onerror = (ev) => {
+          if (w !== worker) return;
           const err = new Error(ev.message || 'model worker failed');
           pending.forEach((p) => p.reject(err));
           pending.clear();
           loading = null;
+          // An uncaught error does not stop a worker: stop it, or a retry would load a second copy of the model next to it.
+          w.terminate();
+          worker = null;
           set({ phase: 'error', detail: err.message.slice(0, 300) });
           reject(err);
         };

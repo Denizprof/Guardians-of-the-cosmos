@@ -9,7 +9,7 @@ interface Props {
   event: ContextEvent;
   collapsed: boolean;
   /** Run the NISAR coverage probe + NASA Earthdata search at this event's place and date. */
-  onCheckCoverage: (lon: number, lat: number, date: string | null) => void;
+  onCheckCoverage: (lon: number, lat: number, date: string | null, precision?: string | null) => void;
   onClose: () => void;
   onToggleCollapsed: () => void;
 }
@@ -107,7 +107,7 @@ function ContextPanel({ event: ev, collapsed, onCheckCoverage, onClose, onToggle
           )}
           <div className="actions">
             {/* a date known only to the year/month cannot anchor a ±days search window: search without one */}
-            <button type="button" className="btn primary" onClick={() => onCheckCoverage(ev.lon, ev.lat, isCoarseDate(ev.date_precision) ? null : (ev.date ?? null))}>
+            <button type="button" className="btn primary" onClick={() => onCheckCoverage(ev.lon, ev.lat, isCoarseDate(ev.date_precision) ? null : (ev.date ?? null), ev.date_precision)}>
               Satellite data here?
             </button>
             {href && (

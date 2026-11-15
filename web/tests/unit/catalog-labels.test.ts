@@ -41,8 +41,30 @@ describe('earthquakes are shown as earthquakes', () => {
   });
 
   it('a tsunami with another or an uncertain cause is not called an earthquake', () => {
-    for (const e of tsunamis.filter((t) => /^Cause: (Meteorological|Landslide|Volcano|Unknown|Questionable earthquake|Explosion|Astronomical tide)\./.test(t.notes ?? ''))) {
+    for (const e of tsunamis.filter((t) => /^Cause: (Meteorological|Landslide|Volcano|Volcano and landslide|Unknown|Questionable earthquake|Explosion|Astronomical tide)\./.test(t.notes ?? ''))) {
       expect(e.title, e.id).not.toMatch(/earthquake/i);
+    }
+  });
+
+  // Regression: the NCEI cause table was shifted from code 5 upward, so the shipped catalog called the Hunga Tonga
+  // eruption an earthquake tsunami and the Karrat Fjord landslide a meteotsunami.
+  it('well-known tsunamis carry the cause NOAA gives them', () => {
+    const byId = (id: string) => tsunamis.find((e) => e.id === id);
+    const tonga = byId('ncei-tsu-5824'); // Hunga Tonga, 15 Jan 2022: NCEI cause code 6 (volcano)
+    expect(tonga?.notes).toMatch(/^Cause: Volcano\. /);
+    expect(tonga?.title).toMatch(/^Tsunami after a volcanic eruption, 2022/);
+    const karrat = byId('ncei-tsu-5651'); // Karrat Fjord, 2017: code 8 (landslide)
+    expect(karrat?.notes).toMatch(/^Cause: Landslide\. /);
+    expect(karrat?.title).toMatch(/^Tsunami after a landslide, 2017/);
+    const krakatau = byId('ncei-tsu-5699'); // Anak Krakatau, 2018: code 7 (volcano and landslide)
+    expect(krakatau?.notes).toMatch(/^Cause: Volcano and landslide\. /);
+    expect(krakatau?.title).toMatch(/^Tsunami after a volcanic landslide, 2018/);
+    // a title never says more than the stored cause
+    for (const e of tsunamis) {
+      const cause = /^Cause: ([^.]+)\./.exec(e.notes ?? '')?.[1];
+      if (/^Meteotsunami/.test(e.title)) expect(cause, e.id).toBe('Meteorological');
+      if (/volcanic eruption/.test(e.title)) expect(cause, e.id).toBe('Volcano');
+      if (/after a landslide/.test(e.title)) expect(cause, e.id).toBe('Landslide');
     }
   });
 

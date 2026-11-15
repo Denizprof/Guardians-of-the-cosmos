@@ -193,7 +193,9 @@ export function attachSatellite(map: MlMap, host: HTMLElement, opts: SatelliteOp
     raf = 0;
     if (removed) return;
     if (!document.hidden && now - lastDraw > 30) { lastDraw = now; draw(); }
-    if (!opts.still() && mesh && map.getZoom() < MAX_ZOOM) raf = requestAnimationFrame(tick);
+    // the draw above is throttled, so the loop may end on a frame that drew nothing: hide before stopping
+    if (map.getZoom() >= MAX_ZOOM) hide();
+    else if (!opts.still() && mesh) raf = requestAnimationFrame(tick);
   };
   const kick = () => { if (!raf && !removed) raf = requestAnimationFrame(tick); };
   const onMove = () => (opts.still() ? draw() : kick());

@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import type { SarEvent, SarLayer } from '../types';
-import { MONTHS, fmtEventDate, layerLabel, parseUTC } from '../lib';
+import { MONTHS, fmtEventDate, isCoarseDate, layerLabel, parseUTC } from '../lib';
 
 interface Props {
   event: SarEvent;
@@ -34,7 +34,16 @@ function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
     b: t((l.acquisition.secondary || l.acquisition.start)!),
   }));
   const evT = event.date ? t(event.date) : null;
-  const allT = spans.flatMap((s) => [s.a, s.b]).concat(evT ? [evT] : []);
+  // The acquisitions set the scale. An event date joins it only when it is known to the day and lies inside
+  // the acquisitions or close to them: a date a year away would squeeze every pass into a few pixels, so it is
+  // pinned at the edge and labelled "off scale" instead. A date known only to the month or year is drawn as a
+  // band over that whole period (a line would invent a day) and never stretches the axis.
+  const obsT = spans.flatMap((s) => [s.a, s.b]);
+  const coarse = evT !== null && isCoarseDate(event.date_precision);
+  const obsLo = Math.min(...obsT), obsHi = Math.max(...obsT);
+  const near = Math.max((obsHi - obsLo) * 0.25, 12 * 864e5); // a quarter of the series, at least one 12-day repeat
+  const evInScale = evT !== null && !coarse && (!obsT.length || (evT >= obsLo - near && evT <= obsHi + near));
+  const allT = obsT.length ? (evInScale ? obsT.concat([evT!]) : obsT) : evT !== null ? [evT] : [];
   const pad = (Math.max(...allT) - Math.min(...allT)) * 0.06 + 2 * 864e5;
   const lo = Math.min(...allT) - pad, hi = Math.max(...allT) + pad;
   const X = (v: number) => 12 + ((v - lo) / (hi - lo)) * (w - 24);
@@ -69,8 +78,32 @@ function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
   // The event label sits to the right of its line unless it would run past the right edge (narrow phones):
   // then it is anchored to the left of the line, and never starts before the left edge either.
   const EV_LABEL_W = 130; // "event 12 Jan 2026" in 12 px mono plus the 4 px gap
-  const evLabelLeft = evT !== null && X(evT) + EV_LABEL_W > w;
-  const evLabelX = evT === null ? 0 : evLabelLeft ? Math.max(X(evT) - 4, Math.min(EV_LABEL_W, w)) : X(evT) + 4;
+  // Coarse date: the extent of its month or year, clipped to the axis.
+  let band: { x: number; width: number } | null = null;
+  let evOff: 'before' | 'after' | null = null;
+  if (evT !== null && coarse) {
+    const dt = new Date(evT), y = dt.getUTCFullYear(), mo = dt.getUTCMonth();
+    const evA = event.date_precision === 'year' ? Date.UTC(y, 0, 1) : Date.UTC(y, mo, 1);
+    const evB = event.date_precision === 'year' ? Date.UTC(y + 1, 0, 1) : Date.UTC(y, mo + 1, 1);
+    if (evB <= lo) evOff = 'before';
+    else if (evA >= hi) evOff = 'after';
+    else band = { x: X(Math.max(lo, evA)), width: Math.max(0, X(Math.min(hi, evB)) - X(Math.max(lo, evA))) };
+  } else if (evT !== null && !evInScale) {
+    evOff = evT < obsLo ? 'before' : 'after';
+  }
+  // Where the event marker sits: its own time, the left edge of its band, or pinned at the edge when off scale.
+  const evX = evT === null ? 0 : evOff === 'before' ? 1 : evOff === 'after' ? w - 1 : band ? band.x : X(evT);
+  const evLabelLeft = evT !== null && (evOff ? evOff === 'after' : evX + EV_LABEL_W > w);
+  const evLabelX = evT === null ? 0 : evLabelLeft ? Math.max(evX - 4, Math.min(EV_LABEL_W, w)) : evX + 4;
+
+  // Single-date ticks: the hit area (16 px plus the stylesheet's 8 px transparent stroke) is narrowed when the
+  // neighbouring date is closer than that, so one date never covers the next one's tap area.
+  const singleXs = [...new Set(spans.filter((s) => s.a === s.b).map((s) => X(s.a)))].sort((p, q) => p - q);
+  const hitW = (x: number) => {
+    const i = singleXs.indexOf(x);
+    const gap = Math.min(i > 0 ? x - singleXs[i - 1] : Infinity, i < singleXs.length - 1 ? singleXs[i + 1] - x : Infinity);
+    return Math.max(1, Math.min(16, gap - 8));
+  };
 
   return (
     <div className="timeline" role="group" aria-label="Observation timeline">
@@ -94,10 +127,16 @@ function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
               </g>
             ) : null
           )}
-          {evT && (
+          {evT !== null && (
             <g>
-              <line x1={X(evT)} x2={X(evT)} y1={8} y2={rowY + 8} stroke="#ffffff" strokeDasharray="3 3" opacity={0.7} />
-              <text className="ev-label" x={evLabelX} y={14} textAnchor={evLabelLeft ? 'end' : 'start'} fontSize="12" fill="#e7e9ec" fontFamily="var(--mono)">event {fmtEventDate(event)}</text>
+              {evOff && <title>{evOff === 'before' ? 'The event date is before the first pass shown. Its line at the edge is not drawn to scale.' : 'The event date is after the last pass shown. Its line at the edge is not drawn to scale.'}</title>}
+              {band && <title>{event.date_precision === 'year' ? 'The event date is known only to the year. The band covers the whole year.' : 'The event date is known only to the month. The band covers the whole month.'}</title>}
+              {band ? (
+                <rect className="ev-band" x={band.x} y={8} width={band.width} height={rowY} fill="#ffffff" opacity={0.12} />
+              ) : (
+                <line x1={evX} x2={evX} y1={8} y2={rowY + 8} stroke="#ffffff" strokeDasharray="3 3" opacity={0.7} />
+              )}
+              <text className="ev-label" x={evLabelX} y={14} textAnchor={evLabelLeft ? 'end' : 'start'} fontSize="12" fill="#e7e9ec" fontFamily="var(--mono)">event {fmtEventDate(event)}{evOff && <tspan dx={6}>(off scale)</tspan>}</text>
             </g>
           )}
           {spans.map(({ l, a, b }, i) => {
@@ -114,7 +153,11 @@ function Timeline({ event, before, after, slot, onSlot, onPick }: Props) {
                 ) : (
                   <circle cx={X(a)} cy={y} r={isA || isB ? 6 : 4.5} fill={isA || isB ? stroke : '#1b2028'} stroke={stroke} strokeWidth={1.5} />
                 )}
-                <rect x={X(a) - 8} y={y - 12} width={Math.max(16, X(b) - X(a) + 16)} height={24} fill="transparent" className="tick-hit" />
+                {a !== b ? (
+                  <rect x={X(a) - 8} y={y - 12} width={Math.max(16, X(b) - X(a) + 16)} height={24} fill="transparent" className="tick-hit" />
+                ) : (
+                  <rect x={X(a) - hitW(X(a)) / 2} y={y - 12} width={hitW(X(a))} height={24} fill="transparent" className="tick-hit" />
+                )}
                 {(isA || isB) && (
                   <text x={(X(a) + X(b)) / 2} y={y - 10} textAnchor="middle" fontSize="12" fontWeight={600} fill={stroke} fontFamily="var(--mono)">
                     {isB && isA ? 'B=A' : isB ? 'B' : 'A'}

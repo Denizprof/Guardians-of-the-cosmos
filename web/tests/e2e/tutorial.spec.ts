@@ -59,7 +59,26 @@ test.describe('interactive tutorial', () => {
     await onStep(page, 'Probe NISAR coverage');
     await page.locator('[data-tut="lens"]').click();
     await page.locator('[data-tut="probe"]').click();
-    await page.mouse.click(420, 330);
+    // a click in the space round the globe is not a probe, so the point is chosen on the visible globe: it
+    // survives the round trip through the map's projection and nothing else covers the map there
+    const onGlobe = await page.evaluate(() => {
+      const a = (window as any).__gsMaps.a;
+      const canvas = a.getCanvas() as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      for (const [dx, dy] of [[0, 0], [-60, 0], [60, 0], [0, -60], [0, 60], [-120, -60], [120, -60], [-120, 60], [120, 60]]) {
+        const x = cx + dx;
+        const y = cy + dy;
+        const back = a.project(a.unproject([x, y]));
+        if (Math.hypot(back.x - x, back.y - y) > 1) continue;
+        if (document.elementFromPoint(rect.left + x, rect.top + y) !== canvas) continue;
+        return { x: rect.left + x, y: rect.top + y };
+      }
+      return null;
+    });
+    expect(onGlobe, 'a free point on the visible globe').not.toBeNull();
+    await page.mouse.click(onGlobe!.x, onGlobe!.y);
 
     // 9 search
     await onStep(page, 'Search for a place');

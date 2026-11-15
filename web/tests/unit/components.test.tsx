@@ -378,12 +378,12 @@ describe('IntroPanel (coverage states)', () => {
     ...over,
   });
 
-  it('idle: lists every investigation with technique + scene count and selects on click', async () => {
+  it('idle: lists every investigation with technique + layer count and selects on click', async () => {
     const p = props();
     render(<IntroPanel {...p} />);
     for (const e of realEvents) {
       const btn = screen.getByRole('button', { name: new RegExp(e.title) });
-      expect(btn).toHaveTextContent(`${e.layers.length} NISAR scenes`);
+      expect(btn).toHaveTextContent(`${e.layers.length} NISAR layers`);
     }
     await userEvent.click(screen.getByRole('button', { name: new RegExp(realEvents[0].title) }));
     expect(p.onSelect).toHaveBeenCalledWith(realEvents[0].id);

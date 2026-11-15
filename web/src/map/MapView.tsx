@@ -8,6 +8,7 @@ import type { CoverageResult } from '../services';
 import type { Pin } from '../content/explain';
 import { registerNodataProtocol } from './nodataKey';
 import { registerCropProtocol } from './cropTiles';
+import { lensDayUnpublished, onLensDayUnpublished, registerLensTileProtocol } from './lensTiles';
 import { createTileErrorPolicy } from './tileErrors';
 import { browseBounds, coverageFeatures, trimmedBrowseUrl } from './coverageSelect';
 import {
@@ -18,8 +19,10 @@ import { attachHalo } from './halo';
 import { registerHires } from './hires';
 import { attachSatellite } from './satellite';
 import { isLite, mapPixelRatio } from '../app/perf';
-import { addOverlays, overlayUrls, syncImageLayers, syncTileOverlays } from './overlays';
-import type { TileOverlay } from './overlays';
+import {
+  addOverlays, createLensDropPolicy, detachLayer, leaseObjectUrl, overlayUrls, reattachLayer, syncImageLayers, syncTileOverlays,
+} from './overlays';
+import type { DetachedLayer, TileOverlay } from './overlays';
 import { addMarkers } from './markers';
 import { drawStars } from './starfield';
 
@@ -31,6 +34,8 @@ maplibregl.setWorkerUrl(new URL('vendor/maplibre-gl-worker.mjs', document.baseUR
 registerNodataProtocol(maplibregl as unknown as Parameters<typeof registerNodataProtocol>[0]);
 // the farmland and crop-type layer is four WorldCereal maps stacked into one tile; see cropTiles.ts
 registerCropProtocol(maplibregl as unknown as Parameters<typeof registerCropProtocol>[0]);
+// SAR lens radar tiles: a one-off server error is asked for again, and failures keep their HTTP status; see lensTiles.ts
+registerLensTileProtocol(maplibregl as unknown as Parameters<typeof registerLensTileProtocol>[0]);
 // Up to three maps (A, B, SAR lens) share one image queue; the lens alone stacks twelve raster sources (two products x six days).
 maplibregl.config.MAX_PARALLEL_IMAGE_REQUESTS = 32;
 maplibregl.config.MAX_PARALLEL_IMAGE_REQUESTS_PER_FRAME = 16;
@@ -55,6 +60,8 @@ export interface MapViewProps {
   /** A reported / catalog marker was clicked (id of the ContextEvent). */
   onSelectContext: (id: string) => void;
   onMapClick: (lon: number, lat: number) => void;
+  /** Coverage probe on: every click on the globe is a probe, also on a marker or a cluster. */
+  probing?: boolean;
   onPin: (id: string) => void;
   flyTo: { lon: number; lat: number; zoom?: number; bbox?: [number, number, number, number]; nonce: number } | null;
   tileOverlays?: TileOverlay[];
@@ -149,7 +156,7 @@ const SPIN_MAX_MS = 30_000;
 const BASE_PIXEL_RATIO = mapPixelRatio();
 /** From this zoom the SAR lens renders only its square (see the lens effect); below it, a clipped full view. */
 const LENS_WINDOW_MIN_ZOOM = 5;
-/** A stacked lens day whose tiles failed this many times is treated as unavailable and removed. */
+/** A stacked lens day whose tiles failed this many times without delivering one is taken off the stack (retried later). */
 const LENS_DROP_AFTER = 3;
 /** A tiled globe source that never delivered a tile raises the load-failure notice after this many errors. */
 const TILE_FAILURES_BEFORE_NOTICE = 3;
@@ -167,6 +174,10 @@ function MapView(p: MapViewProps) {
   const [lensReady, setLensReady] = useState(false);
   const cb = useRef(p);
   cb.current = p;
+  // The probe was switched on with the mouse already over a marker: drop the pointer that marker had set.
+  useEffect(() => {
+    if (p.probing) maps.current?.a.getCanvas().style.removeProperty('cursor');
+  }, [p.probing]);
 
   const layoutClass = !p.selected || p.mode === 'overlay' ? 'single' : p.mode;
   // Map B is only kept in sync (and therefore only re-rendered) while it is on screen.
@@ -323,7 +334,18 @@ function MapView(p: MapViewProps) {
     for (const el of containers) for (const ev of stopEvents) el.addEventListener(ev, stopSpin, { passive: true, capture: true });
 
     const clickable = ['sar-points', 'sar-halo', 'ctx-points', 'ctx-clusters'];
+    // A position in the space round the globe is not on the map: MapLibre still reports a location for it (and
+    // can hit markers on the far side), so the point is projected back and must land where the pointer is.
+    // Not checked under 3D terrain, which is only on when zoomed in, where the globe fills the view.
+    const onGlobe = (e: { point: { x: number; y: number }; lngLat: maplibregl.LngLat }) => {
+      if (a.getTerrain()) return true;
+      const back = a.project(e.lngLat);
+      return Math.hypot(back.x - e.point.x, back.y - e.point.y) <= 3;
+    };
     a.on('click', (e) => {
+      if (!onGlobe(e)) return;
+      // Coverage probe on: the click is a probe wherever it lands, markers and clusters included.
+      if (cb.current.probing) return cb.current.onMapClick(e.lngLat.lng, e.lngLat.lat);
       const hits = a.queryRenderedFeatures(e.point, { layers: clickable.filter((id) => a.getLayer(id)) });
       const f = hits[0];
       if (!f) return cb.current.onMapClick(e.lngLat.lng, e.lngLat.lat);
@@ -338,7 +360,12 @@ function MapView(p: MapViewProps) {
       cb.current.onSelectContext(String(f.properties.id));
     });
     for (const id of clickable) {
-      a.on('mouseenter', id, () => (a.getCanvas().style.cursor = 'pointer'));
+      // The pointer cursor only where a click opens the marker: not while probing (a click there is a probe, the
+      // probe's crosshair stays) and not over a far-side marker in the space round the globe (a click there does
+      // nothing). On every move, not only on entering, because the hit area of a hidden marker can touch a visible one.
+      a.on('mousemove', id, (e) => {
+        a.getCanvas().style.cursor = !cb.current.probing && onGlobe(e) ? 'pointer' : '';
+      });
       a.on('mouseleave', id, () => (a.getCanvas().style.cursor = ''));
     }
     maps.current = { a, b };
@@ -518,26 +545,24 @@ function MapView(p: MapViewProps) {
     clear();
     if (!g?.browse || !coords) return;
     // The picture has transparent margins: trim them so the data fills the footprint's bounding box.
-    const ctl = new AbortController();
-    let objectUrl: string | null = null;
-    trimmedBrowseUrl(g.browse, ctl.signal)
-      .then((u) => {
-        objectUrl = u;
-        if (ctl.signal.aborted) return;
+    const browse = g.browse;
+    // leaseObjectUrl also revokes a picture that finishes decoding after the selection has moved on
+    const release = leaseObjectUrl(
+      (signal) => trimmedBrowseUrl(browse, signal),
+      (u) => {
         clear();
         a.addSource('coverage-browse', { type: 'image', url: u, coordinates: coords });
         a.addLayer({ id: 'coverage-browse', type: 'raster', source: 'coverage-browse', paint: { 'raster-opacity': 0.92, 'raster-fade-duration': 0 } }, 'coverage-fill');
-      })
-      .catch((e: unknown) => {
-        if (ctl.signal.aborted) return;
+      },
+      (e) => {
         // the outline still shows; say that the picture did not load instead of leaving a silent gap
         console.warn('[map:globe] coverage browse picture failed', e instanceof Error ? e.message : e);
         cb.current.onMapError?.('globe', 'coverage-browse');
-      });
+      }
+    );
     return () => {
-      ctl.abort();
       clear();
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      release();
     };
   }, [loaded, p.coverage, p.coverageScene]);
 
@@ -600,33 +625,82 @@ function MapView(p: MapViewProps) {
     bindLabelLanguage(lens);
     lens.getCanvas().setAttribute('aria-label', 'Globe: SAR lens view');
     // Lens tile errors. GIBS answers a day *without a pass* with a transparent 200 tile, but a day that is
-    // *not published yet* answers 404 on every tile, and GIBS occasionally returns a one-off 500. Neither is
-    // a reason to alarm the reader (measured 14 Nov 2026: all failures were the unpublished newest NISAR day
-    // plus two isolated OPERA 500s). So: a stacked day whose tiles keep failing is dropped from the stack
-    // (logged), isolated errors are logged only, and the visible notice appears only when no radar source is
-    // left at all, which is the case where "no data" would otherwise be implied.
+    // *not published yet* fails on every tile, and GIBS occasionally returns a one-off 500 (measured
+    // 14 Nov 2026: all failures were the unpublished newest NISAR day plus two isolated OPERA 500s).
+    // The tiles come through the lens-tile protocol (lensTiles.ts): a 5xx or network error has already been
+    // asked for again (up to three times) before it reaches this handler, with its real HTTP status; a 404
+    // (day not published) never reaches it, because MapLibre raises no error event for a status-404 tile, and
+    // the loader stops requesting that day for a while. One late day is normal and stays quiet; but when every
+    // day still on the stack answers 404 there is no radar to show at all, and that is reported (see
+    // checkAllUnpublished below, which asks the loader).
+    // So (see createLensDropPolicy): isolated errors are logged only; a stacked day that has failed
+    // LENS_DROP_AFTER times and still has delivered nothing after a grace period is taken off the stack. A
+    // drop after server / network errors is not final: the day is put back when the camera next comes to rest
+    // or the browser comes back online. Such a drop raises the visible notice, as does an empty stack: a
+    // radar day that failed to load must not read as "no radar pass".
     const report = mapErrorReporter('lens', () => cb.current.onMapError);
-    const lensFailures = new Map<string, number>();
-    const delivered = new Set<string>(); // sources that have loaded at least one tile: never dropped
-    const dropped = new Set<string>();
+    const dropPolicy = createLensDropPolicy(LENS_DROP_AFTER);
+    const detached = new Map<string, DetachedLayer>();
+    const graceTimers = new Set<number>();
+    let lensOrder: string[] | null = null; // the stack's layer order before anything was dropped
+    let lensGone = false;
     lens.on('data', (e: { dataType?: string; sourceId?: string; tile?: unknown }) => {
-      if (e.dataType === 'source' && e.tile && e.sourceId?.startsWith('lens-')) delivered.add(e.sourceId);
+      // a day that has delivered tiles is real data with a few flaky tiles (GIBS sporadic 500s): never dropped
+      if (e.dataType === 'source' && e.tile && e.sourceId?.startsWith('lens-')) dropPolicy.delivered(e.sourceId);
     });
+    const dropLensDay = (src: string) => {
+      const r = dropPolicy.graceElapsed(src);
+      if (!r.drop) return;
+      console.warn(
+        r.notify
+          ? `[map:lens] ${src}: tiles keep failing (server or network error); dropped from the lens stack until the next retry`
+          : `[map:lens] ${src}: the service has no such day (HTTP 404 / 410); dropped from the lens stack`
+      );
+      lensOrder ??= (lens.getStyle()?.layers ?? []).map((l) => l.id);
+      const d = detachLayer(lens, src);
+      if (d) detached.set(src, d);
+      const left = Object.keys(lens.getStyle()?.sources ?? {}).filter((k) => k.startsWith('lens-'));
+      if (r.notify) cb.current.onMapError?.('lens', src);
+      else if (!left.length) cb.current.onMapError?.('lens', 'all SAR lens sources');
+    };
     lens.on('error', (e: { sourceId?: string; error?: { message?: string; status?: number } }) => {
       const src = e?.sourceId;
       if (!src || !src.startsWith('lens-')) return report(e); // style / terrain / labels: report as usual
-      const n = (lensFailures.get(src) ?? 0) + 1;
-      lensFailures.set(src, n);
-      console.warn(`[map:lens] ${src} tile failed (${n})`, e?.error?.status ?? '', e?.error?.message ?? '');
-      // a day that has delivered tiles is real data with a few flaky tiles (GIBS sporadic 500s): keep it
-      if (n < LENS_DROP_AFTER || dropped.has(src) || delivered.has(src)) return;
-      dropped.add(src);
-      console.warn(`[map:lens] ${src}: tiles keep failing (day not published yet or unavailable); dropped from the lens stack`);
-      if (lens.getLayer(src)) lens.removeLayer(src);
-      if (lens.getSource(src)) lens.removeSource(src);
-      const left = Object.keys(lens.getStyle()?.sources ?? {}).filter((k) => k.startsWith('lens-') && !dropped.has(k));
-      if (!left.length) cb.current.onMapError?.('lens', 'all SAR lens sources');
+      const r = dropPolicy.failed(src, e?.error?.status);
+      console.warn(`[map:lens] ${src} tile failed (${r.count})`, e?.error?.status ?? '', e?.error?.message ?? '');
+      if (r.action !== 'arm') return;
+      // a layer's first tiles can fail before any good one arrives: decide after a few seconds
+      const t = window.setTimeout(() => {
+        graceTimers.delete(t);
+        if (!lensGone) dropLensDay(src);
+      }, TILE_NOTICE_GRACE_MS);
+      graceTimers.add(t);
     });
+    // Every day left on the stack answers 404 (a renamed layer, a clock far ahead, GIBS far behind): MapLibre
+    // tells the error handler nothing, so the loader does. Checked after the same grace period, said once.
+    let allGoneTimer = 0;
+    let allGoneSaid = false;
+    const checkAllUnpublished = () => {
+      allGoneTimer = 0;
+      if (lensGone || allGoneSaid) return;
+      const sources = Object.entries(lens.getStyle()?.sources ?? {}).filter(([k]) => k.startsWith('lens-'));
+      if (!sources.length || !sources.every(([, s]) => lensDayUnpublished((s as { tiles?: string[] }).tiles?.[0] ?? ''))) return;
+      allGoneSaid = true;
+      console.warn(`[map:lens] every radar day on the lens stack (${sources.length}) answers HTTP 404: nothing to show`);
+      cb.current.onMapError?.('lens', 'all SAR lens sources');
+    };
+    const offUnpublished = onLensDayUnpublished(() => {
+      if (!allGoneTimer && !allGoneSaid && !lensGone) allGoneTimer = window.setTimeout(checkAllUnpublished, TILE_NOTICE_GRACE_MS);
+    });
+    /** Put every dropped day back for another attempt (it is dropped again if it still cannot load). */
+    const retryDropped = () => {
+      if (lensGone) return;
+      for (const src of dropPolicy.retry()) {
+        const d = detached.get(src);
+        detached.delete(src);
+        if (d) reattachLayer(lens, d, lensOrder ?? []);
+      }
+    };
     let styled = false;
     // Two ways to show the lens:
     //  - 'clip':   a full-viewport map with the same camera as map A, clipped to the square by CSS. Exact at
@@ -685,12 +759,20 @@ function MapView(p: MapViewProps) {
     });
     a.on('move', sync);
     a.on('moveend', sync);
+    a.on('moveend', retryDropped);
+    window.addEventListener('online', retryDropped);
     lensMap.current = lens;
     apply();
     if (import.meta.env.DEV && (window as any).__gsMaps) (window as any).__gsMaps.lens = lens;
     return () => {
       a.off('move', sync);
       a.off('moveend', sync);
+      a.off('moveend', retryDropped);
+      window.removeEventListener('online', retryDropped);
+      lensGone = true;
+      graceTimers.forEach((t) => window.clearTimeout(t));
+      offUnpublished();
+      window.clearTimeout(allGoneTimer);
       mo.disconnect();
       if (raf) cancelAnimationFrame(raf);
       el.style.cssText = '';

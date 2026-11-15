@@ -66,8 +66,9 @@ export const SAR_LENS_SOURCE: SarLensSource = {
       maxzoom: 13,
       stackDays: 6,
       // checked 14 Nov 2026 (headless run): 12 Nov still answered 404 on every tile, so the newest published
-      // day is three back. The lens also drops any day whose tiles keep failing (see MapView), so a slower
-      // publishing day costs one skipped layer, never a false alarm.
+      // day is three back. A day that is published later than this answers 404; the tile loader
+      // (map/lensTiles.ts) reports that status, does not retry it and stops asking for that day for a while,
+      // and MapLibre raises no error for a 404 tile: a late day costs one missing layer, not a failure notice.
       lagDays: 3,
     },
   ],

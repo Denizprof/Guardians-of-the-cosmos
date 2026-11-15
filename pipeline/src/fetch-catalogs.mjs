@@ -103,14 +103,17 @@ export function parseCsv(text) {
 }
 
 // ---------- normalizers (pure; unit-tested) ----------
+// NCEI cause codes, from NOAA's own list: https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/tsunami/causes
+// (checked live 2026-11-15). Keep in step with TSUNAMI_CAUSE in web/src/eventDetails.ts.
 const TSUNAMI_CAUSE = {
   0: 'Unknown', 1: 'Earthquake', 2: 'Questionable earthquake', 3: 'Earthquake and landslide', 4: 'Volcano and earthquake',
-  5: 'Volcano', 6: 'Volcano, earthquake and landslide', 7: 'Landslide', 8: 'Meteorological', 9: 'Explosion', 10: 'Astronomical tide',
+  5: 'Volcano, earthquake and landslide', 6: 'Volcano', 7: 'Volcano and landslide', 8: 'Landslide', 9: 'Meteorological',
+  10: 'Explosion', 11: 'Astronomical tide',
 };
 const TSUNAMI_VALIDITY = { '-1': 'erroneous', 0: 'event only', 1: 'very doubtful', 2: 'questionable', 3: 'probable', 4: 'definite' };
 
 /** Cause codes whose cause is established and involves an earthquake (2 = "questionable earthquake" is not). */
-const QUAKE_CAUSES = new Set([1, 3, 4, 6]);
+const QUAKE_CAUSES = new Set([1, 3, 4, 5]);
 
 /**
  * Title of a tsunami record. It names what caused the tsunami: most records in the NCEI database are small
@@ -124,9 +127,10 @@ export function tsunamiTitle(t) {
   const place = loc && country && loc.toLowerCase().endsWith(country.toLowerCase()) ? loc : [loc, country].filter(Boolean).join(', ');
   const where = place ? ` — ${place}` : '';
   if (QUAKE_CAUSES.has(t.causeCode)) return `Tsunami after ${isNum(t.magnitude) ? `M ${t.magnitude}` : 'an'} earthquake, ${t.year}${where}`;
-  if (t.causeCode === 5) return `Tsunami after a volcanic eruption, ${t.year}${where}`;
-  if (t.causeCode === 7) return `Tsunami after a landslide, ${t.year}${where}`;
-  if (t.causeCode === 8) return `Meteotsunami (weather-driven), ${t.year}${where}`;
+  if (t.causeCode === 6) return `Tsunami after a volcanic eruption, ${t.year}${where}`;
+  if (t.causeCode === 7) return `Tsunami after a volcanic landslide, ${t.year}${where}`;
+  if (t.causeCode === 8) return `Tsunami after a landslide, ${t.year}${where}`;
+  if (t.causeCode === 9) return `Meteotsunami (weather-driven), ${t.year}${where}`;
   return `Tsunami ${t.year}${where}`;
 }
 
@@ -510,8 +514,9 @@ async function writeIfGood(name, def, events, extra) {
 export async function main(names = Object.keys(SOURCES)) {
   const report = [];
   for (const name of names) {
-    const def = SOURCES[name];
-    if (!def) { console.warn(`unknown source ${name}`); continue; }
+    const def = Object.hasOwn(SOURCES, name) ? SOURCES[name] : undefined;
+    // A mistyped or renamed source fetched nothing: it must fail the run, not pass as a refresh.
+    if (!def) { console.warn(`unknown source ${name}`); report.push({ name, ok: false, error: 'unknown source' }); continue; }
     console.log(`> ${name}`);
     const meta = {};
     try {

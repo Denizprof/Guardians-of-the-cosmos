@@ -155,10 +155,16 @@ function withinEdits(a: string, b: string, max: number): boolean {
   return prev[b.length] <= max;
 }
 
-export function detectLang(text: string): Lang {
-  if (/[çğışöüÇĞİŞÖÜ]/.test(text)) return 'tr';
+/** The language of a question. Words decide first; a single letter does not, because ö, ü and ç are shared with
+ *  German, French and other names ("Zürich", "Düsseldorf") and ş or ı turn up in Turkish place names inside
+ *  English questions ("coverage over Kahramanmaraş?"). `locale` is the interface language, used only as a
+ *  last hint when the words say nothing. */
+export function detectLang(text: string, locale?: string): Lang {
   const t = ` ${fold(text)} `;
-  return /\b(nedir|nasil|neden|icin|midir|mudur|misin|musun|hangi|deprem|uydu|nelerdir|merhaba|tesekkur)\b/.test(t) ? 'tr' : 'en';
+  if (/\b(nedir|nasil|neden|icin|midir|mudur|misin|musun|hangi|deprem|uydu|nelerdir|merhaba|tesekkur|bu|ne|bir|ve|ile|nerede|kac|niye|nicin|hakkinda|cok)\b/.test(t)) return 'tr';
+  if (/\b(what|why|how|is|are|the|does|do|where|when|which|who|can|show|there|hello|hi|thanks|thank)\b/.test(t)) return 'en';
+  if (/[ğışĞİŞ]/.test(text)) return 'tr';
+  return locale?.toLowerCase().startsWith('tr') ? 'tr' : 'en';
 }
 
 interface Indexed {
@@ -355,7 +361,7 @@ export interface CtxLike {
   };
   selected_layers?: CtxLayer[];
   clicked_location?: { lon: number; lat: number };
-  coverage?: { lon: number; lat: number; total: number; granules: { citation_id: string; scene: string; product: string; start: string; tier: string; track: number; frame: number; direction: string }[] };
+  coverage?: { lon: number; lat: number; total: number; truncated?: boolean; granules: { citation_id: string; scene: string; product: string; start: string; tier: string; track: number; frame: number; direction: string }[] };
 }
 
 const TECHNIQUE: Record<string, string> = {
@@ -408,7 +414,7 @@ export function contextSources(ctx: CtxLike, maxGranules = 4): Source[] {
         type: 'observation',
         granule: g.scene,
         label: `NISAR ${g.product} ${day(g.start)}`,
-        text: `${i === 0 ? `The coverage probe at ${coord(c.lon, c.lat)} lists ${c.total} NISAR product(s). Newest: ` : 'Also listed: '}a ${g.product} product acquired ${day(g.start)} UTC, track ${g.track}, frame ${g.frame}, ${g.direction.toLowerCase()} pass, tier ${g.tier}.`,
+        text: `${i === 0 ? `The coverage probe at ${coord(c.lon, c.lat)} lists ${c.truncated ? `at least ${c.total}` : c.total} NISAR product(s)${c.truncated ? ' (the list is capped; more exist)' : ''}. Newest: ` : 'Also listed: '}a ${g.product} product acquired ${day(g.start)} UTC, track ${g.track}, frame ${g.frame}, ${g.direction.toLowerCase()} pass, tier ${g.tier}.`,
       }),
     );
   }

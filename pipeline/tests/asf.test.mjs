@@ -16,8 +16,8 @@ test('tierOf maps CMR collection names to data tiers', () => {
   assert.equal(tierOf('NISAR_L2_GUNW_PROVISIONAL_V1'), 'PROVISIONAL');
   assert.equal(tierOf('NISAR_L2_GCOV_V1'), 'VALIDATED');
   assert.equal(tierOf('NISAR_UR_L2_GCOV_V1'), 'URGENT RESPONSE');
-  assert.equal(tierOf(), 'VALIDATED');
-  assert.equal(tierOf(''), 'VALIDATED');
+  assert.equal(tierOf(), 'UNKNOWN');
+  assert.equal(tierOf(''), 'UNKNOWN');
 });
 
 test('tierOf: Urgent Response wins even when the name also says BETA', () => {

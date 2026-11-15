@@ -82,6 +82,39 @@ describe('createEngine', () => {
     expect(engine.control.state().phase).toBe('ready');
   });
 
+  it('a worker crash stops that worker; a retry starts a fresh one that the old one cannot disturb', async () => {
+    const engine = createEngine(CFG, make);
+    const first = engine.control.load();
+    workers[0].onerror?.({ message: 'boom' } as ErrorEvent);
+    await expect(first).rejects.toThrow('boom');
+    expect(engine.control.state()).toMatchObject({ phase: 'error', detail: 'boom' });
+    expect(workers[0].terminated).toBe(true);
+
+    const second = engine.control.load();
+    expect(workers).toHaveLength(2);
+    workers[0].reply({ type: 'ready' }); // a late message from the dead worker
+    expect(engine.control.state().phase).toBe('loading');
+    workers[0].onerror?.({ message: 'late' } as ErrorEvent);
+    expect(engine.control.state().phase).toBe('loading');
+    expect(workers[1].terminated).toBe(false);
+    workers[1].reply({ type: 'ready' });
+    await second;
+    expect(engine.control.state().phase).toBe('ready');
+  });
+
+  it('a worker crash while answering rejects the open question and the model must be loaded again', async () => {
+    const engine = createEngine(CFG, make);
+    const loading = engine.control.load();
+    workers[0].reply({ type: 'ready' });
+    await loading;
+    const answer = engine.generate([{ role: 'user', content: 'q' }]);
+    workers[0].onerror?.({ message: 'wasm abort' } as ErrorEvent);
+    await expect(answer).rejects.toThrow('wasm abort');
+    expect(workers[0].terminated).toBe(true);
+    expect(engine.control.state().phase).toBe('error');
+    await expect(engine.generate([{ role: 'user', content: 'q' }])).rejects.toThrow(/not loaded/);
+  });
+
   it('generate(): refuses before the model is ready; resolves with the worker text; rejects on a worker error', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     const engine = createEngine(CFG, make);

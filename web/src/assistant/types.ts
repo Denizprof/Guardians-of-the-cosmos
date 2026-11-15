@@ -83,7 +83,10 @@ export interface ContextCoverageGranule {
 export interface ContextCoverage {
   lon: number;
   lat: number;
+  /** Number of products the search listed. Not the full count when `truncated` is set. */
   total: number;
+  /** Present (true) only when the search hit its row limit: more products exist than `total`. */
+  truncated?: boolean;
   granules: ContextCoverageGranule[];
 }
 

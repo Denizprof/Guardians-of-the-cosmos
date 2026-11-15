@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  parseCsv, normalizeTsunamis, tsunamiTitle, normalizeVolcanoes, normalizeUsgs, normalizeGlc, normalizeGdacsFloods,
+  main, parseCsv, normalizeTsunamis, tsunamiTitle, normalizeVolcanoes, normalizeUsgs, normalizeGlc, normalizeGdacsFloods,
   aggregateFirms, firmsCellsToEvents, confidenceClass, isoFromParts, SOURCES,
 } from '../src/fetch-catalogs.mjs';
 
@@ -125,12 +125,56 @@ test('tsunami titles name what caused the tsunami, and do not repeat the country
   assert.equal(tsunamiTitle({ year: 2026, causeCode: 1, magnitude: 7.7, locationName: 'ISLA CAÑAS, PANAMA', country: 'PANAMA' }), 'Tsunami after M 7.7 earthquake, 2026 — Isla Cañas, Panama');
   assert.equal(tsunamiTitle({ year: 1946, causeCode: 3, magnitude: 8.6, locationName: 'UNIMAK ISLAND, AK', country: 'USA' }), 'Tsunami after M 8.6 earthquake, 1946 — Unimak Island, Ak, Usa');
   assert.equal(tsunamiTitle({ year: 1905, causeCode: 1, locationName: 'CALABRIA', country: 'ITALY' }), 'Tsunami after an earthquake, 1905 — Calabria, Italy');
-  assert.equal(tsunamiTitle({ year: 2018, causeCode: 5, locationName: 'ANAK KRAKATAU', country: 'INDONESIA' }), 'Tsunami after a volcanic eruption, 2018 — Anak Krakatau, Indonesia');
-  assert.equal(tsunamiTitle({ year: 1958, causeCode: 7, locationName: 'LITUYA BAY', country: 'USA' }), 'Tsunami after a landslide, 1958 — Lituya Bay, Usa');
-  assert.equal(tsunamiTitle({ year: 2020, causeCode: 8, locationName: 'MENORCA', country: 'SPAIN' }), 'Meteotsunami (weather-driven), 2020 — Menorca, Spain');
+  // NCEI cause codes (hazard-service /descriptors/tsunami/causes): 5 = volcano, earthquake and landslide, 6 = volcano,
+  // 7 = volcano and landslide, 8 = landslide, 9 = meteorological, 10 = explosion, 11 = astronomical tide.
+  assert.equal(tsunamiTitle({ year: 1930, causeCode: 5, magnitude: 6.5, locationName: 'X', country: 'Y' }), 'Tsunami after M 6.5 earthquake, 1930 — X, Y');
+  assert.equal(tsunamiTitle({ year: 2022, causeCode: 6, locationName: 'TONGA ISLANDS', country: 'TONGA' }), 'Tsunami after a volcanic eruption, 2022 — Tonga Islands, Tonga');
+  assert.equal(tsunamiTitle({ year: 2018, causeCode: 7, locationName: 'ANAK KRAKATAU', country: 'INDONESIA' }), 'Tsunami after a volcanic landslide, 2018 — Anak Krakatau, Indonesia');
+  assert.equal(tsunamiTitle({ year: 2017, causeCode: 8, locationName: 'KARRAT FJORD', country: 'GREENLAND' }), 'Tsunami after a landslide, 2017 — Karrat Fjord, Greenland');
+  assert.equal(tsunamiTitle({ year: 2020, causeCode: 9, locationName: 'MENORCA', country: 'SPAIN' }), 'Meteotsunami (weather-driven), 2020 — Menorca, Spain');
+  // an explosion or a tide is named in the notes only, never as an earthquake (a linked magnitude does not change that)
+  assert.equal(tsunamiTitle({ year: 1917, causeCode: 10, magnitude: 5, locationName: 'HALIFAX', country: 'CANADA' }), 'Tsunami 1917 — Halifax, Canada');
+  assert.equal(tsunamiTitle({ year: 1930, causeCode: 11, locationName: 'X', country: 'Y' }), 'Tsunami 1930 — X, Y');
   // a questionable or unknown cause is not presented as an earthquake
   assert.equal(tsunamiTitle({ year: 1930, causeCode: 2, magnitude: 7, locationName: 'X', country: 'Y' }), 'Tsunami 1930 — X, Y');
   assert.equal(tsunamiTitle({ year: 1930, causeCode: 0 }), 'Tsunami 1930');
+});
+
+// Regression: the cause table was shifted from code 5 upward, so Hunga Tonga 2022 (code 6, volcano) was stored as
+// "Volcano, earthquake and landslide" and titled "after an earthquake", and landslide tsunamis as "Meteorological".
+test('the tsunami normalizer decodes every NCEI cause code as NOAA defines it', () => {
+  const official = {
+    0: 'Unknown', 1: 'Earthquake', 2: 'Questionable earthquake', 3: 'Earthquake and landslide', 4: 'Volcano and earthquake',
+    5: 'Volcano, earthquake and landslide', 6: 'Volcano', 7: 'Volcano and landslide', 8: 'Landslide', 9: 'Meteorological',
+    10: 'Explosion', 11: 'Astronomical tide',
+  };
+  for (const [code, label] of Object.entries(official)) {
+    const [e] = normalizeTsunamis([{ id: 1, year: 2000, month: 1, day: 1, latitude: 1, longitude: 1, eventValidity: 4, causeCode: Number(code), locationName: 'X', country: 'Y' }]);
+    assert.ok(e.notes.startsWith(`Cause: ${label}. `), `code ${code}: ${e.notes}`);
+    assert.equal(/earthquake/.test(e.title), [1, 3, 4, 5].includes(Number(code)), `code ${code}: ${e.title}`);
+  }
+  const title = (causeCode) => normalizeTsunamis([{ id: 1, year: 2000, month: 1, day: 1, latitude: 1, longitude: 1, eventValidity: 4, causeCode }])[0].title;
+  assert.match(title(6), /volcanic eruption/);
+  assert.match(title(8), /after a landslide/);
+  assert.match(title(9), /^Meteotsunami/);
+});
+
+// Regression: a mistyped source name printed a warning, fetched nothing and still exited 0.
+test('an unknown source name is a failure, not a successful refresh', async () => {
+  const before = process.exitCode;
+  const warn = console.warn, log = console.log;
+  console.warn = () => {}; console.log = () => {};
+  try {
+    process.exitCode = undefined;
+    for (const name of ['gdacs-flood', 'constructor']) {
+      assert.deepEqual(await main([name]), [{ name, ok: false, error: 'unknown source' }]);
+      assert.equal(process.exitCode, 1);
+      process.exitCode = undefined;
+    }
+  } finally {
+    console.warn = warn; console.log = log;
+    process.exitCode = before;
+  }
 });
 
 test('the tsunami normalizer uses those titles', () => {

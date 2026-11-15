@@ -18,13 +18,13 @@ browser. This folder holds what it is built from.
 The model never supplies facts; it only words them. Facts live in the knowledge base, where each has a source
 and can be corrected without retraining.
 
-## The knowledge base (112 records)
+## The knowledge base (114 records)
 
 `node assistant-model/build_kb.mjs` builds it from:
 
 | Source | Records | Checked how |
 | --- | --- | --- |
-| The app's own vetted text: radar explainers, the five investigations, 19 satellite layers and their legends | 70 | Copied as is from `web/src/content/explain.ts`, `events.json`, `layers.json` |
+| The app's own vetted text: radar explainers, the five investigations, 20 satellite layers and their legends | 72 | Copied as is from `web/src/content/explain.ts`, `events.json`, `layers.json` |
 | App guide (`knowledge/app.json`): the tools, labels, credits | 18 | Hand-written from what the app shows; English and Turkish |
 | General SAR / NISAR facts (`knowledge/verified_sar.json`) | 24 | Each checked against its cited NASA / USGS / NOAA / Earth Engine page on 2026-11-14 |
 
@@ -41,9 +41,18 @@ the 24 supported or trimmed ones are used. `verified_sar.json` keeps the verdict
 - **What it teaches:** a skill, not facts: answer only from the SOURCES in the prompt, mark the source used,
   reply `NO_ANSWER` when they do not hold the answer. Every target answer in the training data is the text of
   a source, so the data cannot teach a false fact.
-- **Data:** `node assistant-model/build_dataset.mjs` writes 1,195 training, 171 validation and 212 test
-  examples. The prompt is built by the app's own code (`web/src/assistant/local/core.ts`), so training and the
-  browser use one format.
+- **Data:** `node assistant-model/build_dataset.mjs` writes the examples. The prompt is built by the app's own
+  code (`web/src/assistant/local/core.ts`), so training and the browser use one format.
+- **The run reported below** used an earlier build of the data: 1,195 training, 171 validation and 212 test
+  examples. The knowledge base and the question lists have grown since, so the script writes more examples
+  today; the current counts and held-out records are in `data/manifest.json`. The adapter has **not** been
+  retrained or re-measured on the current data.
+
+The test records are chosen by position in the knowledge base, so they move when it changes. An adapter must
+only be measured on the data it was trained with: after rebuilding the data, train again before running
+`evaluate.py --adapter`, or the test set may hold records the adapter has already seen.
+`node assistant-model/build_dataset.mjs --manifest-only` updates `data/manifest.json` and leaves the `.jsonl`
+files as they are.
 
 ## Results (held-out test set, 212 questions)
 
@@ -84,7 +93,7 @@ pip install -r assistant-model/requirements.txt
 
 # 3. measure the untrained model, train, measure again
 python assistant-model/evaluate.py --name base
-python assistant-model/train_lora.py                 # add --gpu-load 0.5 to run the GPU at half load
+python assistant-model/train_lora.py --epochs 2      # add --gpu-load 0.5 to run the GPU at half load
 python assistant-model/evaluate.py --name tuned --adapter assistant-model/adapters/global-sar-lora
 
 # 4. export for the browser (also needs: pip install "optimum[onnxruntime]" onnx onnx-ir)

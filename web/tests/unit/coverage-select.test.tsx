@@ -48,6 +48,42 @@ describe('placing a browse picture', () => {
   });
 });
 
+// Defect: a footprint with longitudes on both sides of 180 degrees (179.4 and -179.7) was boxed by plain min
+// and max, so a picture about 1 degree wide was stretched over 359 degrees, and the outline went the long way too.
+describe('a footprint that crosses the antimeridian', () => {
+  const crossing: GeoJSON.Polygon = { type: 'Polygon', coordinates: [[[179.4, -17], [-179.7, -17], [-179.7, -16], [179.4, -16], [179.4, -17]]] };
+  // the same area as archives often deliver it: cut in two at the 180th meridian
+  const split: GeoJSON.MultiPolygon = {
+    type: 'MultiPolygon',
+    coordinates: [
+      [[[179.4, -17], [180, -17], [180, -16], [179.4, -16], [179.4, -17]]],
+      [[[-180, -17], [-179.7, -17], [-179.7, -16], [-180, -16], [-180, -17]]],
+    ],
+  };
+  const lonSpan = (geom: GeoJSON.Geometry) => {
+    const c = (geom as GeoJSON.Polygon | GeoJSON.MultiPolygon).coordinates.flat(geom.type === 'Polygon' ? 1 : 2) as number[][];
+    const lons = c.map((p) => p[0]);
+    return Math.max(...lons) - Math.min(...lons);
+  };
+
+  it('never places the picture on a box that runs the long way round the globe', () => {
+    for (const fp of [crossing, split]) {
+      const b = browseBounds(fp);
+      if (b) expect(b[1][0] - b[0][0]).toBeLessThan(180);
+    }
+  });
+  it('draws the outline the short way across the 180th meridian, without changing latitudes', () => {
+    for (const fp of [crossing, split]) {
+      const [f] = coverageFeatures([{ ...g(0), footprint: fp }], 'SCENE_0');
+      expect(lonSpan(f.geometry)).toBeCloseTo(0.9, 6);
+      expect(f.geometry.type).toBe(fp.type);
+    }
+    const [f] = coverageFeatures([{ ...g(0), footprint: crossing }], 'SCENE_0');
+    expect((f.geometry as GeoJSON.Polygon).coordinates[0]).toEqual([[179.4, -17], [180.3, -17], [180.3, -16], [179.4, -16], [179.4, -17]]);
+    expect(crossing.coordinates[0][1]).toEqual([-179.7, -17]); // the stored footprint is not modified
+  });
+});
+
 describe('stepping through products', () => {
   it('moves to the next / previous product and stops at the ends', () => {
     expect(stepScene(many, 'SCENE_3', 1)).toBe('SCENE_4');
@@ -89,6 +125,19 @@ describe('coverage panel: every product can be viewed on its own', () => {
     expect(p.onSelectScene).toHaveBeenCalledWith('SCENE_6');
     await userEvent.click(within(viewer).getByRole('button', { name: /Previous product/ }));
     expect(p.onSelectScene).toHaveBeenCalledWith('SCENE_4');
+  });
+  // SYNTHETIC: a row whose ASF path and frame numbers were unusable arrives with no track and no frame
+  // (services.ts never guesses them). It must not be counted as an orbit track of its own, and the missing
+  // values must read as missing, not as a gap in the text.
+  it('a product with no usable track is not counted as an orbit track and shows a dash for the missing values', () => {
+    const bad = { ...g(1), scene: 'SCENE_BAD', track: undefined as never, frame: undefined as never, direction: 'UNKNOWN', product: 'UNKNOWN' };
+    const three = [g(0), bad, { ...g(2), track: 80 }];
+    render(<IntroPanel {...props({ coverage: { ...cov, total: 3, granules: three }, selectedScene: 'SCENE_BAD' })} />);
+    const stat = screen.getByText(/^orbit tracks/).previousElementSibling!;
+    expect(stat).toHaveTextContent(/^2$/);
+    const item = within(screen.getByRole('list', { name: /NISAR products/ })).getAllByRole('button')[1];
+    expect(item).toHaveTextContent('UNKNOWN · track – unknown · frame –');
+    expect(screen.getByRole('group', { name: /Selected product/ })).toHaveTextContent('UNKNOWN · track – unknown · frame –');
   });
   it('says plainly that nothing is drawn until a product is chosen', () => {
     render(<IntroPanel {...props()} />);

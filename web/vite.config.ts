@@ -31,6 +31,8 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), maplibreWorker(), meteomatics(env)],
     optimizeDeps: { exclude: ['maplibre-gl'] },
     // /api/assistant -> local assistant-gateway (see docs/assistant-integration.md).
-    server: { port: 5173, proxy: { '/api/assistant': 'http://127.0.0.1:8787' } },
+    // Object form with changeOrigin: false keeps the browser's Host header. The string shorthand sets
+    // changeOrigin: true, and the gateway then refuses same-origin queries (Origin != Host) with 403.
+    server: { port: 5173, proxy: { '/api/assistant': { target: 'http://127.0.0.1:8787', changeOrigin: false } } },
   };
 });

@@ -25,6 +25,8 @@ export interface TutorialStep {
   target?: string;
   /** `now` against `base`, the snapshot taken when the step began: only what the visitor does during the step counts. */
   done: (now: TutorialSnapshot, base: TutorialSnapshot) => boolean;
+  /** Given the state when the step would begin: is there anything left for the visitor to do? If not, the step is passed over. */
+  applies?: (start: TutorialSnapshot) => boolean;
 }
 
 export const TUTORIAL_STEPS: TutorialStep[] = [
@@ -32,12 +34,12 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   { id: 'investigation', title: 'Open an investigation', text: 'Press Investigations in the top bar, or pick one of the cards at the bottom, and choose an event.', target: '[data-tut="investigations"]', done: (n) => !!n.selectedId },
   { id: 'compare', title: 'Compare before and after', text: 'In the panel, next to Compare, choose Side by side to see the two radar images next to each other.', target: '[data-tut="compare"]', done: (n) => !!n.selectedId && n.mode === 'side' },
   { id: 'level', title: 'Change the explanation level', text: 'Further down the panel, next to What the radar sees, choose Scientific.', target: '[data-tut="level"]', done: (n) => !!n.selectedId && n.level === 'scientific' },
-  { id: 'close', title: 'Close the investigation', text: 'Press the X at the top of the panel, or the Escape key, to go back to the globe.', done: (n) => !n.selectedId },
+  { id: 'close', title: 'Close the investigation', text: 'Press the X at the top of the panel, or the Escape key, to go back to the globe.', done: (n) => !n.selectedId, applies: (s) => !!s.selectedId },
   { id: 'layers', title: 'Add a satellite layer', text: 'Press Satellite layers and tick any layer. Its colour legend appears under it.', target: '[data-tut="layers"]', done: (n, b) => n.layersOn > b.layersOn },
-  { id: 'lens', title: 'Open the SAR lens', text: 'Press SAR lens. The square that appears shows radar instead of a photo; drag it around.', target: '[data-tut="lens"]', done: (n) => n.lensOn },
-  { id: 'probe', title: 'Probe NISAR coverage', text: 'Press Coverage probe, then click any point on the globe to list what NISAR recorded there.', target: '[data-tut="probe"]', done: (n) => n.probed },
+  { id: 'lens', title: 'Open the SAR lens', text: 'Press SAR lens. The square that appears shows radar instead of a photo; drag it around.', target: '[data-tut="lens"]', done: (n) => n.lensOn, applies: (s) => !s.lensOn },
+  { id: 'probe', title: 'Probe NISAR coverage', text: 'Press Coverage probe, then click any point on the globe to list what NISAR recorded there.', target: '[data-tut="probe"]', done: (n) => n.probed, applies: (s) => !s.probed },
   { id: 'search', title: 'Search for a place', text: 'Type a place name or coordinates in the search box and choose a result to fly there.', target: '[data-tut="search"]', done: (n, b) => n.flyNonce !== b.flyNonce },
-  { id: 'ask', title: 'Ask the assistant', text: 'Press Ask, or click the satellite circling the globe, to open the assistant.', target: '[data-tut="ask"]', done: (n) => n.assistantOpen },
+  { id: 'ask', title: 'Ask the assistant', text: 'Press Ask, or click the satellite circling the globe, to open the assistant.', target: '[data-tut="ask"]', done: (n) => n.assistantOpen, applies: (s) => !s.assistantOpen },
 ];
 
 interface Props {
@@ -72,9 +74,13 @@ export default function Tutorial({ state, onEnd, advanceMs = 900 }: Props) {
   const step: TutorialStep | undefined = TUTORIAL_STEPS[index];
 
   const go = (n: number) => {
+    // pass over steps whose starting state leaves nothing to do (closing an investigation that is not open):
+    // shown, they would say "Done" at once and move on without the visitor having done anything
+    let i = n;
+    for (let s = TUTORIAL_STEPS[i]; s?.applies && !s.applies(latest.current); s = TUTORIAL_STEPS[i]) i++;
     base.current = latest.current;
     setPassed(false);
-    setIndex(n);
+    setIndex(i);
   };
 
   // the step is done when the app says so

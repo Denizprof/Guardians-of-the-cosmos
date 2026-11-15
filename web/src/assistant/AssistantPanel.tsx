@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
 import type { SarEvent, SarLayer } from '../types';
 import type { CoverageResult } from '../services';
 import type { AssistantAdapter, ModelControl } from './adapter';
@@ -49,7 +49,7 @@ function lookupFor(ctx?: AssistantContext) {
   return { layers, urls };
 }
 
-function CitationChip({ c, n, ctx, onSelectLayer }: { c: Citation; n: number; ctx?: AssistantContext; onSelectLayer?: (id: string) => void }) {
+function CitationChip({ c, n, domId, ctx, onSelectLayer }: { c: Citation; n: number; domId: string; ctx?: AssistantContext; onSelectLayer?: (id: string) => void }) {
   const { layers, urls } = lookupFor(ctx);
   // Prefer values from the request context we built ourselves over what the model echoed back.
   const layerId = layers.get(c.id);
@@ -64,15 +64,24 @@ function CitationChip({ c, n, ctx, onSelectLayer }: { c: Citation; n: number; ct
   );
   const title = c.granule ? `Granule ${c.granule}` : c.label;
   if (layerId && onSelectLayer) {
-    return <button type="button" className="asst-chip" id={`asst-c-${c.id}`} title={`${title}. Show layer on the map`} onClick={() => onSelectLayer(layerId)}>{inner}</button>;
+    return <button type="button" className="asst-chip" id={domId} title={`${title}. Show layer on the map`} onClick={() => onSelectLayer(layerId)}>{inner}</button>;
   }
   if (url) {
-    return <a className="asst-chip" id={`asst-c-${c.id}`} href={url} target="_blank" rel="noopener noreferrer" title={`${title}. Opens in a new tab`}>{inner}</a>;
+    return <a className="asst-chip" id={domId} href={url} target="_blank" rel="noopener noreferrer" title={`${title}. Opens in a new tab`}>{inner}</a>;
   }
-  return <span className="asst-chip" id={`asst-c-${c.id}`} title={title}>{inner}</span>;
+  return <span className="asst-chip" id={domId} tabIndex={-1} title={title}>{inner}</span>;
 }
 
-function renderAnswer(text: string, citations: Citation[]): ReactNode {
+/** Go to a citation chip without following the link: a "#id" navigation would replace the app's route hash (the shareable link). */
+function goToChip(e: MouseEvent<HTMLAnchorElement>, domId: string) {
+  e.preventDefault();
+  const chip = document.getElementById(domId);
+  chip?.scrollIntoView?.({ block: 'nearest' });
+  chip?.focus({ preventScroll: true });
+}
+
+/** idFor(n) is the DOM id of citation n's chip in the same answer; ids are per answer, so two answers citing one source do not collide. */
+function renderAnswer(text: string, citations: Citation[], idFor: (n: number) => string): ReactNode {
   const index = new Map(citations.map((c, i) => [c.id, i + 1]));
   return text.split(/\n{2,}/).map((para, pi) => {
     const parts: ReactNode[] = [];
@@ -80,7 +89,7 @@ function renderAnswer(text: string, citations: Citation[]): ReactNode {
     for (const m of para.matchAll(MARKER)) {
       parts.push(para.slice(last, m.index));
       const n = index.get(m[1]);
-      if (n) parts.push(<a key={`${pi}-${m.index}`} className="asst-mark" href={`#asst-c-${m[1]}`} aria-label={`Citation ${n}`}>[{n}]</a>);
+      if (n) parts.push(<a key={`${pi}-${m.index}`} className="asst-mark" href={`#${idFor(n)}`} onClick={(e) => goToChip(e, idFor(n))} aria-label={`Citation ${n}`}>[{n}]</a>);
       last = (m.index ?? 0) + m[0].length;
     }
     parts.push(para.slice(last));
@@ -254,20 +263,23 @@ export function AssistantPanel(props: AssistantPanelProps) {
                 </ul>
               </>
             )}
-            {msgs.map((m) => (
+            {msgs.map((m) => {
+              const idFor = (n: number) => `${uid}-m${m.id}-c${n}`;
+              return (
               <article key={m.id} className={`asst-msg asst-${m.role}${m.failed ? ' asst-failed' : ''}${m.declined ? ' asst-declined' : ''}`}>
                 <span className="asst-who">{m.role === 'user' ? 'You' : 'Assistant'}</span>
                 {m.role === 'assistant' && !m.failed && !m.declined && m.response?.answer ? (
-                  <div className="asst-text">{renderAnswer(m.text, m.response.citations ?? [])}</div>
+                  <div className="asst-text" data-no-i18n>{renderAnswer(m.text, m.response.citations ?? [], idFor)}</div>
                 ) : (
                   <div className="asst-text" role={m.failed ? 'alert' : undefined}>
-                    {m.role === 'user' || m.declined ? m.text : <>{m.response?.status === 'unavailable' ? 'Assistant unavailable: ' : 'Error: '}{m.text}</>}
+                    {/* the message text is the reader's or the model's own words: only the fixed prefix is translated */}
+                    {m.role === 'user' || m.declined ? <span data-no-i18n>{m.text}</span> : <>{m.response?.status === 'unavailable' ? 'Assistant unavailable: ' : 'Error: '}<span data-no-i18n>{m.text}</span></>}
                   </div>
                 )}
                 {!m.failed && !m.declined && m.response?.citations && m.response.citations.length > 0 && (
                   <ul className="asst-cites" aria-label="Citations">
                     {m.response.citations.map((c, i) => (
-                      <li key={c.id}><CitationChip c={c} n={i + 1} ctx={m.context} onSelectLayer={onSelectLayer} /></li>
+                      <li key={c.id}><CitationChip c={c} n={i + 1} domId={idFor(i + 1)} ctx={m.context} onSelectLayer={onSelectLayer} /></li>
                     ))}
                   </ul>
                 )}
@@ -281,7 +293,8 @@ export function AssistantPanel(props: AssistantPanelProps) {
                   </div>
                 )}
               </article>
-            ))}
+              );
+            })}
             {busy && <p className="asst-muted" role="status">Thinking…</p>}
           </div>
           <form className="asst-form" onSubmit={send}>

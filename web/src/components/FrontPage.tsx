@@ -98,6 +98,7 @@ const TOOLS: { n: string; id: string; name: string; text: string; steps: string[
  */
 export default function FrontPage({ onStart, onTutorial }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
+  const how = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
   }, []);
@@ -122,7 +123,7 @@ export default function FrontPage({ onStart, onTutorial }: Props) {
             <h1 ref={heading} tabIndex={-1}>Watch the surface of the Earth change, through radar.</h1>
             <p className="fp-lede">Global SAR is a globe you can explore. It compares real satellite observations from before and after earthquakes, floods, eruptions, fires and forest clearing, so you can see what changed on the ground.</p>
             <p className="fp-sub">It is led by NISAR, the NASA and ISRO radar satellite that sees through clouds and darkness and returns to the same place every 12 days.</p>
-            <a className="fp-jump" href="#fp-how" onClick={(e) => { e.preventDefault(); document.getElementById('fp-how')?.scrollIntoView({ block: 'start' }); }}>How to use it</a>
+            <a className="fp-jump" href="#fp-how" onClick={(e) => { e.preventDefault(); document.getElementById('fp-how')?.scrollIntoView({ block: 'start' }); how.current?.focus({ preventScroll: true }); }}>How to use it</a>
           </div>
           {/* 3D render of a radar satellite and its beam over Europe and North Africa: an illustration, not a photograph */}
           <img className="fp-art" src={`${BASE}intro/nisar-earth.webp`} alt="" aria-hidden="true" width={1200} height={984} decoding="async" />
@@ -159,7 +160,7 @@ export default function FrontPage({ onStart, onTutorial }: Props) {
         </section>
 
         <section className="fp-section" id="fp-how">
-          <h2 className="fp-label">How to use it</h2>
+          <h2 className="fp-label" ref={how} tabIndex={-1}>How to use it</h2>
           <p className="fp-how-title">Seven tools, all on the bar at the top of the globe.</p>
           <ul className="fp-moves" aria-label="Moving the globe">
             <li>Drag to turn the globe.</li>

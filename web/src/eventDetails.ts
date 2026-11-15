@@ -5,6 +5,7 @@
 // silently empty record. Every URL goes through safeHref; every date is read as UTC.
 import type { ContextEvent } from './types';
 import { CATEGORY_LABEL, fmtCoord, fmtDatePrecise, fmtDateTime, isCoarseDate, parseUTC, safeHref } from './lib';
+import { withDeadline } from './services';
 
 export interface DetailField {
   label: string;
@@ -241,9 +242,12 @@ export function parseEonet(json: unknown, apiUrl = ''): ParseResult {
   return { ok: true, details: { provider: 'NASA EONET', apiUrl, fields, timeline, lists: sources.length ? [{ label: 'Sources', items: sources }] : [] } };
 }
 
+// NCEI cause codes, from NOAA's own list: https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/descriptors/tsunami/causes
+// (checked live 2026-11-15). Keep in step with TSUNAMI_CAUSE in pipeline/src/fetch-catalogs.mjs.
 const TSUNAMI_CAUSE: Record<string, string> = {
-  0: 'Unknown', 1: 'Earthquake', 2: 'Questionable earthquake', 3: 'Earthquake and landslide', 4: 'Volcano and earthquake', 5: 'Volcano',
-  6: 'Volcano, earthquake and landslide', 7: 'Landslide', 8: 'Meteorological', 9: 'Explosion', 10: 'Astronomical tide',
+  0: 'Unknown', 1: 'Earthquake', 2: 'Questionable earthquake', 3: 'Earthquake and landslide', 4: 'Volcano and earthquake',
+  5: 'Volcano, earthquake and landslide', 6: 'Volcano', 7: 'Volcano and landslide', 8: 'Landslide', 9: 'Meteorological',
+  10: 'Explosion', 11: 'Astronomical tide',
 };
 const TSUNAMI_VALIDITY: Record<string, string> = { '-1': 'erroneous entry', 0: 'event that only caused a seiche', 1: 'very doubtful', 2: 'questionable', 3: 'probable', 4: 'definite' };
 const NCEI_LABELS: Record<string, string> = {
@@ -296,15 +300,18 @@ const PARSERS: Record<DetailSource['kind'], (json: unknown, apiUrl: string) => P
 export async function fetchEventDetails(ev: Pick<ContextEvent, 'id'>, signal?: AbortSignal): Promise<EventDetails> {
   const src = detailSource(ev);
   if (!src) throw new Error('No per-event API is available for this catalog');
-  const res = await fetch(src.apiUrl, { signal, headers: { accept: 'application/json' } });
-  if (!res.ok) throw new Error(`${src.provider} request failed (HTTP ${res.status})`);
-  let json: unknown;
-  try {
-    json = await res.json();
-  } catch (e) {
-    if ((e as Error)?.name === 'AbortError') throw e;
-    throw new Error(`${src.provider} did not return JSON`);
-  }
+  // one deadline for headers and body: a provider that accepts the connection and never answers ends as an error
+  const json = await withDeadline<unknown>(signal, `${src.provider} request timed out`, async (s) => {
+    const res = await fetch(src.apiUrl, { signal: s, headers: { accept: 'application/json' } });
+    if (!res.ok) throw new Error(`${src.provider} request failed (HTTP ${res.status})`);
+    try {
+      return await res.json();
+    } catch (e) {
+      // an abort (the caller's, or the deadline) is not a bad body
+      if (s.aborted || (e as Error)?.name === 'AbortError') throw e;
+      throw new Error(`${src.provider} did not return JSON`);
+    }
+  });
   const parsed = PARSERS[src.kind](json, src.apiUrl);
   if (!parsed.ok) throw new Error(parsed.reason);
   return parsed.details;

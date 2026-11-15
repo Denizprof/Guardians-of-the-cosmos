@@ -18,6 +18,18 @@ describe('Open-Meteo weather (hosted site, no key)', () => {
     expect(buildOpenMeteoUrl(33, -24.55, null, NOW)).toMatch(/^https:\/\/api\.open-meteo\.com\/v1\/forecast\?/);
   });
 
+  // The forecast endpoint answers HTTP 200 with every value null from about 68 days back (measured 2026-11-15),
+  // so dates older than 60 days must go to the archive, which has them.
+  it('uses the archive, not the forecast endpoint, for dates 61 to 90 days old', () => {
+    for (const days of [61, 68, 75, 89]) {
+      const t = new Date(NOW - days * 86_400_000).toISOString();
+      expect(buildOpenMeteoUrl(10, 20, t, NOW), `${days} days`).toMatch(/^https:\/\/archive-api\.open-meteo\.com\/v1\/archive\?/);
+    }
+    expect(buildOpenMeteoUrl(10, 20, new Date(NOW - 59 * 86_400_000).toISOString(), NOW)).toMatch(/^https:\/\/api\.open-meteo\.com\/v1\/forecast\?/);
+    // the endpoint can be forced, for the retry when the forecast endpoint has nothing
+    expect(buildOpenMeteoUrl(10, 20, new Date(NOW - 30 * 86_400_000).toISOString(), NOW, true)).toMatch(/^https:\/\/archive-api\.open-meteo\.com\/v1\/archive\?/);
+  });
+
   it('never asks for a future time', () => {
     const u = new URL(buildOpenMeteoUrl(0, 0, '2030-01-01T00:00:00Z', NOW));
     expect(u.searchParams.get('end_date')).toBe('2026-11-15');

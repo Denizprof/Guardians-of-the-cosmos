@@ -20,6 +20,52 @@ describe('audit-fix sentences have Turkish', () => {
   });
 });
 
+// Second audit round: every sentence the fixes added, as the page renders it (one text node each).
+describe('second-round audit sentences have Turkish', () => {
+  it.each([
+    'Volcano and landslide',
+    'Volcano and landslide (code 7)',
+    'Volcano (code 6)',
+    'The linked investigation "mozambique-floods-2025" was not found.',
+    'Precipitation, event day (UTC)',
+    'The weather service returned no values for this place and time',
+    'Could not get weather data: ',
+    'This event is dated to the day only. Rain is the total for that UTC day; temperature, wind and pressure are one sample at the end of that day.',
+    '(off scale)',
+    'The event date is before the first pass shown. Its line at the edge is not drawn to scale.',
+    'The event date is after the last pass shown. Its line at the edge is not drawn to scale.',
+    'The event date is known only to the month. The band covers the whole month.',
+    'The event date is known only to the year. The band covers the whole year.',
+    ' NISAR layers',
+    'Volcano · InSAR · 3 NISAR layers',
+    'Could not reach the ASF search service (ASF search timed out after 20 s). The curated investigations still work offline.',
+    'Could not reach the ASF search service (ASF search failed (HTTP 500)). The curated investigations still work offline.',
+    'USGS ComCat request timed out',
+    'Eleven NISAR passes on the same orbit from 18 June to 28 October 2026, 12 days apart except for one 24-day gap (24 July to 17 August), processed by us at full resolution (about 20 m). Step through them on the timeline.',
+  ])('%s', (en) => {
+    const tr = translate(en, 'tr');
+    expect(tr).not.toBe(en);
+    for (const n of en.match(/\d+/g) ?? []) expect(tr).toContain(n);
+  });
+  it('the varying parts are carried over and the fixed parts are Turkish', () => {
+    expect(translate('The linked investigation "x-1" was not found.', 'tr')).toBe('Bağlantıdaki "x-1" araştırması bulunamadı.');
+    expect(translate('Volcano and landslide (code 7)', 'tr')).toBe('Yanardağ ve heyelan (kod 7)');
+    const asf = translate('Could not reach the ASF search service (ASF search timed out after 20 s). The curated investigations still work offline.', 'tr');
+    expect(asf).not.toMatch(/timed out|Could not|still work/);
+  });
+  // Coverage probe: an ASF row with an unusable product or orbit direction is listed as UNKNOWN / unknown.
+  it('the placeholder for an unusable ASF value is Turkish', () => {
+    expect(translate('UNKNOWN', 'tr')).toBe('BİLİNMİYOR');
+    expect(translate('unknown', 'tr')).toBe('bilinmiyor');
+  });
+  it('a "(code N)" text with no known label is left as it is', () => {
+    expect(translate('Some new cause (code 99)', 'tr')).toBe('Some new cause (code 99)');
+  });
+  it('the old "NISAR scenes" wording is gone from the table', () => {
+    expect(translate('3 NISAR scenes', 'tr')).toBe('3 NISAR scenes');
+  });
+});
+
 // Regression: the "Recent events" feed said "12 months" while its wildfires covered about five days (a capped
 // fetch). The pipeline now records what each category really covers, and the label must agree with it.
 import fs from 'node:fs';

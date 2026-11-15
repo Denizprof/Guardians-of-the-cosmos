@@ -18,8 +18,52 @@ import { georeference, cropBox } from './georef.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const OUT_ROOT = path.resolve(HERE, '../../web/public/data');
 const CACHE = path.resolve(HERE, '../.cache');
-/** Granules listed in events.config.mjs that ASF did not return (a transient search miss looks like "not observed"). */
-const missingGranules = [];
+/**
+ * Lookup problems found in this run (see auditGranules). Any entry here means events.json is NOT
+ * rewritten: a transient ASF search miss must not look like "not observed".
+ */
+const problems = [];
+
+/**
+ * Check one event's configured granules against the ASF search result, before anything is
+ * downloaded or written. Returns one message per problem:
+ *  - a granule ASF did not return (HTTP 200 with a partial or empty feature list), or
+ *  - a granule whose collection name gives no recognised data tier (never guess VALIDATED).
+ */
+export function auditGranules(ev, found) {
+  const out = [];
+  for (const obs of ev.observations) {
+    const feat = found.get(obs.granule);
+    if (!feat) {
+      out.push(`${obs.granule}: not found on ASF`);
+      continue;
+    }
+    const collection = feat.properties?.collectionName;
+    if (tierOf(collection) === 'UNKNOWN') {
+      out.push(`${obs.granule}: data tier cannot be determined from collection name ${JSON.stringify(collection ?? null)}`);
+    }
+  }
+  return out;
+}
+
+/**
+ * Decide what to write. With any lookup problem the previous manifest is returned unchanged and
+ * write is false. Otherwise each fresh event replaces its previous entry, keeping the stage-2
+ * derived layers (QA-22), in the order of `order` (event ids from events.config.mjs).
+ * Pure: `prev` is never mutated.
+ */
+export function mergeManifest(prev, outEvents, lookupProblems, order) {
+  if (lookupProblems.length) return { manifest: prev, write: false };
+  let events = prev.events;
+  for (const out of outEvents) {
+    const before = events.find((e) => e.id === out.id);
+    const derived = (before?.layers ?? []).filter((l) => l.kind !== 'browse');
+    if (derived.length) console.log(`  ${out.id}: kept ${derived.length} derived layers from the previous manifest`);
+    events = events.filter((e) => e.id !== out.id).concat({ ...out, layers: out.layers.concat(derived) });
+  }
+  events = [...events].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  return { manifest: { ...prev, events }, write: true };
+}
 
 async function download(url, dest) {
   try {
@@ -45,18 +89,20 @@ async function processEvent(ev) {
   console.log(`\n== ${ev.id}`);
   const names = ev.observations.map((o) => o.granule);
   const found = await searchGranules(names);
+  // Check the whole event first: an incomplete event writes no images and no manifest entry.
+  const bad = auditGranules(ev, found);
+  if (bad.length) {
+    for (const b of bad) console.warn(`  PROBLEM: ${b}`);
+    problems.push(...bad);
+    return null;
+  }
   const outDir = path.join(OUT_ROOT, 'events', ev.id);
   await fs.mkdir(outDir, { recursive: true });
 
   // Pass 1: download and georeference every browse image.
   const items = [];
   for (const obs of ev.observations) {
-    const feat = found.get(obs.granule);
-    if (!feat) {
-      console.warn(`  MISSING on ASF: ${obs.granule}`);
-      missingGranules.push(obs.granule);
-      continue;
-    }
+    const feat = found.get(obs.granule); // present: auditGranules passed
     const p = feat.properties;
     const browseUrl = pickBrowse(p);
     // Short hashed cache names: NISAR file names exceed the Windows 260-char path limit.
@@ -166,35 +212,40 @@ function round(v, d) {
   return Math.round(v * f) / f;
 }
 
-const only = process.argv[2];
-if (only && !EVENTS.some((e) => e.id === only)) {
-  console.error(`Unknown event id "${only}". Known: ${EVENTS.map((e) => e.id).join(', ')}`);
-  process.exit(1);
+async function main() {
+  const only = process.argv[2];
+  if (only && !EVENTS.some((e) => e.id === only)) {
+    console.error(`Unknown event id "${only}". Known: ${EVENTS.map((e) => e.id).join(', ')}`);
+    process.exit(1);
+  }
+  const manifestPath = path.join(OUT_ROOT, 'events.json');
+  let manifest = { generated: null, events: [] };
+  try {
+    manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
+  } catch (e) {
+    // A missing manifest is a first run; a corrupt one must not be silently replaced (it holds the
+    // stage-2 derived layers, which would be lost).
+    if (e.code !== 'ENOENT') throw new Error(`Cannot read ${manifestPath}: ${e.message}`);
+  }
+  const outs = [];
+  for (const ev of EVENTS.filter((e) => !only || e.id === only)) {
+    const out = await processEvent(ev);
+    if (out) outs.push(out);
+  }
+  const merged = mergeManifest(manifest, outs, problems, EVENTS.map((e) => e.id));
+  if (!merged.write) {
+    // A failed lookup must not replace a good manifest with one that has lost layers.
+    console.error(
+      `\n${problems.length} configured granule(s) could not be used; ${manifestPath} was NOT rewritten (the previous file, if any, is kept):\n  ${problems.join('\n  ')}`,
+    );
+    process.exitCode = 1;
+    return;
+  }
+  merged.manifest.generated = new Date().toISOString();
+  await fs.writeFile(`${manifestPath}.tmp`, JSON.stringify(merged.manifest, null, 2));
+  await fs.rename(`${manifestPath}.tmp`, manifestPath);
+  console.log(`\nWrote ${manifestPath}`);
 }
-const manifestPath = path.join(OUT_ROOT, 'events.json');
-let manifest = { generated: null, events: [] };
-try {
-  manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
-} catch (e) {
-  // A missing manifest is a first run; a corrupt one must not be silently replaced (it holds the
-  // stage-2 derived layers, which would be lost).
-  if (e.code !== 'ENOENT') throw new Error(`Cannot read ${manifestPath}: ${e.message}`);
-}
-for (const ev of EVENTS.filter((e) => !only || e.id === only)) {
-  const out = await processEvent(ev);
-  // QA-22: keep stage-2 derived layers (process.py) when re-running stage 1.
-  const prev = manifest.events.find((e) => e.id === out.id);
-  const derived = (prev?.layers ?? []).filter((l) => l.kind !== 'browse');
-  if (derived.length) console.log(`  kept ${derived.length} derived layers from the previous manifest`);
-  out.layers = out.layers.concat(derived);
-  manifest.events = manifest.events.filter((e) => e.id !== out.id).concat(out);
-}
-manifest.events.sort((a, b) => EVENTS.findIndex((e) => e.id === a.id) - EVENTS.findIndex((e) => e.id === b.id));
-manifest.generated = new Date().toISOString();
-await fs.writeFile(`${manifestPath}.tmp`, JSON.stringify(manifest, null, 2));
-await fs.rename(`${manifestPath}.tmp`, manifestPath);
-console.log(`\nWrote ${manifestPath}`);
-if (missingGranules.length) {
-  console.error(`\n${missingGranules.length} configured granule(s) were not found on ASF; their layers are missing from the manifest:\n  ${missingGranules.join('\n  ')}`);
-  process.exitCode = 1;
-}
+
+// Run only as a script (node src/fetch-browse.mjs); importing the module for tests does nothing.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

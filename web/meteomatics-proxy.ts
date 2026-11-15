@@ -28,7 +28,8 @@ export function parsePointQuery(q: URLSearchParams, now = Date.now()): PointQuer
   if (q.get('lat') === null || q.get('lon') === null || !Number.isFinite(lat) || !Number.isFinite(lon)) return 'lat and lon are required numbers';
   if (Math.abs(lat) > 90 || Math.abs(lon) > 180) return 'lat/lon out of range';
   const raw = q.get('time');
-  const ms = raw ? Date.parse(raw) : now;
+  // never a future time: a forecast is not the weather of an event (the Open-Meteo path clamps the same way)
+  const ms = raw ? Math.min(Date.parse(raw), now) : now;
   if (raw && (!/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?$/.test(raw) || Number.isNaN(ms))) return 'time must be an ISO 8601 date';
   return { lat: Math.round(lat * 1e4) / 1e4, lon: Math.round(lon * 1e4) / 1e4, time: new Date(ms).toISOString().replace(/\.\d{3}Z$/, 'Z') };
 }

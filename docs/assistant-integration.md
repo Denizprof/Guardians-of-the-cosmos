@@ -137,7 +137,7 @@ Get `mapView` from MapLibre with `const b = map.getBounds(); { center: [c.lng, c
 Vite dev proxy, in `web/vite.config.ts` inside `defineConfig({ ... server: { port: 5173, proxy: { ... } } })`:
 
 ```ts
-server: { port: 5173, proxy: { '/api/assistant': 'http://127.0.0.1:8787' } },
+server: { port: 5173, proxy: { '/api/assistant': { target: 'http://127.0.0.1:8787', changeOrigin: false } } },
 ```
 and set `VITE_ASSISTANT_GATEWAY_URL=/` in `web/.env.local`. With the proxy the browser is same-origin: the gateway accepts a loopback request whose `Origin` matches its `Host` even when `ALLOWED_ORIGINS` is empty. For a static production deploy, host the gateway separately, set `VITE_ASSISTANT_GATEWAY_URL` to its HTTPS URL at build time and list the site origin in `ALLOWED_ORIGINS`.
 

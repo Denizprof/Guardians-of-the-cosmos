@@ -103,4 +103,24 @@ describe('satellite animation loop', () => {
     expect(clear.mock.calls.length).toBeGreaterThan(clears);
     remove();
   });
+
+  // Defect: draw() is throttled to one frame in two, but the decision to stop was taken on every frame. A zoom
+  // that passed the limit on a throttled frame ended the loop without a last draw, so the satellite and its
+  // 44 px button stayed on screen over the zoomed-in map until the map moved again.
+  it('hides the satellite and its button when the loop stops on a frame whose draw was throttled', async () => {
+    const { zoom, remove, host } = attach(4.2);
+    await settle();
+    runFrames(); // drawn at this frame, faint but visible
+    const button = host.querySelector('.sat-button') as HTMLButtonElement;
+    const canvas = host.querySelector('.sat-canvas') as HTMLCanvasElement;
+    expect(button.hidden).toBe(false);
+    expect(Number(canvas.style.opacity)).toBeGreaterThan(0);
+    zoom.value = 4.5; // one step past the limit, and the next frame comes 10 ms later: its draw is skipped
+    now += 10;
+    frames.splice(0).forEach((f) => f(now));
+    expect(frames.length).toBe(0);
+    expect(button.hidden).toBe(true);
+    expect(canvas.style.opacity).toBe('0');
+    remove();
+  });
 });

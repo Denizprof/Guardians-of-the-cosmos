@@ -133,6 +133,57 @@ describe('tutorial card', () => {
     expect(screen.queryByRole('button', { name: 'Skip this step' })).toBeNull();
   });
 
+  it('never shows a step the visitor has nothing to do for: no investigation open means no "close it" step', () => {
+    render(<Tutorial state={idle} onEnd={() => {}} />);
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByRole('button', { name: 'Skip this step' }));
+    expect(screen.queryByText('Done')).toBeNull();
+    expect(title()).toBe(step('layers').title);
+    expect(screen.getByText(`Step 6 of ${TUTORIAL_STEPS.length}`)).toBeInTheDocument();
+    settle();
+    expect(title()).toBe(step('layers').title); // and it does not move on by itself
+  });
+
+  it('still asks to close an investigation that is open', () => {
+    const open = { ...idle, selectedId: 'venezuela-2026' };
+    const { rerender } = render(<Tutorial state={open} onEnd={() => {}} />);
+    for (let i = 0; i < 4; i++) {
+      const skip = screen.queryByRole('button', { name: 'Skip this step' });
+      if (skip) fireEvent.click(skip);
+      else settle(); // "open an investigation" is done by the visitor here
+    }
+    expect(title()).toBe(step('close').title);
+    expect(screen.queryByText('Done')).toBeNull();
+    rerender(<Tutorial state={idle} onEnd={() => {}} />);
+    expect(screen.getByText('Done')).toBeInTheDocument();
+    settle();
+    expect(title()).toBe(step('layers').title);
+  });
+
+  it('passes over the lens, probe and assistant steps when those were already used earlier in the run', () => {
+    const { rerender } = render(<Tutorial state={idle} onEnd={() => {}} />);
+    rerender(<Tutorial state={{ ...idle, lensOn: true, probed: true, assistantOpen: true }} onEnd={() => {}} />);
+    const seen: (string | null)[] = [];
+    for (let guard = 0; guard < 20 && screen.queryByRole('button', { name: 'Close' }) === null; guard++) {
+      seen.push(title());
+      expect(screen.queryByText('Done')).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: 'Skip this step' }));
+    }
+    expect(seen).toEqual(['globe', 'investigation', 'compare', 'level', 'layers', 'search'].map((id) => step(id).title));
+    expect(title()).toBe('Tutorial complete');
+  });
+
+  it('a step that is shown can always be finished, and one that stops applying mid-step can still be skipped', () => {
+    const { rerender } = render(<Tutorial state={idle} onEnd={() => {}} />);
+    for (let i = 0; i < 5; i++) fireEvent.click(screen.getByRole('button', { name: 'Skip this step' })); // on "SAR lens"
+    expect(title()).toBe(step('lens').title);
+    rerender(<Tutorial state={{ ...idle, lensOn: true }} onEnd={() => {}} />);
+    expect(screen.getByText('Done')).toBeInTheDocument();
+    settle();
+    expect(title()).toBe(step('probe').title);
+    fireEvent.click(screen.getByRole('button', { name: 'Skip this step' }));
+    expect(title()).toBe(step('search').title);
+  });
+
   it('End tutorial and the final Close both hand back to the app', () => {
     const onEnd = vi.fn();
     render(<Tutorial state={idle} onEnd={onEnd} />);

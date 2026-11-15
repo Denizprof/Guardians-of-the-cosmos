@@ -27,10 +27,11 @@ function knownBug(id, title, fn) {
 }
 
 // ------------------------------------------------------------------ asf.mjs
-test('tierOf: total, one of four tiers, UR prefix wins, BETA/PROVISIONAL by infix', () => {
+test('tierOf: total, one of four tiers or UNKNOWN, UR prefix wins, BETA/PROVISIONAL by infix', () => {
   fc.assert(fc.property(fc.oneof(fc.string({ maxLength: 40 }), fc.string({ unit: 'binary', maxLength: 40 })), (s) => {
     const t = tierOf(s);
-    assert.ok(['URGENT RESPONSE', 'BETA', 'PROVISIONAL', 'VALIDATED'].includes(t));
+    assert.ok(['URGENT RESPONSE', 'BETA', 'PROVISIONAL', 'VALIDATED', 'UNKNOWN'].includes(t));
+    if (t === 'VALIDATED') assert.match(s, /^NISAR_L\d_[A-Z0-9]+_V\d+$/);
     assert.equal(t === 'URGENT RESPONSE', s.startsWith('NISAR_UR'));
   }), { numRuns: 1000 });
   fc.assert(fc.property(fc.string({ maxLength: 10 }).filter((s) => !s.startsWith('NISAR_UR')), fc.string({ maxLength: 10 }), (a, b) => {

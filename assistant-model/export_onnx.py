@@ -20,6 +20,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from common import BASE_MODEL, ROOT
+from export_cache import STAMP_NAME, can_reuse, write_stamp
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--base", default=BASE_MODEL)
@@ -34,8 +35,21 @@ merged, fp32 = work / "merged", work / "onnx-fp32"
 for d in (out / "onnx", merged, fp32):
     d.mkdir(parents=True, exist_ok=True)
 
-# Steps 1 and 2 are skipped when their output is already there (a re-run after a failure in step 3 or 4).
-if not (fp32 / "model.onnx").exists():
+# Steps 1 and 2 are skipped when their output is already there (a re-run after a failure in step 3 or 4), but
+# only if it was built from this same base model and adapter (export_cache.py). Anything else is rebuilt, so a
+# retrained adapter or another --adapter / --base can never be exported as the old model.
+if can_reuse(work, args.base, args.adapter):
+    print(f"1-2/4 skipped: reusing {fp32 / 'model.onnx'} from an earlier run with the same base model ({args.base}) "
+          f"and adapter ({args.adapter or 'none'}). Delete {work} to rebuild it.", flush=True)
+else:
+    if (fp32 / "model.onnx").exists():
+        print(f"found {fp32 / 'model.onnx'} from an earlier run, but not for this base model and adapter (or it was "
+              "never finished): rebuilding", flush=True)
+    (work / STAMP_NAME).unlink(missing_ok=True)
+    for d in (merged, fp32):
+        shutil.rmtree(d, ignore_errors=True)
+        d.mkdir(parents=True, exist_ok=True)
+
     # 1. merge
     print("1/4 merging the adapter into the base weights", flush=True)
     tokenizer = AutoTokenizer.from_pretrained(args.base)
@@ -53,6 +67,7 @@ if not (fp32 / "model.onnx").exists():
 
     main_export(model_name_or_path=str(merged), output=str(fp32), task="text-generation-with-past", device="cpu", do_validation=False,
                 no_post_process=True)  # the post-processing step cannot handle graphs over 2 GB
+    write_stamp(work, args.base, args.adapter)  # only now: an interrupted export leaves no stamp and is redone
 
 # 3. quantize the big weight matrices to 4 bits
 print("3/4 quantizing to 4-bit weights", flush=True)

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { geocode, nisarCoverage } from '../../src/services';
+import { browseBounds, coverageFeatures } from '../../src/map/coverageSelect';
 
 // RECORDED FIXTURES: real responses captured 2026-11-14 with PowerShell Invoke-WebRequest from
 //   photon.komoot.io (q=Caracas) and api.daac.asf.alaska.edu (NISAR GCOV,GUNW at POINT(-67.5 10.5), 5 results).
@@ -27,11 +28,15 @@ describe('geocode (Photon)', () => {
     expect(url.searchParams.get('limit')).toBe('6');
     expect(url.searchParams.get('lang')).toBe('en');
   });
-  it('forwards the AbortSignal', async () => {
+  it('forwards the caller abort to the request', async () => {
     const f = stubFetch(photon);
+    await geocode('x', new AbortController().signal);
+    expect(((f.mock.calls[0] as any)[1].signal as AbortSignal).aborted).toBe(false);
+    // an already-aborted caller signal reaches fetch as aborted (mid-flight aborts: see the timeout block below)
     const ac = new AbortController();
+    ac.abort();
     await geocode('x', ac.signal);
-    expect((f.mock.calls[0] as any)[1].signal).toBe(ac.signal);
+    expect(((f.mock.calls[1] as any)[1].signal as AbortSignal).aborted).toBe(true);
   });
   it('parses the recorded response into hits with lon/lat in the right order', async () => {
     stubFetch(photon);
@@ -142,6 +147,45 @@ describe('nisarCoverage (ASF SearchAPI)', () => {
     const r = await nisarCoverage(0, 0);
     expect(r.granules[0].thumb).toBeUndefined();
   });
+  // SYNTHETIC rows (no real ASF response looked like this): one malformed row must not stop the whole app.
+  // The panel calls direction[0] / direction.toLowerCase() and renders product, track and frame as text;
+  // the map reads footprint.coordinates.
+  it('a malformed row is made harmless instead of crashing the panel or the map', async () => {
+    const t = '2026-03-01T00:00:00Z';
+    stubFetch({
+      features: [
+        feat('NISAR_L2_GCOV_V1', t, { sceneName: 'BAD_DIRECTION', flightDirection: 7 }),
+        feat('NISAR_L2_GCOV_V1', t, { sceneName: 'BAD_PRODUCT', processingLevel: { level: 'GCOV' } }),
+        feat('NISAR_L2_GCOV_V1', t, { sceneName: 'BAD_NUMBERS', pathNumber: { n: 1 }, frameNumber: [2] }),
+        { ...feat('NISAR_L2_GCOV_V1', t, { sceneName: 'NULL_GEOMETRY' }), geometry: null },
+        { ...feat('NISAR_L2_GCOV_V1', t, { sceneName: 'POINT_GEOMETRY' }), geometry: { type: 'Point', coordinates: [1, 2] } },
+        { ...feat('NISAR_L2_GCOV_V1', t, { sceneName: 'BAD_COORDINATES' }), geometry: { type: 'Polygon', coordinates: 'x' } },
+        feat('NISAR_L2_GCOV_V1', t, { sceneName: 'GOOD' }),
+      ],
+    });
+    const r = await nisarCoverage(0, 0);
+    expect(r.total).toBe(7);
+    const by = (scene: string) => r.granules.find((g) => g.scene === scene)!;
+    for (const g of r.granules) {
+      expect(typeof g.direction).toBe('string');
+      expect(typeof g.product).toBe('string');
+      // rendered as text by the panel: an object here would be a React render error
+      expect(['number', 'string', 'undefined']).toContain(typeof g.track);
+      expect(['number', 'string', 'undefined']).toContain(typeof g.frame);
+    }
+    expect(by('BAD_DIRECTION').direction).toBe('UNKNOWN');
+    expect(by('BAD_PRODUCT').product).toBe('UNKNOWN');
+    for (const scene of ['NULL_GEOMETRY', 'POINT_GEOMETRY', 'BAD_COORDINATES']) {
+      expect(by(scene).footprint).toBeNull();
+      expect(() => coverageFeatures(r.granules, scene)).not.toThrow();
+      expect(coverageFeatures(r.granules, scene)).toEqual([]);
+      expect(() => browseBounds(by(scene).footprint)).not.toThrow();
+    }
+    // the good row is untouched
+    expect(by('GOOD')).toMatchObject({ product: 'GCOV', direction: 'DESCENDING', track: 1, frame: 2 });
+    expect(by('GOOD').footprint.type).toBe('Polygon');
+    expect(coverageFeatures(r.granules, 'GOOD')).toHaveLength(1);
+  });
   it('empty result', async () => {
     stubFetch({ features: [] });
     expect(await nisarCoverage(0, 0)).toMatchObject({ total: 0, granules: [] });
@@ -154,4 +198,75 @@ describe('nisarCoverage (ASF SearchAPI)', () => {
     stubFetch({ error: { type: 'VALIDATION_ERROR', report: 'bad' } });
     await expect(nisarCoverage(0, 0)).rejects.toThrow();
   });
+});
+
+// A server that accepts the connection and never answers must end as an ERROR, not as endless "loading".
+describe('request timeout (stalled upstream)', () => {
+  afterEach(() => vi.useRealTimers());
+
+  const untilAbort = (signal?: AbortSignal) =>
+    new Promise<never>((_, reject) => {
+      if (!signal) return; // no signal at all: hangs for ever (the defect)
+      if (signal.aborted) return reject(signal.reason);
+      signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+    });
+  /** fetch that never answers; rejects only when the signal it was given aborts. */
+  const stallFetch = () => vi.stubGlobal('fetch', vi.fn((_u: unknown, init?: RequestInit) => untilAbort(init?.signal ?? undefined)));
+  /** fetch whose headers arrive but whose body never does. */
+  const stallBody = () =>
+    vi.stubGlobal('fetch', vi.fn(async (_u: unknown, init?: RequestInit) => ({ ok: true, status: 200, json: () => untilAbort(init?.signal ?? undefined) }) as unknown as Response));
+
+  const cases: [string, (s?: AbortSignal) => Promise<unknown>, RegExp][] = [
+    ['nisarCoverage', (s) => nisarCoverage(0, 0, s), /^ASF search timed out/],
+    ['geocode', (s) => geocode('q', s), /^Search timed out/],
+  ];
+  for (const [name, call, msg] of cases) {
+    it(`${name}: a request that never answers rejects with a timeout error after 20 s`, async () => {
+      vi.useFakeTimers();
+      stallFetch();
+      let err: any;
+      let settled = false;
+      call(new AbortController().signal).catch((e) => { err = e; }).finally(() => { settled = true; });
+      await vi.advanceTimersByTimeAsync(19_999);
+      expect(settled).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(settled).toBe(true);
+      expect(err.message).toMatch(msg);
+      expect(err.name).not.toBe('AbortError');
+    }, 2000);
+    it(`${name}: times out without a caller signal too`, async () => {
+      vi.useFakeTimers();
+      stallFetch();
+      let err: any;
+      call().catch((e) => { err = e; });
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(err?.message).toMatch(msg);
+    }, 2000);
+    it(`${name}: a body that stalls after the headers times out too`, async () => {
+      vi.useFakeTimers();
+      stallBody();
+      let err: any;
+      call(new AbortController().signal).catch((e) => { err = e; });
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(err?.message).toMatch(msg);
+      expect(err?.name).not.toBe('AbortError');
+    }, 2000);
+    it(`${name}: the caller's abort before the timeout still rejects as AbortError`, async () => {
+      vi.useFakeTimers();
+      stallFetch();
+      const ac = new AbortController();
+      let err: any;
+      call(ac.signal).catch((e) => { err = e; });
+      await vi.advanceTimersByTimeAsync(5000);
+      ac.abort();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(err?.name).toBe('AbortError');
+    }, 2000);
+    it(`${name}: leaves no timer running after a normal answer`, async () => {
+      vi.useFakeTimers();
+      stubFetch({ features: [] });
+      await call(new AbortController().signal);
+      expect(vi.getTimerCount()).toBe(0);
+    }, 2000);
+  }
 });

@@ -105,6 +105,18 @@ describe('parseCoords', () => {
   it('accepts a decimal comma ("10,5 N 67,2 W")', () => {
     expect(parseCoords('10,5 N 67,2 W')).toEqual([-67.2, 10.5]);
   });
+
+  // A hemisphere letter separated from "<number>°" must attach to THAT number, not the next one.
+  it.each<[string, [number, number]]>([
+    ['10.5° N, 67.2° W', [-67.2, 10.5]],
+    ['45° N 90°', [90, 45]],
+    ['40° S 20°', [20, -40]],
+    ['67.2° W 10.5° N', [-67.2, 10.5]],
+    ['10.5°N 67.2°W', [-67.2, 10.5]],
+    ['N 10.5° W 67.2°', [-67.2, 10.5]],
+  ])('degree sign before a separated hemisphere letter: %s', (q, expected) => {
+    expect(parseCoords(q)).toEqual(expected);
+  });
 });
 
 describe('category tables', () => {

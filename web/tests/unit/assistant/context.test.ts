@@ -89,3 +89,35 @@ describe('buildRequest', () => {
     expect(r.version).toBe('1.0');
   });
 });
+
+describe('limits and precision are passed on, not hidden', () => {
+  const granules = Array.from({ length: 30 }, (_, i) => ({ scene: `S${i}`, product: 'GCOV', start: '2026-01-01T00:00:00Z', tier: 'BETA', track: 1, frame: 1, direction: 'A', footprint: { type: 'Polygon' as const, coordinates: [] } }));
+
+  it('marks a capped coverage search as truncated and leaves the key out otherwise', () => {
+    expect(buildCoverageContext({ lon: 0, lat: 0, total: 250, granules, truncated: true }).truncated).toBe(true);
+    expect('truncated' in buildCoverageContext({ lon: 0, lat: 0, total: 30, granules, truncated: false })).toBe(false);
+    expect('truncated' in buildCoverageContext({ lon: 0, lat: 0, total: 30, granules })).toBe(false);
+    expect(buildContext({ coverage: { lon: 0, lat: 0, total: 250, granules, truncated: true } }).coverage?.truncated).toBe(true);
+  });
+
+  it('a request with truncated coverage is valid under the shared request schema', async () => {
+    const ctx = buildContext({ coverage: { lon: 0, lat: 0, total: 250, granules, truncated: true } });
+    const res = await schemaCheck(buildRequest({ query: 'How many passes?', locale: 'en', level: 'simple', context: ctx }));
+    expect(res.errors).toEqual([]);
+  });
+
+  it('sends a date only to the precision that was recorded', () => {
+    const base = events[0];
+    const at = (date: string, date_precision?: string) => buildContext({ event: { ...base, date, date_precision } as SarEvent }).event?.date;
+    expect(at('2025-08-02T00:00:00Z', 'day')).toBe('2025-08-02');
+    expect(at('2025-08-02T00:00:00Z', 'month')).toBe('2025-08');
+    expect(at('2025-08-02T00:00:00Z', 'year')).toBe('2025');
+    expect(at('2025-08-02T14:31:00Z', 'minute')).toBe('2025-08-02T14:31:00Z');
+    expect(at('2025-08-02T14:31:00Z')).toBe('2025-08-02T14:31:00Z');
+  });
+
+  it('no shipped event with day precision is sent with a time of day', () => {
+    const dayEvents = events.filter((e) => e.date && e.date_precision === 'day');
+    for (const e of dayEvents) expect(buildContext({ event: e }).event?.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});

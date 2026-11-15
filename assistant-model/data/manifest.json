@@ -19,27 +19,27 @@
   "kb:layer-gibs-modis-terra-lst-day-colours",
   "kb:layer-gibs-opera-dswx-s1-colours",
   "kb:layer-gibs-opera-dist-ann-hls-colours",
-  "kb:layer-gibs-viirs-noaa20-night-lights-colours",
+  "kb:layer-gibs-landsat-hbase-2010-colours",
   "kb:sar-nisar-band",
   "kb:sar-polar",
   "kb:sar-urban",
   "kb:sar-prediction-vs-warning"
  ],
  "counts": {
-  "train": 2764,
-  "val": 176,
-  "test": 356
+  "train": 2786,
+  "val": 174,
+  "test": 355
  },
  "by_type": {
-  "train/answer": 1765,
-  "train/decline-offtopic": 198,
-  "train/decline-missing": 634,
   "train/view": 150,
-  "train/answer-two": 17,
-  "val/answer": 126,
-  "val/decline-missing": 50,
+  "train/decline-missing": 643,
+  "train/answer": 1777,
+  "train/answer-two": 18,
+  "train/decline-offtopic": 198,
+  "val/answer": 128,
+  "val/decline-missing": 46,
   "test/answer": 209,
-  "test/decline-missing": 78,
+  "test/decline-missing": 77,
   "test/answer-two": 7,
   "test/view": 40,
   "test/decline-offtopic": 22

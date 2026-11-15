@@ -33,8 +33,9 @@ export function buildEventContext(event: SarEvent): ContextEvent {
     title: clip(event.title, 300),
     subtitle: clip(event.subtitle, 300),
     category: clip(event.category, 30),
-    // a date known only to the month or year is sent as "2026-01" / "2026", so the assistant cannot quote a day nobody recorded
-    date: event.date ? clip(event.date_precision === 'month' ? event.date.slice(0, 7) : event.date_precision === 'year' ? event.date.slice(0, 4) : event.date, 40) : event.date,
+    // a date known only to the day, month or year is sent as "2026-01-05" / "2026-01" / "2026", so the assistant cannot quote
+    // a time or a day nobody recorded
+    date: event.date ? clip(event.date_precision === 'day' ? event.date.slice(0, 10) : event.date_precision === 'month' ? event.date.slice(0, 7) : event.date_precision === 'year' ? event.date.slice(0, 4) : event.date, 40) : event.date,
     technique: event.technique,
     location: { lon: event.location.lon, lat: event.location.lat },
     references: event.references.slice(0, 20).map((r, i) => ({ citation_id: referenceCitationId(event.id, i), label: clip(r.label, 300), url: clip(r.url, 1000) })),
@@ -92,12 +93,16 @@ export function buildMapView(view?: { center: [number, number]; zoom: number; bb
   return { center: [r(center[0]), r(center[1])], zoom: Math.round(zoom * 100) / 100, bbox: [r(bbox[0]), r(bbox[1]), r(bbox[2]), r(bbox[3])] };
 }
 
-/** Caps the granule list (newest first, as returned by the service) but keeps the true total. */
+/**
+ * Caps the granule list (newest first, as returned by the service). `total` is the number of products the search
+ * listed, which is not the full count when the search hit its row limit: that limit is passed on as `truncated`.
+ */
 export function buildCoverageContext(cov: CoverageResult, max = MAX_COVERAGE_GRANULES): ContextCoverage {
   return {
     lon: cov.lon,
     lat: cov.lat,
     total: cov.total,
+    ...(cov.truncated ? { truncated: true } : {}),
     granules: cov.granules.slice(0, max).map((g) => ({
       citation_id: granuleCitationId(g.scene),
       scene: g.scene,

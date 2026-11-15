@@ -5,6 +5,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SAR_LENS_SOURCE, layerDates, lensDateLabel, lensDates, lensTileUrls, type SarLensSource } from '../../src/map/sarLens';
+import { LENS_TILE_PROTOCOL } from '../../src/map/lensTiles';
+import { lensStyle } from '../../src/map/style';
 import SarLens, { type LensGeometry } from '../../src/components/SarLens';
 import ContextPanel from '../../src/components/ContextPanel';
 import type { ContextEvent } from '../../src/types';
@@ -47,6 +49,16 @@ describe('SAR lens source', () => {
     const mosaic: SarLensSource = { ...SAR_LENS_SOURCE, partial: false, layers: [{ id: 'm', tiles: 'https://example.invalid/{z}/{x}/{y}.png', tileSize: 256, minzoom: 0, maxzoom: 10, stackDays: 6, lagDays: 1 }] };
     expect(lensTileUrls(mosaic, NOW)).toEqual([{ id: 'm', date: null, url: 'https://example.invalid/{z}/{x}/{y}.png', tileSize: 256, minzoom: 0, maxzoom: 10 }]);
     expect(lensDateLabel(mosaic, NOW)).toBe('');
+  });
+  it('every radar source of the lens style loads through the retrying loader, never the plain <img> path', () => {
+    const sources = Object.entries(lensStyle().sources).filter(([id]) => id.startsWith('lens-'));
+    expect(sources).toHaveLength(SAR_LENS_SOURCE.layers.reduce((n, l) => n + l.stackDays, 0));
+    for (const [, s] of sources) {
+      const tiles = (s as { tiles: string[] }).tiles;
+      expect(tiles).toHaveLength(1);
+      expect(tiles[0].startsWith(`${LENS_TILE_PROTOCOL}://gibs.earthdata.nasa.gov/`)).toBe(true);
+      expect(tiles[0]).toMatch(/\{z\}\/\{y\}\/\{x\}\.png$/);
+    }
   });
   it('a fixed end date pins the stack', () => {
     const pinned: SarLensSource = { ...SAR_LENS_SOURCE, date: '2026-01-17' };
@@ -206,7 +218,7 @@ describe('ContextPanel (reported / catalog event)', () => {
     const p = props(quake);
     render(<ContextPanel {...p} />);
     await userEvent.click(screen.getByRole('button', { name: 'Satellite data here?' }));
-    expect(p.onCheckCoverage).toHaveBeenCalledWith(quake.lon, quake.lat, quake.date);
+    expect(p.onCheckCoverage).toHaveBeenCalledWith(quake.lon, quake.lat, quake.date, quake.date_precision); // the record's date precision goes with it
     await userEvent.click(screen.getByRole('button', { name: 'Close event details' }));
     expect(p.onClose).toHaveBeenCalledOnce();
   });

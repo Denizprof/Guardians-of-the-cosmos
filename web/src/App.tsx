@@ -76,6 +76,10 @@ export default function App() {
   const [visible, setVisible] = useState<Set<Category>>(new Set(ALL_CATS));
   const [showContext, setShowContext] = useState(true);
   const [panelView, setPanelView] = useState<PanelView>('none');
+  /** The chat inside the open investigation's panel was opened with Ask or the satellite (the tutorial watches this). */
+  const [panelAskOpen, setPanelAskOpen] = useState(false);
+  /** A link named an investigation that is not in the data: said on screen, never a silent blank globe. */
+  const [missingId, setMissingId] = useState<string | null>(null);
   const [ctxSel, setCtxSel] = useState<ContextEvent | null>(null);
   const [popover, setPopover] = useState<Popover>(null);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
@@ -90,7 +94,7 @@ export default function App() {
   const isMobile = useIsMobile();
   const viewportH = useViewportHeight();
   const [years, setYears] = useState<[number, number]>([1900, new Date().getUTCFullYear()]);
-  const [probe, setProbe] = useState<{ lon: number; lat: number; date: string | null } | null>(null);
+  const [probe, setProbe] = useState<{ lon: number; lat: number; date: string | null; precision?: string | null } | null>(null);
   const [catalogLayers, setCatalogLayers] = useState<CatalogLayer[]>([]);
   const [layerState, setLayerState] = useState<Record<string, LayerState>>({});
   const [lensOn, setLensOn] = useState(false);
@@ -146,6 +150,25 @@ export default function App() {
   const selected = useMemo(() => events.find((e) => e.id === selectedId) ?? null, [events, selectedId]);
   const before = selected?.layers.find((l) => l.id === beforeId) ?? null;
   const after = selected?.layers.find((l) => l.id === afterId) ?? null;
+  const openId = selected?.id ?? null;
+  useEffect(() => setPanelAskOpen(false), [openId]); // another investigation, or none: its chat is not open yet
+
+  // A link to an investigation that does not exist (old or mistyped): say so and go to the landing view.
+  // Declared before the URL-write effect, so the dead link is replaced and does not stay as a Back entry.
+  const firstLink = useRef(true);
+  useEffect(() => {
+    if (!events.length) return;
+    const first = firstLink.current;
+    firstLink.current = false;
+    if (!selectedId || selected) return;
+    setMissingId(selectedId);
+    setSelectedId(null);
+    setBeforeId(null);
+    setAfterId(null);
+    if (readHash().event === selectedId) history.replaceState(null, '', '#/');
+    // the link named nothing after all: a first visit gets the front page, as on the landing view
+    if (first && shouldShowIntro({ event: null })) setFrontOpen(true);
+  }, [events.length, selectedId, selected]);
 
   // default before/after when an event opens (or the URL names unknown layers)
   useEffect(() => {
@@ -175,6 +198,10 @@ export default function App() {
         setCtxSel(null);
         setPopover(null);
         clearCoverageRef.current();
+        // the reader asked for this investigation: it must not stay hidden behind the front page or the tour
+        setFrontOpen(false);
+        setIntroOpen(false);
+        focusToolAfterFront.current = true;
       }
     };
     window.addEventListener('hashchange', onHash);
@@ -206,6 +233,7 @@ export default function App() {
   const clearCoverageRef = useRef(clearCoverage);
   clearCoverageRef.current = clearCoverage;
 
+  const focusToolAfterFront = useRef(false);
   const selectEvent = useCallback((id: string | null) => {
     setSelectedId(id);
     setBeforeId(null);
@@ -230,12 +258,12 @@ export default function App() {
     clearCoverage();
   }, [selectEvent, clearCoverage]);
 
-  const runCoverage = useCallback(async (lon: number, lat: number, date: string | null = null) => {
+  const runCoverage = useCallback(async (lon: number, lat: number, date: string | null = null, precision: string | null = null) => {
     setSelectedId(null);
     setCtxSel(null);
     setPanelView('probe');
     setPopover(null);
-    setProbe({ lon, lat, date });
+    setProbe({ lon, lat, date, precision });
     setCoverage(null);
     setCoverageState('loading');
     setCoverageError(null);
@@ -412,10 +440,10 @@ export default function App() {
     markIntroSeen();
     focusToolAfterFront.current = true; // focus moves once the tool is no longer inert (effect below)
   }, []);
-  const focusToolAfterFront = useRef(false);
   useEffect(() => {
     if (frontOpen || !focusToolAfterFront.current) return;
     focusToolAfterFront.current = false;
+    if (appRef.current?.contains(document.activeElement)) return; // focus is already in the tool (e.g. a panel heading)
     appRef.current?.querySelector<HTMLElement>('.topbar .tool')?.focus({ preventScroll: true });
   }, [frontOpen]);
   /** Start the interactive tutorial on a clean tool: nothing open, so its first steps make sense. */
@@ -438,7 +466,7 @@ export default function App() {
   const probed = probe !== null;
   const flyNonce = flyTo?.nonce ?? 0;
   const layersOn = tileOverlays.length;
-  const assistantOpen = !selected && panelView === 'assistant';
+  const assistantOpen = selected ? panelAskOpen : panelView === 'assistant';
   const tutorialState = useMemo<TutorialState>(
     () => ({ selectedId, mode, level, layersOn, lensOn, probed, flyNonce, assistantOpen }),
     [selectedId, mode, level, layersOn, lensOn, probed, flyNonce, assistantOpen],
@@ -462,6 +490,7 @@ export default function App() {
         ask.open = true;
         ask.scrollIntoView({ block: 'start' });
         ask.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+        setPanelAskOpen(true);
       }
       return;
     }
@@ -595,6 +624,7 @@ export default function App() {
         onSelectEvent={selectEvent}
         onSelectContext={selectContext}
         onMapClick={onMapClick}
+        probing={coverageMode && !selected}
         onAskAssistant={askFromSatellite}
         onPin={onMapPin}
         flyTo={flyTo}
@@ -608,6 +638,13 @@ export default function App() {
         <div className="map-error" role="alert">
           <span>Some map data failed to load: {[...mapErrors].join(', ')}. What you see may be incomplete; it does not mean there is no data.</span>
           <button type="button" className="link" onClick={() => setMapErrors(new Set())}>Dismiss</button>
+        </div>
+      )}
+
+      {missingId && (
+        <div className="map-error" role="status" style={mapErrors.size > 0 ? { top: 'auto', bottom: 'var(--sp-4, 16px)' } : undefined}>
+          <span>{`The linked investigation "${missingId}" was not found.`}</span>
+          <button type="button" className="link" onClick={() => setMissingId(null)}>Dismiss</button>
         </div>
       )}
 

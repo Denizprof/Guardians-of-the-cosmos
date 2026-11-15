@@ -82,6 +82,24 @@ describe('front page', () => {
     expect(onStart).toHaveBeenCalledTimes(2);
   });
 
+  it('"How to use it" in the hero scrolls to that section and moves focus to its heading, so reading continues there', async () => {
+    setup();
+    const scrolled = vi.fn();
+    const had = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollIntoView');
+    Element.prototype.scrollIntoView = scrolled; // jsdom has none
+    try {
+      await userEvent.click(screen.getByRole('link', { name: 'How to use it' }));
+      const h2 = screen.getByRole('heading', { level: 2, name: 'How to use it' });
+      expect(scrolled).toHaveBeenCalledTimes(1);
+      expect(document.activeElement).toBe(h2);
+      expect(h2.getAttribute('tabindex')).toBe('-1'); // focusable from script, not an extra Tab stop
+      expect(h2.closest('section')!.id).toBe('fp-how');
+    } finally {
+      if (had) Object.defineProperty(Element.prototype, 'scrollIntoView', had);
+      else delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+    }
+  });
+
   it('offers the interactive tutorial as a second way in', async () => {
     const { onTutorial, onStart } = setup();
     await userEvent.click(screen.getByRole('button', { name: 'Take the interactive tutorial' }));

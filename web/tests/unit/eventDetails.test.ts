@@ -206,6 +206,23 @@ describe('parseNceiTsunami (recorded event 6196)', () => {
     expect(get(f, 'Earthquake magnitude (Mw)')?.value).toBe('6.9');
     expect(get(f, 'NCEI reference ids')?.value).toBe('14545, 14544');
   });
+  // Regression: the table was shifted from code 5 upward (Hunga Tonga 2022, code 6, showed "Volcano, earthquake and landslide").
+  // The list is NOAA's own: hazard-service /api/v1/descriptors/tsunami/causes.
+  it('decodes every NCEI cause code as NOAA defines it', () => {
+    const official: Record<number, string> = {
+      0: 'Unknown', 1: 'Earthquake', 2: 'Questionable earthquake', 3: 'Earthquake and landslide', 4: 'Volcano and earthquake',
+      5: 'Volcano, earthquake and landslide', 6: 'Volcano', 7: 'Volcano and landslide', 8: 'Landslide', 9: 'Meteorological',
+      10: 'Explosion', 11: 'Astronomical tide',
+    };
+    for (const [code, label] of Object.entries(official)) {
+      const res = parseNceiTsunami({ id: 1, year: 2022, causeCode: Number(code) });
+      if (!res.ok) throw new Error(res.reason);
+      expect(get(res.details.fields, 'Cause')?.value).toBe(`${label} (code ${code})`);
+    }
+    const other = parseNceiTsunami({ id: 1, year: 2022, causeCode: 12 });
+    if (!other.ok) throw new Error(other.reason);
+    expect(get(other.details.fields, 'Cause')?.value).toBe('Unlisted cause (code 12)');
+  });
   it('strips the HTML that NCEI puts in comments (text only reaches the page)', () => {
     if (!r.ok) throw new Error(r.reason);
     expect(ncei.comments).toContain('<p>');
@@ -254,11 +271,56 @@ describe('fetchEventDetails', () => {
     expect(d.apiUrl).toBe(f.mock.calls[0][0]);
     expect(d.fields.length).toBeGreaterThan(15);
   });
-  it('forwards the AbortSignal', async () => {
+  it("forwards the caller's abort to the request", async () => {
     const f = respond(eonet);
+    // the request runs on a signal that also carries the 20 s deadline; the caller's abort must reach it
+    await fetchEventDetails({ id: 'eonet-EONET_26331' }, new AbortController().signal);
+    expect(((f.mock.calls[0][1] as RequestInit).signal as AbortSignal).aborted).toBe(false);
     const ctl = new AbortController();
+    ctl.abort();
     await fetchEventDetails({ id: 'eonet-EONET_26331' }, ctl.signal);
-    expect((f.mock.calls[0][1] as RequestInit).signal).toBe(ctl.signal);
+    expect(((f.mock.calls[1][1] as RequestInit).signal as AbortSignal).aborted).toBe(true);
+  });
+  // A provider that accepts the connection and never answers must end as an error, not as endless "loading".
+  describe('stalled provider', () => {
+    afterEach(() => vi.useRealTimers());
+    const untilAbort = (signal?: AbortSignal | null) =>
+      new Promise<never>((_, reject) => {
+        if (!signal) return;
+        if (signal.aborted) return reject(signal.reason);
+        signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+      });
+    it('a request that never answers rejects with a timeout error after 20 s', async () => {
+      vi.useFakeTimers();
+      vi.stubGlobal('fetch', vi.fn((_u: unknown, init?: RequestInit) => untilAbort(init?.signal)));
+      let err: any;
+      let settled = false;
+      fetchEventDetails({ id: 'usgs-us6000u43g' }).catch((e) => { err = e; }).finally(() => { settled = true; });
+      await vi.advanceTimersByTimeAsync(19_999);
+      expect(settled).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(err?.message).toBe('USGS ComCat request timed out');
+      expect(err?.name).not.toBe('AbortError');
+    }, 2000);
+    it('a body that stalls after the headers is a timeout, not "did not return JSON"', async () => {
+      vi.useFakeTimers();
+      vi.stubGlobal('fetch', vi.fn(async (_u: unknown, init?: RequestInit) => ({ ok: true, status: 200, json: () => untilAbort(init?.signal) }) as unknown as Response));
+      let err: any;
+      fetchEventDetails({ id: 'ncei-tsu-6196' }, new AbortController().signal).catch((e) => { err = e; });
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(err?.message).toBe('NOAA NCEI tsunami database request timed out');
+    }, 2000);
+    it("the caller's abort before the deadline still rejects as AbortError", async () => {
+      vi.useFakeTimers();
+      vi.stubGlobal('fetch', vi.fn((_u: unknown, init?: RequestInit) => untilAbort(init?.signal)));
+      const ctl = new AbortController();
+      let err: any;
+      fetchEventDetails({ id: 'usgs-us6000u43g' }, ctl.signal).catch((e) => { err = e; });
+      await vi.advanceTimersByTimeAsync(5_000);
+      ctl.abort();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(err?.name).toBe('AbortError');
+    }, 2000);
   });
   it('rejects with a readable message on HTTP errors, non-JSON bodies and unexpected shapes', async () => {
     respond({}, { ok: false, status: 404 });

@@ -17,13 +17,20 @@ const web = path.resolve(here, '../web');
 const SITE = 'https://globalsar.earth/';
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 const clean = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
-/** Cut at a sentence end so a record stays short enough for a small model's prompt. */
-function fit(text, maxChars) {
+/** A layer description is never cut below this many characters to make room for its facts and limitations. */
+const DESCRIPTION_MIN = 320;
+/**
+ * Cut at a sentence end so a record stays short enough for a small model's prompt.
+ * A shortened text always ends in "…", so it never looks complete; a semicolon is not a sentence end.
+ */
+export function fit(text, maxChars) {
   const t = clean(text);
   if (t.length <= maxChars) return t;
   const cut = t.slice(0, maxChars);
-  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('; '));
-  return end > maxChars * 0.5 ? cut.slice(0, end + 1) : `${cut.slice(0, cut.lastIndexOf(' '))}…`;
+  const end = cut.lastIndexOf('. ');
+  if (end > maxChars * 0.5) return `${cut.slice(0, end + 1)} …`;
+  const word = cut.lastIndexOf(' ');
+  return `${(word > 0 ? cut.slice(0, word) : cut).replace(/[\s;,:(]+$/, '')}…`;
 }
 
 export async function buildKb() {
@@ -92,11 +99,14 @@ export async function buildKb() {
   // --- the satellite layers and their colour legends
   for (const l of layers) {
     const src = l.legend?.source?.url ? l.legend.source : { label: l.provider, url: SITE };
-    const facts = `Provider: ${l.provider}. Mission: ${l.mission}. Resolution: ${l.resolution}.`;
+    // The provider, resolution and limitations are never shortened: only the description gives way when a record
+    // is long (and is then marked with "…"). A layer's limits must always be stated in full.
+    const tail = clean(`Provider: ${l.provider}. Mission: ${l.mission}. Resolution: ${l.resolution}. Limitations: ${l.limitations}`);
+    const withTail = (description, budget) => `${fit(description, Math.max(DESCRIPTION_MIN, budget - tail.length - 1))} ${tail}`;
     add({
       id: `kb:layer-${l.id}`, topic: 'layer', title: `Layer: ${l.title}`,
-      text_en: fit(`${l.description_simple} ${facts} Limitations: ${l.limitations}`, 620),
-      text_scientific_en: fit(`${l.description_scientific} ${facts} Limitations: ${l.limitations}`, 760),
+      text_en: withTail(l.description_simple, 620),
+      text_scientific_en: withTail(l.description_scientific, 760),
       questions_en: [`What does the ${l.title} layer show?`, `What is ${l.title}?`, `What are the limitations of ${l.title}?`, `Where does the ${l.title} data come from?`, `What is the resolution of ${l.title}?`],
       source: { label: l.provider, url: src.url },
     });
@@ -157,6 +167,11 @@ export async function buildKb() {
     seen.add(r.id);
     if (!r.text_en || !r.questions_en?.length) throw new Error(`empty record ${r.id}`);
     if (!/^https?:\/\//.test(r.source.url) || !r.source.label) throw new Error(`record ${r.id} has no usable source`);
+    if (r.topic === 'layer' && !r.id.endsWith('-colours')) {
+      for (const k of ['text_en', 'text_scientific_en']) {
+        if (!r[k]?.includes('Resolution:') || !r[k].includes('Limitations:')) throw new Error(`layer record ${r.id} ${k} lost its resolution or limitations`);
+      }
+    }
     for (const k of Object.keys(r)) if (r[k] === undefined || r[k] === '') delete r[k];
   }
   return {

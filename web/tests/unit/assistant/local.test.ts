@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { LocalAssistantAdapter, type Engine } from '../../../src/assistant/local/adapter';
-import { NO_ANSWER, buildIndex, buildMessages, detectLang, parseOutput, retrieve, type KbFile, type KbRecord, type Source } from '../../../src/assistant/local/core';
+import { NO_ANSWER, buildIndex, buildMessages, contextSources, detectLang, parseOutput, retrieve, type KbFile, type KbRecord, type Source } from '../../../src/assistant/local/core';
 import { buildRequest, collectCitationIds } from '../../../src/assistant/context';
 import { validateResponse } from '../../../src/assistant/validate';
 import type { AssistantContext } from '../../../src/assistant/types';
@@ -51,6 +51,19 @@ describe('core: retrieval and output checks', () => {
     expect(retrieve(index, 'SAR NEDİR')[0].record.id).toBe('kb:concept-sar');
     expect(detectLang('SAR nedir?')).toBe('tr');
     expect(detectLang('What is SAR?')).toBe('en');
+  });
+  it('does not take an English question for Turkish because of a place name with ö, ü, ç or ş', () => {
+    expect(detectLang('Why is Zürich dark?')).toBe('en');
+    expect(detectLang('Is there NISAR coverage over Kahramanmaraş?')).toBe('en');
+    expect(detectLang('What does the radar show near Düsseldorf?')).toBe('en');
+    expect(detectLang('Kahramanmaraş depremi nedir?')).toBe('tr');
+    expect(detectLang('Görüntü neden karanlık?')).toBe('tr');
+    expect(detectLang('Bu görüntü çok bulanık')).toBe('tr');
+    // no telling word either way: Turkish-only letters, then the interface language, decide
+    expect(detectLang('Kahramanmaraş')).toBe('tr');
+    expect(detectLang('Zürich', 'tr-TR')).toBe('tr');
+    expect(detectLang('Zürich', 'en-US')).toBe('en');
+    expect(detectLang('Zürich')).toBe('en');
   });
   const sources: Source[] = [{ id: 'kb:a', text: 'A.', label: 'A', type: 'reference' }];
   it('accepts an answer only when every marker names a given source', () => {
@@ -103,6 +116,14 @@ describe('LocalAssistantAdapter without a model (knowledge-base mode)', () => {
     expect(res.answer?.text).toContain('kendi mikrodalga darbelerini');
   });
 
+  it('answers an English question in English even when it has a place name with ü', async () => {
+    const { res } = await ask(adapterWith(), 'How does a radar satellite work over Zürich?', {}, 'en');
+    expect(res.answer?.text).toContain('sends its own microwave pulses');
+    expect(res.limitations?.[0]).toBe('Quoted from the knowledge base as it is written; no AI model worded this answer.');
+    const none = await ask(adapterWith(), 'Why is Zürich so expensive?', {}, 'en');
+    expect(none.res.error?.message).toMatch(/^I don't have a checked source/);
+  });
+
   it('greets by introducing itself from its own record', async () => {
     const { res, allowed } = await ask(adapterWith(), 'Hello!');
     expect(res.status).toBe('ok');
@@ -146,6 +167,19 @@ describe('questions about "this" while an investigation is open', () => {
   it('a general question still finds the general record while an investigation is open', async () => {
     const { res } = await ask(adapterWith(null, kb), 'What is SAR?', EVENT_CTX);
     expect(res.citations?.map((c) => c.id)).toEqual(['kb:concept-sar']);
+  });
+});
+
+describe('coverage probe sentence: a capped list is not stated as the full count', () => {
+  const g = { citation_id: 'granule:A', scene: 'A', product: 'GCOV', start: '2026-01-01T00:00:00Z', tier: 'BETA', track: 1, frame: 2, direction: 'ASCENDING' };
+  it('says "at least N" and that more exist when the search hit its row limit', () => {
+    const text = contextSources({ coverage: { lon: 1, lat: 2, total: 250, truncated: true, granules: [g] } })[0].text;
+    expect(text).toContain('lists at least 250 NISAR product(s) (the list is capped; more exist). Newest: ');
+  });
+  it('states the plain count when the list is complete', () => {
+    const text = contextSources({ coverage: { lon: 1, lat: 2, total: 3, granules: [g] } })[0].text;
+    expect(text).toContain('lists 3 NISAR product(s). Newest: ');
+    expect(text).not.toContain('at least');
   });
 });
 
@@ -244,6 +278,36 @@ describe('the shipped knowledge base (public/data/assistant/kb.json)', () => {
   });
   it.each(['How do I cook pasta?', 'Tell me a joke about cats', 'What is the population of Turkey?', 'Write me a poem'])('"%s" finds nothing', (q) => {
     expect(retrieve(index, q)).toEqual([]);
+  });
+  // A question that names the app itself ("this app", "this website", "the assistant here") is about the app,
+  // not about the open investigation, even though it contains a pointing word.
+  const KRASH: AssistantContext = {
+    event: { citation_id: 'event:krasheninnikov-2026', id: 'krasheninnikov-2026', title: 'Krasheninnikov eruption', category: 'volcano', date: '2026-01-01T00:00:00Z', technique: 'insar', location: { lon: 160.27, lat: 54.59 } },
+  };
+  it.each([
+    ['What is this app?', 'kb:app-what'],
+    ['Who made this website?', 'kb:app-what'],
+    ['Bu uygulama nedir?', 'kb:app-what'],
+    ['How do I use the assistant here?', 'kb:app-assistant'],
+    ['How do I compare before and after in this app?', 'kb:app-compare'],
+    ['What are the data tiers shown in this app?', 'kb:app-tiers'],
+  ])('with an investigation open, "%s" is still answered by %s', async (q, id) => {
+    const { res } = await ask(adapterWith(null, kb), q, KRASH);
+    expect(res.status).toBe('ok');
+    expect(res.citations?.[0]?.id).toBe(id);
+  });
+  it.each([
+    ['What am I looking at?', 'event:krasheninnikov-2026'],
+    ['What does the radar show here?', 'kb:event-krasheninnikov-2026-radar'],
+    ['How reliable is this analysis?', 'kb:event-krasheninnikov-2026-caveats'],
+  ])('with an investigation open, "%s" is still answered by the investigation (%s)', async (q, id) => {
+    const { res } = await ask(adapterWith(null, kb), q, KRASH);
+    expect(res.citations?.map((c) => c.id)).toEqual([id]);
+  });
+  it('a question that names the app but matches no record is declined, not answered with the open investigation', async () => {
+    const { res } = await ask(adapterWith(null, KB), 'Is this website free of charge?', EVENT_CTX);
+    expect(res.status).toBe('error');
+    expect(res.error?.code).toBe('insufficient_context');
   });
   it('contains none of the legacy records that failed the source check', () => {
     const ids = new Set(kb.records.map((r) => r.id));

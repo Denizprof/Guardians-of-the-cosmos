@@ -54,22 +54,34 @@ function YearRange({ years, onYears }: { years: [number, number]; onYears: (y: [
     setFrom(String(years[0]));
     setTo(String(years[1]));
   }, [years]);
-  useEffect(() => {
-    const t = window.setTimeout(() => {
-      const lo = Math.max(1900, Math.min(Number(from) || 1900, THIS_YEAR));
-      const hi = Math.max(lo, Math.min(Number(to) || THIS_YEAR, THIS_YEAR));
-      if (lo === committed.current[0] && hi === committed.current[1]) return;
+  /** Clamp the typed text to a valid range and apply it; returns the range now in force. */
+  const commit = (): [number, number] => {
+    const lo = Math.max(1900, Math.min(Number(from) || 1900, THIS_YEAR));
+    const hi = Math.max(lo, Math.min(Number(to) || THIS_YEAR, THIS_YEAR));
+    if (lo !== committed.current[0] || hi !== committed.current[1]) {
       committed.current = [lo, hi];
       onYears([lo, hi]);
-    }, YEAR_DEBOUNCE_MS);
+    }
+    return [lo, hi];
+  };
+  useEffect(() => {
+    const t = window.setTimeout(commit, YEAR_DEBOUNCE_MS);
     return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- commit reads only from, to and onYears
   }, [from, to, onYears]);
+  // An inverted, out-of-range or emptied entry is clamped. Show the range that is in force once the field
+  // loses focus (not while typing, which would rewrite a half-typed year), or a hidden marker reads as "no event".
+  const settle = () => {
+    const [lo, hi] = commit();
+    setFrom(String(lo));
+    setTo(String(hi));
+  };
   return (
     <div className="year-range">
       <span className="muted">Years</span>
-      <input className="year" type="number" inputMode="numeric" min={1900} max={THIS_YEAR} value={from} aria-label="From year" onChange={(e) => setFrom(e.target.value)} />
+      <input className="year" type="number" inputMode="numeric" min={1900} max={THIS_YEAR} value={from} aria-label="From year" onChange={(e) => setFrom(e.target.value)} onBlur={settle} />
       <span className="muted">to</span>
-      <input className="year" type="number" inputMode="numeric" min={1900} max={THIS_YEAR} value={to} aria-label="To year" onChange={(e) => setTo(e.target.value)} />
+      <input className="year" type="number" inputMode="numeric" min={1900} max={THIS_YEAR} value={to} aria-label="To year" onChange={(e) => setTo(e.target.value)} onBlur={settle} />
     </div>
   );
 }

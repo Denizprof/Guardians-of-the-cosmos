@@ -218,9 +218,12 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const { out, testIds, counts } = await buildDataset();
   const dir = path.join(here, 'data');
   fs.mkdirSync(dir, { recursive: true });
-  for (const [name, rows] of Object.entries(out)) fs.writeFileSync(path.join(dir, `${name}.jsonl`), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
+  // --manifest-only: record what the script builds today without replacing the .jsonl files a trained adapter
+  // was made from and measured on (they are git-ignored and cannot be recovered once overwritten).
+  const manifestOnly = process.argv.includes('--manifest-only');
+  if (!manifestOnly) for (const [name, rows] of Object.entries(out)) fs.writeFileSync(path.join(dir, `${name}.jsonl`), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
   const byType = {};
   for (const [name, rows] of Object.entries(out)) for (const r of rows) byType[`${name}/${r.type}`] = (byType[`${name}/${r.type}`] ?? 0) + 1;
   fs.writeFileSync(path.join(dir, 'manifest.json'), `${JSON.stringify({ prompt_version: PROMPT_VERSION, seed: SEED, held_out_event: HELD_OUT_EVENT, held_out_records: testIds, counts, by_type: byType }, null, 1)}\n`);
-  console.log(counts, byType);
+  console.log(manifestOnly ? 'manifest.json only (the .jsonl files were left as they are):' : 'wrote train/val/test .jsonl and manifest.json:', counts, byType);
 }

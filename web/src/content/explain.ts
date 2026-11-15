@@ -219,7 +219,7 @@ export const EVENT_CONTENT: Record<string, EventContent> = {
       url: 'https://svs.gsfc.nasa.gov/5675',
     },
     readSimple: [
-      'Eleven NISAR passes on the same orbit, 12 days apart, from 18 June to 28 October 2026, processed by us at full resolution (about 20 m). Step through them on the timeline.',
+      'Eleven NISAR passes on the same orbit from 18 June to 28 October 2026, 12 days apart except for one 24-day gap (24 July to 17 August), processed by us at full resolution (about 20 m). Step through them on the timeline.',
       'Every date uses the same colour scale, so a colour change means the ground really changed. Green = vegetation, pale/white = strong echoes from rough surfaces such as fresh lava, dark = smooth surfaces or slopes hidden from the radar.',
       'Look at the pale fan on the east side of the summit cone: that is where the Kamchatka volcano observatory (KVERT) reported lava flowing.',
       'Radar keeps watching through cloud and polar night, which is common over Kamchatka.',

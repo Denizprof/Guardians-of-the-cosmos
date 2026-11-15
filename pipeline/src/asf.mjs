@@ -19,12 +19,18 @@ export async function searchGranules(names) {
   return out;
 }
 
-/** BETA / PROVISIONAL / VALIDATED / URGENT RESPONSE from the CMR collection name. */
+/**
+ * BETA / PROVISIONAL / VALIDATED / URGENT RESPONSE from the CMR collection name.
+ * A missing or unrecognised name is 'UNKNOWN': VALIDATED is a quality claim and is only returned
+ * for a name that positively matches the plain standard-product pattern (e.g. NISAR_L2_GCOV_V1).
+ */
 export function tierOf(collection = '') {
+  if (typeof collection !== 'string') return 'UNKNOWN';
   if (collection.startsWith('NISAR_UR')) return 'URGENT RESPONSE';
   if (collection.includes('_BETA_')) return 'BETA';
   if (collection.includes('_PROVISIONAL_')) return 'PROVISIONAL';
-  return 'VALIDATED';
+  if (/^NISAR_L\d_[A-Z0-9]+_V\d+$/.test(collection)) return 'VALIDATED';
+  return 'UNKNOWN';
 }
 
 const ts = (s) => `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}T${s.slice(9, 11)}:${s.slice(11, 13)}:${s.slice(13, 15)}Z`;

@@ -15,7 +15,31 @@ export function coverageFeatures(granules: CoverageGranule[], selectedScene: str
   if (!selectedScene) return [];
   const g = granules.find((x) => x.scene === selectedScene);
   if (!g || !g.footprint) return [];
-  return [{ type: 'Feature', geometry: g.footprint, properties: { scene: g.scene } }];
+  return [{ type: 'Feature', geometry: acrossAntimeridian(g.footprint), properties: { scene: g.scene } }];
+}
+
+const finite = (p: unknown): p is number[] => Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1]);
+
+/**
+ * True when the footprint has longitudes on both sides of the 180th meridian (179.4 and -179.7, or a
+ * MultiPolygon cut in two at 180). Taken from the longitude span: no single product is wider than 180 degrees.
+ */
+export function crossesAntimeridian(footprint: GeoJSON.Polygon | GeoJSON.MultiPolygon | null | undefined): boolean {
+  const lons = rings(footprint).flat().filter(finite).map((p) => p[0]);
+  return lons.length > 1 && Math.max(...lons) - Math.min(...lons) > 180;
+}
+
+/**
+ * The same footprint with western longitudes moved to 180..360 when it crosses the antimeridian, so that it is
+ * drawn the short way across instead of as a band round the rest of the globe. Other footprints are returned
+ * as they are (the same object); the input is never modified.
+ */
+function acrossAntimeridian<T extends GeoJSON.Polygon | GeoJSON.MultiPolygon>(footprint: T): T {
+  if (!crossesAntimeridian(footprint)) return footprint;
+  const ring = (r: Ring): Ring => r.map((p) => (finite(p) && p[0] < 0 ? [p[0] + 360, ...p.slice(1)] : p));
+  return footprint.type === 'Polygon'
+    ? { ...footprint, coordinates: (footprint.coordinates as Ring[]).map(ring) }
+    : { ...footprint, coordinates: (footprint.coordinates as Ring[][]).map((poly) => poly.map(ring)) };
 }
 
 /**
@@ -23,10 +47,15 @@ export function coverageFeatures(granules: CoverageGranule[], selectedScene: str
  * product, so it is placed on the footprint's bounding box. Corners in MapLibre image-source order
  * (top-left, top-right, bottom-right, bottom-left). Approximate: the picture is linear in latitude while the
  * map is Mercator, and the image may carry a small margin; good to roughly a kilometre, for looking, not measuring.
+ *
+ * Limit: null for a footprint that crosses the antimeridian. Its plain bounding box runs the long way round
+ * (359 degrees for a 1 degree product), which would put radar imagery over places it does not cover, and how
+ * the browse picture of such a product is laid out has not been checked. Only the outline is drawn there.
  */
 export function browseBounds(footprint: GeoJSON.Polygon | GeoJSON.MultiPolygon | null | undefined): [[number, number], [number, number], [number, number], [number, number]] | null {
-  const pts = rings(footprint).flat().filter((p) => Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1]));
+  const pts = rings(footprint).flat().filter(finite);
   if (pts.length < 3) return null;
+  if (crossesAntimeridian(footprint)) return null;
   const lons = pts.map((p) => p[0]);
   const lats = pts.map((p) => p[1]);
   const w = Math.min(...lons), e = Math.max(...lons), s = Math.min(...lats), n = Math.max(...lats);
