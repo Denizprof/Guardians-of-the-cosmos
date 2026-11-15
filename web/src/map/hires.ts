@@ -7,8 +7,13 @@ export const HIRES_PROTOCOL = 'esrihires';
 export const HIRES_URL = `${HIRES_PROTOCOL}://{z}/{y}/{x}`;
 
 const BASE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile';
-// 1x1 fully transparent PNG
-const CLEAR = Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='), (c) => c.charCodeAt(0)).buffer;
+// A fully transparent tile, drawn by the browser itself (a hand-typed PNG is easy to get subtly wrong).
+let clear: Promise<ArrayBuffer> | null = null;
+const clearTile = () => (clear ??= (() => {
+  const canvas = new OffscreenCanvas(1, 1);
+  canvas.getContext('2d'); // a canvas without a context cannot be exported
+  return canvas.convertToBlob({ type: 'image/png' }).then((b) => b.arrayBuffer());
+})());
 
 /** True for Esri's flat grey placeholder: nearly every pixel is the same light grey (the text is a few white strokes). */
 export function isPlaceholder(rgba: Uint8ClampedArray | Uint8Array): boolean {
@@ -42,11 +47,13 @@ export function registerHires(): void {
     const buf = await res.arrayBuffer();
     // Photos always exist at the low levels; only look inside tiles deep enough for coverage to run out.
     if (z >= 13) {
+      let empty = false;
       try {
-        if (await looksEmpty(new Blob([buf], { type: 'image/jpeg' }))) return { data: CLEAR };
+        empty = await looksEmpty(new Blob([buf], { type: 'image/jpeg' }));
       } catch {
         // cannot decode here: show the tile as delivered
       }
+      if (empty) return { data: await clearTile() }; // a failure here must not fall back to showing the grey tile
     }
     return { data: buf };
   });
