@@ -36,6 +36,7 @@ parser.add_argument("--name", required=True)
 parser.add_argument("--base", default=BASE_MODEL)
 parser.add_argument("--adapter", default=None)
 parser.add_argument("--split", default="test")
+parser.add_argument("--qlora", action="store_true", help="4-bit base model: fits a 4 GB GPU (needs bitsandbytes)")
 parser.add_argument("--limit", type=int, default=0)
 parser.add_argument("--max-new-tokens", type=int, default=320)
 parser.add_argument("--gpu-load", type=float, default=1.0, help="share of the time the GPU works (0.5 = half load, twice as slow)")
@@ -43,10 +44,21 @@ args = parser.parse_args()
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = AutoTokenizer.from_pretrained(args.base)
-model = AutoModelForCausalLM.from_pretrained(args.base, torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32).to(device)
+half = torch.bfloat16 if device == "cuda" and torch.cuda.is_bf16_supported() else torch.float16
+if args.qlora:
+    # 4-bit base so it fits a 4 GB GPU; the adapter is applied on top without merging
+    from transformers import BitsAndBytesConfig
+    model = AutoModelForCausalLM.from_pretrained(
+        args.base, device_map={"": 0},
+        quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=half),
+    )
+else:
+    model = AutoModelForCausalLM.from_pretrained(args.base, torch_dtype=half if device == "cuda" else torch.float32).to(device)
 if args.adapter:
     from peft import PeftModel
-    model = PeftModel.from_pretrained(model, args.adapter).merge_and_unload()
+    model = PeftModel.from_pretrained(model, args.adapter)
+    if not args.qlora:
+        model = model.merge_and_unload()
 model.eval()
 
 examples = load_jsonl(args.split)

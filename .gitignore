@@ -24,3 +24,9 @@ assistant-model/models/
 assistant-model/export/
 assistant-model/reports/*.outputs.jsonl
 web/public/models/
+
+# assistant training environment and logs
+assistant-model/.venv/
+assistant-model/*.log
+assistant-model/*.err
+assistant-model/adapters/

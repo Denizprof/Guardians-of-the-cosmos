@@ -31,6 +31,7 @@ parser.add_argument("--accum", type=int, default=16)
 parser.add_argument("--max-len", type=int, default=1100)
 parser.add_argument("--rank", type=int, default=16)
 parser.add_argument("--gpu-load", type=float, default=1.0, help="share of the time the GPU works, e.g. 0.5 = pause as long as each step took (cooler and quieter, twice as slow)")
+parser.add_argument("--qlora", action="store_true", help="4-bit base model: fits a 4 GB GPU (needs: pip install bitsandbytes)")
 parser.add_argument("--smoke", action="store_true")
 args = parser.parse_args()
 
@@ -40,10 +41,24 @@ if device == "cpu" and not args.smoke:
     raise SystemExit("No CUDA GPU found. Training on CPU would take days; use --smoke only to test the code path.")
 
 tokenizer = AutoTokenizer.from_pretrained(args.base)
-model = AutoModelForCausalLM.from_pretrained(args.base, torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32)
-model.to(device)
-model.gradient_checkpointing_enable()
+# bf16 needs an Ampere or newer GPU (RTX 30xx+). Older cards (GTX 16xx, RTX 20xx) use fp16.
+use_bf16 = device == "cuda" and torch.cuda.is_bf16_supported()
+amp_dtype = torch.bfloat16 if use_bf16 else torch.float16
+if args.qlora:
+    # 4-bit base weights (about 1.2 GB for Qwen3-1.7B) so training fits a 4 GB GPU. The LoRA adapter itself stays in fp32.
+    from peft import prepare_model_for_kbit_training
+    from transformers import BitsAndBytesConfig
+    model = AutoModelForCausalLM.from_pretrained(
+        args.base, device_map={"": 0},
+        quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=amp_dtype),
+    )
+    model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
+else:
+    model = AutoModelForCausalLM.from_pretrained(args.base, torch_dtype=amp_dtype if device == "cuda" else torch.float32)
+    model.to(device)
+    model.gradient_checkpointing_enable()
 model.config.use_cache = False
+scaler = torch.amp.GradScaler("cuda", enabled=device == "cuda" and not use_bf16)
 model = get_peft_model(
     model,
     LoraConfig(r=args.rank, lora_alpha=2 * args.rank, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM",
@@ -93,7 +108,7 @@ def val_loss() -> float:
     model.eval()
     total, count = 0.0, 0
     for batch in batches(val, args.batch):
-        with torch.autocast(device_type=device, dtype=torch.bfloat16, enabled=device == "cuda"):
+        with torch.autocast(device_type=device, dtype=amp_dtype, enabled=device == "cuda"):
             total += model(**batch).loss.item()
         count += 1
     model.train()
@@ -111,9 +126,9 @@ while step < total_steps:
     running = 0.0
     for n, batch in enumerate(batches(rows, args.batch), start=1):
         began = time.time()
-        with torch.autocast(device_type=device, dtype=torch.bfloat16, enabled=device == "cuda"):
+        with torch.autocast(device_type=device, dtype=amp_dtype, enabled=device == "cuda"):
             loss = model(**batch).loss
-        (loss / args.accum).backward()
+        scaler.scale(loss / args.accum).backward()
         running += loss.item()
         # Examples of different lengths fragment PyTorch's memory pool. On Windows the pool then quietly spills into
         # shared (system) memory instead of failing, and every step becomes about ten times slower. Hand the pool
@@ -127,8 +142,10 @@ while step < total_steps:
             torch.cuda.synchronize()
             time.sleep((time.time() - began) * (1 / args.gpu_load - 1))
         if n % args.accum == 0:
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            optimizer.step()
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad], 1.0)
+            scaler.step(optimizer)
+            scaler.update()
             scheduler.step()
             optimizer.zero_grad(set_to_none=True)
             step += 1
