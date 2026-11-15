@@ -200,7 +200,8 @@ test.describe('chaos: offline after load', () => {
     await expect(geo).not.toBeChecked();
     await geo.check();
     // a not-yet-fetched catalog fails cleanly: '!' plus visible reason and Retry, not a crash
-    const eq = filtersPopover(page).locator('label', { hasText: /Earthquakes M7\+/ });
+    // (a catalog that is off by default; earthquakes are on by default and so already loaded)
+    const eq = filtersPopover(page).locator('label', { hasText: /Significant eruptions/ });
     await eq.getByRole('checkbox').check();
     await expect(eq.locator('.count')).toHaveText('!');
     await expect(filtersPopover(page).locator('.catalog-error')).toContainText('Could not load');
@@ -216,7 +217,7 @@ test.describe('chaos: offline after load', () => {
     await context.setOffline(false);
     await toolbar(page).getByRole('button', { name: 'Filters' }).click();
     await filtersPopover(page).locator('.catalog-error').getByRole('button', { name: 'Retry' }).click();
-    await expect(eq.locator('.count')).toHaveText(String(readData('catalogs/usgs-earthquakes.json').events.length));
+    await expect(eq.locator('.count')).toHaveText(String(readData('catalogs/noaa-volcanoes.json').events.length));
   });
 
   test('offline when an investigation opens: the panel itself renders from memory', async ({ page, context, allow }) => {

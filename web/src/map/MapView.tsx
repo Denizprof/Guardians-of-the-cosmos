@@ -7,6 +7,7 @@ import { layerBounds } from '../lib';
 import type { CoverageResult } from '../services';
 import type { Pin } from '../content/explain';
 import { registerNodataProtocol } from './nodataKey';
+import { registerCropProtocol } from './cropTiles';
 import { createTileErrorPolicy } from './tileErrors';
 import { browseBounds, coverageFeatures, trimmedBrowseUrl } from './coverageSelect';
 import {
@@ -27,6 +28,8 @@ export type { TileOverlay };
 maplibregl.setWorkerUrl(new URL('vendor/maplibre-gl-worker.mjs', document.baseURI).href);
 // JPEG satellite layers with black no-data (VIIRS true colour etc.) are keyed to transparent; see nodataKey.ts
 registerNodataProtocol(maplibregl as unknown as Parameters<typeof registerNodataProtocol>[0]);
+// the farmland and crop-type layer is four WorldCereal maps stacked into one tile; see cropTiles.ts
+registerCropProtocol(maplibregl as unknown as Parameters<typeof registerCropProtocol>[0]);
 // Up to three maps (A, B, SAR lens) share one image queue; the lens alone stacks twelve raster sources (two products x six days).
 maplibregl.config.MAX_PARALLEL_IMAGE_REQUESTS = 32;
 maplibregl.config.MAX_PARALLEL_IMAGE_REQUESTS_PER_FRAME = 16;

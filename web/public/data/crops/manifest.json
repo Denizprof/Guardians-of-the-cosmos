@@ -1,0 +1,24 @@
+{
+ "source": "ESA WorldCereal 2021 v100 (10 m), tiles by Terrascope (titiler.terrascope.be), zoom 3",
+ "retrieved": "2026-11-15T04:58:57.290Z",
+ "rule": "Zoom 3 is the service's own tiles, stacked. Below that, a pixel is coloured when at least 25% of the zoom-3 samples it covers are mapped as crops, in the colour of the most common class among them (ties: the more specific class).",
+ "classes": [
+  {
+   "product": "temporarycrops",
+   "color": "#009e73"
+  },
+  {
+   "product": "springcereals",
+   "color": "#56b4e9"
+  },
+  {
+   "product": "wintercereals",
+   "color": "#d55e00"
+  },
+  {
+   "product": "maize",
+   "color": "#f0e442"
+  }
+ ],
+ "tiles": 85
+}

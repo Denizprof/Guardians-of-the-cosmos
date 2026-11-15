@@ -1196,6 +1196,68 @@
    }
   },
   {
+   "id": "esa-worldcereal-crops-2021",
+   "title": "Farmland and crop types 2021 (ESA WorldCereal)",
+   "category": "ecosystems",
+   "subcategories": [
+    "farmland",
+    "crop types",
+    "agricultural expansion and irrigation"
+   ],
+   "kind": "derived",
+   "provider": "ESA WorldCereal (VITO and partners), tiles by Terrascope (VITO)",
+   "mission": "Sentinel-1, Sentinel-2",
+   "sensor": "C-SAR / MSI",
+   "url": "worldcereal://2021/{z}/{x}/{y}",
+   "tileSize": 256,
+   "minzoom": 0,
+   "maxzoom": 12,
+   "time": null,
+   "resolution": "10 m",
+   "license": "CC BY 4.0 (ESA WorldCereal 2021 products v100, Zenodo 10.5281/zenodo.7875105)",
+   "attribution": "© ESA WorldCereal project 2021 (CC BY 4.0), tiles by Terrascope/VITO",
+   "description_simple": "Shows where crops were grown in 2021 and, by colour, whether a field grew maize, winter cereals, spring cereals or another crop. Rice, soybean and other crops are not told apart, and orchards, vineyards and pastures are not shown.",
+   "description_scientific": "Four ESA WorldCereal 2021 v100 products at 10 m, classified from Sentinel-1 (VV, VH) and Sentinel-2 time series per agro-ecological zone: the annual temporary-crop extent and, within it, the binary maize, winter-cereals and spring-cereals maps. This app requests each product in one colour and stacks them with the most specific on top; at zooms 0 to 3 it shows tiles pre-rendered from the service's zoom-3 tiles (reduced below zoom 3). Reported for the temporary-crop extent: user's accuracy 88.5 %, producer's accuracy 92.1 %; for crop type: 82.5 % overall agreement with a street-view reference set (Van Tricht et al. 2023, ESSD 15, 5491-5515).",
+   "limitations": "One year only, 2021. Only maize and cereals are distinguished, and cereals means wheat, barley and rye together, which the product does not separate. Rice, soybean, cotton, vegetables and all other temporary crops share one colour. Perennial crops (orchards, vineyards, plantations) and pastures are not mapped. Spring cereals were mapped only in parts of the Northern Hemisphere. Where a field grew a cereal and maize in the same year, only maize is shown. Neighbouring agro-ecological zones use different season definitions, so seams can appear between them. Reference data for checking crop types in 2021 were limited. Zoomed out to the whole world, a pixel is coloured when at least a quarter of the samples it covers are crops, so scattered farmland disappears and areas are not to scale: zoom in before judging extent.",
+   "verified": {
+    "date": "2026-11-15",
+    "sample_tile": "https://titiler.terrascope.be/wmts?service=WMTS&request=GetTile&version=1.0.0&layer=esa-worldcereal-maize-10m-2021-v1_classification&style=default&format=image/png&TileMatrixSet=EPSG:3857&TileMatrix=3&TileCol=2&TileRow=3&TIME=2021-01-01",
+    "status": 200,
+    "content_type": "image/png",
+    "cors": "echoes the request origin"
+   },
+   "legend": {
+    "type": "classes",
+    "stops": [],
+    "classes": [
+     {
+      "color": "#f0e442",
+      "label": "Maize"
+     },
+     {
+      "color": "#d55e00",
+      "label": "Winter cereals (wheat, barley, rye)"
+     },
+     {
+      "color": "#56b4e9",
+      "label": "Spring cereals (wheat, barley, rye)"
+     },
+     {
+      "color": "#009e73",
+      "label": "Other temporary crops"
+     }
+    ],
+    "simple": "Yellow is maize, orange-red is winter cereals, light blue is spring cereals, and green is any other temporary crop, for example rice, soybean, cotton or vegetables. Land with no colour had no temporary crop mapped in 2021, or was not covered by the map.",
+    "scientific": "Value 100 of each binary WorldCereal 2021 product, drawn in one colour per product and stacked: temporary-crop extent at the bottom, then spring cereals, winter cereals and maize on top. Cereals are the Triticeae wheat, barley and rye.",
+    "source": {
+     "label": "ESA WorldCereal: global maps 2021, product definitions",
+     "url": "https://esa-worldcereal.org/en/products/global-maps"
+    },
+    "verified": true,
+    "note": "The class meanings are WorldCereal's; the colours are chosen by this app (a colour-blind-safe set) and sent to the tile service with each request. Rice, soybean and other crops are not separate classes. Orchards, vineyards and other perennial crops, and pastures, are not shown."
+   }
+  },
+  {
    "id": "gibs-landsat-hbase-2010",
    "title": "Built-up and settlement extent 2010 (HBASE, Landsat)",
    "category": "human-activity",

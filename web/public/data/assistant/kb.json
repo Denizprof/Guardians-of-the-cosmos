@@ -2,7 +2,7 @@
  "version": "1",
  "generated": "2026-11-15",
  "counts": {
-  "total": 112,
+  "total": 114,
   "app": 18,
   "verified_sar": 24,
   "rejected_sar": 18
@@ -2154,6 +2154,40 @@
    "source": {
     "label": "NASA GIBS colormap: MODIS_L3_NDVI",
     "url": "https://gibs.earthdata.nasa.gov/colormaps/v1.3/MODIS_L3_NDVI.xml"
+   }
+  },
+  {
+   "id": "kb:layer-esa-worldcereal-crops-2021",
+   "topic": "layer",
+   "title": "Layer: Farmland and crop types 2021 (ESA WorldCereal)",
+   "text_en": "Shows where crops were grown in 2021 and, by colour, whether a field grew maize, winter cereals, spring cereals or another crop. Rice, soybean and other crops are not told apart, and orchards, vineyards and pastures are not shown. Provider: ESA WorldCereal (VITO and partners), tiles by Terrascope (VITO). Mission: Sentinel-1, Sentinel-2. Resolution: 10 m. Limitations: One year only, 2021. Only maize and cereals are distinguished, and cereals means wheat, barley and rye together, which the product does not separate. Rice, soybean, cotton, vegetables and all other temporary crops share one colour.",
+   "text_scientific_en": "Four ESA WorldCereal 2021 v100 products at 10 m, classified from Sentinel-1 (VV, VH) and Sentinel-2 time series per agro-ecological zone: the annual temporary-crop extent and, within it, the binary maize, winter-cereals and spring-cereals maps. This app requests each product in one colour and stacks them with the most specific on top; at zooms 0 to 3 it shows tiles pre-rendered from the service's zoom-3 tiles (reduced below zoom 3). Reported for the temporary-crop extent: user's accuracy 88.5 %, producer's accuracy 92.1 %; for crop type: 82.5 % overall agreement with a street-view reference set (Van Tricht et al. 2023, ESSD 15, 5491-5515). Provider: ESA WorldCereal (VITO and partners), tiles by Terrascope (VITO). Mission: Sentinel-1, Sentinel-2.",
+   "questions_en": [
+    "What does the Farmland and crop types 2021 (ESA WorldCereal) layer show?",
+    "What is Farmland and crop types 2021 (ESA WorldCereal)?",
+    "What are the limitations of Farmland and crop types 2021 (ESA WorldCereal)?",
+    "Where does the Farmland and crop types 2021 (ESA WorldCereal) data come from?",
+    "What is the resolution of Farmland and crop types 2021 (ESA WorldCereal)?"
+   ],
+   "source": {
+    "label": "ESA WorldCereal (VITO and partners), tiles by Terrascope (VITO)",
+    "url": "https://esa-worldcereal.org/en/products/global-maps"
+   }
+  },
+  {
+   "id": "kb:layer-esa-worldcereal-crops-2021-colours",
+   "topic": "layer",
+   "title": "Colours of: Farmland and crop types 2021 (ESA WorldCereal)",
+   "text_en": "Yellow is maize, orange-red is winter cereals, light blue is spring cereals, and green is any other temporary crop, for example rice, soybean, cotton or vegetables. Land with no colour had no temporary crop mapped in 2021, or was not covered by the map. The class meanings are WorldCereal's; the colours are chosen by this app (a colour-blind-safe set) and sent to the tile service with each request. Rice, soybean and other crops are not separate classes. Orchards, vineyards and other perennial crops, and pastures, are not shown.",
+   "text_scientific_en": "Value 100 of each binary WorldCereal 2021 product, drawn in one colour per product and stacked: temporary-crop extent at the bottom, then spring cereals, winter cereals and maize on top. Cereals are the Triticeae wheat, barley and rye. The class meanings are WorldCereal's; the colours are chosen by this app (a colour-blind-safe set) and sent to the tile service with each request. Rice, soybean and other crops are not separate classes. Orchards, vineyards and other perennial crops, and pastures, are not shown.",
+   "questions_en": [
+    "What do the colours mean in Farmland and crop types 2021 (ESA WorldCereal)?",
+    "How do I read the Farmland and crop types 2021 (ESA WorldCereal) legend?",
+    "What do the colors of the Farmland and crop types 2021 (ESA WorldCereal) layer mean?"
+   ],
+   "source": {
+    "label": "ESA WorldCereal: global maps 2021, product definitions",
+    "url": "https://esa-worldcereal.org/en/products/global-maps"
    }
   },
   {
