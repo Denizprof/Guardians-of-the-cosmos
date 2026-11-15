@@ -893,6 +893,7 @@ export const TR: Record<string, string> = {
   'Data tiers are mixed (PROVISIONAL and VALIDATED), so small calibration differences between dates are possible.':
     'Veri düzeyleri karışık (GEÇİCİ ve DOĞRULANMIŞ); bu yüzden tarihler arasında küçük kalibrasyon farkları olabilir.',
 
+  'Back to the front page': 'Ön sayfaya dön',
   // ---- Front page (components/FrontPage.tsx)
   "Open the app": "Uygulamayı aç",
   "Watch the surface of the Earth change, through radar.": "Yeryüzünün değişimini radarla izleyin.",

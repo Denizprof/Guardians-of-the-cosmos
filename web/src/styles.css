@@ -1018,3 +1018,6 @@ details.concept p { margin: var(--sp-1) 0 var(--sp-2); }
   .fp-lede { font-size: 18px; }
   .fp-start { width: 100%; justify-content: center; }
 }
+
+/* About panel: the way back to the front page sits before "Show the introduction again" */
+.about-front { margin: 0 var(--sp-2) var(--sp-2) 0; }

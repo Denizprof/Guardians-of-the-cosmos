@@ -67,6 +67,26 @@ test.describe('front page', () => {
     expect((await start.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   });
 
+  test('the About tab in the tool leads back to the front page, and Get started returns to the tool', async ({ page }) => {
+    await page.addInitScript((k) => { try { localStorage.setItem(k, '3'); } catch { /* storage blocked */ } }, INTRO_SEEN_KEY);
+    await page.goto('/');
+    await ready(page);
+    await expect(front(page)).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'About Global SAR' }).click();
+    await page.getByRole('button', { name: 'Back to the front page' }).click();
+    await expect(front(page)).toBeVisible();
+    await expect(front(page).getByRole('heading', { level: 1 })).toBeFocused();
+    await expect(page.locator('.app')).toHaveAttribute('inert', '');
+
+    const start = front(page).getByRole('button', { name: 'Get started' });
+    await start.scrollIntoViewIfNeeded();
+    await start.click();
+    await expect(front(page)).toHaveCount(0);
+    await expect(page.getByRole('toolbar', { name: 'Map tools' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => !!document.activeElement?.closest('.topbar'))).toBe(true);
+  });
+
   test('the language switch on the front page turns it Turkish', async ({ page }) => {
     await page.goto('/');
     await ready(page);

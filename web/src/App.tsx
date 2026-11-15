@@ -448,6 +448,12 @@ export default function App() {
     setPanelCollapsed(false);
   }, [selected, panelView, closePanel]);
   const askFromSatellite = useCallback(() => askAssistant(false), [askAssistant]);
+  /** About > "Back to the front page": the front page covers the tool again until Get started. */
+  const showFront = useCallback(() => {
+    closePanel();
+    setPopover(null);
+    setFrontOpen(true);
+  }, [closePanel]);
   const showIntro = useCallback(() => {
     closePanel();
     setPopover(null);
@@ -710,6 +716,7 @@ export default function App() {
           onToggleCollapsed={toggleCollapsed}
           onClose={closePanel}
           onShowIntro={showIntro}
+          onShowFront={showFront}
         />
       ) : null}
 

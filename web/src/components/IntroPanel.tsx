@@ -26,6 +26,8 @@ interface Props {
   onClose?: () => void;
   /** Reopen the introduction screen (About view only). */
   onShowIntro?: () => void;
+  /** Go back to the front page, the full-screen explanation shown on a first visit (About view only). */
+  onShowFront?: () => void;
   /** Coverage probe: the one product currently shown on the map (null = none). */
   selectedScene?: string | null;
   onSelectScene?: (scene: string | null) => void;
@@ -188,6 +190,9 @@ function IntroPanel(p: Props) {
               <p>
                 Explore how Earth’s surface changes: geohazards, fire and forests, climate and ice, water, ecosystems and human activity. Investigations compare genuine satellite observations from before and after, led by NISAR, the NASA–ISRO radar that sees through clouds and darkness every 12 days. Every layer says whether it is an observation, a derived measurement or an interpretation.
               </p>
+              {p.onShowFront && (
+                <button type="button" className="btn primary about-front" onClick={p.onShowFront}>Back to the front page</button>
+              )}
               {p.onShowIntro && (
                 <button type="button" className="btn" onClick={p.onShowIntro}>Show the introduction again</button>
               )}
