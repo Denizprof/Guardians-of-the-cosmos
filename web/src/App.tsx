@@ -13,6 +13,7 @@ import { InvestigationStrip, InvestigationsMenu } from './components/Investigati
 import { readHash } from './app/readHash';
 import { markIntroSeen, shouldShowIntro } from './app/introSeen';
 import Welcome from './components/Welcome';
+import FrontPage from './components/FrontPage';
 import LangSwitch from './components/LangSwitch';
 import { useIsMobile, useViewportHeight } from './app/viewport';
 import { useCatalogs } from './app/useCatalogs';
@@ -56,8 +57,10 @@ export default function App() {
 
   const init = useMemo(readHash, []);
   const [selectedId, setSelectedId] = useState<string | null>(init.event);
-  // Introduction screen: first visit to the landing view only (a link to an investigation skips it).
-  const [introOpen, setIntroOpen] = useState(() => shouldShowIntro(init));
+  // Front page: a screen of its own on a first visit to the landing view (a link to an investigation skips it).
+  const [frontOpen, setFrontOpen] = useState(() => shouldShowIntro(init));
+  // Guided tour: opened from the front page or from About.
+  const [introOpen, setIntroOpen] = useState(false);
   const [beforeId, setBeforeId] = useState<string | null>(init.b);
   const [afterId, setAfterId] = useState<string | null>(init.a);
   const [mode, setMode] = useState<CompareMode>(init.mode ?? 'swipe');
@@ -398,6 +401,14 @@ export default function App() {
     // hand keyboard focus to the tool: its first toolbar control
     window.setTimeout(() => appRef.current?.querySelector<HTMLElement>('.topbar .tool')?.focus({ preventScroll: true }), 0);
   }, []);
+  const startFromFront = useCallback(() => {
+    setFrontOpen(false);
+    closeIntro(); // remembers the visit and hands keyboard focus to the tool
+  }, [closeIntro]);
+  const tourFromFront = useCallback(() => {
+    setFrontOpen(false);
+    setIntroOpen(true); // closing the tour remembers the visit
+  }, []);
   const introCredits = useCallback(() => {
     markIntroSeen();
     setIntroOpen(false);
@@ -454,7 +465,8 @@ export default function App() {
     .join(' ');
 
   return (
-    <div className={appClass} ref={appRef} data-ready={events.length > 0}>
+    <>
+    <div className={appClass} ref={appRef} data-ready={events.length > 0} inert={frontOpen}>
       <header className="topbar">
         <h1 className="brand">
           <b>GLOBAL SAR</b>
@@ -698,6 +710,8 @@ export default function App() {
 
       {introOpen && <Welcome onClose={closeIntro} onCredits={introCredits} />}
     </div>
+    {frontOpen && <FrontPage onStart={startFromFront} onTour={tourFromFront} />}
+    </>
   );
 }
 
