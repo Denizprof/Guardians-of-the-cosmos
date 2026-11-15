@@ -403,8 +403,15 @@ export default function App() {
   }, []);
   const startFromFront = useCallback(() => {
     setFrontOpen(false);
-    closeIntro(); // remembers the visit and hands keyboard focus to the tool
-  }, [closeIntro]);
+    markIntroSeen();
+    focusToolAfterFront.current = true; // focus moves once the tool is no longer inert (effect below)
+  }, []);
+  const focusToolAfterFront = useRef(false);
+  useEffect(() => {
+    if (frontOpen || !focusToolAfterFront.current) return;
+    focusToolAfterFront.current = false;
+    appRef.current?.querySelector<HTMLElement>('.topbar .tool')?.focus({ preventScroll: true });
+  }, [frontOpen]);
   const tourFromFront = useCallback(() => {
     setFrontOpen(false);
     setIntroOpen(true); // closing the tour remembers the visit

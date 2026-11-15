@@ -1,6 +1,8 @@
 // The front page: a full screen shown on a first visit that says what the app is and how to use it, then
 // "Get started" (components/FrontPage.tsx).
 import { describe, expect, it, vi } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FrontPage from '../../src/components/FrontPage';
@@ -33,20 +35,41 @@ describe('front page', () => {
     expect(screen.getByText(/not official NASA products/)).toBeInTheDocument();
   });
 
-  it('lists the seven tools by the names on their toolbar buttons, plus the two explanation levels', () => {
-    setup();
+  it('lists the seven tools by the names on their toolbar buttons, each with steps to follow and a screenshot that ships', () => {
+    const { container } = setup();
     const list = screen.getByRole('list', { name: 'The tools' });
     const names = within(list).getAllByRole('heading', { level: 3 }).map((h) => h.textContent);
-    expect(names).toEqual(['Investigations', 'Filters', 'Satellite layers', 'SAR lens', 'Coverage probe', 'Search', 'Ask', 'Simple or Scientific']);
+    expect(names).toEqual(['Investigations', 'Filters', 'Satellite layers', 'SAR lens', 'Coverage probe', 'Search', 'Ask']);
     expect(screen.getByText('Seven tools, all on the bar at the top of the globe.')).toBeInTheDocument();
+    const tools = [...container.querySelectorAll('.fp-tool')];
+    expect(tools).toHaveLength(7);
+    for (const t of tools) {
+      expect(t.querySelectorAll('.fp-steps li').length, t.querySelector('h3')!.textContent!).toBeGreaterThanOrEqual(3);
+      const img = t.querySelector('img')!;
+      const file = path.resolve(__dirname, '../../public', img.getAttribute('src')!.replace(/^\//, ''));
+      expect(fs.existsSync(file), file).toBe(true);
+      expect(fs.statSync(file).size).toBeLessThan(250_000); // each screenshot stays light
+      expect(img.getAttribute('loading')).toBe('lazy'); // below the fold: not fetched until scrolled to
+      expect(t.querySelector('figcaption')!.textContent!.length).toBeGreaterThan(10);
+    }
   });
 
-  it('states only numbers that are true of the shipped app', () => {
+  it('says how to move the globe, and names the two explanation levels', () => {
+    setup();
+    const moves = within(screen.getByRole('list', { name: 'Moving the globe' })).getAllByRole('listitem');
+    expect(moves).toHaveLength(3);
+    expect(screen.getByText(/two levels, Simple and Scientific/)).toBeInTheDocument();
+  });
+
+  it('states only numbers that are true of the shipped app, and names every kind of catalog it ships', () => {
     setup();
     const layers = (shippedLayers as { layers: unknown[] }).layers.length;
     expect(screen.getByText(new RegExp(`Lay any of ${layers} global datasets over the globe`))).toBeInTheDocument();
-    expect(CATALOGS).toHaveLength(6);
-    expect(screen.getByText(/from six public catalogs/)).toBeInTheDocument();
+    const line = screen.getByText(/Switch event catalogs on or off/).textContent!;
+    for (const [id, word] of [['usgs-earthquakes', 'earthquakes'], ['noaa-tsunamis', 'tsunamis'], ['firms-fires', 'active fires'], ['noaa-volcanoes', 'eruptions'], ['gdacs-floods', 'flood alerts'], ['nasa-glc', 'landslides']] as const) {
+      expect(CATALOGS.some((c) => c.id === id), id).toBe(true);
+      expect(line).toContain(word);
+    }
   });
 
   it('"Get started" comes after the explanation and opens the app; so does "Open the app" at the top', async () => {

@@ -8,47 +8,93 @@ interface Props {
   onTour: () => void;
 }
 
-/** Named exactly as on the toolbar buttons. Every sentence is something the app does (tests check the numbers). */
-const TOOLS: { n: string; name: string; text: string }[] = [
-  { n: '01', name: 'Investigations', text: 'Open a case study, such as an earthquake, a flood or a wildfire, and step through its radar scenes on a timeline.' },
-  { n: '02', name: 'Filters', text: 'Choose which events appear on the globe: earthquakes, tsunamis, active fires, eruptions, flood alerts and landslides, from six public catalogs.' },
-  { n: '03', name: 'Satellite layers', text: 'Lay any of 20 global datasets over the globe, from daily true-colour imagery to flood water, night lights and crop types. Each has a colour legend.' },
-  { n: '04', name: 'SAR lens', text: 'Move a lens across the map to look at the same place in radar instead of in a photo.' },
-  { n: '05', name: 'Coverage probe', text: 'Click any point on Earth to list what NISAR has recorded there: how many products, on which dates and orbit tracks.' },
-  { n: '06', name: 'Search', text: 'Type a place name, an investigation, or a latitude and longitude to fly straight there.' },
-  { n: '07', name: 'Ask', text: 'Put a question to the built-in assistant, or click the satellite circling the globe. It answers from the sources in the app and cites them.' },
-  { n: '+', name: 'Simple or Scientific', text: 'Every explanation comes at two levels. Switch between them at any time. The interface is available in English and Turkish.' },
-];
+const BASE = import.meta.env.BASE_URL;
 
-/** A radar satellite on its orbit, looking down at the globe. Decorative line drawing. */
-function OrbitArt() {
-  return (
-    <svg className="fp-art" aria-hidden="true" viewBox="0 0 440 440" fill="none" strokeLinecap="round">
-      <circle className="fp-art-globe" cx="220" cy="230" r="150" />
-      <g className="fp-art-grid">
-        <ellipse cx="220" cy="230" rx="150" ry="52" />
-        <ellipse cx="220" cy="230" rx="150" ry="104" />
-        <ellipse cx="220" cy="230" rx="52" ry="150" />
-        <ellipse cx="220" cy="230" rx="104" ry="150" />
-        <line x1="70" y1="230" x2="370" y2="230" />
-        <line x1="220" y1="80" x2="220" y2="380" />
-      </g>
-      <ellipse className="fp-art-orbit" cx="220" cy="230" rx="62" ry="196" transform="rotate(24 220 230)" />
-      <path className="fp-art-beam" d="M318 66 L250 196 L302 214 Z" strokeLinejoin="round" />
-      <path className="fp-art-swath" d="M258 198 L296 211" />
-      <g className="fp-art-sat">
-        <rect x="306" y="52" width="24" height="16" rx="2" transform="rotate(24 318 60)" />
-        <line x1="286" y1="46" x2="304" y2="54" />
-        <line x1="332" y1="66" x2="350" y2="74" />
-      </g>
-    </svg>
-  );
-}
+/**
+ * One entry per tool, named exactly as on its toolbar button, with the steps to use it and a screenshot of the
+ * real app (public/front, taken from the running tool). Every sentence is something the app does.
+ */
+const TOOLS: { n: string; id: string; name: string; text: string; steps: string[]; caption: string }[] = [
+  {
+    n: '01', id: 'investigations', name: 'Investigations',
+    text: 'Worked examples on real NISAR data. Each one compares radar images from before and after an event and explains what changed.',
+    steps: [
+      'Press Investigations, or pick one of the cards at the bottom of the globe.',
+      'Drag the handle on the map to swipe between the before and after images, or switch to Side by side or Overlay.',
+      'Click a date on the timeline to change the before or the after image.',
+      'Read the explanation at the Simple or the Scientific level.',
+    ],
+    caption: 'The Limpopo and Incomati floods investigation: radar before and after, split by the swipe handle.',
+  },
+  {
+    n: '02', id: 'filters', name: 'Filters',
+    text: 'Decide which events appear on the globe.',
+    steps: [
+      'Press Filters.',
+      'Tick the kinds of change you want to see, such as geohazards, fire and forests, or water.',
+      'Switch event catalogs on or off: earthquakes, tsunamis, active fires, eruptions, flood alerts and landslides.',
+      'Set a range of years to narrow the events down.',
+      'Click any dot on the globe to read about that event.',
+    ],
+    caption: 'The Filters panel: categories, event catalogs and years.',
+  },
+  {
+    n: '03', id: 'layers', name: 'Satellite layers',
+    text: 'Lay any of 20 global datasets over the globe, from daily true-colour imagery to flood water, night lights and crop types.',
+    steps: [
+      'Press Satellite layers and tick a layer.',
+      'Move the slider under it to make the layer more or less transparent.',
+      'Read the colour legend to see what each colour means and where that comes from.',
+      'Press the i button next to a layer to read what it shows and its known limits.',
+    ],
+    caption: 'The farmland and crop types layer with its colour legend.',
+  },
+  {
+    n: '04', id: 'lens', name: 'SAR lens',
+    text: 'Look at the same place in radar instead of in a photo.',
+    steps: [
+      'Press SAR lens. A square appears that shows radar inside it.',
+      'Drag the square by its handle to move it, and use its corner to resize it.',
+      'Expand it to fill the screen, or close it when you are done.',
+    ],
+    caption: 'The SAR lens over Istanbul: radar inside the square, a photo outside.',
+  },
+  {
+    n: '05', id: 'probe', name: 'Coverage probe',
+    text: 'Find out what NISAR has recorded at any point on Earth.',
+    steps: [
+      'Press Coverage probe, then click a point on the globe.',
+      'The panel lists the NISAR products recorded there, with their dates and orbit tracks.',
+      'Step through them with Prev and Next to see each one on the map.',
+    ],
+    caption: 'The coverage probe in Iowa, listing the NISAR products recorded at that point.',
+  },
+  {
+    n: '06', id: 'search', name: 'Search',
+    text: 'Fly straight to a place, an investigation or a pair of coordinates.',
+    steps: [
+      'Type a place name and choose a result to fly there.',
+      'Type the name of an investigation to open it.',
+      'Type coordinates, such as 41.0, 29.0, to go to an exact point.',
+    ],
+    caption: 'Searching for Istanbul.',
+  },
+  {
+    n: '07', id: 'ask', name: 'Ask',
+    text: 'Put a question about radar, NISAR or the app to the built-in assistant.',
+    steps: [
+      'Press Ask, or click the satellite circling the globe.',
+      'Type a question, or pick one of the examples.',
+      'Every answer names its sources. When the app has no source, it says so rather than guessing.',
+    ],
+    caption: 'The assistant answering a question, with its sources.',
+  },
+];
 
 /**
  * The front page: a screen of its own, shown on a first visit instead of the tool. It says what Global SAR is,
- * who it is for, what it is not, how to use each tool and where the data comes from, and ends with
- * "Get started". The tool loads behind it (inert), so the globe is ready when the visitor arrives.
+ * who it is for, what it is not, how to use each tool step by step and where the data comes from, and ends
+ * with "Get started". The tool loads behind it (inert), so the globe is ready when the visitor arrives.
  */
 export default function FrontPage({ onStart, onTour }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
@@ -76,9 +122,10 @@ export default function FrontPage({ onStart, onTour }: Props) {
             <h1 ref={heading} tabIndex={-1}>Watch the surface of the Earth change, through radar.</h1>
             <p className="fp-lede">Global SAR is a globe you can explore. It compares real satellite observations from before and after earthquakes, floods, eruptions, fires and forest clearing, so you can see what changed on the ground.</p>
             <p className="fp-sub">It is led by NISAR, the NASA and ISRO radar satellite that sees through clouds and darkness and returns to the same place every 12 days.</p>
-            <a className="fp-jump" href="#fp-how" onClick={(e) => { e.preventDefault(); document.getElementById('fp-how')?.scrollIntoView({ block: 'start' }); }}>How it works</a>
+            <a className="fp-jump" href="#fp-how" onClick={(e) => { e.preventDefault(); document.getElementById('fp-how')?.scrollIntoView({ block: 'start' }); }}>How to use it</a>
           </div>
-          <OrbitArt />
+          {/* 3D render of a radar satellite and its beam over Europe and North Africa: an illustration, not a photograph */}
+          <img className="fp-art" src={`${BASE}intro/nisar-earth.webp`} alt="" aria-hidden="true" width={1200} height={984} decoding="async" />
         </section>
 
         <section className="fp-section">
@@ -114,17 +161,32 @@ export default function FrontPage({ onStart, onTour }: Props) {
         <section className="fp-section" id="fp-how">
           <h2 className="fp-label">How to use it</h2>
           <p className="fp-how-title">Seven tools, all on the bar at the top of the globe.</p>
+          <ul className="fp-moves" aria-label="Moving the globe">
+            <li>Drag to turn the globe.</li>
+            <li>Scroll or pinch to zoom.</li>
+            <li>Right-drag, or use two fingers, to tilt.</li>
+          </ul>
           <ol className="fp-tools" aria-label="The tools">
             {TOOLS.map((t) => (
-              <li key={t.name}>
-                <span className="fp-num" aria-hidden="true" data-no-i18n>{t.n}</span>
-                <div>
+              <li key={t.id} className="fp-tool">
+                <figure className="fp-shot">
+                  <img src={`${BASE}front/${t.id}.webp`} alt="" width={1200} height={750} loading="lazy" decoding="async" />
+                  <figcaption>{t.caption}</figcaption>
+                </figure>
+                <div className="fp-tool-text">
+                  <span className="fp-num" aria-hidden="true" data-no-i18n>{t.n}</span>
                   <h3>{t.name}</h3>
                   <p>{t.text}</p>
+                  <ol className="fp-steps">
+                    {t.steps.map((s) => (
+                      <li key={s}>{s}</li>
+                    ))}
+                  </ol>
                 </div>
               </li>
             ))}
           </ol>
+          <p className="fp-levels">Every explanation comes at two levels, Simple and Scientific, and you can switch between them at any time. The interface is available in English and Turkish.</p>
         </section>
 
         <section className="fp-section">

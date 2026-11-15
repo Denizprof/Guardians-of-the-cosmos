@@ -90,7 +90,8 @@ test.describe('guided tour', () => {
     await page.getByRole('button', { name: 'Get started' }).click();
     await expect(intro(page)).toHaveCount(0);
     expect(await page.evaluate((k) => localStorage.getItem(k), INTRO_SEEN_KEY)).toBe('3');
-    expect(await page.evaluate(() => !!document.activeElement && document.activeElement !== document.body)).toBe(true);
+    // focus is handed over just after the dialog is gone
+    await expect.poll(() => page.evaluate(() => !!document.activeElement?.closest('.topbar'))).toBe(true);
   });
 
   test('Escape closes the tour', async ({ page }) => {
