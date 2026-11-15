@@ -28,6 +28,8 @@ interface Props {
   onShowIntro?: () => void;
   /** Go back to the front page, the full-screen explanation shown on a first visit (About view only). */
   onShowFront?: () => void;
+  /** Start the interactive tutorial (About view only). */
+  onShowTutorial?: () => void;
   /** Coverage probe: the one product currently shown on the map (null = none). */
   selectedScene?: string | null;
   onSelectScene?: (scene: string | null) => void;
@@ -192,6 +194,9 @@ function IntroPanel(p: Props) {
               </p>
               {p.onShowFront && (
                 <button type="button" className="btn primary about-front" onClick={p.onShowFront}>Back to the front page</button>
+              )}
+              {p.onShowTutorial && (
+                <button type="button" className="btn about-front" onClick={p.onShowTutorial}>Start the interactive tutorial</button>
               )}
               {p.onShowIntro && (
                 <button type="button" className="btn" onClick={p.onShowIntro}>Show the introduction again</button>

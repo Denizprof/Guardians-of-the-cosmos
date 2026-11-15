@@ -1,5 +1,5 @@
 // First visit in a real browser: the front page (components/FrontPage.tsx), then the tool; and the guided
-// tour (components/Welcome.tsx), reached from the front page or from About.
+// introduction tour (components/Welcome.tsx), reached only from About.
 // Uses Playwright's own `test`, not ./fixtures: that fixture marks the intro as seen so every other spec starts in the tool.
 import { expect, test } from '@playwright/test';
 
@@ -8,7 +8,14 @@ const INTRO_SEEN_KEY = 'global-sar.intro-seen';
 const front = (page: Page) => page.locator('.front');
 const intro = (page: Page) => page.getByRole('dialog', { name: /Global SAR/ });
 const ready = (page: Page) => expect(page.locator('.app[data-ready="true"]')).toBeAttached();
-const openTour = (page: Page) => front(page).getByRole('button', { name: 'Take the guided tour' }).click();
+/** The introduction tour opens only from the About panel. Start as a returning visitor, so the tool is what loads. */
+const seen = (page: Page) => page.addInitScript((k) => { try { localStorage.setItem(k, '3'); } catch { /* storage blocked */ } }, INTRO_SEEN_KEY);
+const openTour = async (page: Page) => {
+  await page.getByRole('button', { name: 'About Global SAR' }).click();
+  const again = page.getByRole('button', { name: /Show the introduction again/ });
+  await again.scrollIntoViewIfNeeded();
+  await again.click();
+};
 
 test.describe('front page', () => {
   test('a first visit shows the front page as a screen of its own; Get started opens the tool, remembers it, and hands it focus', async ({ page }) => {
@@ -92,12 +99,20 @@ test.describe('front page', () => {
     await ready(page);
     await front(page).getByRole('button', { name: 'TR' }).click();
     await expect(front(page).getByRole('heading', { level: 1 })).toHaveText('Yeryüzünün değişimini radarla izleyin.');
-    await expect(front(page).getByRole('button', { name: 'Başlayın' })).toBeAttached();
+    await expect(front(page).getByRole('button', { name: 'Başlayın', exact: true })).toBeAttached();
   });
 });
 
-test.describe('guided tour', () => {
-  test('the front page opens the tour; its last step, Get started, closes it and remembers the visit', async ({ page }) => {
+test.describe('introduction tour', () => {
+  test('the front page does not offer the tour: it is reached only from About', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    await expect(front(page).getByRole('button', { name: /guided tour|introduction/i })).toHaveCount(0);
+    await expect(front(page).getByRole('button', { name: 'Take the interactive tutorial' })).toBeAttached();
+  });
+
+  test('About opens the tour; its last step, Get started, closes it and hands focus to the tool', async ({ page }) => {
+    await seen(page);
     await page.goto('/');
     await ready(page);
     await openTour(page);
@@ -115,6 +130,7 @@ test.describe('guided tour', () => {
   });
 
   test('Escape closes the tour', async ({ page }) => {
+    await seen(page);
     await page.goto('/');
     await ready(page);
     await openTour(page);
@@ -142,11 +158,10 @@ test.describe('guided tour', () => {
 
   test('on a phone the tour fits the screen width and its buttons stay in view', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
+    await seen(page);
     await page.goto('/');
     await ready(page);
-    const tour = front(page).getByRole('button', { name: 'Take the guided tour' });
-    await tour.scrollIntoViewIfNeeded();
-    await tour.click();
+    await openTour(page);
     await expect(intro(page)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await expect(intro(page).getByRole('button', { name: 'Next' })).toBeInViewport();
@@ -155,6 +170,7 @@ test.describe('guided tour', () => {
   });
 
   test('Skip tour closes the tour from the first step', async ({ page }) => {
+    await seen(page);
     await page.goto('/');
     await ready(page);
     await openTour(page);

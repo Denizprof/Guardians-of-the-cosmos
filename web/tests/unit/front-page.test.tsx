@@ -12,9 +12,9 @@ import shippedLayers from '../../public/data/layers.json';
 
 const setup = () => {
   const onStart = vi.fn();
-  const onTour = vi.fn();
-  const { container } = render(<FrontPage onStart={onStart} onTour={onTour} />);
-  return { onStart, onTour, container };
+  const onTutorial = vi.fn();
+  const { container } = render(<FrontPage onStart={onStart} onTutorial={onTutorial} />);
+  return { onStart, onTutorial, container };
 };
 
 describe('front page', () => {
@@ -82,10 +82,10 @@ describe('front page', () => {
     expect(onStart).toHaveBeenCalledTimes(2);
   });
 
-  it('offers the guided tour as a second way in', async () => {
-    const { onTour, onStart } = setup();
-    await userEvent.click(screen.getByRole('button', { name: 'Take the guided tour' }));
-    expect(onTour).toHaveBeenCalledTimes(1);
+  it('offers the interactive tutorial as a second way in', async () => {
+    const { onTutorial, onStart } = setup();
+    await userEvent.click(screen.getByRole('button', { name: 'Take the interactive tutorial' }));
+    expect(onTutorial).toHaveBeenCalledTimes(1);
     expect(onStart).not.toHaveBeenCalled();
   });
 

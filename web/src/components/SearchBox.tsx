@@ -84,7 +84,7 @@ export default function SearchBox({ events, onEvent, onPlace }: Props) {
   const active = expanded && items[sel] ? optId(sel) : undefined;
 
   return (
-    <div className="search">
+    <div className="search" data-tut="search">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
         <circle cx="11" cy="11" r="7" />
         <path d="M20 20l-4-4" />

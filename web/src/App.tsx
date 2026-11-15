@@ -14,6 +14,7 @@ import { readHash } from './app/readHash';
 import { markIntroSeen, shouldShowIntro } from './app/introSeen';
 import Welcome from './components/Welcome';
 import FrontPage from './components/FrontPage';
+import Tutorial, { type TutorialState } from './components/Tutorial';
 import LangSwitch from './components/LangSwitch';
 import { useIsMobile, useViewportHeight } from './app/viewport';
 import { useCatalogs } from './app/useCatalogs';
@@ -61,6 +62,10 @@ export default function App() {
   const [frontOpen, setFrontOpen] = useState(() => shouldShowIntro(init));
   // Guided tour: opened from the front page or from About.
   const [introOpen, setIntroOpen] = useState(false);
+  // Interactive tutorial: a coach card over the live tool (from the front page or About).
+  const [tutorialOn, setTutorialOn] = useState(false);
+  /** Raised on every start, so starting again from About begins at step 1. */
+  const [tutorialRun, setTutorialRun] = useState(0);
   const [beforeId, setBeforeId] = useState<string | null>(init.b);
   const [afterId, setAfterId] = useState<string | null>(init.a);
   const [mode, setMode] = useState<CompareMode>(init.mode ?? 'swipe');
@@ -412,10 +417,31 @@ export default function App() {
     focusToolAfterFront.current = false;
     appRef.current?.querySelector<HTMLElement>('.topbar .tool')?.focus({ preventScroll: true });
   }, [frontOpen]);
-  const tourFromFront = useCallback(() => {
+  /** Start the interactive tutorial on a clean tool: nothing open, so its first steps make sense. */
+  const startTutorial = useCallback(() => {
+    markIntroSeen();
+    selectEvent(null);
+    closePanel();
+    setPopover(null);
+    // nothing left over from before: a step must not be "done" or behave oddly because of an earlier visit
+    closeLens();
+    setCoverageMode(false);
+    setMode('swipe');
+    setLevel('simple');
+    setIntroOpen(false);
     setFrontOpen(false);
-    setIntroOpen(true); // closing the tour remembers the visit
-  }, []);
+    setTutorialRun((n) => n + 1);
+    setTutorialOn(true);
+  }, [selectEvent, closePanel, closeLens]);
+  const endTutorial = useCallback(() => setTutorialOn(false), []);
+  const probed = probe !== null;
+  const flyNonce = flyTo?.nonce ?? 0;
+  const layersOn = tileOverlays.length;
+  const assistantOpen = !selected && panelView === 'assistant';
+  const tutorialState = useMemo<TutorialState>(
+    () => ({ selectedId, mode, level, layersOn, lensOn, probed, flyNonce, assistantOpen }),
+    [selectedId, mode, level, layersOn, lensOn, probed, flyNonce, assistantOpen],
+  );
   const introCredits = useCallback(() => {
     markIntroSeen();
     setIntroOpen(false);
@@ -452,11 +478,13 @@ export default function App() {
   const showFront = useCallback(() => {
     closePanel();
     setPopover(null);
+    setTutorialOn(false); // leaving the tool ends the tutorial; it does not resume by surprise
     setFrontOpen(true);
   }, [closePanel]);
   const showIntro = useCallback(() => {
     closePanel();
     setPopover(null);
+    setTutorialOn(false);
     setIntroOpen(true);
   }, [closePanel]);
 
@@ -487,7 +515,7 @@ export default function App() {
         </h1>
         <SearchBox events={events} onEvent={selectEvent} onPlace={onPlace} />
         <div className="tools" role="toolbar" aria-label="Map tools">
-          <button className="tool" aria-expanded={popover === 'investigations'} onClick={() => toggle('investigations')} title="Curated before/after investigations" aria-label="Investigations">
+          <button className="tool" aria-expanded={popover === 'investigations'} onClick={() => toggle('investigations')} title="Curated before/after investigations" aria-label="Investigations" data-tut="investigations">
             <IconInvestigations />
             <span className="tool-label">Investigations</span>
           </button>
@@ -500,18 +528,19 @@ export default function App() {
             aria-expanded={popover === 'layers'}
             onClick={() => toggle('layers')}
             title="Global satellite layers (NASA, ESA, partners)"
+            data-tut="layers"
             aria-label={`Satellite layers${tileOverlays.length ? ` (${tileOverlays.length})` : ''}`}
           >
             <IconLayers />
             <span className="tool-label">Satellite layers</span>
             {tileOverlays.length > 0 && <span className="tool-count">{tileOverlays.length}</span>}
           </button>
-          <button className="tool sar" aria-pressed={lensOn} onClick={() => (lensOn ? closeLens() : setLensOn(true))} title="A movable square that shows the same view in radar" aria-label="SAR lens">
+          <button className="tool sar" aria-pressed={lensOn} onClick={() => (lensOn ? closeLens() : setLensOn(true))} title="A movable square that shows the same view in radar" aria-label="SAR lens" data-tut="lens">
             <IconLens />
             <span className="tool-label">SAR lens</span>
           </button>
           {!selected && (
-            <button className="tool" aria-pressed={coverageMode} onClick={() => setCoverageMode((v) => !v)} title="Click the map to list real NISAR acquisitions there" aria-label="Coverage probe">
+            <button className="tool" aria-pressed={coverageMode} onClick={() => setCoverageMode((v) => !v)} title="Click the map to list real NISAR acquisitions there" aria-label="Coverage probe" data-tut="probe">
               <IconProbe />
               <span className="tool-label">Coverage probe</span>
             </button>
@@ -522,6 +551,7 @@ export default function App() {
             onClick={() => askAssistant(true)}
             title="Ask the assistant about radar, NISAR and this app"
             aria-label="Ask the assistant"
+            data-tut="ask"
           >
             <IconAsk />
             <span className="tool-label">Ask</span>
@@ -717,14 +747,16 @@ export default function App() {
           onClose={closePanel}
           onShowIntro={showIntro}
           onShowFront={showFront}
+          onShowTutorial={startTutorial}
         />
       ) : null}
 
       {selected && <Timeline event={selected} before={before} after={after} slot={slot} onSlot={setSlot} onPick={onTimelinePick} />}
 
       {introOpen && <Welcome onClose={closeIntro} onCredits={introCredits} />}
+      {tutorialOn && !frontOpen && !introOpen && <Tutorial key={tutorialRun} state={tutorialState} onEnd={endTutorial} />}
     </div>
-    {frontOpen && <FrontPage onStart={startFromFront} onTour={tourFromFront} />}
+    {frontOpen && <FrontPage onStart={startFromFront} onTutorial={startTutorial} />}
     </>
   );
 }

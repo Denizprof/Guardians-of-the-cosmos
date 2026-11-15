@@ -230,7 +230,7 @@ function EventPanel(p: Props) {
         <div className="section">
           <div className="row spread">
             <h3>Compare</h3>
-            <div className="seg" role="group" aria-label="Comparison mode">
+            <div className="seg" role="group" aria-label="Comparison mode" data-tut="compare">
               {(['swipe', 'side', 'overlay'] as CompareMode[]).map((m) => (
                 <button key={m} aria-pressed={p.mode === m} onClick={() => p.onMode(m)}>
                   {m === 'swipe' ? 'Swipe' : m === 'side' ? 'Side by side' : 'Overlay'}
@@ -260,7 +260,7 @@ function EventPanel(p: Props) {
           <div className="section explain">
             <div className="row spread">
               <h3>What the radar sees</h3>
-              <div className="seg" role="group" aria-label="Explanation level">
+              <div className="seg" role="group" aria-label="Explanation level" data-tut="level">
                 <button aria-pressed={!sci} onClick={() => p.onLevel('simple')}>Simple</button>
                 <button aria-pressed={sci} onClick={() => p.onLevel('scientific')}>Scientific</button>
               </div>

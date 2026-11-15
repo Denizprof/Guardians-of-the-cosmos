@@ -4,8 +4,8 @@ import LangSwitch from './LangSwitch';
 interface Props {
   /** "Get started" / "Open the app": leave the front page for the tool. */
   onStart: () => void;
-  /** Leave the front page and open the four-step guided tour (components/Welcome.tsx) over the tool. */
-  onTour: () => void;
+  /** Leave the front page and start the interactive tutorial (components/Tutorial.tsx) in the tool. */
+  onTutorial: () => void;
 }
 
 const BASE = import.meta.env.BASE_URL;
@@ -96,7 +96,7 @@ const TOOLS: { n: string; id: string; name: string; text: string; steps: string[
  * who it is for, what it is not, how to use each tool step by step and where the data comes from, and ends
  * with "Get started". The tool loads behind it (inert), so the globe is ready when the visitor arrives.
  */
-export default function FrontPage({ onStart, onTour }: Props) {
+export default function FrontPage({ onStart, onTutorial }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
@@ -201,7 +201,7 @@ export default function FrontPage({ onStart, onTour }: Props) {
               Get started
               <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9h12M10 4l5 5-5 5" /></svg>
             </button>
-            <button type="button" className="link fp-tour" onClick={onTour}>Take the guided tour</button>
+            <button type="button" className="link fp-tour" onClick={onTutorial}>Take the interactive tutorial</button>
           </div>
           <p className="fp-fine">Runs in your browser. No account and nothing to install.</p>
         </section>
