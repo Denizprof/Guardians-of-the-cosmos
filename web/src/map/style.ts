@@ -17,6 +17,13 @@ export const TERRAIN_ON_ZOOM = 6.5;
 export const TERRAIN_OFF_ZOOM = 5.5;
 /** Sentinel-2 (10 m) ends near z14; the Esri close-up imagery layered over it is sharp to z19. */
 export const MAX_ZOOM = 18.5;
+/** Closest the scale bar (100 px wide) may get: 50 m, i.e. 0.5 m per pixel. */
+export const MIN_SCALE_BAR_M = 50;
+/** Highest zoom at a latitude where the scale bar still reads at least MIN_SCALE_BAR_M. */
+export function maxZoomForScale(lat: number): number {
+  const metresPerPixelAtZ0 = 156543.03392 * Math.cos((lat * Math.PI) / 180);
+  return Math.log2(metresPerPixelAtZ0 / (MIN_SCALE_BAR_M / 100));
+}
 
 // Turkey is shown under its official name, Türkiye (the tiles carry the English exonym 'Turkey').
 const NAME: any = ['match', ['get', 'name_en'], 'Turkey', 'Türkiye', ['coalesce', ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']]];

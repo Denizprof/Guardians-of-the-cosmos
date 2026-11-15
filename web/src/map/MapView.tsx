@@ -11,7 +11,7 @@ import { registerCropProtocol } from './cropTiles';
 import { createTileErrorPolicy } from './tileErrors';
 import { browseBounds, coverageFeatures, trimmedBrowseUrl } from './coverageSelect';
 import {
-  EVENT_BEARING, EVENT_PITCH, HOME_CENTER, MAX_ZOOM, STYLE, TERRAIN, TERRAIN_OFF_ZOOM, TERRAIN_ON_ZOOM, homeZoom, lensStyle,
+  EVENT_BEARING, EVENT_PITCH, HOME_CENTER, MAX_ZOOM, maxZoomForScale, STYLE, TERRAIN, TERRAIN_OFF_ZOOM, TERRAIN_ON_ZOOM, homeZoom, lensStyle,
 } from './style';
 import { mapNameExpression, onLangChange } from '../i18n';
 import { attachHalo } from './halo';
@@ -229,6 +229,10 @@ function MapView(p: MapViewProps) {
     }
     a.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), 'bottom-left');
     a.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
+    // Closest view: the scale bar never reads less than 30 m, at any latitude.
+    const limitZoom = () => a.setMaxZoom(Math.min(MAX_ZOOM, maxZoomForScale(a.getCenter().lat)));
+    a.on('moveend', limitZoom);
+    limitZoom();
     const sync = (src: MlMap, dst: MlMap) => () => {
       if (syncing.current || !bActive.current) return;
       syncing.current = true;
