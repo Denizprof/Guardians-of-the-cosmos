@@ -406,6 +406,30 @@ export default function App() {
     setPanelCollapsed(false);
     setPanelView('about'); // the About panel carries the full credits; focus moves to its heading
   }, []);
+  /** Open the assistant: from "Ask" in the top bar (a second press closes it) or from the satellite on the globe. */
+  const askAssistant = useCallback((toggle: boolean) => {
+    setPopover(null);
+    if (selected) {
+      // inside an investigation the chat lives in that panel, where it knows the event and its layers
+      const ask = appRef.current?.querySelector<HTMLDetailsElement>('section.panel details[data-ask]');
+      if (ask) {
+        setPanelCollapsed(false);
+        ask.open = true;
+        ask.scrollIntoView({ block: 'start' });
+        ask.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+      }
+      return;
+    }
+    if (panelView === 'assistant') {
+      if (toggle) closePanel();
+      else setPanelCollapsed(false);
+      return;
+    }
+    closePanel();
+    setPanelView('assistant');
+    setPanelCollapsed(false);
+  }, [selected, panelView, closePanel]);
+  const askFromSatellite = useCallback(() => askAssistant(false), [askAssistant]);
   const showIntro = useCallback(() => {
     closePanel();
     setPopover(null);
@@ -470,24 +494,7 @@ export default function App() {
           <button
             className="tool"
             aria-pressed={!selected && panelView === 'assistant'}
-            onClick={() => {
-              setPopover(null);
-              if (selected) {
-                // inside an investigation the chat lives in that panel, where it knows the event and its layers
-                const ask = appRef.current?.querySelector<HTMLDetailsElement>('section.panel details[data-ask]');
-                if (ask) {
-                  setPanelCollapsed(false);
-                  ask.open = true;
-                  ask.scrollIntoView({ block: 'start' });
-                  ask.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
-                }
-                return;
-              }
-              if (panelView === 'assistant') return closePanel();
-              closePanel();
-              setPanelView('assistant');
-              setPanelCollapsed(false);
-            }}
+            onClick={() => askAssistant(true)}
             title="Ask the assistant about radar, NISAR and this app"
             aria-label="Ask the assistant"
           >
@@ -532,6 +539,7 @@ export default function App() {
         onSelectEvent={selectEvent}
         onSelectContext={selectContext}
         onMapClick={onMapClick}
+        onAskAssistant={askFromSatellite}
         onPin={onMapPin}
         flyTo={flyTo}
         tileOverlays={tileOverlays}

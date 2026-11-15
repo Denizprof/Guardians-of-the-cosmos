@@ -14,6 +14,7 @@ import {
 } from './style';
 import { mapNameExpression, onLangChange } from '../i18n';
 import { attachHalo } from './halo';
+import { attachSatellite } from './satellite';
 import { isLite, mapPixelRatio } from '../app/perf';
 import { addOverlays, overlayUrls, syncImageLayers, syncTileOverlays } from './overlays';
 import type { TileOverlay } from './overlays';
@@ -57,6 +58,8 @@ export interface MapViewProps {
   focus: { lon: number; lat: number } | null;
   /** SAR lens: null = off. `nisar` is the investigation layer to draw over the SAR basemap, if any. */
   lens: { nisar: SarLayer | null } | null;
+  /** The assistant's satellite (map/satellite.ts) was clicked. */
+  onAskAssistant?: () => void;
   /** A source failed to load (tiles, NISAR image, style). Failures must be visible, never read as "no data". */
   onMapError?: (where: 'globe' | 'lens', source: string) => void;
 }
@@ -330,6 +333,8 @@ function MapView(p: MapViewProps) {
       a.on('mouseleave', id, () => (a.getCanvas().style.cursor = ''));
     }
     maps.current = { a, b };
+    // the assistant's mascot, circling the globe; it stays still in lite mode and for people who asked for less motion
+    const removeSatellite = attachSatellite(a, aEl.current!.parentElement!, { onAsk: () => cb.current.onAskAssistant?.(), still: () => reduced.current || isLite() });
     // two canvases must not share the same accessible name (QA-21)
     a.getCanvas().setAttribute('aria-label', 'Globe: before view and event markers');
     b.getCanvas().setAttribute('aria-label', 'Globe: after view');
@@ -339,6 +344,7 @@ function MapView(p: MapViewProps) {
       window.clearTimeout(restoreTimer);
       mq.removeEventListener('change', onMotionPref);
       for (const el of containers) for (const ev of stopEvents) el.removeEventListener(ev, stopSpin, { capture: true });
+      removeSatellite();
       a.remove();
       b.remove();
       maps.current = null;

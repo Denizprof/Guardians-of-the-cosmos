@@ -468,6 +468,7 @@ export const TR: Record<string, string> = {
   'Limitations': 'Sınırlamalar',
   'Thinking…': 'Düşünüyor…',
   'Ask the assistant': 'Asistana sorun',
+  "Ask the assistant. This satellite is the assistant's mascot: its orbit is illustrative, not a real satellite's position.": 'Asistana sorun. Bu uydu asistanın maskotudur: yörüngesi temsilîdir, gerçek bir uydunun konumu değildir.',
   'Send': 'Gönder',
   'Observation': 'Gözlem',
   'Derived': 'Türetilmiş',
