@@ -1,4 +1,5 @@
 import type { StyleSpecification } from 'maplibre-gl';
+import { HIRES_URL } from './hires';
 import { LENS_RASTER_PAINT, SAR_LENS_SOURCE, lensTileUrls } from './sarLens';
 
 // ---------------------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ export const TERRAIN = { source: 'dem', exaggeration: 1.4 };
 export const TERRAIN_ON_ZOOM = 6.5;
 export const TERRAIN_OFF_ZOOM = 5.5;
 /** Sentinel-2 (10 m) ends near z14; the Esri close-up imagery layered over it is sharp to z19. */
-export const MAX_ZOOM = 19;
+export const MAX_ZOOM = 18.5;
 
 // Turkey is shown under its official name, Türkiye (the tiles carry the English exonym 'Turkey').
 const NAME: any = ['match', ['get', 'name_en'], 'Turkey', 'Türkiye', ['coalesce', ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']]];
@@ -59,10 +60,10 @@ export const STYLE: StyleSpecification = {
     // Close-up photo imagery (sub-metre in cities), faded in once Sentinel-2's 10 m pixels run out (~z13).
     'satellite-hires': {
       type: 'raster',
-      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+      tiles: [HIRES_URL], // loaded by hires.ts, which drops Esri's grey "no data" tiles
       tileSize: 256,
       minzoom: 10,
-      maxzoom: 19,
+      maxzoom: 18, // z19 is mostly z18 stretched (blurry) and has the most "no data" tiles
       attribution:
         'Close-up imagery: <a href="https://www.esri.com" target="_blank" rel="noopener">Esri, Maxar, Earthstar Geographics and the GIS User Community</a>',
     },

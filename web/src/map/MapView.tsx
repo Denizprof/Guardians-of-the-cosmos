@@ -15,6 +15,7 @@ import {
 } from './style';
 import { mapNameExpression, onLangChange } from '../i18n';
 import { attachHalo } from './halo';
+import { registerHires } from './hires';
 import { attachSatellite } from './satellite';
 import { isLite, mapPixelRatio } from '../app/perf';
 import { addOverlays, overlayUrls, syncImageLayers, syncTileOverlays } from './overlays';
@@ -105,6 +106,7 @@ function bindLabelLanguage(map: MlMap) {
 }
 
 function makeMap(container: HTMLElement, reducedMotion: () => boolean): MlMap {
+  registerHires();
   const map = new maplibregl.Map({
     container,
     style: STYLE,
