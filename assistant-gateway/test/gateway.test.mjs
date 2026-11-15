@@ -274,3 +274,15 @@ test('a model redirect is refused and the API key never reaches the redirect tar
   assert.equal(res.status, 502);
   assert.equal(hits.length, 0);
 });
+
+test('a response citing a knowledge record from the request (kb: id) is accepted', async () => {
+  const base = await gateway();
+  const knowledge = [{ citation_id: 'kb:concept-sar', title: 'Fixture record', text: 'Fixture text.', source_label: 'Fixture source', url: 'https://example.org/kb' }];
+  const req = sampleRequest({ query: '__kb__' });
+  req.context.knowledge = knowledge;
+  const res = await post(base, req);
+  assert.equal(res.status, 200);
+  const j = await res.json();
+  assert.equal(j.status, 'ok');
+  assert.equal(j.citations[0].id, 'kb:concept-sar');
+});

@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   parseCsv, normalizeTsunamis, tsunamiTitle, normalizeVolcanoes, normalizeUsgs, normalizeGlc, normalizeGdacsFloods,
-  aggregateFirms, firmsCellsToEvents, confidenceClass, isoFromParts,
+  aggregateFirms, firmsCellsToEvents, confidenceClass, isoFromParts, SOURCES,
 } from '../src/fetch-catalogs.mjs';
 
 const FX = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
@@ -138,4 +138,73 @@ test('the tsunami normalizer uses those titles', () => {
   const quakeCaused = ev.filter((e) => /^Cause: (Earthquake|Volcano and earthquake|Earthquake and landslide|Volcano, earthquake and landslide)./.test(e.notes));
   assert.ok(quakeCaused.length > 0);
   assert.ok(quakeCaused.every((e) => /^Tsunami after (M [0-9.]+|an) earthquake, /.test(e.title)), quakeCaused.map((e) => e.title).join(' | '));
+});
+
+// ---------- audit regressions: date precision, GDACS paging, FIRMS partial feed ----------
+// The GLC export writes "12:00:00 AM" for records whose time of day is unknown (5,533 of 11,033 rows on 2026-11-15).
+test('glc normalizer records day precision when the source gave no time of day', () => {
+  const row = (event_id, event_date) => ({ event_id, event_date, longitude: '10', latitude: '20', landslide_category: 'landslide', event_title: 'x' });
+  const ev = normalizeGlc([row('1', '08/01/2008 12:00:00 AM'), row('2', '01/02/2009 02:00:00 AM'), row('3', '03/04/2010')]);
+  assert.deepEqual(ev.map((e) => [e.date, e.date_precision]), [
+    ['2008-08-01T00:00:00.000Z', 'day'],
+    ['2009-01-02T02:00:00.000Z', 'minute'],
+    ['2010-03-04T00:00:00.000Z', 'day'],
+  ]);
+  assert.ok(normalizeGlc(parseCsv(fx('nasa-glc').csv)).every((e) => ['day', 'minute'].includes(e.date_precision)));
+});
+
+test('gdacs flood normalizer records day precision for date-only and midnight fromdate', () => {
+  const feat = (eventid, fromdate) => ({ geometry: { coordinates: [10, 20] }, properties: { eventid, fromdate, todate: fromdate, name: 'Flood' } });
+  const ev = normalizeGdacsFloods([feat(1, '2020-05-07T00:00:00'), feat(2, '2020-05-07'), feat(3, '2025-12-12T13:00:00')]);
+  assert.deepEqual(ev.map((e) => e.date_precision), ['day', 'day', 'minute']);
+});
+
+/** Replace global fetch for one test; `handler(url)` returns a Response. */
+function stubFetch(t, handler) {
+  const real = globalThis.fetch;
+  globalThis.fetch = async (url) => handler(String(url));
+  t.after(() => { globalThis.fetch = real; });
+}
+const gdacsFeature = (eventid, year) => ({ geometry: { coordinates: [10, 20] }, properties: { eventid, fromdate: `${year}-03-01T00:00:00`, todate: `${year}-03-02T00:00:00`, name: 'Flood' } });
+const gdacsPage = (url) => [Number(/fromdate=(\d{4})/.exec(url)[1]), Number(/pagenumber=(\d+)/.exec(url)[1])];
+
+test('GDACS: a 200 response without a features array fails the source', async (t) => {
+  stubFetch(t, (url) => {
+    const [y] = gdacsPage(url);
+    return y === 2003 ? new Response('{"message":"maintenance"}') : new Response(JSON.stringify({ features: [gdacsFeature(y, y)] }));
+  });
+  await assert.rejects(SOURCES['gdacs-floods'].run(), /GDACS 2003 page 1: response has no features array/);
+});
+
+test('GDACS: HTTP 204 (no body) means no more results, also after a full page of 100', async (t) => {
+  const calls = [];
+  stubFetch(t, (url) => {
+    const [y, page] = gdacsPage(url);
+    calls.push(`${y}/${page}`);
+    if (y === 2001 && page === 1) return new Response(JSON.stringify({ features: Array.from({ length: 100 }, (_, i) => gdacsFeature(1000 + i, y)) }));
+    if (y === 2002 && page === 1) return new Response(JSON.stringify({ features: [gdacsFeature(5, y)] }));
+    return new Response(null, { status: 204 }); // every other year, and 2001 page 2
+  });
+  const ev = await SOURCES['gdacs-floods'].run();
+  assert.equal(ev.length, 101);
+  assert.ok(calls.includes('2001/2'));
+  assert.ok(!calls.includes('2002/2'));
+});
+
+test('FIRMS: a sensor feed that returns no usable detections fails the source instead of writing a partial snapshot', async (t) => {
+  const { csv } = fx('firms-fires');
+  stubFetch(t, (url) => new Response(/MODIS/.test(url) ? '<html><body>Service unavailable</body></html>' : csv.noaa20));
+  t.mock.method(console, 'warn', () => {});
+  await assert.rejects(SOURCES['firms-fires'].run({}), /FIRMS feeds missing: modis/);
+});
+
+test('FIRMS: a complete fetch keeps cells_total / cells_kept and reports no partial flag', async (t) => {
+  const { csv } = fx('firms-fires');
+  stubFetch(t, (url) => new Response(/MODIS/.test(url) ? csv.modis : csv.noaa20));
+  const meta = {};
+  const ev = await SOURCES['firms-fires'].run(meta);
+  assert.ok(ev.length > 0);
+  assert.equal(meta.extra.cells_kept, ev.length);
+  assert.ok(meta.extra.cells_total >= meta.extra.cells_kept);
+  assert.ok(!('partial' in meta.extra));
 });

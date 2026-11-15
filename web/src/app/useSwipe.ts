@@ -34,6 +34,13 @@ export function useSwipe(appRef: RefObject<HTMLDivElement | null>, isMobile: boo
     paintSwipe();
     setSwipePct(pct(swipeX.current));
   }, [selectedId, freeWidth, paintSwipe, pct]);
+  useEffect(() => {
+    // a narrower window or a rotated phone must not leave the divider under the side panel or off-screen
+    if (!selectedId) return;
+    const onResize = () => moveSwipe(swipeX.current, true);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [selectedId, moveSwipe]);
   useEffect(() => () => cancelAnimationFrame(swipeRaf.current), []);
   const onSwipeDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     swipeDragging.current = true;

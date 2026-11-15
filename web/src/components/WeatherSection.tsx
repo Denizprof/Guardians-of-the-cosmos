@@ -140,7 +140,8 @@ type State =
   | { s: 'error'; message: string }
   | { s: 'ready'; result: WeatherResult };
 
-export default function WeatherSection({ lon, lat, date }: { lon: number; lat: number; date: string | null }) {
+/** `precision` is the record's date_precision: a date known only to the day has no event time to claim. */
+export default function WeatherSection({ lon, lat, date, precision }: { lon: number; lat: number; date: string | null; precision?: string | null }) {
   const [state, setState] = useState<State>({ s: 'idle' });
   const ctl = useRef<AbortController | null>(null);
   useEffect(() => () => ctl.current?.abort(), []);
@@ -167,7 +168,7 @@ export default function WeatherSection({ lon, lat, date }: { lon: number; lat: n
       {state.s === 'idle' && (
         <>
           <p className="muted small">
-            Temperature, rain, wind and pressure at this point{date ? ' at the event time' : ' now'}, from weather models.
+            Temperature, rain, wind and pressure at this point{date ? (precision === 'day' ? ' on the event day' : ' at the event time') : ' now'}, from weather models.
           </p>
           <button type="button" className="btn" onClick={load}>Get weather</button>
         </>

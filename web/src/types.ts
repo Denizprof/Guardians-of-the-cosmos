@@ -108,6 +108,9 @@ export interface CatalogFile {
   retrieved: string;
   count: number;
   evidence_note?: string;
+  /** FIRMS only: grid cells with detections, and how many of them (the strongest) the file keeps. */
+  cells_total?: number;
+  cells_kept?: number;
   events: ContextEvent[];
 }
 

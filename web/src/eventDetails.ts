@@ -97,7 +97,8 @@ export function storedFields(ev: ContextEvent): DetailField[] {
     if (value !== null) out.push(href ? { label, value, href } : { label, value });
   };
   add('Type', CATEGORY_LABEL[ev.category] ?? str(ev.category));
-  add('Date (UTC)', isCoarseDate(ev.date_precision) ? fmtDatePrecise(ev.date, ev.date_precision) : (fmtIso(ev.date) ?? str(ev.date)));
+  // a date known only to the day (or coarser) has no time: printing "00:00 UTC" would invent one
+  add('Date (UTC)', ev.date_precision === 'day' || isCoarseDate(ev.date_precision) ? fmtDatePrecise(ev.date, ev.date_precision) : (fmtIso(ev.date) ?? str(ev.date)));
   add('Date precision', str(ev.date_precision));
   if (isNum(ev.lon) && isNum(ev.lat)) add('Location', fmtCoord(ev.lon, ev.lat));
   if (isNum(ev.magnitude)) add('Magnitude', `M ${num(ev.magnitude, 1)}`);

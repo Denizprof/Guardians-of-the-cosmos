@@ -1,6 +1,6 @@
 import { safeHref } from '../lib';
 import { useEffect, useState } from 'react';
-import { queryEarthdata, windowAround, type EarthdataResult } from '../earthdata';
+import { coverageNote, queryEarthdata, windowAround, type EarthdataResult } from '../earthdata';
 import './earthdata.css';
 
 export interface EarthdataPanelProps {
@@ -68,6 +68,14 @@ export default function EarthdataPanel({ lon, lat, date, windowDays = 3, onClose
           <p>NASA CMR did not answer the availability checks ({state.result.uncheckedCollections} collections unchecked), so we cannot say whether data exists here.</p>
           <button type="button" className="edp-retry" onClick={() => setAttempt((n) => n + 1)}>Retry</button>
         </div>
+      ) : state.result.totalCollections === 0 && state.result.truncated ? (
+        // Only part of the candidates was checked: say so instead of "nothing found".
+        <>
+          <p className="edp-state muted" role="status">{coverageNote(state.result)}</p>
+          <p className="edp-foot">
+            <a href={safeHref(state.result.searchUrl)} target="_blank" rel="noopener noreferrer">Open this point and time in Earthdata Search</a>
+          </p>
+        </>
       ) : state.result.totalCollections === 0 ? (
         <p className="edp-state muted">No NASA collections with granules found for this point and window.</p>
       ) : (
@@ -80,7 +88,7 @@ export default function EarthdataPanel({ lon, lat, date, windowDays = 3, onClose
               {state.result.uncheckedCollections} further collections could not be checked (NASA CMR request failed); their availability is unknown.
             </p>
           )}
-          {state.result.truncated && <p className="edp-state muted">Showing the first 90 candidate collections; use Earthdata Search for the full list.</p>}
+          {state.result.truncated && <p className="edp-state muted" role="status">{coverageNote(state.result)}</p>}
           <ul className="edp-groups">
             {state.result.groups.map((g) => (
               <li key={g.platform} className="edp-group">

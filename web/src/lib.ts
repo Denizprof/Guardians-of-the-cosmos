@@ -44,6 +44,19 @@ export function evidenceOf(l: SarLayer): EvidenceClass {
 }
 
 /** Authoritative event catalogs built by pipeline/src/fetch-catalogs.mjs (loaded on demand). */
+/**
+ * One marker per real-world event. Records are normally the same event when their ids match, but the
+ * recent-events feed (EONET) also relays GDACS floods under its own ids while the GDACS flood catalog holds
+ * the same floods as "gdacs-fl-<event number>". Both carry the GDACS report link, so the event number in that
+ * link identifies the flood whichever source it came from.
+ */
+export function markerKey(e: { id: string; url?: string | null }): string {
+  const url = e.url ?? '';
+  if (!/gdacs\.org\/report\.aspx/i.test(url) || !/[?&]eventtype=FL(&|$)/i.test(url)) return e.id;
+  const m = /[?&]eventid=(\d+)/i.exec(url);
+  return m ? `gdacs-fl-${m[1]}` : e.id;
+}
+
 export const CATALOGS: { id: string; label: string; defaultOn: boolean }[] = [
   { id: 'firms-fires', label: 'Active fires, last 24 h (NASA FIRMS)', defaultOn: true },
   { id: 'noaa-tsunamis', label: 'Tsunamis since 1900 (NOAA NCEI)', defaultOn: true },

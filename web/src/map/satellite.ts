@@ -8,9 +8,11 @@ import { ORBIT_PERIOD_S, attitude, globeRadiusPx, orbitAt, projectSatellite, typ
  * satellite's, it laps the Earth in a couple of minutes, and it is drawn far larger than life (a real one would
  * be much smaller than a pixel). The tooltip says so.
  *
- * Drawn on its own small WebGL canvas above the map, with the projection in satelliteOrbit.ts, so it does not
- * depend on MapLibre internals and costs nothing when hidden. The model (public/satellite) is fetched after the
- * map is idle and never blocks it; if it or WebGL 2 is unavailable, there is simply no satellite.
+ * Drawn on its own WebGL canvas, the size of the map and above it, with the projection in satelliteOrbit.ts, so
+ * it does not depend on MapLibre internals. While it can be seen it redraws about 30 times a second; zoomed in
+ * past MAX_ZOOM it is faded out and the animation loop stops until the map moves again. The model
+ * (public/satellite) is fetched after the map is idle and never blocks it; if it or WebGL 2 is unavailable,
+ * there is simply no satellite.
  */
 export interface SatelliteOptions {
   onAsk: () => void;
@@ -147,13 +149,14 @@ export function attachSatellite(map: MlMap, host: HTMLElement, opts: SatelliteOp
 
   const draw = () => {
     if (!gl || !prog || !mesh || removed) return;
+    const zoom = map.getZoom();
+    const fade = Math.max(0, Math.min(1, (MAX_ZOOM - zoom) / 0.5));
+    if (fade === 0) return hide(); // out of sight: no layout read, no clear (the canvas is transparent)
     const { w, h } = size();
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    const zoom = map.getZoom();
-    const fade = Math.max(0, Math.min(1, (MAX_ZOOM - zoom) / 0.5));
-    if (fade === 0 || !w || !h) return hide();
+    if (!w || !h) return hide();
     const centre = map.getCenter();
     const c = map.project(centre);
     const mapBox = map.getContainer().getBoundingClientRect();
@@ -184,12 +187,13 @@ export function attachSatellite(map: MlMap, host: HTMLElement, opts: SatelliteOp
     button.style.transform = `translate(${(p.x - 22).toFixed(1)}px, ${(p.y - 22).toFixed(1)}px)`;
   };
 
-  // Animated: about 30 frames a second while the page is visible. Still: only when the map moves.
+  // Animated: about 30 frames a second while the page is visible and the satellite is in zoom range; past
+  // MAX_ZOOM the loop stops, and the 'move' listener below starts it again. Still: only when the map moves.
   const tick = (now: number) => {
     raf = 0;
     if (removed) return;
     if (!document.hidden && now - lastDraw > 30) { lastDraw = now; draw(); }
-    if (!opts.still() && mesh) raf = requestAnimationFrame(tick);
+    if (!opts.still() && mesh && map.getZoom() < MAX_ZOOM) raf = requestAnimationFrame(tick);
   };
   const kick = () => { if (!raf && !removed) raf = requestAnimationFrame(tick); };
   const onMove = () => (opts.still() ? draw() : kick());

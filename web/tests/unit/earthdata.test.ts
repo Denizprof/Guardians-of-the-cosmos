@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import fixture from '../fixtures/cmr.fixture.json';
 import {
-  buildSearchUrl, formatTemporal, groupByPlatform, parseCollectionEntries, platformFamily, queryEarthdata, toCollection, windowAround,
+  buildSearchUrl, coverageNote, formatTemporal, groupByPlatform, parseCollectionEntries, platformFamily, queryEarthdata, toCollection, windowAround,
 } from '../../src/earthdata';
 
 const q = fixture.query;
@@ -93,5 +93,64 @@ describe('queryEarthdata', () => {
     expect(r.totalCollections).toBe(0);
     expect(r.groups).toEqual([]);
     await expect(queryEarthdata({ ...q, lon: NaN })).rejects.toThrow(/Invalid/);
+  });
+});
+
+describe('candidate truncation (CMR-Hits of the collection queries)', () => {
+  const entry = (i: number) => ({ id: `C${i}-TEST`, short_name: `S${i}` });
+  const range = (from: number, n: number) => Array.from({ length: n }, (_, k) => entry(from + k));
+  /** Two collection pages (general, then platform-targeted) and a fixed granule count for every collection. */
+  const pagedFetch = (general: unknown[], targeted: unknown[], hits: (string | null)[], granules: number) =>
+    (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('/collections.json')) {
+        const i = url.includes('platform%5B%5D=') ? 1 : 0;
+        const h = hits[i];
+        return new Response(JSON.stringify({ feed: { entry: i ? targeted : general } }), { status: 200, headers: h == null ? {} : { 'CMR-Hits': h } });
+      }
+      return new Response('{"feed":{"entry":[]}}', { status: 200, headers: { 'CMR-Hits': String(granules) } });
+    }) as typeof fetch;
+
+  it('is truncated when two overlapping 50-entry pages come from 3640 candidates', async () => {
+    // 20 shared ids -> 80 unique, below the 90 cap that used to be the only trigger
+    const r = await queryEarthdata({ ...q, fetchImpl: pagedFetch(range(0, 50), range(30, 50), ['3640', '412'], 2) });
+    expect(r.totalCollections).toBe(80);
+    expect(r.truncated).toBe(true);
+    expect(r.checkedCollections).toBe(80);
+    expect(r.candidateCollections).toBe(3640);
+    expect(coverageNote(r)).toBe('Checked 80 of 3,640 candidate collections (the most-used and platform-targeted ones); use Earthdata Search for the full list.');
+  });
+
+  it('does not claim "nothing found" when only part of the candidates was checked', async () => {
+    const r = await queryEarthdata({ ...q, fetchImpl: pagedFetch(range(0, 50), range(30, 50), ['3640', '412'], 0) });
+    expect(r.totalCollections).toBe(0);
+    expect(r.truncated).toBe(true);
+    expect(coverageNote(r)).toBe('None of the 80 candidate collections checked (the most-used and platform-targeted ones, of 3,640) has granules for this point and window. This is not a complete search.');
+  });
+
+  it('treats a full page without a CMR-Hits header as truncated, total unknown', async () => {
+    const r = await queryEarthdata({ ...q, fetchImpl: pagedFetch(range(0, 50), range(0, 50), [null, null], 1) });
+    expect(r.truncated).toBe(true);
+    expect(r.candidateCollections).toBeNull();
+    expect(coverageNote(r)).toBe('Checked 50 candidate collections (the most-used and platform-targeted ones), but more exist; use Earthdata Search for the full list.');
+  });
+
+  it('keeps a small complete result not truncated', async () => {
+    const r = await queryEarthdata({ ...q, fetchImpl: pagedFetch(range(0, 8), range(2, 3), ['8', '3'], 1) });
+    expect(r.truncated).toBe(false);
+    expect(r.checkedCollections).toBe(8);
+    expect(r.candidateCollections).toBe(8);
+    expect(coverageNote(r)).toBeNull();
+    // no header at all (older fixture): short pages are still complete
+    expect((await queryEarthdata({ ...q, fetchImpl: mockFetch })).truncated).toBe(false);
+  });
+
+  it('does not count failed availability checks as checked', async () => {
+    const base = pagedFetch(range(0, 50), range(30, 50), ['3640', '412'], 2);
+    const flaky = (async (input: RequestInfo | URL) =>
+      String(input).includes('collection_concept_id=C0-TEST') ? new Response('x', { status: 500 }) : base(input)) as typeof fetch;
+    const r = await queryEarthdata({ ...q, fetchImpl: flaky });
+    expect(r.uncheckedCollections).toBe(1);
+    expect(r.checkedCollections).toBe(79);
   });
 });

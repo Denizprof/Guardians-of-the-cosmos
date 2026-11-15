@@ -1,13 +1,14 @@
-import { Suspense, lazy, memo } from 'react';
+import { memo } from 'react';
 import type { SarEvent } from '../types';
 import { CATEGORY_COLOR, CATEGORY_LABEL, fmtCoord, fmtDate } from '../lib';
 import type { CoverageResult } from '../services';
 import { stepScene } from '../map/coverageSelect';
 import { IconChevron, IconClose } from './icons';
 import WeatherSection from './WeatherSection';
+import LazySection from './LazySection';
 
 // NASA CMR search UI is only needed once a point has been probed.
-const EarthdataPanel = lazy(() => import('./EarthdataPanel'));
+const loadEarthdataPanel = () => import('./EarthdataPanel');
 
 interface Props {
   events: SarEvent[];
@@ -174,9 +175,11 @@ function IntroPanel(p: Props) {
         {p.coverage && p.coverageState === 'idle' && <Coverage c={p.coverage} selectedScene={p.selectedScene ?? null} onSelectScene={p.onSelectScene ?? (() => {})} />}
         {p.probe && (
           <div className="section">
-            <Suspense fallback={<p className="muted small" role="status">Loading the NASA Earthdata search…</p>}>
-              <EarthdataPanel key={`${p.probe.lon},${p.probe.lat},${p.probe.date}`} lon={p.probe.lon} lat={p.probe.lat} date={p.probe.date} windowDays={p.probe.date ? 7 : 3} />
-            </Suspense>
+            <LazySection load={loadEarthdataPanel} fallback={<p className="muted small" role="status">Loading the NASA Earthdata search…</p>}>
+              {(EarthdataPanel) =>
+                p.probe && <EarthdataPanel key={`${p.probe.lon},${p.probe.lat},${p.probe.date}`} lon={p.probe.lon} lat={p.probe.lat} date={p.probe.date} windowDays={p.probe.date ? 7 : 3} />
+              }
+            </LazySection>
           </div>
         )}
 
@@ -230,7 +233,7 @@ function IntroPanel(p: Props) {
               <dt>Radar imagery</dt>
               <dd>NISAR L-band, NASA/JPL-Caltech &amp; ISRO, distributed by ASF DAAC.</dd>
               <dt>Context markers</dt>
-              <dd>USGS (earthquakes M6.3+) and NASA EONET, past 12 months.</dd>
+              <dd>USGS (earthquakes M6.3+) and NASA EONET, past 12 months; wildfires past 30 days. Floods that EONET records only as an area, not a point, are not shown.</dd>
               <dt>Globe imagery</dt>
               <dd>Sentinel-2 cloudless 2024 – <a href="https://cloudless.eox.at" target="_blank" rel="noopener">https://cloudless.eox.at</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0.</dd>
               <dt>Close-up imagery</dt>

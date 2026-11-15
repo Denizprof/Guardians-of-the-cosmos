@@ -19,7 +19,7 @@ import LangSwitch from './components/LangSwitch';
 import { useIsMobile, useViewportHeight } from './app/viewport';
 import { useCatalogs } from './app/useCatalogs';
 import { PANEL_W, useSwipe } from './app/useSwipe';
-import { GROUPS, loadData, layerLabel } from './lib';
+import { GROUPS, loadData, layerLabel, markerKey } from './lib';
 import { loadLayerCatalog, toOverlay, type CatalogLayer } from './layers';
 import LayersPanel, { type LayerState } from './components/LayersPanel';
 import { nisarCoverage, type CoverageResult, type GeocodeHit } from './services';
@@ -113,15 +113,16 @@ export default function App() {
     [catalogLayers, layerState]
   );
 
-  const { activeCatalogs, catalogEvents, catalogErrors, catalogRetrieved, catalogCounts, onToggleCatalog } = useCatalogs();
+  const { activeCatalogs, catalogEvents, catalogErrors, catalogRetrieved, catalogLimits, catalogCounts, onToggleCatalog } = useCatalogs();
 
   // everything shown as reported/context markers: recent EONET/USGS + active catalogs, filtered by year
   const mapContext = useMemo(() => {
     // De-duplicate by id (context.json and the USGS catalog both emit usgs-<id>): one marker per event,
     // preferring the catalog record (it carries the fuller fields), so counts and clicks are not doubled.
     const byId = new Map<string, ContextEvent>();
-    for (const id of activeCatalogs) for (const e of catalogEvents[id] ?? []) if (!byId.has(e.id)) byId.set(e.id, e);
-    if (showContext) for (const e of context) if (!byId.has(e.id)) byId.set(e.id, e);
+    // (keyed by markerKey: the same GDACS flood arrives under different ids from the feed and from the catalog)
+    for (const id of activeCatalogs) for (const e of catalogEvents[id] ?? []) if (!byId.has(markerKey(e))) byId.set(markerKey(e), e);
+    if (showContext) for (const e of context) if (!byId.has(markerKey(e))) byId.set(markerKey(e), e);
     const all = [...byId.values()];
     return all.filter((e) => {
       const y = new Date(e.date).getUTCFullYear();
@@ -693,6 +694,7 @@ export default function App() {
           catalogCounts={catalogCounts}
           catalogErrors={catalogErrors}
           catalogRetrieved={catalogRetrieved}
+          catalogLimits={catalogLimits}
           contextError={contextError}
           onToggleCatalog={onToggleCatalog}
           years={years}

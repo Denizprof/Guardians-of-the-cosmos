@@ -6,6 +6,7 @@
 //   "__invalid__"   returns a body that violates the response schema
 //   "__uncited__"   returns status ok citing an id that is not in the request context
 //   "__http500__"   returns HTTP 500
+//   "__kb__"        returns status ok citing the request's first knowledge record (a kb: id)
 //   anything else   returns a canned ok response citing the first context citation id
 // Run standalone: node fixtures/stub-model.mjs  (listens on 127.0.0.1:8799)
 // =====================================================================================
@@ -30,6 +31,10 @@ export function startStubModel(port = 0) {
         case '__invalid__': return send(200, { version: '1.0', status: 'maybe' });
         case '__uncited__':
           return send(200, { version: '1.0', status: 'ok', answer: { text: 'Claim [[layer:not-in-context]]', format: 'plain' }, citations: [{ id: 'layer:not-in-context', type: 'derived', label: 'bogus' }] });
+        case '__kb__': {
+          const id = body.context?.knowledge?.[0]?.citation_id;
+          return send(200, { version: '1.0', status: 'ok', answer: { text: `[TEST FIXTURE, not a real model] Canned reply. [[${id}]]`, format: 'plain' }, citations: [{ id, type: 'derived', label: 'fixture knowledge citation' }] });
+        }
         default: {
           const id = [...collectCitationIds(body)][0];
           if (!id) return send(200, { version: '1.0', status: 'error', error: { code: 'insufficient_context', message: 'No context supplied.' } });

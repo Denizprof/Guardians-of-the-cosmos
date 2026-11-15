@@ -1,13 +1,14 @@
 import type { CompareMode, SarEvent, SarLayer } from '../types';
-import { CATEGORY_COLOR, CATEGORY_LABEL, EVIDENCE_LABEL, evidenceOf, safeHref, fmtCoord, fmtDate, fmtDateTime, fmtEventDate, layerLabel } from '../lib';
+import { CATEGORY_COLOR, CATEGORY_LABEL, EVIDENCE_LABEL, evidenceOf, safeHref, fmtCoord, fmtDate, fmtDateTime, fmtEventDate, isCoarseDate, layerLabel } from '../lib';
 import { CONCEPTS, EVENT_CONTENT } from '../content/explain';
-import { Suspense, lazy, memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { IconChevron, IconClose } from './icons';
 import WeatherSection from './WeatherSection';
+import LazySection from './LazySection';
 
 // Both talk to live services and are only needed when the reader asks for them: keep them out of the first paint.
-const AssistantPanel = lazy(() => import('../assistant/AssistantPanel').then((m) => ({ default: m.AssistantPanel })));
-const EarthdataPanel = lazy(() => import('./EarthdataPanel'));
+const loadAssistantPanel = () => import('../assistant/AssistantPanel').then((m) => ({ default: m.AssistantPanel }));
+const loadEarthdataPanel = () => import('./EarthdataPanel');
 
 interface Props {
   event: SarEvent;
@@ -105,8 +106,17 @@ function LegendBar({ label, layer }: { label: string; layer: SarLayer }) {
 }
 
 /** NASA CMR search is a 5–10 s live query, so it runs only when asked. */
-function EarthdataSection({ lon, lat, date }: { lon: number; lat: number; date: string | null }) {
+function EarthdataSection({ lon, lat, date, coarse }: { lon: number; lat: number; date: string | null; coarse: boolean }) {
   const [open, setOpen] = useState(false);
+  if (coarse) {
+    // a date known only to the year/month cannot anchor a ±days search window
+    return (
+      <>
+        <h3>Other NASA data here</h3>
+        <p className="muted small">The event date is not known to the day, so there is no time window to search.</p>
+      </>
+    );
+  }
   if (!open) {
     return (
       <>
@@ -117,9 +127,9 @@ function EarthdataSection({ lon, lat, date }: { lon: number; lat: number; date: 
     );
   }
   return (
-    <Suspense fallback={<p className="muted small" role="status">Loading the NASA Earthdata search…</p>}>
-      <EarthdataPanel lon={lon} lat={lat} date={date} windowDays={7} onClose={() => setOpen(false)} />
-    </Suspense>
+    <LazySection load={loadEarthdataPanel} fallback={<p className="muted small" role="status">Loading the NASA Earthdata search…</p>}>
+      {(EarthdataPanel) => <EarthdataPanel lon={lon} lat={lat} date={date} windowDays={7} onClose={() => setOpen(false)} />}
+    </LazySection>
   );
 }
 
@@ -180,9 +190,11 @@ function AskSection({ event, before, after, onAfter }: { event: SarEvent; before
         <span className="faint small">Assistant, cites its sources</span>
       </summary>
       {opened && (
-        <Suspense fallback={<p className="muted small" role="status">Loading the assistant…</p>}>
-          <AssistantPanel event={event} before={before} after={after} onSelectLayer={(id) => (event.layers.some((l) => l.id === id) ? onAfter(id) : undefined)} />
-        </Suspense>
+        <LazySection load={loadAssistantPanel} fallback={<p className="muted small" role="status">Loading the assistant…</p>}>
+          {(AssistantPanel) => (
+            <AssistantPanel event={event} before={before} after={after} onSelectLayer={(id) => (event.layers.some((l) => l.id === id) ? onAfter(id) : undefined)} />
+          )}
+        </LazySection>
       )}
     </details>
   );
@@ -194,6 +206,7 @@ function AskSection({ event, before, after, onAfter }: { event: SarEvent; before
  */
 function EventPanel(p: Props) {
   const ev = p.event;
+  const coarseDate = isCoarseDate(ev.date_precision);
   const c = EVENT_CONTENT[ev.id];
   const color = CATEGORY_COLOR[ev.category];
   const sci = p.level === 'scientific';
@@ -316,11 +329,12 @@ function EventPanel(p: Props) {
         </div>
 
         <div className="section">
-          <EarthdataSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={ev.date} />
+          <EarthdataSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={coarseDate ? null : ev.date} coarse={coarseDate} />
         </div>
 
         <div className="section">
-          <WeatherSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={ev.date} />
+          {/* a date known only to the year/month cannot give a weather time: ask for current conditions instead */}
+          <WeatherSection key={ev.id} lon={ev.location.lon} lat={ev.location.lat} date={coarseDate ? null : ev.date} />
         </div>
 
         <div className="section">

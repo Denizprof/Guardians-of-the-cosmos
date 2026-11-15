@@ -59,14 +59,20 @@ export interface EarthdataResult {
   totalGranules: number;
   /** Collections whose granule count request failed: availability unknown, NOT "none". */
   uncheckedCollections?: number;
-  /** True when CMR returned more candidate collections than were checked. */
+  /** True when CMR matched more candidate collections than were checked (each candidate query returns one page). */
   truncated?: boolean;
+  /** Candidate collections whose granule count was actually obtained. */
+  checkedCollections?: number;
+  /** Candidate collections CMR matched in total (CMR-Hits of the general query); null = unknown. */
+  candidateCollections?: number | null;
   /** Earthdata Search link for the point + window with no collection preselected. */
   searchUrl: string;
   query: { lon: number; lat: number; start: string; end: string };
 }
 
 const CMR = 'https://cmr.earthdata.nasa.gov/search';
+/** Page size of each candidate query; only this first page is read. */
+const PAGE_SIZE = 50;
 const EDS = 'https://search.earthdata.nasa.gov/search';
 
 /** Platforms used as a search HINT for the targeted query (matching is case-insensitive in CMR). */
@@ -204,6 +210,30 @@ async function mapLimit<T, R>(items: T[], limit: number, fn: (t: T) => Promise<R
   return out;
 }
 
+/** CMR-Hits header as a number; null when missing or not numeric ("unknown", never 0). */
+function hitsOf(r: Response): number | null {
+  const h = r.headers.get('CMR-Hits');
+  return h !== null && /^\d+$/.test(h.trim()) ? Number(h) : null;
+}
+
+const nf = new Intl.NumberFormat('en-US');
+
+/**
+ * Sentence stating how much of the candidate list was checked; null when everything was checked.
+ * One plain string so the translation layer sees a single text node.
+ */
+export function coverageNote(r: Pick<EarthdataResult, 'truncated' | 'checkedCollections' | 'candidateCollections' | 'totalCollections'>): string | null {
+  if (!r.truncated) return null;
+  const n = nf.format(r.checkedCollections ?? 0);
+  const m = r.candidateCollections == null ? null : nf.format(r.candidateCollections);
+  if (r.totalCollections === 0) {
+    return `None of the ${n} candidate collections checked (the most-used and platform-targeted ones${m ? `, of ${m}` : '; more exist'}) has granules for this point and window. This is not a complete search.`;
+  }
+  return m
+    ? `Checked ${n} of ${m} candidate collections (the most-used and platform-targeted ones); use Earthdata Search for the full list.`
+    : `Checked ${n} candidate collections (the most-used and platform-targeted ones), but more exist; use Earthdata Search for the full list.`;
+}
+
 /** Collections (with granules) whose granules cover the point in the window, grouped by platform. */
 export async function queryEarthdata(q: EarthdataQuery): Promise<EarthdataResult> {
   const { lon, lat, start, end } = q;
@@ -213,7 +243,7 @@ export async function queryEarthdata(q: EarthdataQuery): Promise<EarthdataResult
   const doFetch = q.fetchImpl ?? fetch;
   const t = withTimeout(q.signal, q.timeoutMs ?? 25000);
   const spatialTemporal = `point=${encodeURIComponent(pointParam(lon, lat))}&temporal%5B%5D=${encodeURIComponent(formatTemporal(start, end))}`;
-  const base = `${CMR}/collections.json?has_granules=true&${spatialTemporal}&page_size=50&sort_key%5B%5D=-usage_score`;
+  const base = `${CMR}/collections.json?has_granules=true&${spatialTemporal}&page_size=${PAGE_SIZE}&sort_key%5B%5D=-usage_score`;
   const hint = PLATFORM_HINTS.map((p) => `platform%5B%5D=${encodeURIComponent(p)}`).join('&');
   try {
     const [general, targeted] = await Promise.all([
@@ -226,6 +256,8 @@ export async function queryEarthdata(q: EarthdataQuery): Promise<EarthdataResult
         return parseCollectionEntries(await r.json());
       }),
     );
+    // Total matches of each candidate query; null = header missing (stripped by a proxy, not exposed via CORS).
+    const hits = [general, targeted].map(hitsOf);
     const unique = new Map<string, CmrCollectionEntry>();
     for (const e of bodies.flat()) if (!unique.has(e.id)) unique.set(e.id, e);
     const MAX_CHECKED = 90;
@@ -237,8 +269,7 @@ export async function queryEarthdata(q: EarthdataQuery): Promise<EarthdataResult
         const r = await doFetch(`${CMR}/granules.json?collection_concept_id=${encodeURIComponent(e.id)}&${spatialTemporal}&page_size=0`, { signal: t.signal });
         if (!r.ok) return null;
         // A missing header (stripped by a proxy, not exposed via CORS) means "unknown", never 0 granules.
-        const h = r.headers.get('CMR-Hits');
-        return h !== null && /^\d+$/.test(h.trim()) ? Number(h) : null;
+        return hitsOf(r);
       } catch (err) {
         if (t.signal.aborted) throw err;
         return null;
@@ -253,7 +284,11 @@ export async function queryEarthdata(q: EarthdataQuery): Promise<EarthdataResult
     return {
       groups,
       uncheckedCollections: counted.filter((n) => n == null).length,
-      truncated: unique.size > MAX_CHECKED,
+      // Without the header a full page is assumed to have more behind it.
+      truncated: unique.size > MAX_CHECKED || bodies.some((b, i) => (hits[i] == null ? b.length >= PAGE_SIZE : hits[i]! > b.length)),
+      checkedCollections: counted.filter((n) => n != null).length,
+      // The targeted query is a subset of the general one, so the general total is the candidate total.
+      candidateCollections: hits[0] == null ? null : Math.max(hits[0], hits[1] ?? 0),
       totalCollections: cols.length,
       totalGranules: cols.reduce((s, c) => s + c.granules, 0),
       searchUrl: buildSearchUrl(qq),

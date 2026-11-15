@@ -242,11 +242,14 @@ export function normalizeGlc(rows) {
     if (!date) continue;
     const fatalities = parseInt(r.fatality_count, 10);
     const desc = (r.event_description || '').trim().slice(0, 110);
+    // The export writes "12:00:00 AM" when the time of day is unknown (half of all rows), so midnight is not a time.
+    const date_precision = d[4] && !(h === 0 && +d[5] === 0 && +d[6] === 0) ? 'minute' : 'day';
     const ev = {
       id: `glc-${r.event_id}`,
       title: `${cap(r.landslide_category || 'landslide')} — ${(r.event_title || r.location_description || r.country_name || '').trim().slice(0, 90)}`.replace(/ — $/, ''),
       category: 'landslide',
       date,
+      date_precision,
       lon, lat,
       source: 'NASA Global Landslide Catalog',
       url: /^https?:\/\//.test(r.source_link) ? r.source_link : 'https://data.nasa.gov/dataset/global-landslide-catalog-export',
@@ -278,6 +281,8 @@ export function normalizeGdacsFloods(features) {
       title: `${p.name || 'Flood'}${p.alertlevel ? ` (GDACS ${p.alertlevel} alert)` : ''}`,
       category: 'flood',
       date,
+      // a date-only or exactly-midnight fromdate carries no time of day
+      date_precision: /^\d{4}-\d{2}-\d{2}(T00:00(:00(\.0+)?)?)?$/.test(from) ? 'day' : 'minute',
       lon, lat,
       source: 'GDACS',
       url: p.url?.report ?? 'https://www.gdacs.org/',
@@ -444,15 +449,16 @@ export const SOURCES = {
           const csv = await fetchRetry(p.url, { timeout: 180000 });
           const rows = parseCsv(csv);
           used[p.key] = aggregateFirms(rows, p.label, cells);
-          if (!rows.length) console.warn(`  FIRMS ${p.key}: file is empty`);
+          if (!used[p.key]) throw new Error('no usable detections (empty or non-CSV body)');
         } catch (e) {
           console.warn(`  FIRMS ${p.key} skipped: ${e.message}`);
           failed.push(p.key);
         }
       }
+      // A snapshot with a sensor missing would look like "no fires there": fail the source and keep the previous file.
+      if (failed.length) throw new Error(`FIRMS feeds missing: ${failed.join(', ')}`);
       const { events, total_cells } = firmsCellsToEvents(cells);
-      // partial: true tells the app (and readers of the file) that a sensor feed is missing from this snapshot.
-      meta.extra = { window: '24h', cell_deg: 0.5, detections_used: used, cells_total: total_cells, cells_kept: events.length, partial: failed.length > 0, failed_products: failed };
+      meta.extra = { window: '24h', cell_deg: 0.5, detections_used: used, cells_total: total_cells, cells_kept: events.length };
       return events;
     },
   },
@@ -466,9 +472,13 @@ export const SOURCES = {
       for (let y = 2000; y <= new Date().getUTCFullYear(); y++) {
         for (let page = 1; ; page++) {
           if (page >= 30) throw new Error(`GDACS ${y}: more than 29 pages of 100; raise the page cap instead of truncating`);
-          const j = await fetchJson(`https://gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&fromdate=${y}-01-01&todate=${y}-12-31&pagenumber=${page}&pagesize=100`);
-          feats.push(...(j.features ?? []));
-          if ((j.features?.length ?? 0) < 100) break;
+          const text = await fetchRetry(`https://gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=FL&fromdate=${y}-01-01&todate=${y}-12-31&pagenumber=${page}&pagesize=100`);
+          if (!text.trim()) break; // GDACS answers "no results" with HTTP 204 and no body (checked live 2026-11-15)
+          const j = JSON.parse(text);
+          // An error body (no features array) must fail the source, not look like a year without floods.
+          if (!Array.isArray(j?.features)) throw new Error(`GDACS ${y} page ${page}: response has no features array`);
+          feats.push(...j.features);
+          if (j.features.length < 100) break;
         }
       }
       return normalizeGdacsFloods(feats);

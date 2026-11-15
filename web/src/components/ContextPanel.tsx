@@ -125,7 +125,7 @@ function ContextPanel({ event: ev, collapsed, onCheckCoverage, onClose, onToggle
 
         <div className="section">
           {/* a date known only to the year/month cannot give a weather time: ask for current conditions instead */}
-          <WeatherSection key={ev.id} lon={ev.lon} lat={ev.lat} date={isCoarseDate(ev.date_precision) ? null : (ev.date ?? null)} />
+          <WeatherSection key={ev.id} lon={ev.lon} lat={ev.lat} date={isCoarseDate(ev.date_precision) ? null : (ev.date ?? null)} precision={ev.date_precision} />
         </div>
 
         <div className="section">

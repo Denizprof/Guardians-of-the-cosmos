@@ -32,8 +32,15 @@ async function groupTotal(p: Page) {
 function expectedTotal(active: string[], from: number, to: number) {
   const sar = readData('events.json').events.length;
   const ids = new Set<string>();
-  for (const id of active) for (const e of readData(`catalogs/${id}.json`).events) if (inRange(e.date, from, to)) ids.add(e.id);
-  for (const e of readData('context.json').events) if (inRange(e.date, from, to)) ids.add(e.id);
+  // one event, one marker: a GDACS flood relayed by the recent-events feed is the same flood as in the GDACS
+  // catalog (same event number in its report link), so it is counted once
+  const key = (e: { id: string; url?: string }) => {
+    const u = e.url ?? '';
+    const n = u.includes('gdacs.org/report.aspx') && /eventtype=FL(&|$)/i.test(u) ? /eventid=(\d+)/i.exec(u)?.[1] : undefined;
+    return n ? `gdacs-fl-${n}` : e.id;
+  };
+  for (const id of active) for (const e of readData(`catalogs/${id}.json`).events) if (inRange(e.date, from, to)) ids.add(key(e));
+  for (const e of readData('context.json').events) if (inRange(e.date, from, to)) ids.add(key(e));
   return sar + ids.size;
 }
 

@@ -231,33 +231,31 @@ test.describe('chaos: offline after load', () => {
     await expect(panel(page)).toHaveCount(0);
   });
 
-  // BUG (real): EarthdataPanel and AssistantPanel are React.lazy chunks. If the chunk cannot be fetched (offline, flaky network,
-  // deploy replaced the hashed chunk), the rejection reaches the root ErrorBoundary and the WHOLE app is replaced by
-  // "Something went wrong and the app stopped." instead of an inline "could not load" in that one section.
+  // Regression: EarthdataPanel and AssistantPanel are React.lazy chunks. If the chunk cannot be fetched (offline, flaky network,
+  // deploy replaced the hashed chunk), the rejection used to reach the root ErrorBoundary and the WHOLE app was replaced by
+  // "Something went wrong and the app stopped." LazySection now shows an inline "could not load" with Retry in that one section.
   // Repro: open an investigation, go offline, click "Search NASA Earthdata" (or open "Ask about this investigation").
-  test('BUG: offline, opening the lazy Earthdata section must degrade inline, not crash the whole app', async ({ page, context, allow }) => {
-    test.fail(true, 'Known app bug: lazy chunk load failure is caught only by the root ErrorBoundary (.fatal)');
-    allow.console.push(...NET_NOISE, /dynamically imported module|EarthdataPanel|ErrorBoundary|The above error occurred/);
+  test('offline, opening the lazy Earthdata section must degrade inline, not crash the whole app', async ({ page, context, allow }) => {
+    allow.console.push(...NET_NOISE, /dynamically imported module|EarthdataPanel|ErrorBoundary|The above error occurred|a section failed to load/);
     await appReady(page);
     await context.setOffline(true); // offline BEFORE the lazy chunk is first requested
     await featured(page, /Venezuela/).click();
     await expect(panel(page)).toBeVisible();
     await page.getByRole('button', { name: 'Search NASA Earthdata' }).click();
     // wait for the section to settle into SOME final state first (a bare count(0) check would pass before the import fails)
-    await expect(page.locator('.fatal, section.edp').first()).toBeVisible();
+    await expect(page.locator('.fatal, section.edp, section.panel [role="alert"]').first()).toBeVisible();
     await expect(page.locator('.fatal'), 'whole app replaced by the fatal-error screen').toHaveCount(0);
     await expect(panel(page)).toBeVisible();
   });
 
-  test('BUG: offline, opening the lazy assistant section must degrade inline, not crash the whole app', async ({ page, context, allow }) => {
-    test.fail(true, 'Known app bug: lazy chunk load failure is caught only by the root ErrorBoundary (.fatal)');
-    allow.console.push(...NET_NOISE, /dynamically imported module|AssistantPanel|ErrorBoundary|The above error occurred/);
+  test('offline, opening the lazy assistant section must degrade inline, not crash the whole app', async ({ page, context, allow }) => {
+    allow.console.push(...NET_NOISE, /dynamically imported module|AssistantPanel|ErrorBoundary|The above error occurred|a section failed to load/);
     await appReady(page);
     await context.setOffline(true); // offline BEFORE the lazy chunk is first requested
     await featured(page, /Venezuela/).click();
     await expect(panel(page)).toBeVisible();
     await page.locator('section.panel details.disclosure > summary', { hasText: 'Ask about this investigation' }).click();
-    await expect(page.locator('.fatal, section.asst').first()).toBeVisible();
+    await expect(page.locator('.fatal, section.asst, section.panel [role="alert"]').first()).toBeVisible();
     await expect(page.locator('.fatal'), 'whole app replaced by the fatal-error screen').toHaveCount(0);
     await expect(panel(page)).toBeVisible();
   });

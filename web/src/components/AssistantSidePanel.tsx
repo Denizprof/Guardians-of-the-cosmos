@@ -1,9 +1,10 @@
-import { Suspense, lazy, memo } from 'react';
+import { memo } from 'react';
 import type { CoverageResult } from '../services';
 import { IconChevron, IconClose } from './icons';
+import LazySection from './LazySection';
 
 // The chat (and its knowledge base) is loaded only when someone opens it.
-const AssistantPanel = lazy(() => import('../assistant/AssistantPanel').then((m) => ({ default: m.AssistantPanel })));
+const loadAssistantPanel = () => import('../assistant/AssistantPanel').then((m) => ({ default: m.AssistantPanel }));
 
 interface Props {
   collapsed: boolean;
@@ -34,9 +35,9 @@ function AssistantSidePanel({ collapsed, coverage, onToggleCollapsed, onClose }:
       </header>
       <div className="panel-body">
         <div className="section">
-          <Suspense fallback={<p className="muted small" role="status">Loading the assistant…</p>}>
-            <AssistantPanel event={null} coverage={coverage} variant="full" />
-          </Suspense>
+          <LazySection load={loadAssistantPanel} fallback={<p className="muted small" role="status">Loading the assistant…</p>}>
+            {(AssistantPanel) => <AssistantPanel event={null} coverage={coverage} variant="full" />}
+          </LazySection>
         </div>
       </div>
     </section>

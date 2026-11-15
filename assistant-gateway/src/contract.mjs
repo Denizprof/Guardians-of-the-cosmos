@@ -23,6 +23,7 @@ export function collectCitationIds(request) {
   }
   for (const l of c.selected_layers ?? []) ids.add(l.citation_id);
   for (const g of c.coverage?.granules ?? []) ids.add(g.citation_id);
+  for (const k of c.knowledge ?? []) ids.add(k.citation_id); // knowledge records (contract 1.1, "kb:" ids)
   return ids;
 }
 

@@ -9,6 +9,11 @@ const snapshotAgeH = (iso: string) => {
 };
 import { IconClose } from './icons';
 
+const num = new Intl.NumberFormat('en-US');
+/** The pipeline keeps only the strongest fire cells to fit a size budget; say so, or a gap reads as "no fire". */
+const limitText = (l: { kept: number; total: number; min: number | null }) =>
+  `Showing the strongest ${num.format(l.kept)} of ${num.format(l.total)} half-degree cells${l.min === null ? '' : ` (peak fire power at least ${num.format(l.min)} MW)`}; weaker fires are not shown.`;
+
 interface Props {
   events: SarEvent[];
   context: ContextEvent[];
@@ -23,6 +28,8 @@ interface Props {
   contextError?: string | null;
   /** Build time of each loaded catalog snapshot (ISO). */
   catalogRetrieved?: Record<string, string>;
+  /** Catalogs cut to their strongest cells: cells kept, cells in total, weakest kept peak fire power (MW). */
+  catalogLimits?: Record<string, { kept: number; total: number; min: number | null }>;
   onToggleCatalog: (id: string) => void;
   years: [number, number];
   onYears: (y: [number, number]) => void;
@@ -131,7 +138,7 @@ function Filters(props: Props) {
         <h3>Event catalogs</h3>
         <label>
           <input type="checkbox" checked={showContext} onChange={(e) => onShowContext(e.target.checked)} />
-          Recent events, 12 months (USGS, EONET)
+          Recent events, 12 months; wildfires 30 days (USGS, EONET)
         </label>
         {props.contextError && <p className="catalog-error" role="alert">{props.contextError}</p>}
         {CATALOGS.map((c) => (
@@ -145,6 +152,7 @@ function Filters(props: Props) {
               <p className={`catalog-meta${snapshotAgeH(props.catalogRetrieved[c.id]) > 24 ? ' stale' : ''}`}>
                 Snapshot from {fmtDateTime(props.catalogRetrieved[c.id])}
                 {snapshotAgeH(props.catalogRetrieved[c.id]) > 24 ? ': older than 24 h, so these are not current fires.' : ' (not live).'}
+                {props.catalogLimits?.[c.id] && <>{' '}<span>{limitText(props.catalogLimits[c.id])}</span></>}
               </p>
             )}
             {/* visible text, not a hover-only tooltip (touch screens have no hover) */}

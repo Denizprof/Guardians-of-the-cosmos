@@ -44,6 +44,19 @@ describe('storedFields (the record shipped in public/data)', () => {
     expect(get(f, 'Deaths reported')).toBeUndefined(); // absent in the record: not invented
   });
 
+  it('a date known only to the day is printed without a time (no invented 00:00 UTC)', () => {
+    const eruption: ContextEvent = data('catalogs/noaa-volcanoes.json').events.find((e: ContextEvent) => e.id === 'ncei-vol-7588');
+    expect(eruption.date_precision).toBe('day');
+    expect(get(storedFields(eruption), 'Date (UTC)')?.value).toBe('7 May 2026');
+    expect(get(storedFields({ ...quake, date: '2026-05-07T00:00:00.000Z', date_precision: 'day' }), 'Date (UTC)')?.value).toBe('7 May 2026');
+  });
+
+  it('a date known to the minute or better keeps its time', () => {
+    expect(get(storedFields({ ...quake, date: '2026-05-07T00:00:00.000Z', date_precision: 'minute' }), 'Date (UTC)')?.value).toBe('7 May 2026 00:00 UTC');
+    expect(get(storedFields({ ...quake, date: '2026-05-07T09:41:12.000Z', date_precision: 'second' }), 'Date (UTC)')?.value).toBe('7 May 2026 09:41 UTC');
+    expect(get(storedFields(tsunami), 'Date (UTC)')?.value).toMatch(/ \d{2}:\d{2} UTC$/);
+  });
+
   it('every stored field of every shipped catalog record is rendered (nothing silently dropped)', () => {
     const files = ['context.json', 'catalogs/usgs-earthquakes.json', 'catalogs/noaa-tsunamis.json', 'catalogs/noaa-volcanoes.json', 'catalogs/gdacs-floods.json', 'catalogs/nasa-glc.json', 'catalogs/firms-fires.json'];
     const labelOf: Record<string, string> = {
