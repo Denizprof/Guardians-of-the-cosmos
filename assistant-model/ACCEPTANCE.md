@@ -19,6 +19,23 @@ question into the chat. Live research went to the real Wikipedia API; nothing wa
 Also checked live: "How does gravity work?", "What is quantum physics?", "How do computers work?" and "Explain the
 history of space exploration" each returned the matching Wikipedia summary with its link and edit date.
 
+## Rephrasing check (same day, same real service)
+
+Each of these was typed differently from the acceptance wording; all now give the intended answer.
+
+| Typed | Answered from |
+| --- | --- |
+| give info about turkey / info about Turkey / türkiye / Türkiye hakkında bilgi | Wikipedia's page for Turkey (Vikipedi for Turkish) |
+| istanbul hakkında bilgi / tell me about the moon / tell me about nasa | the page for that subject |
+| What is SAR? / SAR? what is it / write SAR? what is it / whats SAR / sar? | the SAR explainer |
+| do not tell me about SAR, tell me about NISAR / nisar? / tell me something about NISAR / NISAR nedir | the NISAR record |
+| difference between NISAR and Sentinel-1 / nisar ile sentinel arasındaki fark | the Sentinel-1 record |
+| SAR vs optical difference / SAR ile optik arasındaki fark ne | the radar-versus-optical record |
+
+Before the fixes, "info about Turkey" returned the page on the 2023 earthquakes, "give info about turkey" returned
+"Demographics of Turkey", "write SAR? what is it" returned a film called Sarzameen, and the Turkish SAR-versus-optics
+question returned fibre optics. Pages are now read by exact title first, and filler words such as "write" are dropped.
+
 ## Bugs this run found, now fixed
 
 - Test 6 first returned an unrelated page (New Horizons) because the search used the whole sentence. The search now

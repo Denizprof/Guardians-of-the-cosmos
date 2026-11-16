@@ -13,6 +13,9 @@ describe('searchTerms', () => {
     ['Türkiye hakkında bilgi ver', 'Türkiye'],
     ['Kuantum fiziği nedir?', 'Kuantum fiziği'],
     ['Give me the latest NISAR mission update.', 'NISAR mission'],
+    ['give info about turkey', 'turkey'],
+    ['info about Turkey', 'Turkey'],
+    ['write SAR? what is it', 'SAR? what is it'],
   ])('%s -> %s', (q, terms) => expect(searchTerms(q)).toBe(terms));
 });
 
@@ -22,6 +25,7 @@ describe('createWikipediaResearch', () => {
     const research = createWikipediaResearch(async (input) => {
       const url = String(input);
       urls.push(url);
+      if (/summary\/T%C3%BCrkiye$/.test(url)) return json({}, 404);
       if (url.includes('list=search')) return json({ query: { search: [{ title: 'Turkey (disambiguation)' }, { title: 'Turkey' }] } });
       if (url.includes('disambiguation')) return json({ type: 'disambiguation', extract: 'Turkey may refer to many things, places and birds.' });
       return json({ type: 'standard', title: 'Turkey', extract: 'Turkey, officially the Republic of Türkiye, is a country.', timestamp: '2026-11-10T08:00:00Z', content_urls: { desktop: { page: 'https://en.wikipedia.org/wiki/Turkey' } } });
@@ -30,19 +34,23 @@ describe('createWikipediaResearch', () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.result).toMatchObject({ title: 'Turkey', url: 'https://en.wikipedia.org/wiki/Turkey', edited: '2026-11-10', site: 'Wikipedia (English)' });
-    expect(urls[0]).toMatch(/^https:\/\/en\.wikipedia\.org\/w\/api\.php\?.*srsearch=T%C3%BCrkiye.*origin=\*/);
+    expect(urls[0]).toMatch(/summary\/T%C3%BCrkiye$/); // the subject is tried as a page title first
+    expect(urls[1]).toMatch(/^https:\/\/en\.wikipedia\.org\/w\/api\.php\?.*srsearch=T%C3%BCrkiye.*origin=\*/);
   });
   it('tries Turkish first for a Turkish question, then English', async () => {
     const hosts: string[] = [];
     const research = createWikipediaResearch(async (input) => {
       const url = String(input);
       hosts.push(new URL(url).host);
-      if (url.startsWith('https://tr.')) return json({ query: { search: [] } });
+      if (url.startsWith('https://tr.')) return json(url.includes('list=search') ? { query: { search: [] } } : {}, url.includes('list=search') ? 200 : 404);
+      if (/summary\/Yer%C3%A7ekimi$/.test(url)) return json({}, 404);
       if (url.includes('list=search')) return json({ query: { search: [{ title: 'Gravity' }] } });
       return json({ extract: 'Gravity is a fundamental interaction that attracts masses.' });
     });
     const r = await research('Yerçekimi nedir?', 'tr');
-    expect(hosts).toEqual(['tr.wikipedia.org', 'en.wikipedia.org', 'en.wikipedia.org']);
+    expect(hosts[0]).toBe('tr.wikipedia.org');
+    expect(hosts.filter((h) => h === 'tr.wikipedia.org').length).toBe(2);
+    expect(hosts.at(-1)).toBe('en.wikipedia.org');
     expect(r.ok && r.result.site).toBe('Wikipedia (English)');
   });
   it('reports "unavailable" when the service fails, and "nothing-found" when it finds nothing', async () => {
@@ -51,7 +59,7 @@ describe('createWikipediaResearch', () => {
     expect(await createWikipediaResearch(async () => json({ query: { search: [] } }))('x', 'en')).toEqual({ ok: false, reason: 'nothing-found' });
   });
   it('skips a page that does not mention the subject at all', async () => {
-    const research = createWikipediaResearch(async (input) => String(input).includes('list=search')
+    const research = createWikipediaResearch(async (input) => /summary\/NISAR$/.test(String(input)) ? json({}, 404) : String(input).includes('list=search')
       ? json({ query: { search: [{ title: 'New Horizons' }] } })
       : json({ title: 'New Horizons', extract: 'New Horizons is an interplanetary space probe launched in 2006.' }));
     expect(await research('latest NISAR update', 'en')).toEqual({ ok: false, reason: 'nothing-found' });

@@ -233,6 +233,23 @@ describe('suggestions', () => {
   });
 });
 
+describe('the same question, worded differently, gets the same answer', () => {
+  it.each([
+    ['What is SAR?', 'concept-sar'], ['SAR? what is it', 'concept-sar'], ['write SAR? what is it', 'concept-sar'], ['whats SAR', 'concept-sar'], ['sar?', 'concept-sar'],
+    ['What is NISAR?', 'sar-nisar'], ['nisar?', 'sar-nisar'], ['tell me something about NISAR', 'sar-nisar'], ['do not tell me about SAR, tell me about NISAR', 'sar-nisar'],
+    ['difference between NISAR and Sentinel-1', 'sar-sentinel'], ['SAR vs optical difference', 'ref-radar-vs-optical'], ['SAR ile optik arasındaki fark ne', 'ref-radar-vs-optical'],
+  ])('%s', async (q, id) => {
+    const { cited } = await ask(q, { locale: /ile|ne$/.test(q) ? 'tr' : 'en' });
+    expect(cited[0]).toBe(id);
+  });
+  it('treats "Tell me about Turkey" and "give info about turkey" alike, sending both to the page for Turkey', async () => {
+    const urls: string[] = [];
+    const a = new LocalAssistantAdapter({ loadKb: async () => KB, loadIntent: async () => INTENT, loadCatalog: async () => CATALOG, research: async (q) => { urls.push(q); return { ok: true, result: { title: 'Turkey', text: 'Turkey is a country.', url: 'https://en.wikipedia.org/wiki/Turkey', site: 'Wikipedia (English)', retrieved: '2026-11-16T00:00:00Z' } }; } });
+    for (const q of ['Tell me about Türkiye.', 'give info about turkey', 'türkiye', 'info about Turkey']) expect((await ask(q, { a })).cited, q).toEqual(['web:research']);
+    expect(urls.length).toBe(4);
+  });
+});
+
 describe('review findings stay fixed', () => {
   it('a question that names no place is not answered as "no events matching <word>"', async () => {
     for (const q of ['what is the largest earthquake magnitude', 'how many earthquakes in the world']) {

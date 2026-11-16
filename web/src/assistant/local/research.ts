@@ -29,7 +29,7 @@ const SITE: Record<Lang, string> = { en: 'Wikipedia (English)', tr: 'Vikipedi (T
 const ASKING = new RegExp(
   '^(?:' +
     [
-      'tell me (?:a little |something )?about', 'what (?:is|are|was|were)', 'who (?:is|was|are|were)', 'where is', 'explain(?: to me)?', 'describe',
+      '(?:write|say|type|please)', 'give me (?:some )?(?:info|information|details) (?:about|on)', '(?:give )?(?:some )?(?:info|information|details|facts) (?:about|on)', 'tell me (?:a little |something )?about', 'what (?:is|are|was|were)', 'who (?:is|was|are|were)', 'where is', 'explain(?: to me)?', 'describe',
       'how (?:does|do|did)', 'how', 'give me(?: the)?', 'can you (?:tell me about|explain)', 'i want to know about', 'what do you know about', 'information about',
       'bana', 'hakkinda bilgi ver', 'nedir', 'kimdir', 'anlat',
     ].join('|') +
@@ -67,6 +67,21 @@ interface SummaryJson { title?: unknown; extract?: unknown; timestamp?: unknown;
 
 async function searchOne(terms: string, lang: Lang, signal: AbortSignal, fetchImpl: typeof fetch, verify: boolean): Promise<ResearchResult | undefined> {
   const host = `https://${lang}.wikipedia.org`;
+  // A subject that is itself a page title ("Turkey", "Istanbul", "Moon") is read directly: the site follows redirects,
+  // and a text search would rank sub-pages ("Demographics of Turkey") above the page itself.
+  const direct = terms.trim().replace(/^./, (c) => c.toUpperCase());
+  const first = await getJson(`${host}/api/rest_v1/page/summary/${encodeURIComponent(direct.replace(/ /g, '_'))}`, signal, fetchImpl).catch(() => undefined) as SummaryJson | undefined;
+  if (first && first.type !== 'disambiguation' && typeof first.extract === 'string' && first.extract.length >= 40) {
+    const url = first.content_urls?.desktop?.page;
+    return {
+      title: typeof first.title === 'string' ? first.title : direct,
+      text: first.extract.replace(/\s+/g, ' ').trim(),
+      url: typeof url === 'string' && /^https:\/\/[a-z]+\.wikipedia\.org\//.test(url) ? url : `${host}/wiki/${encodeURIComponent(direct.replace(/ /g, '_'))}`,
+      site: SITE[lang],
+      ...(typeof first.timestamp === 'string' ? { edited: first.timestamp.slice(0, 10) } : {}),
+      retrieved: new Date().toISOString(),
+    };
+  }
   const q = new URLSearchParams({ action: 'query', list: 'search', srsearch: terms, srlimit: '3', format: 'json', origin: '*' });
   const found = (await getJson(`${host}/w/api.php?${q}`, signal, fetchImpl)) as SearchJson;
   const titles = (found.query?.search ?? []).map((s) => s.title).filter((t): t is string => typeof t === 'string');

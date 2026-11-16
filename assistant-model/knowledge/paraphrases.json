@@ -438,7 +438,14 @@
     "what is a radar satellite good for",
     "how does SAR work",
     "how does sar imaging work",
-    "how does synthetic aperture radar work"
+    "how does synthetic aperture radar work",
+    "SAR? what is it",
+    "sar what is it",
+    "whats sar",
+    "what is sar exactly",
+    "sar?",
+    "explain sar",
+    "write sar what is it"
    ],
    "tr": [
     "uzaydan radar görüntüleme nasıl çalışır",
@@ -1035,6 +1042,18 @@
     "erken uyarı tahminden nasıl farklı",
     "tahmin ile uyarı arasındaki fark",
     "erken uyarı sistemleri depremi tahmin eder mi"
+   ]
+  },
+  "ref-radar-vs-optical": {
+   "en": [
+    "SAR vs optical difference",
+    "how is sar different from optical imagery"
+   ],
+   "tr": [
+    "SAR ile optik arasındaki fark ne",
+    "radar ile optik görüntü farkı",
+    "SAR ve optik uydu farkı nedir",
+    "radar görüntüsü optik görüntüden nasıl farklı"
    ]
   }
  },

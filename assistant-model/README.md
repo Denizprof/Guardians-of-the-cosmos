@@ -60,10 +60,10 @@ the 24 supported or trimmed ones are used. `verified_sar.json` keeps the verdict
 - **What it is:** a multinomial logistic regression over 4,096 hashed features of the question: its words, word
   pairs, synonyms and the 3 to 5 letter pieces of each word (which is what makes typos and Turkish suffixes land
   near the right word). One class per knowledge record plus an off-topic class: 174 classes.
-- **Training data:** the records' example questions in English and Turkish (2,666 of them, in
+- **Training data:** the records' example questions in English and Turkish (2,679 of them, in
   `knowledge/*.json` and `knowledge/paraphrases.json`), each also in roughened forms (a typo, a dropped word, a
   filler phrase), plus off-topic questions (`knowledge/offtopic.json`, `knowledge/offtopic_extra.json`):
-  11,118 examples, 40 epochs, about ten seconds on a laptop CPU. No GPU and no downloaded weights are involved.
+  11,230 examples, 40 epochs, about ten seconds on a laptop CPU. No GPU and no downloaded weights are involved.
 - **Deterministic:** the same knowledge base always gives the same weights, and a test checks that the shipped
   files are what the script produces today.
 - **A helper, not a requirement:** if the weight files cannot be loaded, or were trained for a different
@@ -76,9 +76,9 @@ the 24 supported or trimmed ones are used. `verified_sar.json` keeps the verdict
 | Stress set | | Right record first | Right record in top 3 | Off-topic given a source |
 | --- | --- | --- | --- | --- |
 | `stress_test.json` (128 questions, 22 off-topic), used for tuning | words only | 85.9 % | 94.5 % | 45.5 % |
-| | with the classifier | 93.8 % | 97.7 % | 9.1 % |
+| | with the classifier | 93.0 % | 98.4 % | 4.5 % |
 | `stress_test2.json` (92 questions, 22 off-topic), held out | words only | 69.6 % | 82.6 % | 27.3 % |
-| | with the classifier | 80.4 % | 92.4 % | 4.5 % |
+| | with the classifier | 81.5 % | 90.2 % | 4.5 % |
 
 Reading this honestly:
 
@@ -92,7 +92,7 @@ Reading this honestly:
 - About one held-out question in five does not get the best record first. In the app a low-confidence match is
   shown as "the closest topic I know", with suggestions, so the reader can tell.
 - "Off-topic given a source" counts questions answered from a record instead of being sent to live research.
-- Of 22 off-topic questions never seen in training, the classifier alone recognises 16; the word-coverage rule
+- Of 22 off-topic questions never seen in training, the classifier alone recognises 17; the word-coverage rule
   catches most of the rest. A determined user can still find an unrelated question that gets a record.
 - Both sets are small and written by the project. They say nothing about questions on subjects the knowledge
   base does not cover.

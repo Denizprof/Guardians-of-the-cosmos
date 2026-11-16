@@ -2418,14 +2418,20 @@
     "radar vs camera",
     "why isn't the radar picture in colour",
     "is radar better than optical imagery",
-    "why does it look like tv static"
+    "why does it look like tv static",
+    "SAR vs optical difference",
+    "how is sar different from optical imagery"
    ],
    "questions_tr": [
     "Radar ile optik uydu arasındaki fark nedir?",
     "SAR normal uydu fotoğrafından nasıl farklı?",
     "Radar görüntüleri neden siyah beyaz?",
     "Radar görüntüsü neden gri ve gürültülü?",
-    "Neden kamera yerine radar kullanılıyor?"
+    "Neden kamera yerine radar kullanılıyor?",
+    "SAR ile optik arasındaki fark ne",
+    "radar ile optik görüntü farkı",
+    "SAR ve optik uydu farkı nedir",
+    "radar görüntüsü optik görüntüden nasıl farklı"
    ],
    "source": {
     "label": "NASA Earthdata: Synthetic Aperture Radar (SAR)",
@@ -2521,7 +2527,14 @@
     "what is a radar satellite good for",
     "how does SAR work",
     "how does sar imaging work",
-    "how does synthetic aperture radar work"
+    "how does synthetic aperture radar work",
+    "SAR? what is it",
+    "sar what is it",
+    "whats sar",
+    "what is sar exactly",
+    "sar?",
+    "explain sar",
+    "write sar what is it"
    ],
    "source": {
     "label": "Global SAR radar explainer",
