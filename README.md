@@ -81,7 +81,7 @@ That value is lost if people cannot read the data. Global SAR is designed so tha
 - **Five NISAR investigations** (earthquake, flood, volcano, deforestation, wildfire), all on real radar data.
 - **Before / after comparison** in swipe, side-by-side and overlay modes, with a timeline of radar passes and shareable URLs.
 - **Two explanation levels**, *Simple* and *Scientific*, with numbered annotation pins and legends in physical units (cm, dB).
-- **AI assistant** ("Ask") that runs in the visitor's browser, answers only from a checked knowledge base and the investigation on screen, and cites what it used. It understands differently-worded questions in English and Turkish (paraphrases, synonyms, typo fixing) and declines off-topic ones; this is measured on a held-out stress set with a unit test. An optional fine-tuned Qwen3-1.7B model words the answers. The training scripts also run on a 4 GB GPU (4-bit QLoRA).
+- **AI assistant** ("Ask") that runs in the visitor's browser, answers only from a checked knowledge base and the investigation on screen, and cites what it used. It understands differently-worded questions in English and Turkish (paraphrases, synonyms, typo fixing) and declines off-topic ones; this is measured on a held-out stress set with a unit test.
 - **Weather data** from Meteomatics for the selected location and date.
 - **SAR lens** to view any area through recent NISAR and Sentinel-1 radar.
 - **Live NISAR coverage probe**: select any point to list the real NISAR acquisitions over it (ASF Search API).
