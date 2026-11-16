@@ -71,3 +71,7 @@ Response:
   "limitations": ["Line-of-sight only; troposphere not corrected."]
 }
 ```
+
+## Optional response field: `suggestions` (1.2)
+
+A response may carry `suggestions`: up to 6 short follow-up questions (1 to 200 characters each). The app shows them as buttons under the newest answer; pressing one asks that question. They are allowed on `ok` and `error` responses, need no citation, and may be omitted.

@@ -1,126 +1,119 @@
-# The Global SAR chatbot: knowledge base, training and browser export
+# Global SAR AI: knowledge base, classifier, live research and the language model
 
-The chat in the app ("Ask" in the top bar, and "Ask about this investigation") runs entirely in the visitor's
-browser. This folder holds what it is built from.
+Acceptance test results, run live on 2026-11-16: [ACCEPTANCE.md](ACCEPTANCE.md). The optional language model and its
+training pipeline: [MODEL.md](MODEL.md).
+
+The assistant in the app ("Ask" in the top bar, and "Ask about this investigation") runs entirely in the
+visitor's browser: no server, no account, and no question leaves the device. This folder holds what it is
+built from.
 
 ## How it answers
 
-1. **Sources only.** For each question the app picks sources: checked knowledge records
-   (`web/public/data/assistant/kb.json`) and the items open in the view (the investigation, its layers, probed
-   products). Nothing else may be used.
-2. **Two modes, always labelled.**
-   - *Knowledge-base mode* (works everywhere, no download): the best matching record is quoted as written.
-   - *Model mode* (optional, WebGPU): a fine-tuned Qwen3-1.7B words the answer from those same sources.
-3. **Checked before it is shown.** A model answer is shown only if every `[[citation]]` names a source it was
-   given. Otherwise it is discarded and the record is quoted instead. With no source, the model is not asked
-   at all and the chat says it has no checked source.
+1. **Understand the question.** Two signals are combined (`web/src/assistant/local/core.ts`):
+   - a word search (BM25) with synonyms, Turkish stems and typo repair;
+   - an **intent classifier trained on this project's own example questions**, which recognises a question even
+     when it shares few words with the answer, and recognises questions outside the assistant's field.
+   A follow-up such as "and its limits?" or "tell me more" is read together with the previous question.
+2. **Gather sources.** Checked knowledge records (`web/public/data/assistant/kb.json`), the items open in the
+   view (the investigation, its layers, probed products) and, for questions about events on the map, the
+   catalog snapshot the globe draws (`web/public/data/context.json`).
+3. **Research.** A question the knowledge base cannot answer with confidence ("Tell me about Türkiye", "How does
+   gravity work?"), or one that asks for the latest news, is searched live on Wikipedia from the visitor's browser
+   (`web/src/assistant/local/research.ts`), in Turkish first for a Turkish question. The answer is the page's own
+   summary, cited with its link and the date the page was last edited, and labelled as not checked by the team. A
+   page that does not mention the subject is skipped. When the search cannot run, the assistant says so.
+4. **Answer.** The answer is the text of the best source or sources, each marked with its citation, followed by
+   suggested follow-up questions. A catalog answer is counted from the catalog file, never estimated.
 
-The model never supplies facts; it only words them. Facts live in the knowledge base, where each has a source
-and can be corrected without retraining.
+When the build offers the language model (`VITE_ASSISTANT_MODEL`) and the visitor loads it, it words the answer
+from the same sources; its text is shown only when every citation names a source it was given. It is not deployed
+on globalsar.earth today (see [ACCEPTANCE.md](ACCEPTANCE.md)).
 
-## The knowledge base (114 records)
+Facts live in the knowledge base, where each has a source and can be corrected by editing a JSON file. The
+classifier never supplies facts; it only decides which record a question is about. When nothing matches, the
+assistant says what it can help with and offers questions instead of guessing.
+
+## The knowledge base (173 records)
 
 `node assistant-model/build_kb.mjs` builds it from:
 
 | Source | Records | Checked how |
 | --- | --- | --- |
 | The app's own vetted text: radar explainers, the five investigations, 20 satellite layers and their legends | 72 | Copied as is from `web/src/content/explain.ts`, `events.json`, `layers.json` |
-| App guide (`knowledge/app.json`): the tools, labels, credits | 18 | Hand-written from what the app shows; English and Turkish |
+| App and project guide (`knowledge/app.json`, `knowledge/project.json`): tools, team, results, methods, pipeline, technology, glossary, small talk | 68 | Hand-written from what the app shows and from the project README; English and Turkish |
+| Radar reference (`knowledge/radar_reference.json`): NISAR's orbit and radars, radar bands, scattering, geometry | 9 | Each claim checked against its cited NASA or ASF page on 2026-11-16; what the pages did not state was left out |
 | General SAR / NISAR facts (`knowledge/verified_sar.json`) | 24 | Each checked against its cited NASA / USGS / NOAA / Earth Engine page on 2026-11-14 |
+
+136 of the 173 records have a Turkish text. Where the app already has a Turkish translation of a text
+(`web/src/i18n/tr.ts`) the builder uses it; a record without one is answered in English, with a note.
 
 The 24 general facts come from 83 legacy records supplied with the first prototype. Of those, 41 had no source
 and were dropped; of the 42 with a source, 6 were supported as written, 18 were trimmed to what the source
 actually says, 10 were not supported by the page they cited and 8 cited a NASA PDF that no longer exists. Only
 the 24 supported or trimmed ones are used. `verified_sar.json` keeps the verdict and the evidence for all 42.
 
-## Training
+## The intent classifier
 
-- **Base model:** `Qwen/Qwen3-1.7B` (Apache-2.0, Alibaba Cloud). Not trained by this project.
-- **What we trained:** a LoRA adapter (17 M parameters, 1 % of the model), 2 epochs, 15 minutes on an RTX 5070
-  Laptop GPU (8 GB).
-- **What it teaches:** a skill, not facts: answer only from the SOURCES in the prompt, mark the source used,
-  reply `NO_ANSWER` when they do not hold the answer. Every target answer in the training data is the text of
-  a source, so the data cannot teach a false fact.
-- **Data:** `node assistant-model/build_dataset.mjs` writes the examples. The prompt is built by the app's own
-  code (`web/src/assistant/local/core.ts`), so training and the browser use one format.
-- **The run reported below** used an earlier build of the data: 1,195 training, 171 validation and 212 test
-  examples. The knowledge base and the question lists have grown since, so the script writes more examples
-  today; the current counts and held-out records are in `data/manifest.json`. The adapter has **not** been
-  retrained or re-measured on the current data.
+`node assistant-model/train_intent.mjs` trains it and writes `web/public/data/assistant/intent.json` and
+`intent.bin` (about 0.7 MB).
 
-The test records are chosen by position in the knowledge base, so they move when it changes. An adapter must
-only be measured on the data it was trained with: after rebuilding the data, train again before running
-`evaluate.py --adapter`, or the test set may hold records the adapter has already seen.
-`node assistant-model/build_dataset.mjs --manifest-only` updates `data/manifest.json` and leaves the `.jsonl`
-files as they are.
+- **What it is:** a multinomial logistic regression over 4,096 hashed features of the question: its words, word
+  pairs, synonyms and the 3 to 5 letter pieces of each word (which is what makes typos and Turkish suffixes land
+  near the right word). One class per knowledge record plus an off-topic class: 174 classes.
+- **Training data:** the records' example questions in English and Turkish (2,679 of them, in
+  `knowledge/*.json` and `knowledge/paraphrases.json`), each also in roughened forms (a typo, a dropped word, a
+  filler phrase), plus off-topic questions (`knowledge/offtopic.json`, `knowledge/offtopic_extra.json`):
+  11,230 examples, 40 epochs, about ten seconds on a laptop CPU. No GPU and no downloaded weights are involved.
+- **Deterministic:** the same knowledge base always gives the same weights, and a test checks that the shipped
+  files are what the script produces today.
+- **A helper, not a requirement:** if the weight files cannot be loaded, or were trained for a different
+  knowledge base, the assistant ignores them and answers by word search alone.
 
-## Results (held-out test set, 212 questions)
+## Measured results
 
-The test set uses knowledge records, one whole investigation and decline-questions that were never seen in
-training. Each output is judged by what the app would do with it (`evaluate.py`; raw outputs can be
-regenerated with it).
+`node assistant-model/eval_retrieval.mjs [--file=stress_test2.json] [--words-only]`
 
-| | Untrained Qwen3-1.7B | Fine-tuned |
-| --- | --- | --- |
-| Answerable (145): cites exactly the right source | 58 % | 75 % |
-| Answerable: right source and at least 85 % of the words come from the sources | 21 % | 75 % |
-| Answerable: wrongly declines | 3 % | 19 % |
-| Answerable: bad or missing citation (discarded by the app) | 20 % | 0 % |
-| No answer in sources (67): declines | 36 % | 98.5 % |
-| No answer in sources: answers anyway with a valid-looking citation | 49 % | 1.5 % |
+| Stress set | | Right record first | Right record in top 3 | Off-topic given a source |
+| --- | --- | --- | --- | --- |
+| `stress_test.json` (128 questions, 22 off-topic), used for tuning | words only | 85.9 % | 94.5 % | 45.5 % |
+| | with the classifier | 93.0 % | 98.4 % | 4.5 % |
+| `stress_test2.json` (92 questions, 22 off-topic), held out | words only | 69.6 % | 82.6 % | 27.3 % |
+| | with the classifier | 81.5 % | 90.2 % | 4.5 % |
 
 Reading this honestly:
 
-- Training fixed the dangerous behaviour: the untrained model answered half of the questions it had no source
-  for; the fine-tuned one does so 1.5 % of the time (1 of 67).
-- It became **too cautious**: it declines about one answerable question in five. The app compensates: when the
-  model declines but a record matched the question, that record is shown, labelled as the closest match.
-- These numbers are for the full-precision model in Python. The browser runs a 4-bit version of it, which was
-  checked to load and answer in the app but was **not** re-measured on the test set.
-- 212 questions from one small knowledge base is a narrow test. It says nothing about questions outside it.
+- The first set was used to tune thresholds and to write extra paraphrases, so its numbers are optimistic. The
+  second set was not used for either, and wordings resembling its questions were kept out of the training
+  questions; it is the fairer measure. A unit test (`web/tests/unit/assistant/retrieval-stress.test.ts`) fails
+  if its numbers fall.
+- The gold labels of both sets were extended on 2026-11-16 for records added after the sets were written (a new
+  record that answers the question counts as correct), and two "who made you" questions moved from off-topic
+  to answerable because the knowledge base now answers them. Each file's note says so.
+- About one held-out question in five does not get the best record first. In the app a low-confidence match is
+  shown as "the closest topic I know", with suggestions, so the reader can tell.
+- "Off-topic given a source" counts questions answered from a record instead of being sent to live research.
+- Of 22 off-topic questions never seen in training, the classifier alone recognises 17; the word-coverage rule
+  catches most of the rest. A determined user can still find an unrelated question that gets a record.
+- Both sets are small and written by the project. They say nothing about questions on subjects the knowledge
+  base does not cover.
 
-Full reports: `reports/base.json`, `reports/tuned.json`.
-
-## Reproduce
+## Rebuild
 
 ```bash
-# 1. knowledge base and data (Node 22.6+)
-node assistant-model/build_kb.mjs
-node assistant-model/build_dataset.mjs
-
-# 2. training environment (Python 3.11 or 3.12; install the PyTorch build for your GPU first)
-pip install -r assistant-model/requirements.txt
-
-# 3. measure the untrained model, train, measure again
-python assistant-model/evaluate.py --name base
-python assistant-model/train_lora.py --epochs 2      # add --gpu-load 0.5 to run the GPU at half load
-python assistant-model/evaluate.py --name tuned --adapter assistant-model/adapters/global-sar-lora
-
-# 4. export for the browser (also needs: pip install "optimum[onnxruntime]" onnx onnx-ir)
-python assistant-model/export_onnx.py --adapter assistant-model/adapters/global-sar-lora
+node assistant-model/build_kb.mjs        # knowledge base (Node 22.6 or newer)
+node assistant-model/train_intent.mjs    # classifier, about ten seconds
+node --test assistant-model/assistant-model.test.mjs
 ```
 
-Downloaded weights, the adapter, the generated data and the export are git-ignored (they are large and
-rebuilt by the steps above).
-
-## Putting the model on the site
-
-The export step writes `assistant-model/export/global-sar-qwen3-1.7b-onnx/` (about 1.7 GB).
-
-1. Create a free account at huggingface.co and a new **model** repository (public).
-2. Upload the contents of that folder (the web upload works; the `onnx/` folder holds the large file).
-3. In the GitHub repository, add a repository **variable** `ASSISTANT_MODEL` with the repository id
-   (`your-name/global-sar-qwen3-1.7b-onnx`). The Pages workflow passes it to the build as
-   `VITE_ASSISTANT_MODEL`. Without it the site runs in knowledge-base mode.
-
-For local testing without an upload, copy the export folder to `web/public/models/` and start the app with
-`VITE_ASSISTANT_MODEL=./models/global-sar-qwen3-1.7b-onnx`.
+Run both steps after any change to `knowledge/*.json`, `events.json`, `layers.json` or `explain.ts`: the
+classifier has one class per record, so it must be retrained when records are added or removed.
 
 ## Known limits
 
-- Model mode needs WebGPU (recent Chrome or Edge on desktop; not most phones) and a 1.7 GB download.
-- The export keeps arithmetic in 32-bit floats. A fully 16-bit export is smaller but produced garbage on
-  WebGPU in our tests, and a fully 32-bit one exceeds the 2 GB a browser can load (`export_onnx.py` explains).
-- English and Turkish. Turkish answers exist only for records that have a Turkish text (the app guide and the
-  general SAR facts).
+- Without the language model, the assistant answers from its records, the open view, the catalog and one
+  encyclopedia page per question. It does not combine sources, reason beyond them, do arithmetic or hold a free
+  conversation.
+- Live research needs an internet connection and Wikipedia; NASA and ISRO sites cannot be searched from a static site.
+- English and Turkish only. Most satellite-layer records have English text only.
+- The catalog answers come from the snapshot bundled with the site, not from a live feed.
 - The assistant cannot predict earthquakes or any other event, and says so.

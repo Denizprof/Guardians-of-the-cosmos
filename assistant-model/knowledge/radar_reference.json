@@ -1,0 +1,260 @@
+{
+ "note": "General radar and NISAR reference facts. Each claim was checked against the cited NASA or ASF page on 2026-11-16; anything those pages did not state (antenna size, swath width, product list) was left out.",
+ "records": [
+  {
+   "slug": "ref-nisar-orbit",
+   "title": "NISAR's orbit and how often it returns",
+   "text_en": "NISAR flies at an altitude of 747 km on an orbit inclined 98.4°, crossing the equator at about 6 AM going north and 6 PM going south. It repeats exactly the same ground track every 12 days, and because it images on both ascending and descending passes, a place is revisited about every 6 days on average. That exact repeat is what makes before and after images comparable.",
+   "text_tr": "NISAR, 98,4° eğimli bir yörüngede 747 km yükseklikte uçar; ekvatoru kuzeye giderken yaklaşık sabah 6'da, güneye giderken akşam 6'da geçer. Aynı yer izini tam olarak her 12 günde bir tekrarlar; hem yükselen hem alçalan geçişlerde görüntü aldığı için bir yer ortalama yaklaşık 6 günde bir yeniden görüntülenir. Önce ve sonra görüntülerini karşılaştırılabilir kılan da bu tam tekrardır.",
+   "questions_en": [
+    "How high does NISAR fly?",
+    "What is NISAR's orbit?",
+    "How often does NISAR pass over the same place?",
+    "What is NISAR's revisit time?",
+    "How often does NISAR take a new image?",
+    "Why are the radar passes 12 days apart?",
+    "nisar altitude",
+    "nisar repeat cycle",
+    "how many days between nisar images",
+    "when will the satellite come back"
+   ],
+   "questions_tr": [
+    "NISAR ne kadar yüksekte uçuyor?",
+    "NISAR'ın yörüngesi nedir?",
+    "NISAR aynı yerin üzerinden ne sıklıkla geçer?",
+    "Radar geçişleri neden 12 gün arayla?",
+    "uydu ne zaman geri gelir"
+   ],
+   "source": {
+    "label": "NASA: NISAR mission overview",
+    "url": "https://science.nasa.gov/mission/nisar/mission-overview/"
+   }
+  },
+  {
+   "slug": "ref-nisar-radars",
+   "title": "NISAR's two radars and its mission length",
+   "text_en": "NISAR is a joint mission of NASA and the Indian Space Research Organisation (ISRO). It carries two radars: an L-band SAR with a 24 cm wavelength and an S-band SAR with a 9.4 cm wavelength. It was launched on 30 July 2025 from the Satish Dhawan Space Centre in India on ISRO's GSLV rocket, for a planned three-year mission. Its data is free and open: the L-band data is archived by the Alaska Satellite Facility, and the S-band data by ISRO.",
+   "text_tr": "NISAR, NASA ile Hindistan Uzay Araştırma Örgütü'nün (ISRO) ortak görevidir. İki radar taşır: 24 cm dalga boylu bir L-bant SAR ve 9,4 cm dalga boylu bir S-bant SAR. 30 Temmuz 2025'te Hindistan'daki Satish Dhawan Uzay Merkezi'nden ISRO'nun GSLV roketiyle, üç yıl olarak planlanan bir görev için fırlatıldı. Verileri ücretsiz ve açıktır: L-bant verisini Alaska Satellite Facility, S-bant verisini ISRO arşivler.",
+   "questions_en": [
+    "How many radars does NISAR have?",
+    "What is NISAR's wavelength?",
+    "Who built NISAR?",
+    "How long will NISAR last?",
+    "Which rocket launched NISAR?",
+    "Is NISAR data free?",
+    "Which countries made NISAR?",
+    "nisar s-band",
+    "what does NISAR stand for partners",
+    "how long is the nisar mission"
+   ],
+   "questions_tr": [
+    "NISAR'da kaç radar var?",
+    "NISAR'ın dalga boyu nedir?",
+    "NISAR'ı kim yaptı?",
+    "NISAR görevi ne kadar sürecek?",
+    "NISAR verisi ücretsiz mi?",
+    "NISAR'ı hangi ülkeler yaptı?"
+   ],
+   "source": {
+    "label": "NASA: NISAR mission overview",
+    "url": "https://science.nasa.gov/mission/nisar/mission-overview/"
+   }
+  },
+  {
+   "slug": "ref-bands",
+   "title": "Radar bands and their wavelengths",
+   "text_en": "Radar bands are named by letters, each a range of wavelengths: X-band is 2.4 to 3.8 cm, C-band 3.8 to 7.5 cm, S-band 7.5 to 15 cm, L-band 15 to 30 cm and P-band 30 to 100 cm. The wavelength decides what the radar interacts with. Short waves such as X-band barely get into a forest and mostly see the top of it; long waves such as L-band pass deeper through the canopy and into dry soil. NISAR's main radar is L-band, at 24 cm.",
+   "text_tr": "Radar bantları harflerle adlandırılır; her biri bir dalga boyu aralığıdır: X-bant 2,4-3,8 cm, C-bant 3,8-7,5 cm, S-bant 7,5-15 cm, L-bant 15-30 cm ve P-bant 30-100 cm. Radarın neyle etkileşeceğini dalga boyu belirler. X-bant gibi kısa dalgalar ormana pek giremez ve çoğunlukla tepesini görür; L-bant gibi uzun dalgalar ağaç örtüsünün ve kuru toprağın daha derinine iner. NISAR'ın ana radarı 24 cm'lik L-banttır.",
+   "questions_en": [
+    "What are the radar bands?",
+    "What is the difference between L-band, C-band and X-band?",
+    "What wavelength is C-band?",
+    "What is X-band?",
+    "What is P-band?",
+    "Which band penetrates vegetation best?",
+    "radar frequency bands explained",
+    "why do longer wavelengths see through trees",
+    "list of sar bands"
+   ],
+   "questions_tr": [
+    "Radar bantları nelerdir?",
+    "L-bant, C-bant ve X-bant arasındaki fark nedir?",
+    "C-bandın dalga boyu nedir?",
+    "X-bant nedir?",
+    "Hangi bant bitki örtüsünden en iyi geçer?"
+   ],
+   "source": {
+    "label": "NASA Earthdata: Synthetic Aperture Radar (SAR)",
+    "url": "https://www.earthdata.nasa.gov/learn/earth-observation-data-basics/sar"
+   }
+  },
+  {
+   "slug": "ref-scattering",
+   "title": "How surfaces scatter radar: rough surface, volume and double bounce",
+   "text_en": "What a radar image shows depends on how the surface scatters the signal. A rough surface, such as bare soil, scatters some energy back to the satellite. A volume, such as a forest canopy, scatters the signal many times among leaves and branches. Double bounce happens when the signal reflects off two surfaces at a right angle, such as a wall and the ground, or tree trunks standing in flood water, and returns very strongly. Smooth surfaces such as calm water reflect the signal away from the sensor and look dark.",
+   "text_tr": "Bir radar görüntüsünün ne gösterdiği, yüzeyin sinyali nasıl saçtığına bağlıdır. Çıplak toprak gibi pürüzlü bir yüzey enerjinin bir kısmını uyduya geri saçar. Orman örtüsü gibi bir hacim, sinyali yapraklar ve dallar arasında defalarca saçar. Çift yansıma, sinyal dik açıyla duran iki yüzeyden (örneğin bir duvar ile zemin ya da sel suyunun içindeki ağaç gövdeleri) yansıdığında oluşur ve çok güçlü geri döner. Durgun su gibi pürüzsüz yüzeyler sinyali algılayıcıdan uzağa yansıtır ve karanlık görünür.",
+   "questions_en": [
+    "What is double bounce?",
+    "What is volume scattering?",
+    "What are the scattering mechanisms in SAR?",
+    "Why are buildings so bright in radar?",
+    "Why does a flooded forest look bright?",
+    "what is surface scattering",
+    "how does radar bounce off things",
+    "why is a forest grey in radar"
+   ],
+   "questions_tr": [
+    "Çift yansıma nedir?",
+    "Hacim saçılımı nedir?",
+    "SAR'da saçılma türleri nelerdir?",
+    "Binalar radarda neden çok parlak?",
+    "Su basmış orman neden parlak görünür?",
+    "radar cisimlerden nasıl yansır"
+   ],
+   "source": {
+    "label": "NASA Earthdata: Synthetic Aperture Radar (SAR)",
+    "url": "https://www.earthdata.nasa.gov/learn/earth-observation-data-basics/sar"
+   }
+  },
+  {
+   "slug": "ref-geometry",
+   "title": "Foreshortening, layover and shadow",
+   "text_en": "A radar satellite looks to the side, not straight down, and that distorts steep terrain in three ways. Foreshortening: slopes facing the radar look compressed and bright. Layover: on very steep slopes the top of a mountain returns its echo before the bottom, so it appears to lean over toward the satellite. Shadow: slopes facing away are hidden from the radar and appear black, with no information. This is why mountains can look strange in radar images.",
+   "text_tr": "Radar uydusu dümdüz aşağıya değil, yana doğru bakar; bu da dik araziyi üç şekilde bozar. Kısalma: radara bakan yamaçlar sıkışmış ve parlak görünür. Üst üste binme: çok dik yamaçlarda dağın tepesinin yankısı eteğininkinden önce döner, bu yüzden dağ uyduya doğru eğilmiş gibi görünür. Gölge: uydunun tersine bakan yamaçlar radardan gizlenir ve hiçbir bilgi içermeden siyah görünür. Dağların radar görüntülerinde tuhaf görünmesinin nedeni budur.",
+   "questions_en": [
+    "What is foreshortening?",
+    "What is radar shadow?",
+    "Why do mountains look strange in radar images?",
+    "Why is SAR side-looking?",
+    "What are the geometric distortions in SAR?",
+    "why do mountains lean in radar",
+    "black areas behind mountains",
+    "side-looking radar"
+   ],
+   "questions_tr": [
+    "Kısalma nedir?",
+    "Radar gölgesi nedir?",
+    "Dağlar radar görüntülerinde neden tuhaf görünür?",
+    "SAR neden yandan bakar?",
+    "SAR'daki geometrik bozulmalar nelerdir?"
+   ],
+   "source": {
+    "label": "ASF: Introduction to SAR",
+    "url": "https://hyp3-docs.asf.alaska.edu/guides/introduction_to_sar/"
+   }
+  },
+  {
+   "slug": "ref-synthetic-aperture",
+   "title": "Why it is called synthetic aperture",
+   "text_en": "A radar's sharpness depends on the size of its antenna, and seeing fine detail from orbit would need an antenna far too long to launch. A synthetic aperture radar gets around this by using its own motion: as the satellite flies, many echoes recorded from a short antenna are combined to simulate a much larger one. The aperture, the antenna opening, is synthetic because it is built by computation, not by hardware.",
+   "text_tr": "Bir radarın keskinliği anteninin büyüklüğüne bağlıdır; yörüngeden ince ayrıntıyı görmek için fırlatılamayacak kadar uzun bir anten gerekirdi. Sentetik açıklıklı radar bunu kendi hareketini kullanarak aşar: uydu uçarken kısa bir antenle kaydedilen çok sayıda yankı birleştirilerek çok daha büyük bir anten taklit edilir. Açıklık, yani anten ağzı, donanımla değil hesaplamayla oluşturulduğu için sentetiktir.",
+   "questions_en": [
+    "Why is it called synthetic aperture radar?",
+    "What does synthetic aperture mean?",
+    "What does SAR stand for?",
+    "How does SAR get high resolution?",
+    "What is an aperture?",
+    "why synthetic",
+    "how can a small antenna see small details",
+    "what do the letters SAR mean"
+   ],
+   "questions_tr": [
+    "Neden sentetik açıklıklı radar deniyor?",
+    "Sentetik açıklık ne demek?",
+    "SAR'ın açılımı nedir?",
+    "SAR yüksek çözünürlüğü nasıl elde eder?",
+    "açıklık nedir"
+   ],
+   "source": {
+    "label": "NASA Earthdata: Synthetic Aperture Radar (SAR)",
+    "url": "https://www.earthdata.nasa.gov/learn/earth-observation-data-basics/sar"
+   }
+  },
+  {
+   "slug": "ref-radar-vs-optical",
+   "title": "Radar compared with an ordinary satellite photo",
+   "text_en": "An optical satellite is a camera: it needs sunlight and a clear sky, and it shows colours the way your eye would. A radar satellite sends its own microwave signal and records the echo, so it works at night and through clouds and smoke. Instead of colour it measures how rough, wet or structured the surface is, and how far away it is. That is why a radar image looks grey and grainy, and why it can show a flood under storm clouds that a camera cannot see.",
+   "text_tr": "Optik uydu bir fotoğraf makinesidir: güneş ışığına ve açık gökyüzüne ihtiyaç duyar, renkleri gözünüzün göreceği gibi gösterir. Radar uydusu kendi mikrodalga sinyalini gönderir ve yankısını kaydeder; bu yüzden gece de, bulutların ve dumanın içinden de çalışır. Renk yerine yüzeyin ne kadar pürüzlü, ıslak ya da yapılı olduğunu ve ne kadar uzakta olduğunu ölçer. Radar görüntüsünün gri ve grenli görünmesinin, bir kameranın göremediği fırtına bulutları altındaki seli gösterebilmesinin nedeni budur.",
+   "questions_en": [
+    "What is the difference between radar and optical satellites?",
+    "How is SAR different from a normal satellite photo?",
+    "Why are radar images black and white?",
+    "Why does the radar image look grey and noisy?",
+    "Why use radar instead of a camera?",
+    "radar vs camera",
+    "why isn't the radar picture in colour",
+    "is radar better than optical imagery",
+    "why does it look like tv static"
+   ],
+   "questions_tr": [
+    "Radar ile optik uydu arasındaki fark nedir?",
+    "SAR normal uydu fotoğrafından nasıl farklı?",
+    "Radar görüntüleri neden siyah beyaz?",
+    "Radar görüntüsü neden gri ve gürültülü?",
+    "Neden kamera yerine radar kullanılıyor?"
+   ],
+   "source": {
+    "label": "NASA Earthdata: Synthetic Aperture Radar (SAR)",
+    "url": "https://www.earthdata.nasa.gov/learn/earth-observation-data-basics/sar"
+   }
+  },
+  {
+   "slug": "ref-detail",
+   "title": "How much detail the radar layers show",
+   "text_en": "The NISAR backscatter layers in the investigations are processed at about 20 m per pixel. At that detail you can see rivers, fields, forest edges, lava flows and city blocks, but not a single house, a car or a person. Radar from orbit cannot look inside buildings. The sharp close-up pictures you see when you zoom in are ordinary aerial and satellite photos from Esri, not radar.",
+   "text_tr": "Araştırmalardaki NISAR geri saçılım katmanları piksel başına yaklaşık 20 m ayrıntıyla işlenmiştir. Bu ayrıntıda nehirleri, tarlaları, orman kenarlarını, lav akıntılarını ve şehir bloklarını görebilirsiniz; tek bir evi, arabayı ya da insanı göremezsiniz. Yörüngedeki radar binaların içini göremez. Yakınlaştırdığınızda gördüğünüz keskin yakın plan resimler radar değil, Esri'nin sıradan hava ve uydu fotoğraflarıdır.",
+   "questions_en": [
+    "What is the resolution of the radar images?",
+    "How small a thing can the radar see?",
+    "Can the radar see people?",
+    "Can the satellite see inside my house?",
+    "Can radar see through walls?",
+    "How sharp is NISAR?",
+    "can it see cars",
+    "pixel size of the radar layers",
+    "is the satellite spying on me"
+   ],
+   "questions_tr": [
+    "Radar görüntülerinin çözünürlüğü nedir?",
+    "Radar ne kadar küçük şeyleri görebilir?",
+    "Radar insanları görebilir mi?",
+    "Uydu evimin içini görebilir mi?",
+    "Radar duvarların arkasını görebilir mi?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "slug": "ref-vv-vh",
+   "title": "VV and VH polarization",
+   "text_en": "Polarization is the orientation of the radar wave, and the two letters say how it was sent and received: the first is the transmitted polarization, the second the received one. VV means sent vertical, received vertical (co-polarized). VH means sent vertical, received horizontal (cross-polarized). VV comes mostly from direct surface scattering, so it responds to surface roughness and moisture, and calm water is very dark in it. VH needs the wave to be depolarized, which happens mainly through volume scattering, for example many bounces inside a vegetation canopy, so it is more sensitive to vegetation and biomass. HH and HV are the same pair with a horizontal transmitted wave; the NISAR layers in this app use HH and HV.",
+   "text_tr": "Polarizasyon, radar dalgasının yönelimidir; iki harf dalganın nasıl gönderilip alındığını söyler: ilki gönderilen, ikincisi alınan polarizasyondur. VV, dikey gönderilip dikey alınan (eş polarizasyonlu) sinyal demektir. VH, dikey gönderilip yatay alınan (çapraz polarizasyonlu) sinyal demektir. VV çoğunlukla doğrudan yüzey saçılımından gelir; bu yüzden yüzey pürüzlülüğüne ve neme duyarlıdır ve durgun su VV'de çok karanlıktır. VH için dalganın polarizasyonunun değişmesi gerekir; bu da esas olarak hacim saçılımıyla, örneğin bitki örtüsü içindeki çoklu yansımalarla olur; bu yüzden VH bitki örtüsüne ve biyokütleye daha duyarlıdır. HH ve HV, yatay gönderilen dalgayla oluşan aynı çifttir; bu uygulamadaki NISAR katmanları HH ve HV kullanır.",
+   "questions_en": [
+    "What is the difference between VV and VH polarization?",
+    "What does VV mean?",
+    "What does VH mean?",
+    "Explain VV and VH.",
+    "VV vs VH",
+    "What is cross-polarization?",
+    "What is co-polarization?",
+    "Why is VH used for vegetation?",
+    "Sentinel-1 VV VH",
+    "what do the letters in HH HV VV VH mean"
+   ],
+   "questions_tr": [
+    "VV ve VH polarizasyonu arasındaki fark nedir?",
+    "VV ne demek?",
+    "VH ne demek?",
+    "VV ve VH nedir?",
+    "Çapraz polarizasyon nedir?",
+    "Eş polarizasyon nedir?"
+   ],
+   "source": {
+    "label": "NASA Earthdata: Synthetic Aperture Radar (SAR)",
+    "url": "https://www.earthdata.nasa.gov/learn/earth-observation-data-basics/sar"
+   }
+  }
+ ]
+}

@@ -71,6 +71,8 @@ span.asst-chip { cursor: default; }
 .asst-progress { width: 100%; height: 6px; accent-color: var(--sar); }
 .asst-suggest { list-style: none; margin: var(--sp-2) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .asst-suggest .asst-btn { font-size: var(--fs-small); text-align: left; }
+.asst-followups { margin-top: var(--sp-2); }
+.asst-followups .asst-btn { border-radius: 999px; padding-inline: 10px; }
 .asst-declined { border-style: dashed; }
 .asst-declined .asst-text { color: var(--text-2); }
 .asst-full { padding: 0; }

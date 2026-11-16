@@ -138,6 +138,8 @@ export interface AssistantResponse {
   citations?: Citation[];
   confidence?: number;
   limitations?: string[];
+  /** Follow-up questions the user may want to ask next (contract 1.2). Shown as buttons. */
+  suggestions?: string[];
   error?: { code: string; message: string };
 }
 

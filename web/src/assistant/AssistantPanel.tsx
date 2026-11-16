@@ -6,6 +6,7 @@ import { defaultAdapter } from './local';
 import { buildContext, buildRequest, collectCitationIds, type ContextInput } from './context';
 import { isSafeHttpUrl } from './validate';
 import type { AssistantContext, AssistantResponse, Citation, ExplanationLevel, Health } from './types';
+import { getLang } from '../i18n';
 import './assistant.css';
 
 export interface AssistantPanelProps {
@@ -104,7 +105,7 @@ function NotConnected({ health, onRetry, local }: { health: Health; onRetry: () 
     return (
       <div className="asst-notice" role="status">
         <h4>Assistant unavailable</h4>
-        <p>The assistant answers only from its checked knowledge base, and that could not be loaded. It will not answer without it.</p>
+        <p>The assistant answers from its knowledge base, and that could not be loaded. Check your connection and try again.</p>
         {health.detail && <p className="asst-detail">{health.detail}</p>}
         <button type="button" className="asst-btn" onClick={onRetry}>Try again</button>
       </div>
@@ -116,12 +117,12 @@ function NotConnected({ health, onRetry, local }: { health: Health; onRetry: () 
       <p>
         {gatewayDown
           ? 'The assistant gateway could not be reached. '
-          : 'No AI model is configured for this build, so there is nothing to answer questions yet. '}
+          : 'The assistant service is not configured for this build, so there is nothing to answer questions yet. '}
         The assistant does not guess or answer from a placeholder; it stays off until it is connected.
       </p>
       {health.detail && <p className="asst-detail">{health.detail}</p>}
       <ol>
-        <li>Start the gateway with your model: <code>cd assistant-gateway</code>, set <code>ASSISTANT_MODEL_URL</code>, run <code>npm start</code>.</li>
+        <li>Start the gateway with your service: <code>cd assistant-gateway</code>, set <code>ASSISTANT_MODEL_URL</code>, run <code>npm start</code>.</li>
         <li>Set <code>VITE_ASSISTANT_GATEWAY_URL</code> in <code>web/.env.local</code> (for example <code>/</code> with the Vite proxy, or <code>http://localhost:8787</code>).</li>
         <li>Restart <code>npm run dev</code>.</li>
       </ol>
@@ -137,23 +138,23 @@ function ModelBar({ model }: { model: ModelControl }) {
   const pct = Math.round((state.progress ?? 0) * 100);
   return (
     <div className="asst-mode" role="status">
-      {state.phase === 'ready' && <p><strong>AI model loaded.</strong> It runs on your device and words its answers only from the cited sources.</p>}
+      {state.phase === 'ready' && <p><strong>Global SAR AI model loaded.</strong> It runs on your device and words its answers only from the cited sources.</p>}
       {state.phase === 'idle' && (
         <>
-          <p><strong>Knowledge-base answers.</strong> Each answer is quoted from a checked record. An AI model can word the answers instead: it downloads once ({model.size}, from Hugging Face) and then runs on your device.</p>
-          <button type="button" className="asst-btn" onClick={() => { void model.load().catch(() => {}); }}>Load the AI model</button>
+          <p><strong>Answers quote their sources.</strong> The Global SAR AI model can word the answers instead: it downloads once ({model.size}) and then runs on your device.</p>
+          <button type="button" className="asst-btn" onClick={() => { void model.load().catch(() => {}); }}>Load the Global SAR AI model</button>
         </>
       )}
       {state.phase === 'loading' && (
         <>
-          <p><strong>Loading the AI model…</strong> {state.detail ?? ''} You can keep asking in the meantime.</p>
-          <progress className="asst-progress" max={100} value={pct} aria-label="AI model download">{pct}%</progress>
+          <p><strong>Loading the Global SAR AI model…</strong> {state.detail ?? ''} You can keep asking in the meantime.</p>
+          <progress className="asst-progress" max={100} value={pct} aria-label="Global SAR AI model download">{pct}%</progress>
         </>
       )}
-      {state.phase === 'unsupported' && <p><strong>Knowledge-base answers.</strong> {state.detail} Each answer is quoted from a checked record.</p>}
+      {state.phase === 'unsupported' && <p><strong>Answers quote their sources.</strong> {state.detail}</p>}
       {state.phase === 'error' && (
         <>
-          <p className="asst-mode-error"><strong>The AI model could not be loaded.</strong> {state.detail} Answers are quoted from the knowledge base.</p>
+          <p className="asst-mode-error"><strong>The Global SAR AI model could not be loaded.</strong> {state.detail} Answers quote their sources.</p>
           <button type="button" className="asst-btn" onClick={() => { void model.load().catch(() => {}); }}>Try again</button>
         </>
       )}
@@ -192,9 +193,11 @@ export function AssistantPanel(props: AssistantPanelProps) {
     context.clicked_location ? 'clicked point' : null,
     context.coverage ? `${context.coverage.granules.length} coverage granules` : null,
   ].filter(Boolean).join(', ');
+  // starter questions in the interface language; the assistant answers in the language of the question
+  const turkish = getLang() === 'tr';
   const suggestions = event
-    ? ['What am I looking at?', 'What does the radar show here?', 'How reliable is this analysis?']
-    : ['What is SAR?', 'What can I do in this app?', 'Can radar predict earthquakes?'];
+    ? turkish ? ['Neye bakıyorum?', 'Radar burada ne gösteriyor?', 'Bu analiz ne kadar güvenilir?'] : ['What am I looking at?', 'What does the radar show here?', 'How reliable is this analysis?']
+    : turkish ? ['SAR nedir?', 'Hangi araştırmalar var?', 'Radar depremleri tahmin edebilir mi?', 'Bunu kim yaptı?'] : ['What is SAR?', 'Which investigations are there?', 'Can radar predict earthquakes?', 'Who made this?'];
 
   const ask = async (question: string) => {
     const q = question.trim();
@@ -203,7 +206,7 @@ export function AssistantPanel(props: AssistantPanelProps) {
     const ac = new AbortController();
     abortRef.current = ac;
     const history = msgs.filter((m) => !m.failed && !m.declined).map((m) => ({ role: m.role, content: m.text }));
-    const base = buildRequest({ query: q, locale: locale ?? (typeof navigator !== 'undefined' ? navigator.language : 'en'), level, context, conversation: history });
+    const base = buildRequest({ query: q, locale: locale ?? (turkish ? 'tr' : 'en'), level, context, conversation: history });
     setMsgs((m) => [...m, { id: ++idRef.current, role: 'user', text: q }]);
     setDraft('');
     setBusy(true);
@@ -232,11 +235,12 @@ export function AssistantPanel(props: AssistantPanelProps) {
   };
 
   const disabled = conn.state !== 'ready';
+  const lastId = msgs.length ? msgs[msgs.length - 1].id : -1;
 
   return (
     <section className={`asst${variant === 'full' ? ' asst-full' : ''}`} aria-labelledby={`${uid}-h`}>
       <header className="asst-head">
-        <h3 id={`${uid}-h`} className={variant === 'full' ? 'asst-sr' : undefined}>Assistant</h3>
+        <h3 id={`${uid}-h`} className={variant === 'full' ? 'asst-sr' : undefined}>Global SAR AI</h3>
         <div className="asst-level" role="group" aria-label="Explanation level">
           {(['simple', 'scientific'] as const).map((l) => (
             <button key={l} type="button" className="asst-seg" aria-pressed={level === l} onClick={() => setLevel(l)}>
@@ -255,10 +259,10 @@ export function AssistantPanel(props: AssistantPanelProps) {
           <div className="asst-log" ref={logRef} role="log" aria-live="polite" aria-relevant="additions" aria-busy={busy} tabIndex={0} aria-label="Conversation">
             {msgs.length === 0 && (
               <>
-                <p className="asst-muted">Ask about radar, NISAR, this app or what you are looking at. Every answer cites its sources; when there is no source, you get no answer rather than a guess.</p>
+                <p className="asst-muted">Ask me anything about radar, NISAR, the investigations, the satellite layers, the events on the map or how to use this app, in English or Turkish. Every answer shows its source.</p>
                 <ul className="asst-suggest" aria-label="Example questions">
                   {suggestions.map((s) => (
-                    <li key={s}><button type="button" className="asst-btn" onClick={() => { void ask(s); }}>{s}</button></li>
+                    <li key={s}><button type="button" className="asst-btn" data-no-i18n onClick={() => { void ask(s); }}>{s}</button></li>
                   ))}
                 </ul>
               </>
@@ -267,7 +271,7 @@ export function AssistantPanel(props: AssistantPanelProps) {
               const idFor = (n: number) => `${uid}-m${m.id}-c${n}`;
               return (
               <article key={m.id} className={`asst-msg asst-${m.role}${m.failed ? ' asst-failed' : ''}${m.declined ? ' asst-declined' : ''}`}>
-                <span className="asst-who">{m.role === 'user' ? 'You' : 'Assistant'}</span>
+                <span className="asst-who">{m.role === 'user' ? 'You' : 'Global SAR AI'}</span>
                 {m.role === 'assistant' && !m.failed && !m.declined && m.response?.answer ? (
                   <div className="asst-text" data-no-i18n>{renderAnswer(m.text, m.response.citations ?? [], idFor)}</div>
                 ) : (
@@ -283,23 +287,30 @@ export function AssistantPanel(props: AssistantPanelProps) {
                     ))}
                   </ul>
                 )}
+                {m.id === lastId && !m.failed && m.response?.suggestions && m.response.suggestions.length > 0 && (
+                  <ul className="asst-suggest asst-followups" aria-label="Suggested questions">
+                    {m.response.suggestions.map((sg) => (
+                      <li key={sg}><button type="button" className="asst-btn" data-no-i18n disabled={busy} onClick={() => { void ask(sg); }}>{sg}</button></li>
+                    ))}
+                  </ul>
+                )}
                 {!m.failed && typeof m.response?.confidence === 'number' && (
                   <p className="asst-meta">Model-reported confidence: {Math.round(m.response.confidence * 100)}%. This is the model's own estimate, not a verified measure.</p>
                 )}
                 {!m.failed && !m.declined && m.response?.limitations && m.response.limitations.length > 0 && (
                   <div className="asst-limits">
-                    <strong>Limitations</strong>
+                    <strong>About this answer</strong>
                     <ul>{m.response.limitations.map((l, i) => <li key={i}>{l}</li>)}</ul>
                   </div>
                 )}
               </article>
               );
             })}
-            {busy && <p className="asst-muted" role="status">Thinking…</p>}
+            {busy && <p className="asst-muted asst-thinking" role="status">Thinking…</p>}
           </div>
           <form className="asst-form" onSubmit={send}>
             <label htmlFor={`${uid}-q`} className="asst-sr">Ask the assistant</label>
-            <textarea id={`${uid}-q`} rows={2} maxLength={2000} value={draft} placeholder={event ? 'Ask about this scene…' : 'Ask about radar, NISAR or this app…'} disabled={disabled} onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey} />
+            <textarea id={`${uid}-q`} rows={2} maxLength={2000} value={draft} placeholder={event ? 'Ask about this scene…' : 'Ask about radar, NISAR, the investigations or this app…'} disabled={disabled} onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey} />
             <button type="submit" className="asst-btn asst-primary" disabled={disabled || busy || !draft.trim()}>Send</button>
           </form>
           <p className="asst-ctx" id={`${uid}-ctx`}>Context sent with each question: {contextSummary || 'none (no event selected)'}.</p>

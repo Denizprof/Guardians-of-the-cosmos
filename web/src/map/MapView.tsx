@@ -73,6 +73,8 @@ export interface MapViewProps {
   onAskAssistant?: () => void;
   /** A source failed to load (tiles, NISAR image, style). Failures must be visible, never read as "no data". */
   onMapError?: (where: 'globe' | 'lens', source: string) => void;
+  /** The camera settled: where the globe is looking. The assistant uses it to answer "what am I viewing?". */
+  onViewChange?: (view: { center: [number, number]; zoom: number; bbox: [number, number, number, number] }) => void;
 }
 
 /** Turn a MapLibre error event into a short source label and report it (also logged for diagnosis). */
@@ -207,6 +209,13 @@ function MapView(p: MapViewProps) {
     reduced.current = mq.matches;
     const a = makeMap(aEl.current!, () => reduced.current);
     const b = makeMap(bEl.current!, () => reduced.current);
+    const reportView = () => {
+      const c = a.getCenter();
+      const bounds = a.getBounds();
+      cb.current.onViewChange?.({ center: [c.lng, c.lat], zoom: a.getZoom(), bbox: [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()] });
+    };
+    a.on('moveend', reportView);
+    a.once('load', reportView);
     // Tile errors on the globe. Measured over all 19 satellite layers (14 Nov 2026): layers that loaded 100+
     // tiles still produced a few errors each: sporadic GIBS HTTP 500s and 404s for tiles outside a layer's
     // coverage (e.g. JRC surface water has no tiles near the poles). Alarming on those told users "data failed

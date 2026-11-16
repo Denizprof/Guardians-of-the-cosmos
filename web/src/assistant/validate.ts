@@ -26,7 +26,7 @@ function checkKeys(obj: Record<string, unknown>, allowed: string[], path: string
 export function validateResponse(raw: unknown, allowedCitationIds?: ReadonlySet<string>): ValidationResult {
   const errors: string[] = [];
   if (!isObj(raw)) return { ok: false, errors: ['response: expected object'] };
-  checkKeys(raw, ['version', 'status', 'answer', 'citations', 'confidence', 'limitations', 'error'], '', errors);
+  checkKeys(raw, ['version', 'status', 'answer', 'citations', 'confidence', 'limitations', 'suggestions', 'error'], '', errors);
 
   if (typeof raw.version !== 'string' || !VERSION.test(raw.version)) errors.push('version: must be 1.x');
   if (raw.status !== 'ok' && raw.status !== 'error' && raw.status !== 'unavailable') errors.push('status: must be ok, error or unavailable');
@@ -65,6 +65,7 @@ export function validateResponse(raw: unknown, allowedCitationIds?: ReadonlySet<
 
   if (raw.confidence !== undefined && !(typeof raw.confidence === 'number' && raw.confidence >= 0 && raw.confidence <= 1)) errors.push('confidence: must be 0..1');
   if (raw.limitations !== undefined && !(Array.isArray(raw.limitations) && raw.limitations.length <= 20 && raw.limitations.every((l) => isStr(l, 1000)))) errors.push('limitations: expected array of strings');
+  if (raw.suggestions !== undefined && !(Array.isArray(raw.suggestions) && raw.suggestions.length <= 6 && raw.suggestions.every((s) => isStr(s, 200, 1)))) errors.push('suggestions: expected at most 6 short strings');
   if (raw.error !== undefined) {
     if (!isObj(raw.error) || !isStr(raw.error.code, 64) || !isStr(raw.error.message, 1000)) errors.push('error: expected {code, message}');
   }

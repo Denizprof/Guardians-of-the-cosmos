@@ -40,6 +40,8 @@ export default function App() {
   const [context, setContext] = useState<ContextEvent[]>([]);
   const [generated, setGenerated] = useState('');
   const [loadError, setLoadError] = useState<string | null>(null);
+  /** Where the globe is looking, for the assistant's "what am I viewing?". */
+  const [mapView, setMapView] = useState<{ center: [number, number]; zoom: number; bbox: [number, number, number, number] } | null>(null);
   const [contextError, setContextError] = useState<string | null>(null);
   const [layersError, setLayersError] = useState<string | null>(null);
   const [mapErrors, setMapErrors] = useState<Set<string>>(() => new Set());
@@ -632,6 +634,7 @@ export default function App() {
         focus={focus}
         lens={lensProp}
         onMapError={onMapError}
+        onViewChange={setMapView}
       />
 
       {mapErrors.size > 0 && (
@@ -766,7 +769,7 @@ export default function App() {
       ) : panelView === 'context' && ctxSel ? (
         <ContextPanel key={ctxSel.id} event={ctxSel} collapsed={panelCollapsed} onCheckCoverage={runCoverage} onClose={closePanel} onToggleCollapsed={toggleCollapsed} />
       ) : panelView === 'assistant' ? (
-        <AssistantSidePanel collapsed={panelCollapsed} onToggleCollapsed={toggleCollapsed} onClose={closePanel} />
+        <AssistantSidePanel mapView={mapView} collapsed={panelCollapsed} onToggleCollapsed={toggleCollapsed} onClose={closePanel} />
       ) : panelView === 'about' || panelView === 'probe' ? (
         <IntroPanel
           events={events}

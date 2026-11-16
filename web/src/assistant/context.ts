@@ -147,6 +147,7 @@ export function collectCitationIds(ctx: AssistantContext): Set<string> {
   }
   ctx.selected_layers?.forEach((l) => ids.add(l.citation_id));
   ctx.coverage?.granules.forEach((g) => ids.add(g.citation_id));
+  if (ctx.map_view && !ctx.event) ids.add('view:map'); // local/core.ts MAP_VIEW_ID
   ctx.knowledge?.forEach((k) => ids.add(k.citation_id));
   return ids;
 }
