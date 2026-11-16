@@ -14,7 +14,10 @@ function maplibreWorker(): Plugin {
     fs.mkdirSync(path.dirname(dst), { recursive: true });
     fs.copyFileSync(src, dst);
   };
-  return { name: 'maplibre-worker', buildStart: copy, configureServer: copy };
+  // In the 'config' hook, before Vite lists public/: the dev server caches that listing when it starts, so a
+  // copy made later (configureServer) was not served on the first `npm run dev` of a fresh clone. The worker
+  // URL answered with index.html, MapLibre logged "Worker failed to load" and the globe had no labels or borders.
+  return { name: 'maplibre-worker', config: copy, buildStart: copy };
 }
 
 // Relative base so the static build works on GitHub Pages / any sub-path.

@@ -12,7 +12,7 @@ import { lensDayUnpublished, onLensDayUnpublished, registerLensTileProtocol } fr
 import { createTileErrorPolicy } from './tileErrors';
 import { browseBounds, coverageFeatures, trimmedBrowseUrl } from './coverageSelect';
 import {
-  EVENT_BEARING, EVENT_PITCH, HOME_CENTER, MAX_ZOOM, maxZoomForScale, STYLE, TERRAIN, TERRAIN_OFF_ZOOM, TERRAIN_ON_ZOOM, homeZoom, lensStyle,
+  EVENT_BEARING, EVENT_PITCH, HOME_CENTER, MAX_ZOOM, STYLE, TERRAIN, TERRAIN_OFF_ZOOM, TERRAIN_ON_ZOOM, homeZoom, lensStyle, zoomCeiling,
 } from './style';
 import { mapNameExpression, onLangChange } from '../i18n';
 import { attachHalo } from './halo';
@@ -249,8 +249,9 @@ function MapView(p: MapViewProps) {
     }
     a.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), 'bottom-left');
     a.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
-    // Closest view: the scale bar never reads less than 30 m, at any latitude.
-    const limitZoom = () => a.setMaxZoom(Math.min(MAX_ZOOM, maxZoomForScale(a.getCenter().lat)));
+    // Closest view: the scale bar never reads less than 50 m, at any latitude. zoomCeiling() is always a
+    // value setMaxZoom() accepts: a throw here, in a 'moveend' fired from a React effect, stopped the whole app.
+    const limitZoom = () => a.setMaxZoom(zoomCeiling(a.getCenter().lat, a.getMinZoom()));
     a.on('moveend', limitZoom);
     limitZoom();
     const sync = (src: MlMap, dst: MlMap) => () => {

@@ -20,10 +20,21 @@ export const TERRAIN_OFF_ZOOM = 5.5;
 export const MAX_ZOOM = 18.5;
 /** Closest the scale bar (100 px wide) may get: 50 m, i.e. 0.5 m per pixel. */
 export const MIN_SCALE_BAR_M = 50;
-/** Highest zoom at a latitude where the scale bar still reads at least MIN_SCALE_BAR_M. */
+/** Web Mercator's latitude limit. Past it cos(lat) runs to 0 and the scale limit below runs to -Infinity. */
+export const MAX_SCALE_LAT = 85.051129;
+/**
+ * Highest zoom at a latitude where the scale bar still reads at least MIN_SCALE_BAR_M.
+ * Always finite: the globe lets the camera sit exactly on a pole (latitude +-90), where the unclamped
+ * formula gave about z-36, and MapLibre's setMaxZoom() throws for a value under the map's minZoom.
+ */
 export function maxZoomForScale(lat: number): number {
-  const metresPerPixelAtZ0 = 156543.03392 * Math.cos((lat * Math.PI) / 180);
+  const safeLat = Number.isFinite(lat) ? Math.max(-MAX_SCALE_LAT, Math.min(MAX_SCALE_LAT, lat)) : 0;
+  const metresPerPixelAtZ0 = 156543.03392 * Math.cos((safeLat * Math.PI) / 180);
   return Math.log2(metresPerPixelAtZ0 / (MIN_SCALE_BAR_M / 100));
+}
+/** The value handed to map.setMaxZoom(): the scale limit, capped at MAX_ZOOM and never under the map's minZoom. */
+export function zoomCeiling(lat: number, minZoom: number): number {
+  return Math.max(minZoom, Math.min(MAX_ZOOM, maxZoomForScale(lat)));
 }
 
 // Turkey is shown under its official name, Türkiye (the tiles carry the English exonym 'Turkey').
