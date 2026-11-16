@@ -260,3 +260,29 @@ test.describe('chaos: offline after load', () => {
     await expect(panel(page)).toBeVisible();
   });
 });
+
+// Regression (16 Nov 2026, reported from a phone): "Something went wrong and the app stopped. maxZoom must be
+// greater than the current minZoom". The globe lets the camera sit on a pole; there the scale-based zoom limit
+// was about z-36 and MapLibre's setMaxZoom() threw. Thrown in a plain 'moveend' it was only a console error,
+// but a layout change (rotating the phone, a panel opening) calls setPadding() from a React effect, which fires
+// 'moveend' synchronously, and that throw replaced the whole app with the fatal screen.
+test.describe('camera on a pole', () => {
+  for (const lat of [90, -90]) {
+    test(`latitude ${lat}: moving, resizing across the phone breakpoint and opening an investigation never stop the app`, async ({ page }) => {
+      await appReady(page);
+      await page.waitForFunction(() => (window as any).__gsMaps?.a?.getSource?.('ctx'));
+      const maxZoom = await page.evaluate((lat) => {
+        const a = (window as any).__gsMaps.a;
+        a.jumpTo({ center: [0, lat], zoom: 3 }); // fires 'moveend' -> the zoom limit is recomputed at the pole
+        return a.getMaxZoom();
+      }, lat);
+      expect(maxZoom).toBeGreaterThan(14);
+      await page.setViewportSize({ width: 700, height: 800 }); // phone layout: camera padding changes in an effect
+      await sleep(500);
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await sleep(500);
+      await expect(page.locator('.fatal')).toHaveCount(0);
+      await expectUsable(page);
+    });
+  }
+});
