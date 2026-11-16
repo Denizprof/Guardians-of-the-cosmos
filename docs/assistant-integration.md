@@ -1,13 +1,13 @@
 # AI Assistant integration
 
-This repo ships the **plumbing** for an AI assistant, not a model. Until you connect one, the UI shows "Assistant not connected" with setup steps and never produces an answer. No provider SDK, URL or key is built in.
+The app ships with its own assistant, which runs in the visitor's browser and needs nothing connected. This page describes the second path: putting a remote service of your own behind the gateway. No provider SDK, URL or key is built in.
 
 ## Two ways to answer
 
-1. **In the browser (default).** With no gateway configured the app uses its own chatbot (`web/src/assistant/local/`): checked knowledge records plus the current view, an optional on-device model, and the same citation rules as below. It needs no server, so it also works on the static site. See `assistant-model/README.md`.
+1. **In the browser (default).** With no gateway configured the app uses its own assistant (`web/src/assistant/local/`): a search index and a trained intent classifier over checked knowledge records, plus the current view and the map's event catalog, under the same citation rules as below. It needs no server, so it also works on the static site. See `assistant-model/README.md`.
 2. **Your own model behind the gateway.** Set `VITE_ASSISTANT_GATEWAY_URL` and everything on this page applies. The rest of this document describes this path.
 
-Contract 1.1 adds an optional `context.knowledge` list (knowledge-base records retrieved for the question, citation ids `kb:<slug>`); the in-browser chatbot fills it, and a gateway model may receive and cite it too.
+Contract 1.2 adds an optional `suggestions` list to the response (follow-up questions, shown as buttons). Contract 1.1 adds an optional `context.knowledge` list (knowledge-base records retrieved for the question, citation ids `kb:<slug>`); the in-browser chatbot fills it, and a gateway model may receive and cite it too.
 
 ## Architecture
 

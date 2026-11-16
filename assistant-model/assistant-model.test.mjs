@@ -1,4 +1,4 @@
-// Regression tests for the chatbot's knowledge base builder and the README that describes it.
+// Regression tests for the assistant's knowledge base builder, its trained classifier and the README that describes them.
 //
 //   node --test assistant-model/assistant-model.test.mjs
 import test from 'node:test';
@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildKb, fit } from './build_kb.mjs';
-import { buildDataset } from './build_dataset.mjs';
+import { loadIntent, trainIntent } from './train_intent.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -76,40 +76,42 @@ test('README: the knowledge-base record counts match kb.json', () => {
   const heading = readme.match(/## The knowledge base \((\d+) records\)/);
   assert.ok(heading, 'README has no "## The knowledge base (N records)" heading');
   assert.equal(num(heading[1]), kb.counts.total);
-  const rows = [...readme.matchAll(/^\| (The app's own vetted text|App guide|General SAR)[^|]*\| (\d+) \|/gm)].map((m) => num(m[2]));
-  assert.deepEqual(rows, [kb.counts.total - kb.counts.app - kb.counts.verified_sar, kb.counts.app, kb.counts.verified_sar]);
+  const rows = [...readme.matchAll(/^\| (The app's own vetted text|App and project guide|Radar reference|General SAR)[^|]*\| (\d+) \|/gm)].map((m) => num(m[2]));
+  const { total, app, reference, verified_sar: verified } = kb.counts;
+  assert.deepEqual(rows, [total - app - reference - verified, app, reference, verified]);
+  assert.match(readme, new RegExp(`${kb.counts.turkish} of the ${total} records have a Turkish text`));
 });
 
-test('README: the reproduce command trains the number of epochs the README reports', () => {
-  const reported = readme.match(/LoRA adapter \([^)]*\), (\d+(?:\.\d+)?) epochs/);
-  assert.ok(reported, 'README Training section does not state the epochs');
-  const command = readme.match(/^python assistant-model\/train_lora\.py([^\n#]*)/m);
-  assert.ok(command, 'README has no train_lora.py reproduce command');
-  const flag = command[1].match(/--epochs\s+(\d+(?:\.\d+)?)/);
-  const fallback = fs.readFileSync(path.join(here, 'train_lora.py'), 'utf8').match(/"--epochs",\s*type=float,\s*default=(\d+(?:\.\d+)?)/);
-  assert.equal(Number(flag ? flag[1] : fallback[1]), Number(reported[1]));
+// ---------- the trained classifier: what ships is what the script trains today, for today's knowledge base
+
+test('the shipped classifier has one class per knowledge record and matches a fresh training run', async () => {
+  const kb = await buildKb();
+  const shipped = loadIntent();
+  assert.ok(shipped, 'intent.json / intent.bin are missing: run node assistant-model/train_intent.mjs');
+  assert.deepEqual(shipped.labels.filter((l) => !l.startsWith('__')), kb.records.map((r) => r.id), 'the classifier is stale: run node assistant-model/train_intent.mjs');
+  const { model, report } = trainIntent(kb);
+  assert.equal(model.weights.length, shipped.weights.length);
+  // training is deterministic; one quantisation step of tolerance covers a different JavaScript engine's rounding
+  let worst = 0;
+  for (let i = 0; i < model.weights.length; i++) worst = Math.max(worst, Math.abs(model.weights[i] - shipped.weights[i]));
+  assert.ok(worst <= 1, `shipped weights differ from a fresh training run (by up to ${worst} steps)`);
+  const meta = readJson(path.join(here, '../web/public/data/assistant/intent.json'));
+  assert.equal(meta.report.examples, report.examples);
+  assert.equal(meta.report.classes, report.classes);
 });
 
-test('README: the example counts of the reported run are the ones recorded for that run', () => {
-  const m = readme.match(/([\d,]+) training, ([\d,]+) validation and ([\d,]+) test\s+examples/);
-  assert.ok(m, 'README does not state the example counts of the reported run');
-  const tuned = readJson(path.join(here, 'reports/tuned.json'));
-  assert.equal(num(m[3]), tuned.examples, 'test examples differ from reports/tuned.json');
-  assert.equal(num(readme.match(/## Results \(held-out test set, ([\d,]+) questions\)/)[1]), tuned.examples);
-  const training = path.join(here, 'adapters/global-sar-lora/training.json'); // git-ignored: checked only where it exists
-  if (fs.existsSync(training)) {
-    const t = readJson(training);
-    assert.equal(num(m[1]), t.train_examples, 'training examples differ from the adapter\'s training.json');
-    assert.equal(Number(readme.match(/LoRA adapter \([^)]*\), (\d+(?:\.\d+)?) epochs/)[1]), t.epochs);
-  }
-  // the README must not present those counts as what the script writes today
-  assert.ok(!/build_dataset\.mjs` writes [\d,]+ training/.test(readme));
-  assert.match(readme, /data\/manifest\.json/);
+test('README: the classifier numbers are the ones recorded at training', () => {
+  const meta = readJson(path.join(here, '../web/public/data/assistant/intent.json'));
+  const kb = readJson(path.join(here, '../web/public/data/assistant/kb.json'));
+  assert.match(readme, new RegExp(`${meta.report.classes} classes`));
+  assert.match(readme, new RegExp(`${meta.report.examples.toLocaleString('en-US')} examples, ${meta.report.epochs} epochs`));
+  const questions = kb.records.reduce((n, r) => n + r.questions_en.length + (r.questions_tr?.length ?? 0), 0);
+  assert.match(readme, new RegExp(`${questions.toLocaleString('en-US')} of them`));
+  assert.match(readme, new RegExp(`classifier alone recognises ${meta.report.off_topic_held_out.recognised}`));
 });
 
-test('data/manifest.json describes what build_dataset.mjs builds today', async () => {
-  const manifest = readJson(path.join(here, 'data/manifest.json'));
-  const { counts, testIds } = await buildDataset();
-  assert.deepEqual(manifest.counts, counts, 'manifest.json is stale: run node assistant-model/build_dataset.mjs --manifest-only');
-  assert.deepEqual(manifest.held_out_records, testIds);
+test('nothing in the assistant names a third-party language model or model hub', () => {
+  const files = ['README.md', 'build_kb.mjs', 'train_intent.mjs', 'eval_retrieval.mjs', 'knowledge/app.json', 'knowledge/project.json', 'knowledge/radar_reference.json',
+    '../web/src/assistant/local/core.ts', '../web/src/assistant/local/adapter.ts', '../web/src/assistant/local/catalog.ts', '../web/src/assistant/local/index.ts', '../web/src/assistant/AssistantPanel.tsx'];
+  for (const f of files) assert.ok(!/qwen|hugging ?face|transformers\.js|\bonnx\b|\blora\b/i.test(fs.readFileSync(path.join(here, f), 'utf8')), f);
 });

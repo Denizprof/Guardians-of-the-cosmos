@@ -1,0 +1,1408 @@
+[
+ {
+  "slug": "project-team",
+  "title": "The team behind Global SAR",
+  "text_en": "Global SAR was built by the team Guardians of the Cosmos: Azra, Ece, Berk, Daniel, Efe and Arte. They made it for the NASA Space Apps Challenge 2026, in the challenge Dancing with the SARs. The code is open source on GitHub.",
+  "text_tr": "Global SAR'ı Guardians of the Cosmos takımı geliştirdi: Azra, Ece, Berk, Daniel, Efe ve Arte. Uygulamayı NASA Space Apps Challenge 2026'nın Dancing with the SARs görevi için yaptılar. Kod GitHub'da açık kaynaktır.",
+  "questions_en": [
+   "Who made this?",
+   "Who built Global SAR?",
+   "Who is on the team?",
+   "Who are the Guardians of the Cosmos?",
+   "Who created this website?",
+   "Who are the developers?",
+   "Who is behind this project?",
+   "team members",
+   "who made you",
+   "whose project is this",
+   "names of the people who built it"
+  ],
+  "questions_tr": [
+   "Bunu kim yaptı?",
+   "Global SAR'ı kim geliştirdi?",
+   "Takımda kimler var?",
+   "Guardians of the Cosmos kim?",
+   "Bu siteyi kim yaptı?",
+   "Geliştiriciler kim?",
+   "seni kim yaptı",
+   "takım üyeleri kimler"
+  ],
+  "source": {
+   "label": "Global SAR project README",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#team"
+  }
+ },
+ {
+  "slug": "project-challenge",
+  "title": "The NASA Space Apps Challenge and Dancing with the SARs",
+  "text_en": "Global SAR is an entry for the NASA Space Apps Challenge 2026, a worldwide hackathon that uses NASA's open data. The challenge it answers is called Dancing with the SARs: make synthetic aperture radar data understandable and useful. Global SAR's answer is a 3D globe where anyone can compare radar images from before and after a real event and read what changed in plain language.",
+  "text_tr": "Global SAR, NASA'nın açık verilerini kullanan dünya çapındaki hackathon olan NASA Space Apps Challenge 2026 için hazırlanmış bir projedir. Yanıtladığı görevin adı Dancing with the SARs'tır: sentetik açıklıklı radar verisini anlaşılır ve yararlı kılmak. Global SAR'ın yanıtı, herkesin gerçek bir olayın öncesi ve sonrasındaki radar görüntülerini karşılaştırıp neyin değiştiğini sade bir dille okuyabildiği üç boyutlu bir küredir.",
+  "questions_en": [
+   "What is the NASA Space Apps Challenge?",
+   "What is Dancing with the SARs?",
+   "Which challenge is this project for?",
+   "Is this a hackathon project?",
+   "Why was this app made?",
+   "What competition is this for?",
+   "space apps 2026",
+   "what was the challenge brief"
+  ],
+  "questions_tr": [
+   "NASA Space Apps Challenge nedir?",
+   "Dancing with the SARs nedir?",
+   "Bu proje hangi yarışma için?",
+   "Bu bir hackathon projesi mi?",
+   "Bu uygulama neden yapıldı?"
+  ],
+  "source": {
+   "label": "NASA Space Apps Challenge",
+   "url": "https://www.spaceappschallenge.org"
+  }
+ },
+ {
+  "slug": "project-problem",
+  "title": "The problem Global SAR solves",
+  "text_en": "Radar satellites see Earth through clouds and darkness, but their images look like grey noise to students, the public and many decision-makers, and the data sits in large HDF5 files behind logins. Global SAR turns that data into evidence anyone can read: pick an event, compare before and after, and read a plain-language explanation in real units. The goal is that a first-time visitor can say what changed in an investigation within one minute, with no radar knowledge.",
+  "text_tr": "Radar uyduları Dünya'yı bulutların ve karanlığın içinden görür; ama görüntüleri öğrencilere, halka ve birçok karar vericiye gri bir gürültü gibi gelir, veriler de giriş gerektiren büyük HDF5 dosyalarında durur. Global SAR bu veriyi herkesin okuyabileceği kanıta dönüştürür: bir olay seçin, öncesini ve sonrasını karşılaştırın, gerçek birimlerle yazılmış sade açıklamayı okuyun. Amaç, ilk kez gelen bir ziyaretçinin radar bilgisi olmadan bir dakika içinde neyin değiştiğini söyleyebilmesidir.",
+  "questions_en": [
+   "What problem does Global SAR solve?",
+   "Why does this project matter?",
+   "Why is radar data hard to understand?",
+   "What is the goal of the project?",
+   "What is the idea behind Global SAR?",
+   "What makes this project useful?",
+   "why should I care about this",
+   "what is the mission of this project",
+   "what's the point of this site"
+  ],
+  "questions_tr": [
+   "Global SAR hangi sorunu çözüyor?",
+   "Bu proje neden önemli?",
+   "Radar verisi neden zor anlaşılır?",
+   "Projenin amacı nedir?",
+   "Bu sitenin amacı ne?"
+  ],
+  "source": {
+   "label": "Global SAR project README",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#why-it-matters"
+  }
+ },
+ {
+  "slug": "project-results",
+  "title": "The five results on real NISAR data",
+  "text_en": "The five investigations found: up to about 45 cm of ground motion along the coast in the Venezuela earthquakes; 322 to 379 km² of new flood water around Chókwè in the Limpopo floods; 35.7 km² of cleared forest at União do Sul in the Amazon; 68 km² of burned woody canopy in the Aspen Acres fire in Colorado; and an 11-date radar time series of the Krasheninnikov volcano. All are derived by the team from genuine NISAR products; they are estimates, not field-validated and not official NASA products.",
+  "text_tr": "Beş araştırmanın sonuçları: Venezuela depremlerinde kıyı boyunca yaklaşık 45 cm'ye varan yer hareketi; Limpopo taşkınlarında Chókwè çevresinde 322 ila 379 km² yeni su; Amazon'da União do Sul'da 35,7 km² kesilmiş orman; Colorado'daki Aspen Acres yangınında 68 km² yanmış ağaç örtüsü; ve Krasheninnikov yanardağının 11 tarihli radar zaman serisi. Hepsini takım gerçek NISAR ürünlerinden türetti; bunlar tahmindir, sahada doğrulanmamıştır ve resmî NASA ürünü değildir.",
+  "questions_en": [
+   "What are the results?",
+   "What did the project find?",
+   "What are the main findings?",
+   "Summarise the five investigations.",
+   "What numbers did you measure?",
+   "What did the radar measure in each investigation?",
+   "give me the key results",
+   "what did you discover",
+   "how much did the ground move and how much flooded",
+   "what are the headline numbers"
+  ],
+  "questions_tr": [
+   "Sonuçlar nelerdir?",
+   "Proje ne buldu?",
+   "Ana bulgular neler?",
+   "Beş araştırmayı özetle.",
+   "Hangi sayıları ölçtünüz?",
+   "neler keşfettiniz"
+  ],
+  "source": {
+   "label": "Global SAR results (the project's own analysis, not an official NASA product)",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#results-on-real-nisar-data"
+  }
+ },
+ {
+  "slug": "event-venezuela-2026-data",
+  "title": "Venezuela earthquakes: data, method and result",
+  "text_en": "Method: interferometry on NISAR GUNW products. Data: track 162A, frame 007, a pre-event pair from 1 to 13 June 2026 and a pair across the earthquakes from 13 to 25 June 2026, quality tier PROVISIONAL. Result: up to about 45 cm of line-of-sight motion away from the satellite along the coast. Check: the pre-event pair gives a noise level of 3.5 cm (standard deviation), and the pattern is consistent with NASA's published analysis.",
+  "text_tr": "Yöntem: NISAR GUNW ürünleriyle interferometri. Veri: 162A izi, 007 çerçevesi; 1-13 Haziran 2026 arasındaki deprem öncesi çift ve 13-25 Haziran 2026 arasındaki depremi kapsayan çift, kalite düzeyi PROVISIONAL. Sonuç: kıyı boyunca uydudan uzaklaşma yönünde yaklaşık 45 cm'ye varan görüş hattı hareketi. Kontrol: deprem öncesi çift 3,5 cm'lik (standart sapma) bir gürültü düzeyi verir ve desen NASA'nın yayımladığı analizle uyumludur.",
+  "questions_en": [
+   "How much did the ground move in Venezuela?",
+   "Which NISAR data was used for the Venezuela earthquakes?",
+   "What is the noise level of the Venezuela measurement?",
+   "Which track and frame cover Venezuela?",
+   "How was the Venezuela earthquake measured?",
+   "how many centimetres did the earthquake move the ground",
+   "45 cm ground motion",
+   "venezuela data and dates"
+  ],
+  "questions_tr": [
+   "Venezuela'da yer ne kadar hareket etti?",
+   "Venezuela depremleri için hangi NISAR verisi kullanıldı?",
+   "Venezuela ölçümünün gürültü düzeyi nedir?",
+   "deprem yeri kaç santimetre oynattı"
+  ],
+  "source": {
+   "label": "Global SAR investigation \"Venezuela earthquakes\" (the project's own analysis, not an official NASA product)",
+   "url": "https://globalsar.earth/#/e/venezuela-2026"
+  }
+ },
+ {
+  "slug": "event-mozambique-floods-2026-data",
+  "title": "Limpopo floods: data, method and result",
+  "text_en": "Method: backscatter change on NISAR GCOV products (HH and HV). Data: track 114A, frame 165, acquired on 24 December 2025, 5 January 2026 and 17 January 2026, quality tier BETA. Result: 322 to 379 km² of new water around Chókwè in Mozambique, inside a 3,370 km² study area. The range comes from two speckle filters, and a scene-wide brightening of 3.07 dB is removed first.",
+  "text_tr": "Yöntem: NISAR GCOV ürünlerinde (HH ve HV) geri saçılım değişimi. Veri: 114A izi, 165 çerçevesi; 24 Aralık 2025, 5 Ocak 2026 ve 17 Ocak 2026 çekimleri, kalite düzeyi BETA. Sonuç: Mozambik'te Chókwè çevresinde, 3.370 km²'lik çalışma alanı içinde 322 ila 379 km² yeni su. Aralık iki farklı benek filtresinden gelir; önce sahnenin tamamındaki 3,07 dB'lik parlaklaşma çıkarılır.",
+  "questions_en": [
+   "How much area was flooded in Mozambique?",
+   "How many square kilometres flooded in the Limpopo floods?",
+   "Which NISAR data was used for the Mozambique floods?",
+   "Which dates were used for the flood map?",
+   "How big was the flood?",
+   "322 to 379 km2",
+   "how much new water around Chokwe",
+   "flood area estimate"
+  ],
+  "questions_tr": [
+   "Mozambik'te ne kadar alan su altında kaldı?",
+   "Limpopo taşkınında kaç kilometrekare su bastı?",
+   "Taşkın haritası için hangi tarihler kullanıldı?",
+   "sel ne kadar büyüktü"
+  ],
+  "source": {
+   "label": "Global SAR investigation \"Limpopo and Incomati floods\" (the project's own analysis, not an official NASA product)",
+   "url": "https://globalsar.earth/#/e/mozambique-floods-2026"
+  }
+ },
+ {
+  "slug": "event-uniao-do-sul-deforestation-2026-data",
+  "title": "Amazon clear-cut, União do Sul: data, method and result",
+  "text_en": "Method: change in HV backscatter (tree canopy) on NISAR GCOV products. Data: track 002A, frame 172, four dates from 18 September to 24 October 2026. Result: 35.7 km² of strong HV loss, which means cleared forest, at União do Sul in Mato Grosso, Brazil. Check: 68 % of the official INPE DETER alert box shows loss, against 11 % of the wider area.",
+  "text_tr": "Yöntem: NISAR GCOV ürünlerinde HV geri saçılımındaki (ağaç örtüsü) değişim. Veri: 002A izi, 172 çerçevesi; 18 Eylül ile 24 Ekim 2026 arasında dört tarih. Sonuç: Brezilya'nın Mato Grosso eyaletindeki União do Sul'da 35,7 km² güçlü HV kaybı, yani kesilmiş orman. Kontrol: resmî INPE DETER uyarı kutusunun %68'i kayıp gösterirken, daha geniş alanda bu oran %11'dir.",
+  "questions_en": [
+   "How much forest was cleared in the Amazon?",
+   "How many square kilometres of forest were lost at União do Sul?",
+   "Which NISAR data was used for the deforestation investigation?",
+   "How was the clear-cut checked?",
+   "35.7 km2 of forest",
+   "how much rainforest was cut down",
+   "amazon deforestation area"
+  ],
+  "questions_tr": [
+   "Amazon'da ne kadar orman kesildi?",
+   "União do Sul'da kaç kilometrekare orman kayboldu?",
+   "Ormansızlaşma araştırmasında hangi veri kullanıldı?",
+   "ne kadar ağaç kesildi"
+  ],
+  "source": {
+   "label": "Global SAR investigation \"Amazon clear-cut, União do Sul\" (the project's own analysis, not an official NASA product)",
+   "url": "https://globalsar.earth/#/e/uniao-do-sul-deforestation-2026"
+  }
+ },
+ {
+  "slug": "event-aspen-acres-fire-2026-data",
+  "title": "Aspen Acres wildfire: data, method and result",
+  "text_en": "Method: change in HV backscatter (tree canopy) on NISAR GCOV products. Data: track 019A, frame 021, four dates from 15 June to 14 August 2026. Result: 68 km² of woody canopy loss in the Aspen Acres fire in Colorado, USA. The reported fire size is 372 km²: the radar number is smaller because L-band HV detects the loss of trees, not burned grass and shrubs.",
+  "text_tr": "Yöntem: NISAR GCOV ürünlerinde HV geri saçılımındaki (ağaç örtüsü) değişim. Veri: 019A izi, 021 çerçevesi; 15 Haziran ile 14 Ağustos 2026 arasında dört tarih. Sonuç: ABD'nin Colorado eyaletindeki Aspen Acres yangınında 68 km² ağaç örtüsü kaybı. Bildirilen yangın büyüklüğü 372 km²'dir: radar sayısı daha küçüktür, çünkü L-bant HV yanmış otu ve çalıyı değil, ağaç kaybını algılar.",
+  "questions_en": [
+   "How much burned in the Aspen Acres fire?",
+   "How many square kilometres of forest burned in Colorado?",
+   "Why is the radar burn area smaller than the reported fire size?",
+   "Which NISAR data was used for the wildfire?",
+   "68 km2 canopy loss",
+   "how big was the colorado fire",
+   "wildfire burned area"
+  ],
+  "questions_tr": [
+   "Aspen Acres yangınında ne kadar alan yandı?",
+   "Colorado'da kaç kilometrekare orman yandı?",
+   "Radar yanık alanı neden bildirilen yangından küçük?",
+   "yangın ne kadar büyüktü"
+  ],
+  "source": {
+   "label": "Global SAR investigation \"Aspen Acres wildfire\" (the project's own analysis, not an official NASA product)",
+   "url": "https://globalsar.earth/#/e/aspen-acres-fire-2026"
+  }
+ },
+ {
+  "slug": "event-krasheninnikov-2026-data",
+  "title": "Krasheninnikov volcano: data, method and result",
+  "text_en": "Method: a time series of NISAR GCOV backscatter. Data: track 060D, frame 061, eleven dates from 18 June to 28 October 2026 over the Krasheninnikov volcano in Kamchatka, Russia. The layers are HH/HV composites at full resolution on one fixed calibrated stretch, so colours can be compared from date to date. This investigation is qualitative: it shows change, and makes no numerical claim.",
+  "text_tr": "Yöntem: NISAR GCOV geri saçılımının zaman serisi. Veri: 060D izi, 061 çerçevesi; Rusya'nın Kamçatka bölgesindeki Krasheninnikov yanardağı üzerinde 18 Haziran ile 28 Ekim 2026 arasında on bir tarih. Katmanlar, tam çözünürlükte ve tek bir sabit kalibre edilmiş ölçekte HH/HV bileşimleridir; bu yüzden renkler tarihten tarihe karşılaştırılabilir. Bu araştırma niteldir: değişimi gösterir, sayısal bir iddiada bulunmaz.",
+  "questions_en": [
+   "Which NISAR data was used for the Krasheninnikov volcano?",
+   "How many dates are in the volcano time series?",
+   "Is there a measurement for the volcano?",
+   "Where is Krasheninnikov?",
+   "kamchatka volcano time series",
+   "how many radar passes over the volcano",
+   "volcano data and dates"
+  ],
+  "questions_tr": [
+   "Krasheninnikov yanardağı için hangi NISAR verisi kullanıldı?",
+   "Yanardağ zaman serisinde kaç tarih var?",
+   "Krasheninnikov nerede?",
+   "kamçatka yanardağı"
+  ],
+  "source": {
+   "label": "Global SAR investigation \"Krasheninnikov volcano\" (the project's own analysis, not an official NASA product)",
+   "url": "https://globalsar.earth/#/e/krasheninnikov-2026"
+  }
+ },
+ {
+  "slug": "method-insar",
+  "title": "How the project measures ground motion (InSAR method)",
+  "text_en": "Ground motion comes from NISAR GUNW interferograms. The line-of-sight displacement is d = −φλ / 4π, where φ is the unwrapped phase and λ the radar wavelength taken from the product itself. The ionosphere phase screen is subtracted, pixels with coherence below 0.3 or outside connected components are masked, and the displacement is referenced to a far-away stable box. A pair from before the event gives the noise level: 3.5 cm for Venezuela.",
+  "text_tr": "Yer hareketi NISAR GUNW interferogramlarından elde edilir. Görüş hattı yer değiştirmesi d = −φλ / 4π formülüyle hesaplanır; φ açılmış faz, λ ise ürünün kendisinden alınan radar dalga boyudur. İyonosfer faz perdesi çıkarılır, uyumu 0,3'ün altında olan ya da bağlı bileşenlerin dışında kalan pikseller maskelenir ve yer değiştirme uzaktaki durağan bir kutuya göre ölçülür. Olaydan önceki bir çift gürültü düzeyini verir: Venezuela için 3,5 cm.",
+  "questions_en": [
+   "How do you calculate ground motion?",
+   "What is the formula for displacement?",
+   "How is the interferogram turned into centimetres?",
+   "How did you process the GUNW data?",
+   "How do you know the noise level?",
+   "what is d = -phi lambda / 4 pi",
+   "how do you convert phase to displacement",
+   "insar processing steps"
+  ],
+  "questions_tr": [
+   "Yer hareketini nasıl hesaplıyorsunuz?",
+   "Yer değiştirme formülü nedir?",
+   "İnterferogram santimetreye nasıl çevriliyor?",
+   "GUNW verisini nasıl işlediniz?"
+  ],
+  "source": {
+   "label": "Global SAR methods (the project's own processing)",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#methods"
+  }
+ },
+ {
+  "slug": "method-flood",
+  "title": "How the project maps flood water",
+  "text_en": "Flood water is mapped on NISAR GCOV HH backscatter, because calm open water is dark in radar. The threshold between water and land is the centre of the valley in the image histogram; for Limpopo both dates use −14.75 dB. New water means: water-like after, not water-like before, and darkened by more than 3 dB compared with the scene-wide median change, which removes calibration and soil-moisture differences between dates. The area is given as a range from two speckle filters, a 3×3 median and a 5×5 boxcar.",
+  "text_tr": "Taşkın suyu NISAR GCOV HH geri saçılımından haritalanır, çünkü durgun açık su radarda karanlıktır. Su ile kara arasındaki eşik, görüntü histogramındaki vadinin ortasıdır; Limpopo için iki tarihte de −14,75 dB kullanılır. Yeni su şu demektir: sonra suya benziyor, önce benzemiyor ve sahne genelindeki ortanca değişime göre 3 dB'den fazla kararmış; bu, tarihler arasındaki kalibrasyon ve toprak nemi farklarını giderir. Alan, iki benek filtresinden (3×3 ortanca ve 5×5 kutu) gelen bir aralık olarak verilir.",
+  "questions_en": [
+   "How do you map floods with radar?",
+   "How is flood water detected?",
+   "What threshold separates water from land?",
+   "How did you calculate the flooded area?",
+   "What does new water mean?",
+   "how does the water mask work",
+   "flood mapping method",
+   "how do you tell water from land"
+  ],
+  "questions_tr": [
+   "Radarla taşkın nasıl haritalanır?",
+   "Sel suyu nasıl tespit ediliyor?",
+   "Su ile karayı hangi eşik ayırıyor?",
+   "Su altında kalan alanı nasıl hesapladınız?",
+   "su maskesi nasıl çalışıyor"
+  ],
+  "source": {
+   "label": "Global SAR methods (the project's own processing)",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#methods"
+  }
+ },
+ {
+  "slug": "method-forest",
+  "title": "How the project maps forest and fire loss",
+  "text_en": "Forest and fire loss are mapped on NISAR GCOV HV backscatter. HV is bright where the radar scatters many times inside a tree canopy, and it drops when the canopy is cut or burned. The project takes the HV change in decibels between two dates on a 3×3 median, removes the scene-wide median change, and counts a pixel as strong loss when HV fell by more than 3 dB. Where an independent reference exists, such as Brazil's INPE DETER alerts, the loss inside it is reported next to the loss in the wider area.",
+  "text_tr": "Orman ve yangın kaybı NISAR GCOV HV geri saçılımından haritalanır. HV, radarın ağaç örtüsü içinde defalarca saçıldığı yerlerde parlaktır; örtü kesildiğinde ya da yandığında düşer. Proje iki tarih arasındaki HV değişimini 3×3 ortanca üzerinde desibel olarak alır, sahne genelindeki ortanca değişimi çıkarır ve HV 3 dB'den fazla düştüyse pikseli güçlü kayıp sayar. Brezilya'nın INPE DETER uyarıları gibi bağımsız bir kaynak varsa, onun içindeki kayıp daha geniş alandaki kayıpla yan yana bildirilir.",
+  "questions_en": [
+   "How do you detect deforestation with radar?",
+   "How is burned forest mapped?",
+   "Why do you use HV for forests?",
+   "How did you calculate the canopy loss?",
+   "What counts as strong loss?",
+   "forest loss method",
+   "how does radar see cut trees",
+   "how do you find burned areas"
+  ],
+  "questions_tr": [
+   "Radarla ormansızlaşma nasıl tespit edilir?",
+   "Yanan orman nasıl haritalanır?",
+   "Ormanlar için neden HV kullanılıyor?",
+   "Ağaç örtüsü kaybını nasıl hesapladınız?"
+  ],
+  "source": {
+   "label": "Global SAR methods (the project's own processing)",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#methods"
+  }
+ },
+ {
+  "slug": "method-browse",
+  "title": "NASA browse images and how they are placed on the map",
+  "text_en": "A browse image is NASA's own quick-look picture of a radar product. Global SAR shows these as published and places them on the globe by fitting the corners of each image to the footprint listed by the ASF archive. That placement is accurate to roughly 1 to 1.4 km, so browse images are labelled as visualizations and are only for looking, never for measuring. Measurements come from the layers the team computed from the full data.",
+  "text_tr": "Ön izleme (browse) görüntüsü, NASA'nın bir radar ürünü için hazırladığı hızlı bakış resmidir. Global SAR bunları yayımlandığı gibi gösterir ve her görüntünün köşelerini ASF arşivinde listelenen kapsama alanına oturtarak küreye yerleştirir. Bu yerleştirmenin doğruluğu kabaca 1 ila 1,4 km'dir; bu yüzden ön izleme görüntüleri görselleştirme olarak etiketlenir ve yalnızca bakmak içindir, ölçmek için değil. Ölçümler, takımın tam veriden hesapladığı katmanlardan gelir.",
+  "questions_en": [
+   "What is a browse image?",
+   "What does NASA browse mean?",
+   "How accurate is the position of the browse images?",
+   "Can I measure on a browse image?",
+   "How are the images placed on the globe?",
+   "what is georeferencing",
+   "why is the picture slightly shifted",
+   "quicklook image"
+  ],
+  "questions_tr": [
+   "Ön izleme görüntüsü nedir?",
+   "NASA browse ne demek?",
+   "Ön izleme görüntülerinin konumu ne kadar doğru?",
+   "Görüntüler küreye nasıl yerleştiriliyor?"
+  ],
+  "source": {
+   "label": "Global SAR methods (the project's own processing)",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#methods"
+  }
+ },
+ {
+  "slug": "project-integrity",
+  "title": "Scientific integrity: how results stay traceable",
+  "text_en": "Every layer records its mission, product, data tier, track, frame, acquisition times, granule name and each processing step, so a result can be traced to the exact NASA file it came from. NASA imagery is labelled NASA browse; the team's own computations are labelled derived by team. Known limits are shown next to the result they affect. Nothing in the app is simulated or predicted.",
+  "text_tr": "Her katman görevini, ürününü, veri düzeyini, izini, çerçevesini, çekim zamanlarını, granül adını ve her işleme adımını kaydeder; böylece bir sonuç, geldiği NASA dosyasına kadar izlenebilir. NASA görüntüleri NASA browse olarak, takımın kendi hesaplamaları derived by team olarak etiketlenir. Bilinen sınırlar, etkiledikleri sonucun yanında gösterilir. Uygulamadaki hiçbir şey simülasyon ya da tahmin değildir.",
+  "questions_en": [
+   "How can I trust the results?",
+   "Is the data real?",
+   "Is anything simulated?",
+   "What is provenance?",
+   "How do I know where a layer came from?",
+   "Is this fake data?",
+   "are the images real",
+   "how do you make sure the science is honest",
+   "can I trace a result back to nasa data"
+  ],
+  "questions_tr": [
+   "Sonuçlara nasıl güvenebilirim?",
+   "Veriler gerçek mi?",
+   "Simülasyon var mı?",
+   "Bir katmanın nereden geldiğini nasıl anlarım?",
+   "görüntüler gerçek mi",
+   "bu sahte veri mi"
+  ],
+  "source": {
+   "label": "Global SAR project README",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#scientific-integrity"
+  }
+ },
+ {
+  "slug": "project-limitations",
+  "title": "Limitations of the project's results",
+  "text_en": "The results have clear limits. InSAR measures motion only along the satellite's line of sight, and the delay caused by the lower atmosphere is not corrected. Early-2026 NISAR products are BETA, and several investigations use BETA or mixed PROVISIONAL and VALIDATED data. Flood and canopy areas are estimates that were not checked in the field, so they are given as ranges where possible. They are the team's own analysis, not official NASA products. No public NISAR products were found for 27 July to 10 August 2026.",
+  "text_tr": "Sonuçların açık sınırları vardır. InSAR hareketi yalnızca uydunun görüş hattı boyunca ölçer ve alt atmosferin yol açtığı gecikme düzeltilmemiştir. 2026 başındaki NISAR ürünleri BETA düzeyindedir; birkaç araştırma BETA ya da karışık PROVISIONAL ve VALIDATED veri kullanır. Taşkın ve ağaç örtüsü alanları sahada doğrulanmamış tahminlerdir; bu yüzden mümkün olduğunda aralık olarak verilir. Bunlar takımın kendi analizidir, resmî NASA ürünü değildir. 27 Temmuz - 10 Ağustos 2026 için herkese açık NISAR ürünü bulunamamıştır.",
+  "questions_en": [
+   "What are the limitations of the project?",
+   "What are the weaknesses of the analysis?",
+   "How accurate are the results?",
+   "What can go wrong with these measurements?",
+   "Why is there no data for late July 2026?",
+   "what are the caveats",
+   "what should I be careful about",
+   "is there a gap in the NISAR data"
+  ],
+  "questions_tr": [
+   "Projenin sınırlamaları nelerdir?",
+   "Analizin zayıf yönleri neler?",
+   "Sonuçlar ne kadar doğru?",
+   "Neden Temmuz sonu için veri yok?",
+   "nelere dikkat etmeliyim"
+  ],
+  "source": {
+   "label": "Global SAR project README",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#limitations"
+  }
+ },
+ {
+  "slug": "project-pipeline",
+  "title": "How Global SAR works: the data pipeline",
+  "text_en": "Global SAR works in three steps. Collect: a pipeline gets NISAR products from NASA's ASF DAAC archive; its first stage needs no login and downloads NASA's browse images and the event catalogs. Process: a Python stage reads only the parts of the large HDF5 files it needs over the internet and computes ground motion in centimetres, backscatter change in decibels, and water and canopy maps. Explore: the web app reads one static data package, events.json plus image overlays, and calls public services live for search, coverage and satellite layers.",
+  "text_tr": "Global SAR üç adımda çalışır. Topla: bir veri hattı NISAR ürünlerini NASA'nın ASF DAAC arşivinden alır; ilk aşaması giriş gerektirmez, NASA'nın ön izleme görüntülerini ve olay kataloglarını indirir. İşle: bir Python aşaması büyük HDF5 dosyalarının yalnızca gereken kısımlarını internet üzerinden okur ve santimetre cinsinden yer hareketini, desibel cinsinden geri saçılım değişimini, su ve ağaç örtüsü haritalarını hesaplar. Keşfet: web uygulaması tek bir statik veri paketini (events.json ve görüntü katmanları) okur; arama, kapsama ve uydu katmanları için herkese açık servisleri canlı çağırır.",
+  "questions_en": [
+   "How does Global SAR work?",
+   "How does the app work behind the scenes?",
+   "What is the data pipeline?",
+   "How is the data processed?",
+   "Where does the app get its data from technically?",
+   "How do you get the NISAR files?",
+   "explain the architecture",
+   "how was the data prepared",
+   "what happens between the satellite and my screen"
+  ],
+  "questions_tr": [
+   "Global SAR nasıl çalışır?",
+   "Uygulama arka planda nasıl çalışıyor?",
+   "Veri hattı nedir?",
+   "Veriler nasıl işleniyor?",
+   "NISAR dosyalarını nasıl alıyorsunuz?",
+   "mimariyi anlat"
+  ],
+  "source": {
+   "label": "Global SAR project README",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#how-it-works"
+  }
+ },
+ {
+  "slug": "project-tech",
+  "title": "The technology Global SAR is built with",
+  "text_en": "The web app is built with React, TypeScript and Vite, and the 3D globe is drawn with MapLibre GL, including terrain and atmosphere. The data pipeline uses Node.js for searching the archive and fetching catalogs, and Python with h5py, NumPy, SciPy, scikit-image, rasterio and pyproj for the radar processing. Tests use Vitest, Playwright, axe-core, pytest and Hypothesis. The site is hosted on GitHub Pages at globalsar.earth.",
+  "text_tr": "Web uygulaması React, TypeScript ve Vite ile yapılmıştır; üç boyutlu küre, arazi ve atmosferle birlikte MapLibre GL ile çizilir. Veri hattı, arşivde arama ve katalogları indirmek için Node.js'i, radar işleme için h5py, NumPy, SciPy, scikit-image, rasterio ve pyproj ile Python'u kullanır. Testlerde Vitest, Playwright, axe-core, pytest ve Hypothesis kullanılır. Site GitHub Pages üzerinde, globalsar.earth adresinde barındırılır.",
+  "questions_en": [
+   "What technology is this built with?",
+   "What is the tech stack?",
+   "Which programming languages were used?",
+   "Which framework does the site use?",
+   "What map library is used?",
+   "Is it built with React?",
+   "what is the globe made with",
+   "which libraries do you use",
+   "how was the website coded",
+   "where is the site hosted"
+  ],
+  "questions_tr": [
+   "Bu hangi teknolojiyle yapıldı?",
+   "Hangi programlama dilleri kullanıldı?",
+   "Site hangi kütüphaneyi kullanıyor?",
+   "Harita hangi kütüphaneyle yapıldı?",
+   "site nasıl kodlandı",
+   "site nerede barındırılıyor"
+  ],
+  "source": {
+   "label": "Global SAR project README",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#tech-stack"
+  }
+ },
+ {
+  "slug": "project-quality",
+  "title": "Testing and quality",
+  "text_en": "Global SAR is covered by more than a thousand automated tests: unit, property and fuzz tests for the web app, end-to-end and accessibility tests in a real browser on desktop and phone sizes, and separate test suites for the Python and Node data pipeline and for the assistant. A QA audit of the project found 23 issues, and 19 of them were fixed with regression tests. Every push to the repository runs the tests before the site is published.",
+  "text_tr": "Global SAR binden fazla otomatik testle korunur: web uygulaması için birim, özellik ve bulanıklaştırma testleri, masaüstü ve telefon boyutlarında gerçek tarayıcıda uçtan uca ve erişilebilirlik testleri, ayrıca Python ve Node veri hattı ile asistan için ayrı test takımları. Projenin kalite denetimi 23 sorun buldu; bunların 19'u regresyon testleriyle düzeltildi. Depoya yapılan her gönderim, site yayımlanmadan önce testleri çalıştırır.",
+  "questions_en": [
+   "How is the app tested?",
+   "How many tests does the project have?",
+   "Is the code tested?",
+   "How do you check quality?",
+   "Was there a QA audit?",
+   "is this app reliable software",
+   "test coverage",
+   "are there bugs"
+  ],
+  "questions_tr": [
+   "Uygulama nasıl test ediliyor?",
+   "Projede kaç test var?",
+   "Kod test edildi mi?",
+   "Kalite nasıl kontrol ediliyor?"
+  ],
+  "source": {
+   "label": "Global SAR project README",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#quality-and-testing"
+  }
+ },
+ {
+  "slug": "project-open-source",
+  "title": "Open source, licence and cost",
+  "text_en": "Global SAR is free to use, with no account and no payment. The code is open source under the MIT licence at github.com/Denizprof/Guardians-of-the-cosmos. Third-party data and imagery keep their own licences: for example the Sentinel-2 cloudless globe imagery by EOX is CC BY-NC-SA 4.0 and may not be used commercially, and Esri World Imagery is used under Esri's terms with attribution.",
+  "text_tr": "Global SAR'ı kullanmak ücretsizdir; hesap ya da ödeme gerekmez. Kod, MIT lisansıyla github.com/Denizprof/Guardians-of-the-cosmos adresinde açık kaynaktır. Üçüncü taraf veriler ve görüntüler kendi lisanslarını korur: örneğin EOX'in Sentinel-2 cloudless küre görüntüsü CC BY-NC-SA 4.0'dır ve ticari amaçla kullanılamaz; Esri World Imagery ise atıf yapılarak Esri'nin koşullarıyla kullanılır.",
+  "questions_en": [
+   "Is Global SAR free?",
+   "Is this open source?",
+   "Where is the source code?",
+   "What licence does the project use?",
+   "Do I need an account?",
+   "Can I use this commercially?",
+   "Is there a GitHub repository?",
+   "how much does it cost",
+   "do I have to sign up or pay",
+   "can I reuse the code",
+   "github link",
+   "is the app free to use",
+   "is this website free"
+  ],
+  "questions_tr": [
+   "Global SAR ücretsiz mi?",
+   "Bu açık kaynak mı?",
+   "Kaynak kodu nerede?",
+   "Proje hangi lisansı kullanıyor?",
+   "Hesap açmam gerekiyor mu?",
+   "ücreti ne kadar",
+   "github bağlantısı",
+   "uygulama ücretsiz mi",
+   "bu site ücretsiz mi",
+   "para ödemem gerekiyor mu",
+   "kullanmak ücretli mi"
+  ],
+  "source": {
+   "label": "Global SAR on GitHub",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos"
+  }
+ },
+ {
+  "slug": "project-run-locally",
+  "title": "Running Global SAR on your own computer",
+  "text_en": "To run Global SAR yourself you need Node.js 20.19 or newer and git. Clone the repository from GitHub, run npm run setup once to install it, then npm start, and open http://localhost:4173. On Windows you can double-click start-windows.cmd instead, and on a Mac start-mac.command. The data package is included, so the core app needs no API keys.",
+  "text_tr": "Global SAR'ı kendiniz çalıştırmak için Node.js 20.19 ya da daha yenisi ve git gerekir. Depoyu GitHub'dan klonlayın, kurmak için bir kez npm run setup, ardından npm start komutunu çalıştırın ve http://localhost:4173 adresini açın. Windows'ta bunun yerine start-windows.cmd dosyasına, Mac'te start-mac.command dosyasına çift tıklayabilirsiniz. Veri paketi depoya dahildir; bu yüzden temel uygulama API anahtarı gerektirmez.",
+  "questions_en": [
+   "How do I run this locally?",
+   "How do I install Global SAR?",
+   "How can I run the app on my computer?",
+   "What do I need to build the project?",
+   "Do I need API keys?",
+   "how to set it up myself",
+   "npm commands to start it",
+   "can I host my own copy"
+  ],
+  "questions_tr": [
+   "Bunu kendi bilgisayarımda nasıl çalıştırırım?",
+   "Global SAR nasıl kurulur?",
+   "Projeyi çalıştırmak için ne gerekli?",
+   "API anahtarı gerekiyor mu?"
+  ],
+  "source": {
+   "label": "Global SAR project README",
+   "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#run-it-locally"
+  }
+ },
+ {
+  "slug": "tool-weather",
+  "title": "Weather at an event",
+  "text_en": "When you open an event, the panel can show the weather at that place and time: precipitation, temperature, wind and pressure. It helps explain what the radar saw, for example heavy rain before a flood. On globalsar.earth the values come from the free Open-Meteo service; a self-hosted copy with an account can use the Meteomatics Weather API instead. For an event dated only to the day, rain is the total for that UTC day.",
+  "text_tr": "Bir olayı açtığınızda panel o yerdeki ve andaki hava durumunu gösterebilir: yağış, sıcaklık, rüzgâr ve basınç. Bu, radarın gördüğünü açıklamaya yardımcı olur; örneğin bir selden önceki şiddetli yağmur. globalsar.earth üzerinde değerler ücretsiz Open-Meteo servisinden gelir; hesabı olan kendi sunucunuzdaki bir kopya bunun yerine Meteomatics Weather API'sini kullanabilir. Yalnızca günü bilinen bir olayda yağış, o UTC gününün toplamıdır.",
+  "questions_en": [
+   "Does the app show weather?",
+   "What was the weather during the event?",
+   "Where does the weather data come from?",
+   "How do I see rainfall for an event?",
+   "What is Meteomatics?",
+   "was it raining when this happened",
+   "temperature and wind at the event",
+   "weather section"
+  ],
+  "questions_tr": [
+   "Uygulama hava durumunu gösteriyor mu?",
+   "Olay sırasında hava nasıldı?",
+   "Hava verisi nereden geliyor?",
+   "Bir olay için yağışı nasıl görürüm?"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "tool-earthdata",
+  "title": "NASA Earthdata search for a place",
+  "text_en": "The NASA Earthdata section of an event's panel searches NASA's Common Metadata Repository (CMR) for other NASA datasets that have data at that location around that date. It checks the most-used collections, not all of them, and says so; for the full list it links to NASA's own Earthdata Search.",
+  "text_tr": "Bir olayın panelindeki NASA Earthdata bölümü, o konumda ve o tarih civarında verisi olan diğer NASA veri kümelerini bulmak için NASA'nın Ortak Üstveri Deposu'nu (CMR) arar. Tüm koleksiyonları değil, en çok kullanılanları kontrol eder ve bunu belirtir; tam liste için NASA'nın kendi Earthdata Search sayfasına bağlantı verir.",
+  "questions_en": [
+   "What is the Earthdata section?",
+   "How do I find other NASA data for a place?",
+   "What is CMR?",
+   "Which other NASA datasets cover this event?",
+   "What is NASA Earthdata?",
+   "more nasa datasets here",
+   "earthdata search panel"
+  ],
+  "questions_tr": [
+   "Earthdata bölümü nedir?",
+   "Bir yer için başka NASA verilerini nasıl bulurum?",
+   "CMR nedir?",
+   "NASA Earthdata nedir?"
+  ],
+  "source": {
+   "label": "NASA Earthdata",
+   "url": "https://www.earthdata.nasa.gov"
+  }
+ },
+ {
+  "slug": "tool-timeline",
+  "title": "The timeline of radar passes",
+  "text_en": "Inside an investigation, the timeline shows every radar pass available for that place as a point in time, with the event date marked. Click a pass to load it as the before or after image, or step through the passes one by one to watch the change unfold. In the volcano investigation the timeline holds eleven passes, 12 days apart except for one 24-day gap.",
+  "text_tr": "Bir araştırmanın içinde zaman çizelgesi, o yer için mevcut her radar geçişini zamanda bir nokta olarak gösterir; olay tarihi de işaretlidir. Bir geçişi önce ya da sonra görüntüsü olarak yüklemek için tıklayın ya da değişimi izlemek için geçişler arasında tek tek ilerleyin. Yanardağ araştırmasında zaman çizelgesinde, 24 günlük tek bir boşluk dışında 12 gün arayla on bir geçiş vardır.",
+  "questions_en": [
+   "What is the timeline?",
+   "How do I change the date of the radar image?",
+   "How do I step through the radar passes?",
+   "How do I pick a different before or after image?",
+   "How do I see the change over time?",
+   "play the images in order",
+   "choose another date",
+   "time slider"
+  ],
+  "questions_tr": [
+   "Zaman çizelgesi nedir?",
+   "Radar görüntüsünün tarihini nasıl değiştiririm?",
+   "Radar geçişleri arasında nasıl gezinirim?",
+   "Değişimi zaman içinde nasıl görürüm?"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-share",
+  "title": "Sharing a link to what you see",
+  "text_en": "The address in your browser changes as you open an investigation, so you can copy it and share exactly that investigation. For example globalsar.earth/#/e/venezuela-2026 opens the Venezuela earthquakes. Adding ?lang=tr to the address opens the app in Turkish.",
+  "text_tr": "Bir araştırma açtığınızda tarayıcınızdaki adres değişir; böylece adresi kopyalayıp tam o araştırmayı paylaşabilirsiniz. Örneğin globalsar.earth/#/e/venezuela-2026 Venezuela depremlerini açar. Adrese ?lang=tr eklemek uygulamayı Türkçe açar.",
+  "questions_en": [
+   "How do I share this view?",
+   "Can I send someone a link to an investigation?",
+   "Is there a shareable URL?",
+   "How do I link to an event?",
+   "copy link to this page",
+   "send this to a friend",
+   "permalink"
+  ],
+  "questions_tr": [
+   "Bu görünümü nasıl paylaşırım?",
+   "Bir araştırmanın bağlantısını gönderebilir miyim?",
+   "Bir olaya nasıl bağlantı veririm?"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-language",
+  "title": "Languages: English and Turkish",
+  "text_en": "Global SAR is available in English and Turkish. Use the EN / TR switch in the top bar to change the language; the whole interface is translated, and Turkey is labelled Türkiye. The assistant also understands and answers questions in both languages.",
+  "text_tr": "Global SAR İngilizce ve Türkçe olarak kullanılabilir. Dili değiştirmek için üst çubuktaki EN / TR düğmesini kullanın; arayüzün tamamı çevrilmiştir. Asistan da her iki dilde soruları anlar ve yanıtlar.",
+  "questions_en": [
+   "Which languages does the app support?",
+   "Can I use the app in Turkish?",
+   "How do I change the language?",
+   "Do you speak Turkish?",
+   "Is there a Turkish version?",
+   "switch to english",
+   "can you answer in another language",
+   "language settings"
+  ],
+  "questions_tr": [
+   "Uygulama hangi dilleri destekliyor?",
+   "Uygulamayı Türkçe kullanabilir miyim?",
+   "Dili nasıl değiştiririm?",
+   "Türkçe biliyor musun?",
+   "Türkçe konuşabilir misin?",
+   "ingilizceye nasıl geçerim"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-lite",
+  "title": "Lite mode for slow computers",
+  "text_en": "If the globe is slow, use lite mode: add ?lite=1 to the address. It turns off 3D terrain, the halo and sky shading and uses smaller images, which is about three times faster on a weak graphics card. The app switches to lite mode by itself when the browser has no hardware graphics acceleration.",
+  "text_tr": "Küre yavaşsa hafif modu kullanın: adrese ?lite=1 ekleyin. Bu mod üç boyutlu araziyi, haleyi ve gökyüzü gölgelendirmesini kapatır ve daha küçük görüntüler kullanır; zayıf bir ekran kartında yaklaşık üç kat daha hızlıdır. Tarayıcıda donanım grafik hızlandırması yoksa uygulama kendiliğinden hafif moda geçer.",
+  "questions_en": [
+   "The app is slow, what can I do?",
+   "What is lite mode?",
+   "How do I make the globe faster?",
+   "Why is the map lagging?",
+   "Does it work on an old computer?",
+   "the site is laggy",
+   "low performance mode",
+   "it freezes on my laptop"
+  ],
+  "questions_tr": [
+   "Uygulama yavaş, ne yapabilirim?",
+   "Hafif mod nedir?",
+   "Küreyi nasıl hızlandırırım?",
+   "Harita neden takılıyor?",
+   "site kasıyor"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-install",
+  "title": "Installing Global SAR and using it on a phone",
+  "text_en": "Global SAR can be installed like an app. In Chrome or Edge choose Install Global SAR from the address bar or the browser menu; on a phone use Add to Home screen. There is a dedicated phone layout. An internet connection is still needed, because the map imagery loads live.",
+  "text_tr": "Global SAR bir uygulama gibi kurulabilir. Chrome ya da Edge'de adres çubuğundan veya tarayıcı menüsünden Install Global SAR'ı seçin; telefonda Ana ekrana ekle'yi kullanın. Telefonlar için ayrı bir düzen vardır. Harita görüntüleri canlı yüklendiği için internet bağlantısı yine de gerekir.",
+  "questions_en": [
+   "Can I install this as an app?",
+   "Does it work on a phone?",
+   "Is there a mobile app?",
+   "Does it work offline?",
+   "How do I add it to my home screen?",
+   "is there an android or iphone app",
+   "can I use it without internet",
+   "mobile version"
+  ],
+  "questions_tr": [
+   "Bunu uygulama olarak kurabilir miyim?",
+   "Telefonda çalışıyor mu?",
+   "Mobil uygulaması var mı?",
+   "İnternetsiz çalışır mı?",
+   "ana ekrana nasıl eklerim"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-closeup",
+  "title": "Globe imagery and close-up photos",
+  "text_en": "From far away the globe shows Sentinel-2 cloudless imagery by EOX, at about 10 m detail. As you zoom in, Esri World Imagery fades in on top, sharp enough to see buildings in cities. Where Esri has no photos the app keeps the Sentinel-2 view underneath. The closest zoom is limited so the scale bar never reads below 50 m. This background is ordinary optical imagery, not radar and not live.",
+  "text_tr": "Uzaktan bakıldığında küre, EOX'in yaklaşık 10 m ayrıntılı Sentinel-2 bulutsuz görüntüsünü gösterir. Yakınlaştıkça üzerine, şehirlerde binaları görecek kadar keskin olan Esri World Imagery belirir. Esri'nin fotoğrafı olmayan yerlerde uygulama altta Sentinel-2 görüntüsünü tutar. En yakın yakınlaştırma, ölçek çubuğu 50 m'nin altına inmeyecek şekilde sınırlıdır. Bu arka plan sıradan optik görüntüdür; radar değildir ve canlı değildir.",
+  "questions_en": [
+   "What is the background imagery of the globe?",
+   "Is the globe a live satellite view?",
+   "Why can't I zoom in further?",
+   "How detailed is the map when I zoom in?",
+   "Where do the close-up photos come from?",
+   "is the globe picture real time",
+   "can I see my house",
+   "how old is the base map",
+   "what is the earth picture made of"
+  ],
+  "questions_tr": [
+   "Kürenin arka plan görüntüsü nedir?",
+   "Küre canlı uydu görüntüsü mü?",
+   "Neden daha fazla yakınlaştıramıyorum?",
+   "Yakın plan fotoğraflar nereden geliyor?",
+   "evimi görebilir miyim"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-privacy",
+  "title": "Privacy: what the assistant does with your questions",
+  "text_en": "The assistant runs entirely in your browser. Your questions are not sent to any server, and no account is needed. The app itself loads map imagery and data from public services such as NASA, ASF, EOX and Esri, as any map does.",
+  "text_tr": "Asistan tamamen tarayıcınızda çalışır. Sorularınız hiçbir sunucuya gönderilmez ve hesap gerekmez. Uygulamanın kendisi, her harita gibi, harita görüntülerini ve verileri NASA, ASF, EOX ve Esri gibi herkese açık servislerden yükler.",
+  "questions_en": [
+   "Is my data private?",
+   "Do you store my questions?",
+   "Where are my questions sent?",
+   "Do you track me?",
+   "Is this chat recorded?",
+   "who can read what I type",
+   "privacy policy",
+   "do you collect personal data"
+  ],
+  "questions_tr": [
+   "Verilerim gizli mi?",
+   "Sorularımı saklıyor musunuz?",
+   "Sorularım nereye gönderiliyor?",
+   "Bu sohbet kaydediliyor mu?"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-get-started",
+  "title": "Where to start",
+  "text_en": "A good first step: press Investigations in the top bar and open the Venezuela earthquakes. Drag the swipe handle left and right to compare the radar image from before with the one across the earthquake, then read the Simple explanation next to it. After that, try Satellite layers for global maps, the SAR lens to see any place in radar, and the Coverage probe to list the NISAR data over any point. You can ask me about anything you see on the way.",
+  "text_tr": "İyi bir ilk adım: üst çubuktaki Araştırmalar'a basın ve Venezuela depremlerini açın. Deprem öncesi radar görüntüsünü depremi kapsayan görüntüyle karşılaştırmak için kaydırma tutamacını sağa sola sürükleyin, sonra yanındaki Basit açıklamayı okuyun. Ardından küresel haritalar için Uydu katmanları'nı, herhangi bir yeri radarla görmek için SAR merceğini ve herhangi bir nokta üzerindeki NISAR verisini listelemek için Kapsama sondasını deneyin. Yolda gördüğünüz her şeyi bana sorabilirsiniz.",
+  "questions_en": [
+   "Where do I start?",
+   "How do I use this app?",
+   "I am new here, what should I do first?",
+   "Give me a quick tour.",
+   "What should I try first?",
+   "show me around",
+   "how does this site work for a beginner",
+   "first steps",
+   "I'm lost"
+  ],
+  "questions_tr": [
+   "Nereden başlamalıyım?",
+   "Bu uygulamayı nasıl kullanırım?",
+   "Yeniyim, önce ne yapmalıyım?",
+   "Bana kısa bir tur ver.",
+   "İlk olarak neyi denemeliyim?",
+   "kayboldum"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-investigation-list",
+  "title": "The five investigations",
+  "text_en": "Global SAR has five investigations, all on real NISAR radar data: the Venezuela earthquakes of 24 June 2026 (ground motion), the Limpopo and Incomati floods in Mozambique in January 2026 (flood water), the Krasheninnikov volcano in Kamchatka (a time series through 2026), the Amazon clear-cut at União do Sul in Brazil (deforestation, October 2026), and the Aspen Acres wildfire in Colorado (burned forest, summer 2026). Open any of them from Investigations in the top bar.",
+  "text_tr": "Global SAR'da hepsi gerçek NISAR radar verisine dayanan beş araştırma vardır: 24 Haziran 2026 Venezuela depremleri (yer hareketi), Ocak 2026'da Mozambik'teki Limpopo ve Incomati taşkınları (sel suyu), Kamçatka'daki Krasheninnikov yanardağı (2026 boyunca bir zaman serisi), Brezilya'da União do Sul'daki Amazon ağaç kesimi (ormansızlaşma, Ekim 2026) ve Colorado'daki Aspen Acres orman yangını (yanan orman, 2026 yazı). Herhangi birini üst çubuktaki Araştırmalar'dan açın.",
+  "questions_en": [
+   "Which investigations are there?",
+   "List the investigations.",
+   "What events can I explore?",
+   "Which case studies does the app have?",
+   "How many investigations are there?",
+   "What disasters does the app cover?",
+   "which events did you analyse",
+   "what are the five investigations",
+   "show me all the events with radar analysis"
+  ],
+  "questions_tr": [
+   "Hangi araştırmalar var?",
+   "Araştırmaları listele.",
+   "Hangi olayları inceleyebilirim?",
+   "Kaç araştırma var?",
+   "Uygulama hangi afetleri kapsıyor?",
+   "beş araştırma neler"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-live",
+  "title": "What is live and what is not",
+  "text_en": "The five investigations are fixed studies of past events; they do not update. Live parts of the app are: the Coverage probe, which asks the ASF archive for NISAR products at the moment you click; the Earthdata search; the daily satellite layers from NASA GIBS, which usually arrive a day or so after the satellite pass; and the SAR lens. The event markers on the globe come from catalogs fetched when the site was last built, so they are recent but not real time. Global SAR is not an alert system.",
+  "text_tr": "Beş araştırma geçmiş olayların sabit incelemeleridir; güncellenmezler. Uygulamanın canlı kısımları şunlardır: tıkladığınız anda ASF arşivine NISAR ürünlerini soran Kapsama sondası; Earthdata araması; NASA GIBS'ten gelen ve genellikle uydu geçişinden bir gün kadar sonra ulaşan günlük uydu katmanları; ve SAR merceği. Küredeki olay işaretleri, site en son derlendiğinde indirilen kataloglardan gelir; yani günceldir ama gerçek zamanlı değildir. Global SAR bir uyarı sistemi değildir.",
+  "questions_en": [
+   "Is the data live?",
+   "Is this real time?",
+   "How up to date is the information?",
+   "How often is the data updated?",
+   "how recent is the data",
+   "does the map refresh",
+   "is it showing what is happening right now"
+  ],
+  "questions_tr": [
+   "Veriler canlı mı?",
+   "Bu gerçek zamanlı mı?",
+   "Bilgiler ne kadar güncel?",
+   "Veriler ne sıklıkla güncelleniyor?",
+   "şu an olanı mı gösteriyor"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-markers",
+  "title": "The coloured markers on the globe",
+  "text_en": "Each marker on the globe is one event. Large markers with a ring are the five investigations, which have radar analysis. Small markers are catalog events shown for context: earthquakes from USGS, and volcanoes, floods, fires, storms and ice from NASA EONET, with more catalogs (tsunamis, eruptions, FIRMS fires, landslides, flood alerts) available in Filters. The colour shows the category. Click a marker to open its details. No radar analysis is claimed for catalog events.",
+  "text_tr": "Küredeki her işaret bir olaydır. Halkalı büyük işaretler, radar analizi olan beş araştırmadır. Küçük işaretler bağlam için gösterilen katalog olaylarıdır: USGS'ten depremler, NASA EONET'ten yanardağlar, seller, yangınlar, fırtınalar ve buz; Filtreler'de daha fazla katalog (tsunamiler, patlamalar, FIRMS yangınları, heyelanlar, sel uyarıları) bulunur. Renk kategoriyi gösterir. Ayrıntılarını açmak için bir işarete tıklayın. Katalog olayları için radar analizi iddia edilmez.",
+  "questions_en": [
+   "What are the dots on the map?",
+   "What do the markers mean?",
+   "What do the colours of the points mean?",
+   "Why are some markers bigger?",
+   "What happens when I click a dot?",
+   "what are these circles on the globe",
+   "what are the pins",
+   "map symbols explained"
+  ],
+  "questions_tr": [
+   "Haritadaki noktalar nedir?",
+   "İşaretler ne anlama geliyor?",
+   "Noktaların renkleri ne demek?",
+   "Bazı işaretler neden daha büyük?",
+   "küredeki daireler ne"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-accessibility",
+  "title": "Accessibility and keyboard use",
+  "text_en": "Global SAR can be used with a keyboard: every tool, panel and the chat can be reached with Tab and activated with Enter. The interface is checked automatically with axe-core accessibility tests, legends use text and units as well as colour, and there is a layout for phones.",
+  "text_tr": "Global SAR klavyeyle kullanılabilir: her araca, panele ve sohbete Tab ile ulaşılır, Enter ile etkinleştirilir. Arayüz axe-core erişilebilirlik testleriyle otomatik olarak denetlenir, lejantlar rengin yanında metin ve birim de kullanır ve telefonlar için ayrı bir düzen vardır.",
+  "questions_en": [
+   "Is the app accessible?",
+   "Can I use the app with a keyboard?",
+   "Does it work with a screen reader?",
+   "Are there keyboard shortcuts?",
+   "accessibility features",
+   "can I navigate without a mouse"
+  ],
+  "questions_tr": [
+   "Uygulama erişilebilir mi?",
+   "Uygulamayı klavyeyle kullanabilir miyim?",
+   "Ekran okuyucuyla çalışıyor mu?"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-teachers",
+  "title": "Using Global SAR in a classroom",
+  "text_en": "Global SAR works well in a lesson. Each of the five investigations is a ready example with sources, real units and stated limits: students pick an event, compare before and after, and read the Simple explanation, while the Scientific level gives the product names and processing for older students. A shared link opens the same investigation on every screen, and nothing needs to be installed.",
+  "text_tr": "Global SAR derste kullanıma uygundur. Beş araştırmanın her biri kaynakları, gerçek birimleri ve belirtilmiş sınırlarıyla hazır bir örnektir: öğrenciler bir olay seçer, öncesini ve sonrasını karşılaştırır ve Basit açıklamayı okur; Bilimsel düzey ise daha büyük öğrenciler için ürün adlarını ve işleme adımlarını verir. Paylaşılan bir bağlantı her ekranda aynı araştırmayı açar ve hiçbir şey kurmak gerekmez.",
+  "questions_en": [
+   "Can I use this in my class?",
+   "How can teachers use Global SAR?",
+   "Is this suitable for students?",
+   "How do I teach radar with this app?",
+   "lesson ideas",
+   "is it good for a school project",
+   "can kids understand it"
+  ],
+  "questions_tr": [
+   "Bunu dersimde kullanabilir miyim?",
+   "Öğretmenler Global SAR'ı nasıl kullanabilir?",
+   "Öğrenciler için uygun mu?",
+   "okul projesi için uygun mu"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "app-download",
+  "title": "Getting the data yourself",
+  "text_en": "The NISAR data behind every layer is public. Each layer's provenance names the exact granule, and you can download it from the Alaska Satellite Facility (ASF DAAC) with a free NASA Earthdata Login. The project's processed data package, events.json and the image overlays, is in the GitHub repository, together with the pipeline that rebuilds it.",
+  "text_tr": "Her katmanın arkasındaki NISAR verisi herkese açıktır. Her katmanın köken bilgisi tam granül adını verir; onu ücretsiz bir NASA Earthdata Login hesabıyla Alaska Satellite Facility'den (ASF DAAC) indirebilirsiniz. Projenin işlenmiş veri paketi (events.json ve görüntü katmanları), onu yeniden üreten veri hattıyla birlikte GitHub deposundadır.",
+  "questions_en": [
+   "Can I download the data?",
+   "Where can I get the NISAR files?",
+   "How do I download the radar images?",
+   "Is the processed data available?",
+   "How can I reproduce the results?",
+   "export the data",
+   "get the raw files",
+   "where is events.json"
+  ],
+  "questions_tr": [
+   "Verileri indirebilir miyim?",
+   "NISAR dosyalarını nereden alabilirim?",
+   "Radar görüntülerini nasıl indiririm?",
+   "Sonuçları nasıl yeniden üretebilirim?"
+  ],
+  "source": {
+   "label": "ASF DAAC NISAR documentation",
+   "url": "https://nisar-docs.asf.alaska.edu/"
+  }
+ },
+ {
+  "slug": "glossary-granule",
+  "title": "Granule, track and frame",
+  "text_en": "A granule is one file of satellite data: one radar product for one place and time. NISAR's orbit is divided into numbered tracks, the paths the satellite repeats over the ground, and each track is cut into numbered frames along its length. So track 162, frame 007 always means the same piece of ground, which is what makes before and after images line up. A or D after the track number says whether the satellite was moving north (ascending) or south (descending).",
+  "text_tr": "Granül, tek bir uydu verisi dosyasıdır: bir yer ve zaman için bir radar ürünü. NISAR'ın yörüngesi numaralı izlere, yani uydunun yer üzerinde tekrarladığı yollara ayrılır; her iz de uzunluğu boyunca numaralı çerçevelere bölünür. Bu yüzden 162 izi, 007 çerçevesi hep aynı yer parçası demektir; önce ve sonra görüntülerinin üst üste oturmasını sağlayan da budur. İz numarasından sonraki A ya da D, uydunun kuzeye (yükselen) mi güneye (alçalan) mı gittiğini söyler.",
+  "questions_en": [
+   "What is a granule?",
+   "What do track and frame mean?",
+   "What is an ascending pass?",
+   "What does descending mean?",
+   "What does track 162A mean?",
+   "what is a satellite pass",
+   "what is a scene",
+   "ascending vs descending orbit"
+  ],
+  "questions_tr": [
+   "Granül nedir?",
+   "İz ve çerçeve ne demek?",
+   "Yükselen geçiş nedir?",
+   "Alçalan ne demek?",
+   "uydu geçişi nedir"
+  ],
+  "source": {
+   "label": "ASF DAAC NISAR documentation",
+   "url": "https://nisar-docs.asf.alaska.edu/"
+  }
+ },
+ {
+  "slug": "glossary-products",
+  "title": "NISAR products used here: GCOV and GUNW",
+  "text_en": "Global SAR uses two kinds of NISAR product. GCOV is geocoded backscatter: how strongly each spot on the ground returned the radar signal, in the HH and HV polarizations. It is used for the flood, forest, fire and volcano investigations. GUNW is a geocoded unwrapped interferogram: the phase difference between two passes, which gives ground motion. It is used for the Venezuela earthquakes. Both are Level 2 products, already placed on a map grid, and are distributed by the ASF DAAC as HDF5 files.",
+  "text_tr": "Global SAR iki tür NISAR ürünü kullanır. GCOV coğrafi kodlanmış geri saçılımdır: yerdeki her noktanın radar sinyalini HH ve HV polarizasyonlarında ne kadar güçlü geri döndürdüğü. Taşkın, orman, yangın ve yanardağ araştırmalarında kullanılır. GUNW coğrafi kodlanmış açılmış interferogramdır: iki geçiş arasındaki faz farkı, yani yer hareketi. Venezuela depremlerinde kullanılır. İkisi de harita ızgarasına yerleştirilmiş Düzey 2 ürünlerdir ve ASF DAAC tarafından HDF5 dosyaları olarak dağıtılır.",
+  "questions_en": [
+   "What is GCOV?",
+   "What is GUNW?",
+   "Which NISAR products does the app use?",
+   "What is the difference between GCOV and GUNW?",
+   "What is an HDF5 file?",
+   "What is a Level 2 product?",
+   "nisar product types",
+   "what does gunw stand for",
+   "what file format is the data"
+  ],
+  "questions_tr": [
+   "GCOV nedir?",
+   "GUNW nedir?",
+   "Uygulama hangi NISAR ürünlerini kullanıyor?",
+   "GCOV ile GUNW arasındaki fark nedir?",
+   "HDF5 dosyası nedir?"
+  ],
+  "source": {
+   "label": "ASF DAAC NISAR documentation",
+   "url": "https://nisar-docs.asf.alaska.edu/"
+  }
+ },
+ {
+  "slug": "glossary-asf",
+  "title": "ASF DAAC and where NISAR data lives",
+  "text_en": "The Alaska Satellite Facility Distributed Active Archive Center, ASF DAAC, is the NASA data centre that archives and distributes NISAR's L-band data, openly and free of charge. Global SAR's pipeline downloads its products from there, and the Coverage probe asks ASF's search service live which NISAR products exist over the point you click.",
+  "text_tr": "Alaska Satellite Facility Dağıtık Etkin Arşiv Merkezi (ASF DAAC), NISAR'ın L-bant verisini açık ve ücretsiz olarak arşivleyen ve dağıtan NASA veri merkezidir. Global SAR'ın veri hattı ürünlerini oradan indirir; Kapsama sondası da tıkladığınız nokta üzerinde hangi NISAR ürünlerinin bulunduğunu ASF'nin arama servisine canlı sorar.",
+  "questions_en": [
+   "What is ASF?",
+   "What is the ASF DAAC?",
+   "Where is NISAR data stored?",
+   "Who distributes NISAR data?",
+   "What is the Alaska Satellite Facility?",
+   "what is a DAAC",
+   "nisar data archive"
+  ],
+  "questions_tr": [
+   "ASF nedir?",
+   "ASF DAAC nedir?",
+   "NISAR verisi nerede saklanıyor?",
+   "NISAR verisini kim dağıtıyor?"
+  ],
+  "source": {
+   "label": "NASA: NISAR mission",
+   "url": "https://science.nasa.gov/mission/nisar/"
+  }
+ },
+ {
+  "slug": "glossary-catalog-sources",
+  "title": "USGS, EONET, FIRMS, GDACS and the other catalogs",
+  "text_en": "The event markers come from public catalogs. USGS ComCat lists earthquakes measured by seismometers. NASA EONET lists natural events such as volcanoes, floods, fires, storms and icebergs. NASA FIRMS lists places where satellites detected heat from fires in the last day. NOAA NCEI keeps the historical tsunami and significant-eruption databases. NASA's Global Landslide Catalog lists reported landslides, and GDACS issues flood alerts. These are reports and detections for context; none of them is a radar analysis.",
+  "text_tr": "Olay işaretleri herkese açık kataloglardan gelir. USGS ComCat, sismometrelerle ölçülen depremleri listeler. NASA EONET yanardağ, sel, yangın, fırtına ve buzdağı gibi doğa olaylarını listeler. NASA FIRMS, uyduların son bir günde yangın ısısı algıladığı yerleri listeler. NOAA NCEI tarihsel tsunami ve önemli patlama veritabanlarını tutar. NASA'nın Küresel Heyelan Kataloğu bildirilen heyelanları listeler, GDACS ise sel uyarıları yayımlar. Bunlar bağlam için sunulan bildirim ve tespitlerdir; hiçbiri radar analizi değildir.",
+  "questions_en": [
+   "What is USGS?",
+   "What is EONET?",
+   "What is FIRMS?",
+   "What is GDACS?",
+   "Where do the earthquake markers come from?",
+   "Which catalogs does the app use?",
+   "What is the Global Landslide Catalog?",
+   "who reports the events",
+   "source of the fire dots",
+   "what is NOAA NCEI"
+  ],
+  "questions_tr": [
+   "USGS nedir?",
+   "EONET nedir?",
+   "FIRMS nedir?",
+   "GDACS nedir?",
+   "Deprem işaretleri nereden geliyor?",
+   "Uygulama hangi katalogları kullanıyor?"
+  ],
+  "source": {
+   "label": "Global SAR app guide",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "glossary-los",
+  "title": "Line of sight: what the radar actually measures",
+  "text_en": "A radar satellite looks at the ground from the side, at an angle. Interferometry measures only how much the ground moved toward or away from the satellite along that slanted viewing line, called the line of sight. It cannot tell by itself how much of that motion was up or down and how much was sideways. That is why the Venezuela result reads as motion away from the satellite, not simply as sinking.",
+  "text_tr": "Radar uydusu yere yandan, bir açıyla bakar. İnterferometri yalnızca yerin, görüş hattı denen bu eğik bakış doğrultusu boyunca uyduya ne kadar yaklaştığını ya da uzaklaştığını ölçer. Bu hareketin ne kadarının yukarı aşağı, ne kadarının yana doğru olduğunu tek başına söyleyemez. Venezuela sonucunun yalnızca çökme olarak değil, uydudan uzaklaşma olarak okunmasının nedeni budur.",
+  "questions_en": [
+   "What is line of sight?",
+   "What does LOS mean?",
+   "What does motion away from the satellite mean?",
+   "Did the ground go up or down?",
+   "Why can't radar tell vertical from horizontal motion?",
+   "line-of-sight displacement",
+   "is it sinking or sliding"
+  ],
+  "questions_tr": [
+   "Görüş hattı nedir?",
+   "LOS ne demek?",
+   "Uydudan uzaklaşan hareket ne anlama gelir?",
+   "Yer yukarı mı aşağı mı gitti?"
+  ],
+  "source": {
+   "label": "Global SAR radar explainer",
+   "url": "https://globalsar.earth/"
+  }
+ },
+ {
+  "slug": "catalog-lookup",
+  "title": "Looking up events on the map",
+  "topic": "app",
+  "text_en": "I can look up the events on the map for you. Ask, for example, how many earthquakes the catalog holds, which one was the strongest, or which floods, wildfires or volcano events were reported in a country. The catalog on the globe holds the larger earthquakes of the last twelve months from USGS and volcano, flood, wildfire and iceberg events from NASA EONET. They are reports shown for context, not radar analysis.",
+  "text_tr": "Haritadaki olayları sizin için arayabilirim. Örneğin katalogda kaç deprem olduğunu, hangisinin en güçlü olduğunu ya da bir ülkede hangi sellerin, orman yangınlarının veya yanardağ olaylarının bildirildiğini sorabilirsiniz. Küredeki katalog, USGS'ten son on iki ayın büyük depremlerini ve NASA EONET'ten yanardağ, sel, orman yangını ve buzdağı olaylarını içerir. Bunlar bağlam için gösterilen bildirimlerdir; radar analizi değildir.",
+  "questions_en": [
+   "How many earthquakes are on the map?",
+   "What was the strongest earthquake?",
+   "Were there any earthquakes in Japan recently?",
+   "Which earthquakes happened in Indonesia?",
+   "What are the latest volcano eruptions?",
+   "How many floods are in the catalog?",
+   "How many wildfires are on the map?",
+   "List the recent earthquakes.",
+   "earthquakes in Chile",
+   "floods in Brazil",
+   "wildfires in Australia",
+   "volcano eruptions in Iceland",
+   "biggest earthquake this year",
+   "most recent earthquake",
+   "how many events are on the map",
+   "any recent fires in Canada",
+   "which volcanoes erupted recently",
+   "how many icebergs are tracked",
+   "latest floods",
+   "what is the largest earthquake in the catalog",
+   "show me earthquakes near Turkey",
+   "number of volcano events",
+   "were there floods in India"
+  ],
+  "questions_tr": [
+   "Haritada kaç deprem var?",
+   "En güçlü deprem hangisiydi?",
+   "Japonya'da son depremler neler?",
+   "Endonezya'da hangi depremler oldu?",
+   "Son yanardağ patlamaları neler?",
+   "Katalogda kaç sel var?",
+   "Haritada kaç orman yangını var?",
+   "Türkiye'de deprem oldu mu?",
+   "en büyük deprem",
+   "en son deprem",
+   "haritada kaç olay var",
+   "Şili depremleri",
+   "son seller",
+   "bu yılın en büyük depremi",
+   "Avustralya'daki yangınlar"
+  ]
+ },
+ {
+  "slug": "chat-hello",
+  "title": "Hello",
+  "topic": "chat",
+  "text_en": "Hello! I'm the Global SAR assistant. I can explain radar and the NISAR mission, walk you through the five investigations and their results, describe any satellite layer, show you how each tool works, and look up events in the map's catalogs. What would you like to know?",
+  "text_tr": "Merhaba! Ben Global SAR asistanıyım. Radarı ve NISAR görevini açıklayabilir, beş araştırmayı ve sonuçlarını anlatabilir, herhangi bir uydu katmanını tarif edebilir, her aracın nasıl çalıştığını gösterebilir ve haritadaki kataloglarda olay arayabilirim. Ne öğrenmek istersiniz?",
+  "questions_en": [
+   "Hello",
+   "Hi",
+   "Hey",
+   "Good morning",
+   "Good evening",
+   "hi there",
+   "hello assistant",
+   "yo",
+   "greetings",
+   "hey there",
+   "sup",
+   "what's up"
+  ],
+  "questions_tr": [
+   "Merhaba",
+   "Selam",
+   "Günaydın",
+   "İyi günler",
+   "İyi akşamlar",
+   "selamlar",
+   "naber",
+   "merhabalar",
+   "selamün aleyküm",
+   "hey"
+  ]
+ },
+ {
+  "slug": "chat-thanks",
+  "title": "You're welcome",
+  "topic": "chat",
+  "text_en": "You're welcome! Ask me anything else about radar, NISAR, the investigations or the tools here.",
+  "text_tr": "Rica ederim! Radar, NISAR, araştırmalar ya da buradaki araçlar hakkında başka ne isterseniz sorun.",
+  "questions_en": [
+   "Thanks",
+   "Thank you",
+   "Thanks a lot",
+   "thank you very much",
+   "great, thanks",
+   "that helps, thank you",
+   "cheers",
+   "awesome thanks",
+   "ok thanks",
+   "perfect thank you",
+   "nice",
+   "cool",
+   "great answer",
+   "good job"
+  ],
+  "questions_tr": [
+   "Teşekkürler",
+   "Teşekkür ederim",
+   "Sağ ol",
+   "çok teşekkürler",
+   "eyvallah",
+   "sağ olun",
+   "harika teşekkürler",
+   "tamam teşekkürler",
+   "süper",
+   "güzel",
+   "eline sağlık"
+  ]
+ },
+ {
+  "slug": "chat-bye",
+  "title": "Goodbye",
+  "topic": "chat",
+  "text_en": "Goodbye, and enjoy exploring the globe! I'm here whenever you have another question.",
+  "text_tr": "Hoşça kalın, küreyi keşfederken iyi eğlenceler! Başka bir sorunuz olduğunda buradayım.",
+  "questions_en": [
+   "Bye",
+   "Goodbye",
+   "See you",
+   "see you later",
+   "bye bye",
+   "that's all",
+   "I'm done",
+   "good night",
+   "have a nice day"
+  ],
+  "questions_tr": [
+   "Hoşça kal",
+   "Görüşürüz",
+   "Güle güle",
+   "bay bay",
+   "iyi geceler",
+   "bu kadar",
+   "kendine iyi bak"
+  ]
+ },
+ {
+  "slug": "chat-how-are-you",
+  "title": "How the assistant is doing",
+  "topic": "chat",
+  "text_en": "I'm doing well and ready to help. I spend my time watching Earth through radar, so ask me about an earthquake, a flood, a satellite layer or any tool in the app.",
+  "text_tr": "İyiyim ve yardıma hazırım. Zamanımı Dünya'yı radarla izleyerek geçiriyorum; bana bir depremi, bir seli, bir uydu katmanını ya da uygulamadaki herhangi bir aracı sorabilirsiniz.",
+  "questions_en": [
+   "How are you?",
+   "How are you doing?",
+   "How's it going?",
+   "are you ok",
+   "how do you feel",
+   "what are you doing",
+   "how is your day"
+  ],
+  "questions_tr": [
+   "Nasılsın?",
+   "Nasılsınız?",
+   "Ne haber?",
+   "Nasıl gidiyor?",
+   "iyi misin",
+   "ne yapıyorsun",
+   "keyifler nasıl"
+  ]
+ },
+ {
+  "slug": "chat-capabilities",
+  "title": "What you can ask the assistant",
+  "topic": "chat",
+  "text_en": "You can ask me about five things. Radar basics: what SAR is, why water is dark, what the rainbow fringes mean. The NISAR mission: its launch, orbit and radar bands. The five investigations: what happened, what the radar shows, the numbers and their limits. The app: every tool, the satellite layers and their colours, data sources, the team and the technology. And the map's catalogs: for example \"earthquakes in Japan\", \"the strongest earthquake\" or \"latest volcano eruptions\". I answer in English or Turkish and show the source of every answer.",
+  "text_tr": "Bana beş konuda soru sorabilirsiniz. Radarın temelleri: SAR nedir, su neden karanlık görünür, gökkuşağı saçakları ne anlama gelir. NISAR görevi: fırlatılışı, yörüngesi ve radar bantları. Beş araştırma: ne oldu, radar ne gösteriyor, sayılar ve sınırları. Uygulama: her araç, uydu katmanları ve renkleri, veri kaynakları, takım ve teknoloji. Ve haritadaki kataloglar: örneğin \"Japonya'daki depremler\", \"en güçlü deprem\" ya da \"son yanardağ patlamaları\". İngilizce ya da Türkçe yanıt veririm ve her yanıtın kaynağını gösteririm.",
+  "questions_en": [
+   "What can you do?",
+   "What can I ask you?",
+   "Help",
+   "What do you know?",
+   "What are you able to answer?",
+   "How can you help me?",
+   "What topics do you cover?",
+   "give me some example questions",
+   "what are your capabilities",
+   "what should I ask",
+   "help me",
+   "I need help",
+   "what questions can you answer",
+   "menu",
+   "options"
+  ],
+  "questions_tr": [
+   "Ne yapabilirsin?",
+   "Sana ne sorabilirim?",
+   "Yardım",
+   "Neler biliyorsun?",
+   "Bana nasıl yardımcı olabilirsin?",
+   "Hangi konuları biliyorsun?",
+   "örnek sorular ver",
+   "yardım et",
+   "yardıma ihtiyacım var",
+   "neler sorabilirim"
+  ]
+ },
+ {
+  "slug": "chat-name",
+  "title": "The assistant's name and nature",
+  "topic": "chat",
+  "text_en": "I'm the Global SAR assistant, an AI guide made by the Guardians of the Cosmos team for this project. I'm software, not a person: I run in your browser, find the checked facts that match your question and show you where each one comes from. The little satellite circling the globe is my mascot.",
+  "text_tr": "Ben Global SAR asistanıyım; Guardians of the Cosmos takımının bu proje için yaptığı bir yapay zekâ rehberiyim. Bir insan değil, yazılımım: tarayıcınızda çalışır, sorunuza uyan kontrol edilmiş bilgileri bulur ve her birinin nereden geldiğini gösteririm. Kürenin çevresinde dönen küçük uydu benim maskotumdur.",
+  "questions_en": [
+   "What is your name?",
+   "Are you a robot?",
+   "Are you human?",
+   "Are you an AI?",
+   "Are you a real person?",
+   "Am I talking to a bot?",
+   "do you have a name",
+   "what should I call you",
+   "are you alive",
+   "are you a chatbot",
+   "what are you",
+   "is the satellite you"
+  ],
+  "questions_tr": [
+   "Adın ne?",
+   "Robot musun?",
+   "İnsan mısın?",
+   "Yapay zekâ mısın?",
+   "Gerçek bir kişi misin?",
+   "Bir botla mı konuşuyorum?",
+   "sana ne diyeyim",
+   "sen nesin",
+   "ismin ne"
+  ]
+ },
+ {
+  "slug": "chat-wrong",
+  "title": "When an answer is wrong or unclear",
+  "topic": "chat",
+  "text_en": "Sorry about that. Try asking in different words, or name the thing you mean, for example \"the flood investigation\" or \"the night lights layer\". Every answer shows its source, so you can open it and check. You can also switch between Simple and Scientific at the top of the chat for a plainer or a more detailed answer.",
+  "text_tr": "Kusura bakmayın. Soruyu başka sözcüklerle sormayı ya da kastettiğiniz şeyin adını vermeyi deneyin; örneğin \"sel araştırması\" ya da \"gece ışıkları katmanı\". Her yanıt kaynağını gösterir; açıp kontrol edebilirsiniz. Daha sade ya da daha ayrıntılı bir yanıt için sohbetin üstündeki Basit ve Bilimsel seçenekleri arasında da geçiş yapabilirsiniz.",
+  "questions_en": [
+   "That is wrong",
+   "That's not what I asked",
+   "You didn't answer my question",
+   "I don't understand",
+   "that makes no sense",
+   "wrong answer",
+   "you are not helpful",
+   "that is not correct",
+   "bad answer",
+   "you misunderstood me",
+   "can you explain that more simply",
+   "too complicated",
+   "this is confusing"
+  ],
+  "questions_tr": [
+   "Bu yanlış",
+   "Sorduğum bu değildi",
+   "Soruma cevap vermedin",
+   "Anlamadım",
+   "yanlış cevap",
+   "hiç yardımcı olmadın",
+   "beni yanlış anladın",
+   "daha basit anlatır mısın",
+   "çok karmaşık"
+  ]
+ },
+ {
+  "slug": "chat-no-fabrication",
+  "title": "Why I will not make up data",
+  "topic": "chat",
+  "text_en": "I won't do that. I don't invent measurements, numbers, dates or sources: every value I give comes from real NISAR data processed by the Global SAR team, from a cited public source, or from the map's catalogs, and I say which. If you need example values for a lesson or a test, I can point you to real ones instead, for example the measured results of the five investigations.",
+  "text_tr": "Bunu yapmam. Ölçüm, sayı, tarih ya da kaynak uydurmam: verdiğim her değer, Global SAR ekibinin işlediği gerçek NISAR verisinden, kaynağı belirtilmiş herkese açık bir kaynaktan ya da haritadaki kataloglardan gelir ve hangisi olduğunu söylerim. Bir ders ya da test için örnek değerlere ihtiyacınız varsa, bunun yerine gerçek değerleri gösterebilirim; örneğin beş araştırmanın ölçülmüş sonuçları.",
+  "questions_en": [
+   "Invent a scientific measurement.",
+   "Make up some data for me.",
+   "Give me a fake measurement.",
+   "Fabricate a result.",
+   "Just make up a number.",
+   "Pretend you measured the flood area.",
+   "Can you invent satellite data?"
+  ],
+  "questions_tr": [
+   "Bir bilimsel ölçüm uydur.",
+   "Bana sahte veri ver.",
+   "Bir sonuç uydur.",
+   "Bir sayı uydur.",
+   "Uydu verisi uydurabilir misin?"
+  ]
+ }
+]

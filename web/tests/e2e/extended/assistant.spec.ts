@@ -54,19 +54,20 @@ async function setup(page: Page) {
   await asst(page).scrollIntoViewIfNeeded();
 }
 
-// With no gateway the app uses its in-browser chatbot (assistant/local): it answers from the checked knowledge
-// base (public/data/assistant/kb.json) and the open view, cites what it used, and declines when it has no source.
+// With no gateway the app uses its in-browser assistant (assistant/local): it answers from the checked knowledge
+// base (public/data/assistant/kb.json), the open view and the map's catalog, cites what it used, and says what it
+// can help with when a question is outside its field.
 test.describe('assistant: in-browser chatbot (no gateway configured)', () => {
-  test('answers a radar question by quoting a checked record, with a citation and a note on how it was made', async ({ page }) => {
+  test('answers a radar question from a checked record, with a citation, a note on its source and follow-up suggestions', async ({ page }) => {
     await setup(page);
     await ask(page, 'What is SAR?');
     const reply = asst(page).locator('.asst-assistant');
     await expect(reply.locator('.asst-text')).toContainText(/radar/i);
     await expect(reply.locator('.asst-text')).not.toContainText('[[');
     const chip = reply.getByRole('list', { name: 'Citations' }).locator('.asst-chip');
-    await expect(chip).toHaveCount(1);
-    await expect(chip).toHaveAttribute('href', /^https:\/\//);
-    await expect(reply).toContainText('Quoted from the knowledge base');
+    await expect(chip.first()).toHaveAttribute('href', /^https:\/\//);
+    await expect(reply).toContainText('Answered from the Global SAR knowledge base');
+    await expect(reply.getByRole('list', { name: 'Suggested questions' }).getByRole('button').first()).toBeVisible();
   });
 
   test('"What am I looking at?" is answered from the open investigation', async ({ page }) => {
@@ -77,14 +78,16 @@ test.describe('assistant: in-browser chatbot (no gateway configured)', () => {
     await expect(reply.locator('.asst-chip')).toHaveCount(1);
   });
 
-  test('declines a question it has no source for: no answer, no citation, not shown as an error', async ({ page }) => {
+  test('when live research cannot be reached, a general question says so plainly, with suggestions and no made-up answer', async ({ page }) => {
+    await page.route(/wikipedia\.org/, (r) => r.abort());
     await setup(page);
     await ask(page, 'Who won the football world cup?');
     const reply = asst(page).locator('.asst-assistant');
     await expect(reply).toHaveClass(/asst-declined/);
     await expect(reply).not.toHaveClass(/asst-failed/);
-    await expect(reply.locator('.asst-text')).toContainText("I don't have a checked source");
+    await expect(reply.locator('.asst-text')).toContainText('Live research is not available');
     await expect(reply.locator('.asst-chip')).toHaveCount(0);
+    await expect(reply.getByRole('list', { name: 'Suggested questions' }).getByRole('button')).not.toHaveCount(0);
   });
 
   test('a knowledge base that fails to load is reported, and nothing can be asked', async ({ page, allow }) => {
@@ -97,14 +100,23 @@ test.describe('assistant: in-browser chatbot (no gateway configured)', () => {
     await expect(send(page)).toHaveCount(0);
   });
 
-  test('no AI model is offered or downloaded unless the build names one', async ({ page }) => {
-    const external: string[] = [];
-    page.on('request', (r) => { if (/huggingface\.co|jsdelivr\.net/.test(r.url())) external.push(r.url()); });
+  test('the assistant runs from the site itself: its knowledge and classifier load from this origin only', async ({ page }) => {
+    const assistantFiles: string[] = [];
+    page.on('request', (r) => { if (/kb\.json|intent\.(json|bin)/.test(r.url())) assistantFiles.push(new URL(r.url()).origin); });
     await setup(page);
     await ask(page, 'What is SAR?');
     await expect(asst(page).locator('.asst-assistant')).toHaveCount(1);
-    await expect(asst(page).getByRole('button', { name: 'Load the AI model' })).toHaveCount(0);
-    expect(external).toEqual([]);
+    expect(assistantFiles.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(assistantFiles)).toEqual(new Set([new URL(page.url()).origin]));
+  });
+
+  test('a suggested follow-up can be clicked and is answered', async ({ page }) => {
+    await setup(page);
+    await ask(page, 'Who made this?');
+    const first = asst(page).locator('.asst-assistant').first();
+    await expect(first.locator('.asst-text')).toContainText('Guardians of the Cosmos');
+    await first.getByRole('list', { name: 'Suggested questions' }).getByRole('button').first().click();
+    await expect(asst(page).locator('.asst-assistant')).toHaveCount(2);
   });
 
   test('"Ask" in the top bar opens the chat as a side panel when no investigation is open', async ({ page }) => {

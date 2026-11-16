@@ -1,7 +1,8 @@
 # Builds the web app and publishes it to GitHub Pages on every push to main (and on manual runs).
 # Requires Settings > Pages > Source = "GitHub Actions". With "Deploy from a branch" GitHub publishes the
 # README instead of the built app.
-# The site is static: server-backed features (Meteomatics weather, the AI assistant) show "not connected".
+# The site is static: weather comes from Open-Meteo instead of the Meteomatics proxy, and the AI assistant runs in
+# the visitor's browser from web/public/data/assistant/ (knowledge base and trained classifier).
 # No secrets are used or needed; web/.env.local is git-ignored and never part of the build.
 name: Deploy to GitHub Pages
 
@@ -37,8 +38,8 @@ jobs:
       - run: npm run build
         env:
           VITE_STATIC_SITE: '1'
-          # Optional: Hugging Face repository of the chatbot model (assistant-model/README.md). Unset = the chat
-          # answers from its knowledge base only.
+          # Optional: where the Global SAR AI language-model weights are published (assistant-model/MODEL.md).
+          # Unset = no model is offered; the assistant still answers from its sources and live research.
           VITE_ASSISTANT_MODEL: ${{ vars.ASSISTANT_MODEL }}
       - uses: actions/configure-pages@v5
         with:

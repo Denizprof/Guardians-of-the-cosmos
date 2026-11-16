@@ -1,17 +1,22 @@
 // Which assistant the app talks to by default:
-//   - a gateway URL is configured (VITE_ASSISTANT_GATEWAY_URL): the owner's remote model, through the gateway;
-//   - otherwise: the in-browser chatbot (adapter.ts), which needs no server and so also works on a static site.
-// One shared instance, so the chat in the top bar and the one inside an investigation use the same loaded model.
+//   - a gateway URL is configured (VITE_ASSISTANT_GATEWAY_URL): the owner's remote service, through the gateway;
+//   - otherwise: Global SAR AI in the browser (adapter.ts), which needs no server and so also works on a static site.
+//     It answers from its knowledge base, the open view and the map's catalog, searches the web live for questions
+//     outside them, and, when the build names one (VITE_ASSISTANT_MODEL), offers a language model that words answers.
+// One shared instance, so the chat in the top bar and the one inside an investigation share what is loaded.
 import { UnavailableAdapter, createAdapter, type AssistantAdapter } from '../adapter';
 import { LocalAssistantAdapter } from './adapter';
 import { createEngine } from './engine';
+import { createWikipediaResearch } from './research';
 
 interface Env {
   VITE_ASSISTANT_GATEWAY_URL?: string;
-  /** Hugging Face repository with the ONNX model to offer for download, e.g. "onnx-community/Qwen3-1.7B-ONNX". Unset = knowledge-base mode only. */
+  /** Where the language-model weights are published (assistant-model/MODEL.md). Unset: no model is offered. */
   VITE_ASSISTANT_MODEL?: string;
   VITE_ASSISTANT_MODEL_DTYPE?: string;
   VITE_ASSISTANT_MODEL_SIZE?: string;
+  /** '0' turns live web research off. */
+  VITE_ASSISTANT_RESEARCH?: string;
 }
 
 let local: LocalAssistantAdapter | null = null;
@@ -22,6 +27,7 @@ export function defaultAdapter(env: Env = import.meta.env as Env): AssistantAdap
   if (!local) {
     const model = env.VITE_ASSISTANT_MODEL?.trim();
     local = new LocalAssistantAdapter({
+      research: env.VITE_ASSISTANT_RESEARCH?.trim() === '0' ? null : createWikipediaResearch(),
       engine: model ? createEngine({ model, dtype: env.VITE_ASSISTANT_MODEL_DTYPE?.trim() || 'q4', size: env.VITE_ASSISTANT_MODEL_SIZE?.trim() || 'about 1.7 GB' }) : null,
     });
   }

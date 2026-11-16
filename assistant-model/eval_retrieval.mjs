@@ -11,7 +11,11 @@ const kb = JSON.parse(fs.readFileSync(path.join(here, '../web/public/data/assist
 const fileArg = process.argv.find((a) => a.startsWith('--file='))?.slice(7) ?? 'stress_test.json';
 const test = JSON.parse(fs.readFileSync(path.join(here, 'knowledge', fileArg), 'utf8'));
 console.log(`set: ${fileArg}`);
-const index = buildIndex(kb.records);
+const { loadIntent } = await import('./train_intent.mjs');
+// --words-only measures the search without the trained classifier
+const intent = process.argv.includes('--words-only') ? undefined : loadIntent();
+console.log(intent ? `classifier: ${intent.labels.length} classes` : 'classifier: none (words only)');
+const index = buildIndex(kb.records, intent);
 const verbose = process.argv.includes('--verbose');
 
 let r1 = 0, r3 = 0, none = 0;

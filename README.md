@@ -11,7 +11,7 @@
 [![Challenge](https://img.shields.io/badge/Challenge-Dancing_with_the_SARs-9B4F82?style=for-the-badge)](https://www.spaceappschallenge.org)
 
 ![Data](https://img.shields.io/badge/data-real_NISAR_L--band-1A1424)
-![Tests](https://img.shields.io/badge/tests-1%2C071_passing-2E7D32)
+![Tests](https://img.shields.io/badge/tests-1%2C562_passing-2E7D32)
 ![Vulnerabilities](https://img.shields.io/badge/npm_audit-0_vulnerabilities-2E7D32)
 ![Stack](https://img.shields.io/badge/stack-React_19_·_TypeScript_·_MapLibre_GL-3178C6)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -32,7 +32,7 @@
 | **Solution** | **Global SAR**, a photoreal 3D globe. Select an earthquake, flood, fire or volcano, compare *before* and *after* radar images, read a plain-language explanation in real units, and ask the AI assistant about what you see. |
 | **Evidence** | Five investigations on genuine NISAR data: 45 cm of earthquake ground motion, 322–379 km² of new flood water, 35.7 km² of cleared forest, 68 km² of burned canopy and an 11-date volcano time series. |
 | **Trust** | Every layer records its mission, product, data tier, track, frame, dates and processing steps. NASA imagery is labelled *NASA browse*; our computations are labelled *derived by team*. Nothing is simulated. |
-| **Quality** | 1,071 automated tests (789 web, 196 Python, 59 pipeline JS, 27 gateway), accessibility checks and 0 known dependency vulnerabilities. |
+| **Quality** | 1,562 automated tests (1,280 web, 196 Python, 59 pipeline JS, 27 gateway), accessibility checks and 0 known dependency vulnerabilities. |
 
 ---
 
@@ -81,7 +81,7 @@ That value is lost if people cannot read the data. Global SAR is designed so tha
 - **Five NISAR investigations** (earthquake, flood, volcano, deforestation, wildfire), all on real radar data.
 - **Before / after comparison** in swipe, side-by-side and overlay modes, with a timeline of radar passes and shareable URLs.
 - **Two explanation levels**, *Simple* and *Scientific*, with numbered annotation pins and legends in physical units (cm, dB).
-- **AI assistant** ("Ask") that runs in the visitor's browser, answers only from a checked knowledge base and the investigation on screen, and cites what it used. It understands differently-worded questions in English and Turkish (paraphrases, synonyms, typo fixing) and declines off-topic ones; this is measured on a held-out stress set with a unit test.
+- **AI assistant** ("Ask") that runs in the visitor's browser and knows the whole project: radar and NISAR, the five investigations and their numbers, every satellite layer and tool, the methods, the data sources, the team and the technology. Questions outside the project ("Tell me about Türkiye", "How does gravity work?") and requests for the latest news are searched live on Wikipedia and answered with the page's summary, link and edit date. It also looks up the events on the map ("earthquakes in Japan", "the strongest earthquake"), refuses to invent data, follows a conversation ("tell me more", "and its limits?"), suggests follow-up questions, and answers in English and Turkish. A search index and an intent classifier trained on the project's own questions work out what is being asked; every answer is the text of a checked source and cites it. Measured on a held-out stress set, with a unit test; acceptance tests recorded in [assistant-model/ACCEPTANCE.md](assistant-model/ACCEPTANCE.md). An optional on-device language model (training and browser export in `assistant-model/`) can word the answers; it is not deployed yet.
 - **Weather data** from Meteomatics for the selected location and date.
 - **SAR lens** to view any area through recent NISAR and Sentinel-1 radar.
 - **Live NISAR coverage probe**: select any point to list the real NISAR acquisitions over it (ASF Search API).
@@ -123,7 +123,7 @@ flowchart LR
 
 1. **Collect.** The pipeline retrieves NISAR products from NASA's ASF DAAC. Stage 1 requires no login: it downloads NASA's official browse images and georeferences them by fitting each image's data corners to the ASF footprint, recording the residual per layer (about 25–650 m).
 2. **Process.** Stage 2 streams only the HDF5 chunks it needs over HTTPS, with retries for unreliable networks, and computes quantitative layers (see [Methods](#methods)).
-3. **Explore.** The web app reads one static data package (`events.json` plus WebP overlays) and calls public services live. The assistant runs behind a contract-tested gateway that only answers from the context it is given.
+3. **Explore.** The web app reads one static data package (`events.json` plus WebP overlays) and calls public services live. The assistant runs in the visitor's browser from a checked knowledge base; a contract-tested gateway is available for connecting a remote service instead.
 
 ---
 
@@ -187,7 +187,7 @@ flowchart LR
 | Front end | React 19, TypeScript 7, Vite 8 |
 | Map | MapLibre GL 6 (3D globe, terrain, atmosphere) |
 | Data pipeline | Node.js (ASF search, browse images, catalogs); Python (h5py + fsspec HDF5 streaming, NumPy, SciPy, scikit-image, rasterio, pyproj) |
-| AI assistant | Node gateway with a JSON-schema contract shared by app, gateway and model; CORS, size and rate limits |
+| AI assistant | In the browser: BM25 search plus an intent classifier trained on the project's own questions, a 171-record checked knowledge base, catalog lookups. Optional Node gateway with a JSON-schema contract; CORS, size and rate limits |
 | Testing | Vitest, fast-check (property and fuzz tests), Testing Library, Playwright, axe-core, pytest, Hypothesis |
 | Hosting | GitHub Pages via GitHub Actions, custom domain **globalsar.earth** (HTTPS) |
 
@@ -223,8 +223,8 @@ Then open **http://localhost:4173**.
 <summary><b>Weather and AI assistant configuration</b></summary>
 
 - **Weather:** copy `web/env.example` to `web/.env.local`, add your Meteomatics username and password, and restart. See [docs/meteomatics.md](docs/meteomatics.md).
-- **AI assistant, in the browser (default):** nothing to configure. To offer the fine-tuned model, set `VITE_ASSISTANT_MODEL` to its Hugging Face repository; see [assistant-model/README.md](assistant-model/README.md).
-- **AI assistant, your own model:** start the gateway with your model endpoint (`cd assistant-gateway && ASSISTANT_MODEL_URL=<your endpoint> npm start`) and set `VITE_ASSISTANT_GATEWAY_URL=/` in `web/.env.local`. See [docs/assistant-integration.md](docs/assistant-integration.md) and the contract in `shared/assistant-contract/`.
+- **AI assistant, in the browser (default):** nothing to configure. After changing its knowledge, rebuild it with `node assistant-model/build_kb.mjs && node assistant-model/train_intent.mjs`; see [assistant-model/README.md](assistant-model/README.md).
+- **AI assistant, your own service:** start the gateway with your endpoint (`cd assistant-gateway && ASSISTANT_MODEL_URL=<your endpoint> npm start`) and set `VITE_ASSISTANT_GATEWAY_URL=/` in `web/.env.local`. See [docs/assistant-integration.md](docs/assistant-integration.md) and the contract in `shared/assistant-contract/`.
 </details>
 
 <details>
@@ -267,7 +267,7 @@ python python/process.py
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Web unit, property and fuzz tests (Vitest, fast-check) | `cd web && npm test` | **789 / 789** pass |
+| Web unit, property and fuzz tests (Vitest, fast-check) | `cd web && npm test` | **1,280 / 1,280** pass |
 | End-to-end and accessibility (Playwright, axe-core) | `cd web && npm run test:e2e` | Desktop, mobile (375×812), keyboard, resilience and visual suites |
 | Pipeline JS (node:test, fast-check) | `cd pipeline && npm test` | **59** pass, 2 pending |
 | Pipeline Python (pytest, Hypothesis) | `cd pipeline && python -m pytest` | **196 / 196** pass |
@@ -291,7 +291,8 @@ Guardians-of-the-cosmos/
 │   ├── src/*.mjs               # Node: ASF search, browse images, georeferencing, catalogs
 │   ├── python/                 # Python: quantitative layers from NISAR HDF5
 │   └── tests/                  # node:test and pytest suites with recorded fixtures
-├── assistant-gateway/          # AI assistant gateway (contract-tested)
+├── assistant-model/            # The assistant's knowledge base, classifier training and evaluation
+├── assistant-gateway/          # Optional gateway for a remote assistant service (contract-tested)
 ├── shared/assistant-contract/  # JSON schemas shared by app, gateway and model
 ├── docs/                       # Design brief, data sources, final report, QA, research, screenshots
 ├── .github/workflows/          # GitHub Pages deployment
@@ -309,7 +310,7 @@ Guardians-of-the-cosmos/
 | [docs/final-report.md](docs/final-report.md) | Feature inventory, methods, results, tests and known limitations |
 | [docs/data-sources.md](docs/data-sources.md) | Every dataset and API used, with licences |
 | [docs/assistant-integration.md](docs/assistant-integration.md) | AI assistant integration and contract |
-| [assistant-model/README.md](assistant-model/README.md) | The in-browser chatbot: knowledge base, training, measured results, browser export |
+| [assistant-model/README.md](assistant-model/README.md) | The in-browser assistant: knowledge base, trained intent classifier, measured results |
 | [docs/meteomatics.md](docs/meteomatics.md) | Weather data configuration |
 | [docs/qa/](docs/qa/) | QA issues, code review and test report |
 

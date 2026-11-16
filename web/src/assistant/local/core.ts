@@ -1,12 +1,17 @@
-// Core of the in-browser Global SAR chatbot: knowledge retrieval, the prompt format and output parsing.
+// Core of the in-browser Global SAR assistant: understanding a question and finding the knowledge that answers it.
 //
-// SELF-CONTAINED ON PURPOSE (no imports, erasable TypeScript only): the app imports it, and so does
-// assistant-model/build_dataset.mjs through Node's type stripping, so the model is trained on exactly the
-// prompt the app sends. Change the format here and the model must be retrained (bump PROMPT_VERSION).
+// Two signals are combined (rank()):
+//   - lexical search (BM25 with synonyms, Turkish stems and typo repair) over the knowledge records;
+//   - a small intent classifier trained on the records' example questions (assistant-model/train_intent.mjs),
+//     which recognises how people word a question even when it shares few words with the answer.
 //
-// Grounding rule, enforced in code and not left to the model: an answer may only use the SOURCES it was given
-// and must mark each one it used with [[id]]. Anything else is discarded by the caller.
+// SELF-CONTAINED ON PURPOSE (no imports, erasable TypeScript only): the app imports it, and so do the training and
+// evaluation scripts through Node's type stripping, so the classifier is trained on exactly the features the app
+// computes. Change features() and the classifier must be retrained.
+//
+// Grounding rule, enforced in code: an answer is the text of a source and names that source with [[id]].
 
+/** Version of the language-model prompt format (buildMessages). Change the format and the model must be retrained. */
 export const PROMPT_VERSION = '1';
 /** What the model must output when the sources do not contain the answer. */
 export const NO_ANSWER = 'NO_ANSWER';
@@ -31,7 +36,7 @@ export interface KbFile {
   records: KbRecord[];
 }
 
-/** One numbered fact the model may use: a knowledge record or an item of the current view. */
+/** One fact an answer may use: a knowledge record or an item of the current view. */
 export interface Source {
   id: string;
   text: string;
@@ -46,7 +51,7 @@ export interface Source {
 export type Lang = 'en' | 'tr';
 export type Level = 'simple' | 'scientific';
 
-// ---------- text normalisation and retrieval ----------
+// ---------- text normalisation ----------
 
 /** Lower-case and strip diacritics so "İnSAR", "insar" and "ınsar" meet (Turkish dotted/dotless i included). */
 export function fold(s: string): string {
@@ -90,10 +95,10 @@ for (const [canon, words] of Object.entries({
   night: 'dark darkness nighttime gece karanlik',
   temperature: 'heat hot temp sicaklik isi sicak',
   moisture: 'wet dry drought soil nem toprak kuraklik',
-  city: 'cities town towns urban building buildings sehir sehirler kent kasaba bina',
+  city: 'cities town towns urban building buildings skyscraper skyscrapers sehir sehirler kent kasaba bina binalar',
   light: 'lights lit isik isiklar',
   vegetation: 'plant plants crop crops farm farming agriculture bitki bitkiler tarim',
-  teacher: 'student students teacher teachers school ogretmen ogrenci',
+  teacher: 'student students teacher teachers school classroom lesson ogretmen ogrenci okul ders',
   tutorial: 'intro introduction onboarding walkthrough tour guide tanitim rehber',
   predict: 'forecast prediction predicting foresee tahmin',
   warn: 'warning alert alerts warnings uyari',
@@ -102,6 +107,17 @@ for (const [canon, words] of Object.entries({
   zoom: 'rotate tilt spin pan navigate zoomla yakinlastir dondur',
   compare: 'comparison before after swipe slider karsilastir once sonra',
   credit: 'credits attribution licence license copyright source sources kaynak kaynaklar atif',
+  team: 'developers developer creators creator authors makers takim ekip gelistirici gelistiriciler',
+  result: 'results findings finding outcome outcomes sonuc sonuclar bulgu bulgular',
+  limit: 'limits limitation limitations weakness weaknesses caveat caveats shortcoming shortcomings sinir sinirlama sinirlamalar',
+  bright: 'white glow glowing shiny brightness parlak beyaz',
+  move: 'moved motion movement displacement shift shifted hareket kayma',
+  free: 'cost price pay paid payment ucretsiz ucret bedava fiyat',
+  language: 'languages turkish english dil turkce ingilizce',
+  slow: 'laggy lag lagging freezes sluggish yavas kasiyor takiliyor',
+  phone: 'mobile android iphone tablet telefon mobil',
+  weather: 'rain rainfall precipitation wind hava yagmur yagis ruzgar',
+  data: 'dataset datasets veri veriler',
 })) {
   for (const w of words.split(' ')) SYN[w] = canon;
 }
@@ -161,11 +177,95 @@ function withinEdits(a: string, b: string, max: number): boolean {
  *  last hint when the words say nothing. */
 export function detectLang(text: string, locale?: string): Lang {
   const t = ` ${fold(text)} `;
-  if (/\b(nedir|nasil|neden|icin|midir|mudur|misin|musun|hangi|deprem|uydu|nelerdir|merhaba|tesekkur|bu|ne|bir|ve|ile|nerede|kac|niye|nicin|hakkinda|cok)\b/.test(t)) return 'tr';
-  if (/\b(what|why|how|is|are|the|does|do|where|when|which|who|can|show|there|hello|hi|thanks|thank)\b/.test(t)) return 'en';
+  if (/\b(nedir|nasil|neden|icin|midir|mudur|misin|musun|hangi|deprem|uydu|nelerdir|merhaba|tesekkur|tesekkurler|bu|ne|bir|ve|ile|nerede|kac|niye|nicin|hakkinda|cok|selam|naber|nasilsin|kim|kimler|neler|var|mi|mu|yapti|anlat|goster|soyle|bana|lutfen|evet|hayir|gunaydin|nereden|sen|ben|sana)\b/.test(t)) return 'tr';
+  if (/\b(what|why|how|is|are|the|does|do|where|when|which|who|can|show|there|hello|hi|thanks|thank|tell|me|you|and|of|in|a|an|to|for|please|give|make|explain|invent|about|with|my|your|i|it|this|that|on|be)\b/.test(t)) return 'en';
   if (/[ğışĞİŞ]/.test(text)) return 'tr';
   return locale?.toLowerCase().startsWith('tr') ? 'tr' : 'en';
 }
+
+// ---------- the trained intent classifier ----------
+
+/** Number of hashed features. The trained weights are a (INTENT_DIM x labels) table. */
+export const INTENT_DIM = 4096;
+/** The class for questions outside the assistant's field (poems, exchange rates, tomorrow's weather). */
+export const OFF_LABEL = '__off__';
+
+/** Weights of the classifier, as written by assistant-model/train_intent.mjs. */
+export interface IntentModel {
+  dim: number;
+  /** Record ids (plus OFF_LABEL), one per output class. */
+  labels: string[];
+  /** A stored weight w means w * scale. */
+  scale: number;
+  bias: number[];
+  /** Feature-major table: weights[feature * labels.length + label]. */
+  weights: Int8Array;
+}
+
+function hash32(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+const GRAM_WEIGHT = 0.5;
+
+/** A question as a sparse, length-normalised vector of hashed features: its words (stop words included, because
+ *  "who are you" and "how are you" differ only in them), word pairs, synonyms, and the 3-5 letter pieces of each
+ *  word, which is what makes typos and Turkish suffixes land near the right word. */
+export function features(text: string, dim: number = INTENT_DIM): Map<number, number> {
+  const raw = new Map<number, number>();
+  const add = (key: string, weight: number) => {
+    const i = hash32(key) % dim;
+    raw.set(i, (raw.get(i) ?? 0) + weight);
+  };
+  const words = fold(text).split(/[^a-z0-9]+/).filter(Boolean);
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    add(`w:${w}`, 1);
+    const c = canon(w);
+    if (c) add(`c:${c}`, 1);
+    if (i > 0) add(`b:${words[i - 1]}_${w}`, 1);
+    const padded = `^${w}$`;
+    for (let n = 3; n <= 5; n++) for (let j = 0; j + n <= padded.length; j++) add(`g:${padded.slice(j, j + n)}`, GRAM_WEIGHT);
+  }
+  let norm = 0;
+  for (const [i, v] of raw) {
+    const s = Math.sqrt(v);
+    raw.set(i, s);
+    norm += s * s;
+  }
+  norm = Math.sqrt(norm) || 1;
+  for (const [i, v] of raw) raw.set(i, v / norm);
+  return raw;
+}
+
+/** The classifier's probability for each label, for one question. */
+export function intentProbs(model: IntentModel, text: string): Map<string, number> {
+  const n = model.labels.length;
+  const logits = new Float64Array(n);
+  for (let c = 0; c < n; c++) logits[c] = model.bias[c] ?? 0;
+  for (const [f, v] of features(text, model.dim)) {
+    const row = f * n;
+    const x = v * model.scale;
+    for (let c = 0; c < n; c++) logits[c] += model.weights[row + c] * x;
+  }
+  let max = -Infinity;
+  for (let c = 0; c < n; c++) if (logits[c] > max) max = logits[c];
+  let sum = 0;
+  for (let c = 0; c < n; c++) {
+    logits[c] = Math.exp(logits[c] - max);
+    sum += logits[c];
+  }
+  const out = new Map<string, number>();
+  for (let c = 0; c < n; c++) out.set(model.labels[c], logits[c] / sum);
+  return out;
+}
+
+// ---------- the search index ----------
 
 interface Indexed {
   record: KbRecord;
@@ -181,9 +281,11 @@ export interface KbIndex {
   avgLen: number;
   /** Words (5+ letters) the knowledge base knows, for fixing typos in a question. */
   vocab: string[];
+  /** The trained classifier, when its weights were loaded. Without it the index searches by words alone. */
+  intent?: IntentModel;
 }
 
-export function buildIndex(records: KbRecord[]): KbIndex {
+export function buildIndex(records: KbRecord[], intent?: IntentModel): KbIndex {
   const df = new Map<string, number>();
   const docs = records.map((record) => {
     // questions and title count double: they are how people actually ask
@@ -201,7 +303,7 @@ export function buildIndex(records: KbRecord[]): KbIndex {
     return { record, tf, len: list.length, asked };
   });
   const avgLen = docs.reduce((n, d) => n + d.len, 0) / Math.max(1, docs.length);
-  return { docs, df, avgLen, vocab: [...df.keys()].filter((w) => w.length >= 5) };
+  return { docs, df, avgLen, vocab: [...df.keys()].filter((w) => w.length >= 5), ...(intent ? { intent } : {}) };
 }
 
 /** The question's content words, folded, with likely typos replaced by the closest word the knowledge base knows. */
@@ -248,8 +350,6 @@ const COMMON = new Set(
 
 /** How much of what the question is about (weighted by how rare each word is) the best record covers.
  *  Words the knowledge base has never seen count in full: "write me a poem about the sea" is about a poem. */
-const OFF_TOPIC_MAX = 0.5; // share of the question's weight that is words the knowledge base has never seen
-const COVER_MIN = 0.2; // share of it the best record's own words cover
 function coverage(index: KbIndex, words: string[], doc: Indexed): { unknown: number; covered: number } {
   const N = index.docs.length;
   const idfOf = (n: number) => Math.log(1 + (N - n + 0.5) / (n + 0.5));
@@ -272,28 +372,58 @@ function coverage(index: KbIndex, words: string[], doc: Indexed): { unknown: num
 
 export interface Hit {
   record: KbRecord;
+  /** Combined score: lexical match plus the classifier's vote. */
   score: number;
+  /** The classifier's probability for this record (0 when no classifier is loaded). */
+  p: number;
 }
 
-/** BM25 over the knowledge base, plus a bonus for questions worded like a record's example questions.
- *  The best record must reach `minScore`, and the others must be reasonably close to it; an empty list means
- *  "nothing relevant", never a guess. Pass minScore 0 to see every candidate (tests, diagnostics). */
-export function retrieve(index: KbIndex, question: string, k = 3, minScore = 6): Hit[] {
+/** Thresholds of rank(). Tuned on assistant-model/knowledge/stress_test.json (eval_retrieval.mjs); the second
+ *  stress set is never used for tuning. */
+export const TUNING = {
+  /** Points a classifier probability of 1 adds to a record's lexical score. */
+  intentWeight: 16,
+  /** Lowest combined score of a confident answer. */
+  minScore: 6,
+  /** A classifier this sure of a record answers even when the words barely match ("sup" -> the greeting). */
+  intentSure: 0.6,
+  /** Off-topic when the classifier's off-topic probability is at least this and no record beats it. */
+  offSure: 0.5,
+  /** Words-only rule: share of the question's weight that is words the knowledge base has never seen. */
+  offTopicMax: 0.5,
+  /** Words-only rule: share of the question the best record's own words must cover. */
+  coverMin: 0.2,
+};
+
+export interface Ranked {
+  /** Best records first. Empty only when nothing matched at all. */
+  hits: Hit[];
+  /** The top record very likely answers the question. */
+  confident: boolean;
+  /** The question is outside the assistant's field: do not answer it from a record. */
+  offTopic: boolean;
+}
+
+/** Rank the knowledge records for a question, and say how far the result can be trusted.
+ *  `all` keeps every record with any match (diagnostics, and picking among one investigation's own records). */
+export function rank(index: KbIndex, question: string, k = 3, all = false): Ranked {
   const words = contentWords(index, question);
   const q = [...new Set(tokens(words.join(' ')))];
-  if (!q.length) return [];
+  const probs = index.intent && question.trim() ? intentProbs(index.intent, question) : undefined;
+  const pOff = probs?.get(OFF_LABEL) ?? 0;
+  if (!q.length && !probs) return { hits: [], confident: false, offTopic: false };
   const N = index.docs.length;
-  const hits: Hit[] = [];
+  const scored: (Hit & { lexical: number })[] = [];
   for (const d of index.docs) {
-    let score = 0;
+    let lexical = 0;
     for (const t of q) {
       const f = d.tf.get(t);
       if (!f) continue;
       const n = index.df.get(t) ?? 0;
       const idf = Math.log(1 + (N - n + 0.5) / (n + 0.5));
-      score += (idf * f * 2.2) / (f + 1.2 * (0.25 + (0.75 * d.len) / index.avgLen));
+      lexical += (idf * f * 2.2) / (f + 1.2 * (0.25 + (0.75 * d.len) / index.avgLen));
     }
-    if (score > 0) {
+    if (lexical > 0) {
       // A question worded almost like one of the record's example questions is very likely about that record,
       // even when its words are common ("What is SAR?" must find the SAR explainer, not every record with "SAR").
       let best = 0;
@@ -303,20 +433,42 @@ export function retrieve(index: KbIndex, question: string, k = 3, minScore = 6):
         const jaccard = shared / (a.size + q.length - shared);
         if (jaccard > best) best = jaccard;
       }
-      score += 8 * best * best;
+      lexical += 8 * best * best;
     }
-    if (score > 0) hits.push({ record: d.record, score });
+    const p = probs?.get(d.record.id) ?? 0;
+    const score = lexical + TUNING.intentWeight * p;
+    if (lexical > 0 || p >= 0.05) scored.push({ record: d.record, score, p, lexical });
   }
-  hits.sort((a, b) => b.score - a.score || a.record.id.localeCompare(b.record.id));
-  if (!hits.length || hits[0].score < minScore) return [];
-  if (minScore > 0) {
-    // too little of the question is about anything this record covers: say "nothing relevant" rather than guess
-    const top = index.docs.find((d) => d.record.id === hits[0].record.id)!;
-    const cov = coverage(index, words, top);
-    if (cov.unknown > OFF_TOPIC_MAX || cov.covered < COVER_MIN) return [];
+  scored.sort((a, b) => b.score - a.score || a.record.id.localeCompare(b.record.id));
+  if (!scored.length) return { hits: [], confident: false, offTopic: pOff >= TUNING.offSure || q.length > 0 };
+  const top = scored[0];
+  const cov = coverage(index, words, index.docs.find((d) => d.record.id === top.record.id)!);
+  const wordsSayOff = cov.unknown > TUNING.offTopicMax || cov.covered < TUNING.coverMin;
+  let confident: boolean;
+  let offTopic: boolean;
+  if (probs) {
+    // the words must not flatly contradict the classifier: a question mostly made of words the knowledge base has
+    // never seen ("how do computers work") is not about a record just because it is phrased like one
+    const sure = top.p >= TUNING.intentSure && !(wordsSayOff && top.p < 0.9);
+    offTopic = !sure && pOff >= TUNING.offSure && pOff > top.p;
+    // the classifier and the words must not both doubt the record
+    confident = !offTopic && (sure || (top.score >= TUNING.minScore && !(wordsSayOff && top.p < 0.15)));
+    if (!confident && !offTopic && wordsSayOff && top.p < 0.15 && pOff >= 0.25) offTopic = true;
+  } else {
+    offTopic = wordsSayOff;
+    confident = !offTopic && top.score >= TUNING.minScore;
   }
-  const floor = minScore > 0 ? Math.max(2.5, hits[0].score * 0.35) : 0;
-  return hits.filter((h) => h.score >= floor).slice(0, k);
+  const floor = all ? 0 : Math.max(2.5, top.score * 0.35);
+  const hits = scored.filter((h) => h.score >= floor).slice(0, k).map(({ record, score, p }) => ({ record, score, p }));
+  return { hits, confident, offTopic };
+}
+
+/** The records that confidently answer a question, best first; an empty list means "nothing sure", never a guess.
+ *  Pass minScore 0 to see every candidate (tests, diagnostics). */
+export function retrieve(index: KbIndex, question: string, k = 3, minScore = TUNING.minScore): Hit[] {
+  if (minScore <= 0) return rank(index, question, k, true).hits;
+  const r = rank(index, question, k);
+  return r.confident ? r.hits : [];
 }
 
 // ---------- sources ----------
@@ -360,6 +512,7 @@ export interface CtxLike {
     references?: { citation_id: string; label: string; url: string }[];
   };
   selected_layers?: CtxLayer[];
+  map_view?: { center: [number, number]; zoom: number; bbox: [number, number, number, number] };
   clicked_location?: { lon: number; lat: number };
   coverage?: { lon: number; lat: number; total: number; truncated?: boolean; granules: { citation_id: string; scene: string; product: string; start: string; tier: string; track: number; frame: number; direction: string }[] };
 }
@@ -372,6 +525,9 @@ const TECHNIQUE: Record<string, string> = {
 const clipText = (t: string, n: number) => (t.length > n ? `${t.slice(0, t.lastIndexOf(' ', n))}…` : t);
 const day = (iso?: string | null) => (iso ? iso.slice(0, 10) : 'unknown date');
 const coord = (lon: number, lat: number) => `${Math.abs(lat).toFixed(3)}°${lat >= 0 ? 'N' : 'S'} ${Math.abs(lon).toFixed(3)}°${lon >= 0 ? 'E' : 'W'}`;
+
+/** Citation id of the sentence describing the camera's view of the globe. */
+export const MAP_VIEW_ID = 'view:map';
 
 /** The current view as sources: the open investigation, its references, the selected layers and probed products.
  *  Every sentence here is built from fields of the request context; nothing is added. */
@@ -406,6 +562,22 @@ export function contextSources(ctx: CtxLike, maxGranules = 4): Source[] {
         `${p.processing.length ? ` Processing: ${clipText(p.processing.slice(0, 2).join(' '), 260)}` : ''}`,
     });
   }
+  const mv = ctx.map_view;
+  if (mv && !e) {
+    const [w, s, east, n] = mv.bbox;
+    const span = (a: number, b: number, pos: string, neg: string) => `${Math.abs(a).toFixed(1)}°${a >= 0 ? pos : neg} to ${Math.abs(b).toFixed(1)}°${b >= 0 ? pos : neg}`;
+    const whole = east - w >= 300 || n - s >= 150;
+    out.push({
+      id: MAP_VIEW_ID,
+      type: 'observation',
+      label: 'Your current view of the globe',
+      text:
+        `No investigation is open: you are looking at the 3D globe, centred on ${coord(mv.center[0], mv.center[1])} at zoom ${mv.zoom.toFixed(1)}` +
+        `${whole ? ', with most of a hemisphere in view' : `, showing roughly ${span(w, east, 'E', 'W')} and ${span(s, n, 'N', 'S')}`}.` +
+        `${ctx.clicked_location ? ` The last point you clicked is ${coord(ctx.clicked_location.lon, ctx.clicked_location.lat)}.` : ''}` +
+        " The coloured markers are events from the map's catalogs; open Investigations to see radar analysis.",
+    });
+  }
   const c = ctx.coverage;
   if (c) {
     c.granules.slice(0, maxGranules).forEach((g, i) =>
@@ -419,19 +591,6 @@ export function contextSources(ctx: CtxLike, maxGranules = 4): Source[] {
     );
   }
   return out;
-}
-
-/** Pick the sources for one question: the most relevant items of the current view first, then knowledge records. */
-export function selectSources(index: KbIndex, question: string, ctx: CtxLike, lang: Lang, level: Level, max = 5): Source[] {
-  const q = new Set(tokens(question));
-  const view = contextSources(ctx)
-    .map((s, i) => ({ s, i, overlap: tokens(s.text).filter((t) => q.has(t)).length }))
-    // the open investigation itself always stays: questions like "what is this?" share no words with it
-    .sort((a, b) => Number(b.i === 0 && !!ctx.event) - Number(a.i === 0 && !!ctx.event) || b.overlap - a.overlap || a.i - b.i)
-    .slice(0, 3)
-    .map((x) => x.s);
-  const kb = retrieve(index, question, 3).map((h) => recordSource(h.record, lang, level));
-  return [...view, ...kb].slice(0, max);
 }
 
 // ---------- prompt ----------

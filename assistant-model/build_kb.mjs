@@ -37,7 +37,14 @@ export async function buildKb() {
   const { CONCEPTS, EVENT_CONTENT } = await import(new URL('../web/src/content/explain.ts', import.meta.url).href);
   const events = readJson(path.join(web, 'public/data/events.json')).events;
   const layers = readJson(path.join(web, 'public/data/layers.json')).layers;
-  const app = readJson(path.join(here, 'knowledge/app.json'));
+  const { TR } = await import(new URL('../web/src/i18n/tr.ts', import.meta.url).href);
+  const app = [...readJson(path.join(here, 'knowledge/app.json')), ...readJson(path.join(here, 'knowledge/project.json'))];
+  const reference = readJson(path.join(here, 'knowledge/radar_reference.json')).records;
+  /** The app's own Turkish for a text it renders (web/src/i18n/tr.ts), or undefined when it has none. */
+  const tr = (s) => TR[clean(s)];
+  /** Turkish for several texts joined, only when every one of them has a translation: never half English. */
+  const trAll = (parts) => { const out = parts.map(tr); return out.every(Boolean) ? out.join(' ') : undefined; };
+  const fitTr = (text, max) => (text ? fit(text, max) : undefined);
   const verifiedPath = path.join(here, 'knowledge/verified_sar.json');
   const verified = fs.existsSync(verifiedPath) ? readJson(verifiedPath) : { records: [] };
   const records = [];
@@ -45,7 +52,13 @@ export async function buildKb() {
 
   // --- the app itself
   for (const a of app) {
-    add({ id: `kb:${a.slug}`, topic: 'app', title: a.title, text_en: clean(a.text_en), text_tr: clean(a.text_tr), questions_en: a.questions_en, questions_tr: a.questions_tr, source: { label: 'Global SAR app guide', url: SITE } });
+    const topic = a.topic ?? (a.slug.startsWith('event-') ? 'investigation' : a.slug.startsWith('project-') || a.slug.startsWith('method-') ? 'project' : 'app');
+    add({ id: `kb:${a.slug}`, topic, title: a.title, text_en: clean(a.text_en), text_tr: clean(a.text_tr), questions_en: a.questions_en, questions_tr: a.questions_tr, source: a.source ?? { label: 'Global SAR app guide', url: SITE } });
+  }
+
+  // --- general radar and NISAR reference facts, each checked against the page it cites (knowledge/radar_reference.json)
+  for (const r of reference) {
+    add({ id: `kb:${r.slug}`, topic: 'sar', title: r.title, text_en: clean(r.text_en), text_tr: clean(r.text_tr), questions_en: r.questions_en, questions_tr: r.questions_tr, source: r.source });
   }
 
   // --- radar explainers written for the app (Simple and Scientific versions)
@@ -58,7 +71,7 @@ export async function buildKb() {
     lband: ['Why does L-band matter?', 'What is L-band?', 'Why does NISAR use a long wavelength?', 'What is special about NISAR radar?'],
   };
   for (const c of CONCEPTS) {
-    add({ id: `kb:concept-${c.id}`, topic: 'radar', title: c.title, text_en: fit(c.simple, 520), text_scientific_en: fit(c.scientific, 620), questions_en: [c.title, ...(CONCEPT_Q[c.id] ?? [])], source: { label: 'Global SAR radar explainer', url: SITE } });
+    add({ id: `kb:concept-${c.id}`, topic: 'radar', title: c.title, text_en: fit(c.simple, 520), text_tr: fitTr(tr(c.simple), 560), text_scientific_en: fit(c.scientific, 620), questions_en: [c.title, ...(CONCEPT_Q[c.id] ?? [])], source: { label: 'Global SAR radar explainer', url: SITE } });
   }
 
   // --- the investigations
@@ -66,30 +79,34 @@ export async function buildKb() {
     const c = EVENT_CONTENT[e.id];
     if (!c) continue;
     const name = e.title;
+    const trName = tr(e.title) ?? e.title;
     const link = `${SITE}#/e/${e.id}`;
     const own = { label: `Global SAR investigation "${name}" (the project's own analysis, not an official NASA product)`, url: link };
     add({
       id: `kb:event-${e.id}-happened`, topic: 'investigation', title: `${name}: what happened`,
-      text_en: fit(c.happened.text, 600),
+      text_en: fit(c.happened.text, 600), text_tr: fitTr(tr(c.happened.text), 660),
       questions_en: [`What happened in the ${name}?`, `Tell me about the ${name}.`, `When did the ${name} happen?`, `Where was the ${name}?`, `What is the ${name} investigation about?`],
+      questions_tr: [`${trName} araştırmasında ne oldu?`, `${trName} hakkında bilgi ver.`, `${trName} ne zaman oldu?`, `${trName} nerede oldu?`],
       source: { label: c.happened.source, url: c.happened.url },
     });
     add({
       id: `kb:event-${e.id}-radar`, topic: 'investigation', title: `${name}: what the radar shows`,
-      text_en: fit(c.readSimple.slice(0, 3).join(' '), 640), text_scientific_en: fit(c.readScientific.slice(0, 2).join(' '), 760),
+      text_en: fit(c.readSimple.slice(0, 3).join(' '), 640), text_tr: fitTr(trAll(c.readSimple.slice(0, 3)), 700), text_scientific_en: fit(c.readScientific.slice(0, 2).join(' '), 760),
       questions_en: [`What does the radar show for the ${name}?`, `How do I read the ${name} images?`, `What do the colours mean in the ${name} investigation?`, `What changed between before and after in the ${name}?`],
+      questions_tr: [`${trName} araştırmasında radar ne gösteriyor?`, `${trName} görüntüleri nasıl okunur?`, `${trName} araştırmasında renkler ne anlama geliyor?`, `${trName} öncesi ve sonrası arasında ne değişti?`],
       source: own,
     });
     add({
       id: `kb:event-${e.id}-caveats`, topic: 'investigation', title: `${name}: limits of the analysis`,
-      text_en: fit(c.caveats.join(' '), 600),
+      text_en: fit(c.caveats.join(' '), 600), text_tr: fitTr(trAll(c.caveats), 660),
       questions_en: [`How reliable is the ${name} analysis?`, `What are the limitations of the ${name} investigation?`, `Is the ${name} map an official NASA product?`, `How accurate is the ${name} measurement?`],
+      questions_tr: [`${trName} analizi ne kadar güvenilir?`, `${trName} araştırmasının sınırlamaları nelerdir?`, `${trName} haritası resmî bir NASA ürünü mü?`, `${trName} ölçümü ne kadar doğru?`],
       source: own,
     });
     for (const p of c.pins) {
       add({
         id: `kb:event-${e.id}-pin-${p.id}`, topic: 'investigation', title: `${name}: ${p.label}`,
-        text_en: fit(p.simple, 520), text_scientific_en: fit(p.scientific, 520),
+        text_en: fit(p.simple, 520), text_tr: fitTr(tr(p.simple), 560), text_scientific_en: fit(p.scientific, 520),
         questions_en: [`What is "${p.label}" in the ${name} investigation?`, `What does the marker "${p.label}" show?`, `Explain ${p.label}.`],
         source: own,
       });
@@ -106,8 +123,13 @@ export async function buildKb() {
     add({
       id: `kb:layer-${l.id}`, topic: 'layer', title: `Layer: ${l.title}`,
       text_en: withTail(l.description_simple, 620),
+      // Turkish only when the app has Turkish for both the description and the limitations: a layer's limits are never dropped
+      text_tr: tr(l.description_simple) && tr(l.limitations)
+        ? `${fit(tr(l.description_simple), 420)} Sağlayıcı: ${clean(l.provider)}. Görev: ${clean(l.mission)}. Çözünürlük: ${tr(l.resolution) ?? clean(l.resolution)}. Sınırlamalar: ${tr(l.limitations)}`
+        : undefined,
       text_scientific_en: withTail(l.description_scientific, 760),
       questions_en: [`What does the ${l.title} layer show?`, `What is ${l.title}?`, `What are the limitations of ${l.title}?`, `Where does the ${l.title} data come from?`, `What is the resolution of ${l.title}?`],
+      questions_tr: [`${tr(l.title) ?? l.title} katmanı ne gösteriyor?`, `${tr(l.title) ?? l.title} nedir?`, `${tr(l.title) ?? l.title} katmanının sınırlamaları neler?`, `${tr(l.title) ?? l.title} verisi nereden geliyor?`],
       source: { label: l.provider, url: src.url },
     });
     if (l.legend?.simple) {
@@ -115,8 +137,10 @@ export async function buildKb() {
       add({
         id: `kb:layer-${l.id}-colours`, topic: 'layer', title: `Colours of: ${l.title}`,
         text_en: fit(`${flag}${l.legend.simple}${l.legend.note ? ` ${l.legend.note}` : ''}`, 620),
+        text_tr: !flag && !l.legend.note ? fitTr(tr(l.legend.simple), 680) : undefined,
         text_scientific_en: fit(`${flag}${l.legend.scientific ?? l.legend.simple}${l.legend.note ? ` ${l.legend.note}` : ''}`, 700),
         questions_en: [`What do the colours mean in ${l.title}?`, `How do I read the ${l.title} legend?`, `What do the colors of the ${l.title} layer mean?`],
+        questions_tr: [`${tr(l.title) ?? l.title} katmanında renkler ne anlama geliyor?`, `${tr(l.title) ?? l.title} lejantı nasıl okunur?`],
         source: src,
       });
     }
@@ -175,9 +199,9 @@ export async function buildKb() {
     for (const k of Object.keys(r)) if (r[k] === undefined || r[k] === '') delete r[k];
   }
   return {
-    version: '1',
+    version: '2',
     generated: new Date().toISOString().slice(0, 10),
-    counts: { total: records.length, app: app.length, verified_sar: kept.length, rejected_sar: verified.records.length - kept.length },
+    counts: { total: records.length, app: app.length, reference: reference.length, turkish: records.filter((r) => r.text_tr).length, verified_sar: kept.length, rejected_sar: verified.records.length - kept.length },
     records,
   };
 }

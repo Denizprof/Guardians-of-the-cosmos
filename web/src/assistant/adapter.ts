@@ -4,7 +4,7 @@ import { CONTRACT_VERSION, type AssistantRequest, type AssistantResponse, type H
 import { collectCitationIds } from './context';
 import { validateResponse } from './validate';
 
-/** State of an optional on-device model (assistant/local/engine.ts). */
+/** State of the optional on-device language model (assistant/local/engine.ts). */
 export interface ModelState {
   /** unsupported = this browser cannot run it; idle = can be loaded on request. */
   phase: 'unsupported' | 'idle' | 'loading' | 'ready' | 'error';
@@ -21,7 +21,7 @@ export interface ModelControl {
 }
 
 export interface AssistantAdapter {
-  /** How answers are produced, shown to the user. Absent for a remote gateway model. */
+  /** The optional language model that words answers, when the build offers one. */
   readonly model?: ModelControl;
   /** Add what the adapter knows to the request (knowledge records for this question) before it is sent. */
   prepare?(req: AssistantRequest): Promise<AssistantRequest>;
