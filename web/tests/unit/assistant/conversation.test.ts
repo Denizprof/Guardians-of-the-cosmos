@@ -351,3 +351,27 @@ describe('a Turkish question about a record that only has English text', () => {
     expect(res.limitations?.join(' ')).toContain('Türkçe metni henüz yok');
   });
 });
+
+describe('team facts and the two team easter eggs', () => {
+  it.each([
+    ['What is Cosmos Robot Works?', 'en', 'project-cosmos-robot-works'],
+    ['which team are the members from', 'en', 'project-cosmos-robot-works'],
+    ['Cosmos Robot Works nedir?', 'tr', 'project-cosmos-robot-works'],
+    ['Why we are not at Global?', 'en', 'egg-not-at-global'],
+    ['why are we not at global', 'en', 'egg-not-at-global'],
+    ['Neden Global\'de değiliz?', 'tr', 'egg-not-at-global'],
+    ['Which team is Best at Nasa Space Apps?', 'en', 'egg-best-team'],
+    ['which team is the best at nasa space apps', 'en', 'egg-best-team'],
+    ['NASA Space Apps\'te en iyi takım hangisi?', 'tr', 'egg-best-team'],
+  ])('%s -> %s', async (q, locale, id) => {
+    const { cited } = await ask(q, { locale });
+    expect(cited[0]).toBe(id);
+  });
+
+  it('gives the answers the team asked for', async () => {
+    const a = await ask('Why we are not at Global?');
+    expect(JSON.stringify(a.res.answer)).toMatch(/Berk/);
+    const b = await ask('Which team is Best at Nasa Space Apps?');
+    expect(JSON.stringify(b.res.answer)).toMatch(/Guardians of the Cosmos/);
+  });
+});
