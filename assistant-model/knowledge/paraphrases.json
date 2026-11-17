@@ -405,7 +405,10 @@
     "are you hallucinating",
     "is the model on my device",
     "who created you, was it gpt",
-    "are you gpt"
+    "are you gpt",
+    "how do I use the assistant here",
+    "how do I use you",
+    "how does this assistant work"
    ],
    "tr": [
     "sohbet botu nasıl çalışıyor",
@@ -445,7 +448,10 @@
     "what is sar exactly",
     "sar?",
     "explain sar",
-    "write sar what is it"
+    "write sar what is it",
+    "what is sar",
+    "what's SAR",
+    "what is a SAR satellite"
    ],
    "tr": [
     "uzaydan radar görüntüleme nasıl çalışır",
@@ -648,7 +654,9 @@
     "what is NISAR for",
     "what does the acronym nisar stand for",
     "describe the NISAR satellite",
-    "what will nisar measure"
+    "what will nisar measure",
+    "tell me something about NISAR",
+    "what can you tell me about NISAR"
    ],
    "tr": [
     "NISAR görevi nedir",

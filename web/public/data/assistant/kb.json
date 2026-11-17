@@ -1,11 +1,11 @@
 {
  "version": "2",
- "generated": "2026-11-16",
+ "generated": "2026-11-17",
  "counts": {
-  "total": 176,
-  "app": 71,
+  "total": 177,
+  "app": 72,
   "reference": 9,
-  "turkish": 139,
+  "turkish": 140,
   "verified_sar": 24,
   "rejected_sar": 18
  },
@@ -384,6 +384,26 @@
    }
   },
   {
+   "id": "kb:tool-inspect",
+   "topic": "app",
+   "title": "The Inspect area tool",
+   "text_en": "With Inspect area you drag a box on the globe, or click a place for a box about 100 km across. The side panel then shows the box's size, the catalog events inside it, any investigation there, terrain height and a button for current weather. Terrain and weather come live from Open-Meteo and are model data. The catalogs are a snapshot, so an empty box does not mean nothing happened.",
+   "text_tr": "Alanı incele ile küre üzerinde bir kutu çizersiniz ya da bir yere tıklayarak yaklaşık 100 km genişliğinde bir kutu seçersiniz. Yan panel kutunun büyüklüğünü, içindeki katalog olaylarını, orada bir araştırma varsa onu, arazi yüksekliğini ve güncel hava durumu için bir düğmeyi gösterir. Arazi ve hava durumu Open-Meteo'dan canlı gelir ve model verisidir. Kataloglar bir anlık görüntüdür; boş bir kutu hiçbir şey olmadığı anlamına gelmez.",
+   "questions_en": [
+    "What is the Inspect area tool?",
+    "How do I inspect an area?",
+    "Can I draw a box on the globe to get data about it?"
+   ],
+   "questions_tr": [
+    "Alanı incele aracı nedir?",
+    "Bir alanı nasıl incelerim?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
    "id": "kb:tool-search",
    "topic": "app",
    "title": "Search",
@@ -719,7 +739,10 @@
     "are you hallucinating",
     "is the model on my device",
     "who created you, was it gpt",
-    "are you gpt"
+    "are you gpt",
+    "how do I use the assistant here",
+    "how do I use you",
+    "how does this assistant work"
    ],
    "questions_tr": [
     "Sen kimsin?",
@@ -2616,7 +2639,10 @@
     "what is sar exactly",
     "sar?",
     "explain sar",
-    "write sar what is it"
+    "write sar what is it",
+    "what is sar",
+    "what's SAR",
+    "what is a SAR satellite"
    ],
    "source": {
     "label": "Global SAR radar explainer",
@@ -4666,7 +4692,9 @@
     "what is NISAR for",
     "what does the acronym nisar stand for",
     "describe the NISAR satellite",
-    "what will nisar measure"
+    "what will nisar measure",
+    "tell me something about NISAR",
+    "what can you tell me about NISAR"
    ],
    "questions_tr": [
     "NISAR nedir?",
