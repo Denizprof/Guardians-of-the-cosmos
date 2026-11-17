@@ -10,7 +10,7 @@ import InspectPanel from './components/InspectPanel';
 import type { Box } from './inspect';
 import Timeline from './components/Timeline';
 import SarLens, { type LensGeometry } from './components/SarLens';
-import { IconAsk, IconBuildings, IconFilters, IconInfo, IconInspect, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
+import { IconAsk, IconFilters, IconInfo, IconInspect, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
 import { InvestigationStrip, InvestigationsMenu } from './components/Investigations';
 import { readHash } from './app/readHash';
 import { markIntroSeen, shouldShowIntro } from './app/introSeen';
@@ -105,24 +105,6 @@ export default function App() {
   const [catalogLayers, setCatalogLayers] = useState<CatalogLayer[]>([]);
   const [layerState, setLayerState] = useState<Record<string, LayerState>>({});
   const [lensOn, setLensOn] = useState(false);
-  /** 3D buildings when zoomed in close: on by default, can be switched off on slow devices (remembered). */
-  const [buildingsOn, setBuildingsOn] = useState(() => {
-    try {
-      return localStorage.getItem('gsar-buildings') !== 'off';
-    } catch {
-      return true;
-    }
-  });
-  const toggleBuildings = useCallback(() => {
-    setBuildingsOn((on) => {
-      try {
-        localStorage.setItem('gsar-buildings', on ? 'off' : 'on');
-      } catch {
-        // storage blocked: the choice lasts for this visit only
-      }
-      return !on;
-    });
-  }, []);
   const [lensFull, setLensFull] = useState(false);
   const [lensChoice, setLensChoice] = useState<'base' | 'nisar'>('base');
   const appRef = useRef<HTMLDivElement>(null);
@@ -612,10 +594,6 @@ export default function App() {
             <span className="tool-label">Satellite layers</span>
             {tileOverlays.length > 0 && <span className="tool-count">{tileOverlays.length}</span>}
           </button>
-          <button className="tool" aria-pressed={buildingsOn} onClick={toggleBuildings} title="Show or hide 3D buildings when zoomed in close (turn off if the map is slow)" aria-label="3D buildings">
-            <IconBuildings />
-            <span className="tool-label">3D buildings</span>
-          </button>
           <button className="tool sar" aria-pressed={lensOn} onClick={() => (lensOn ? closeLens() : setLensOn(true))} title="A movable square that shows the same view in radar" aria-label="SAR lens" data-tut="lens">
             <IconLens />
             <span className="tool-label">SAR lens</span>
@@ -683,7 +661,6 @@ export default function App() {
         onMapClick={onMapClick}
         probing={coverageMode && !selected}
         inspecting={inspectMode && !selected}
-        buildings={buildingsOn}
         onInspectBox={onInspectBox}
         inspectBox={panelView === 'inspect' && !selected ? inspectBox : null}
         onAskAssistant={askFromSatellite}
