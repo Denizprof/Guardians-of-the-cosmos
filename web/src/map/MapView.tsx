@@ -1,3 +1,4 @@
+import { boxRing, DRAG_MIN_PX, normalizeBox, pointBox, type Box } from '../inspect';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import type { Map as MlMap, GeoJSONSource } from 'maplibre-gl';
@@ -62,6 +63,11 @@ export interface MapViewProps {
   onMapClick: (lon: number, lat: number) => void;
   /** Coverage probe on: every click on the globe is a probe, also on a marker or a cluster. */
   probing?: boolean;
+  /** Inspect area on: a drag draws a box (a click inspects a small square round it); the box is reported once. */
+  inspecting?: boolean;
+  onInspectBox?: (box: Box) => void;
+  /** The box the side panel is describing: drawn on the globe. */
+  inspectBox?: Box | null;
   onPin: (id: string) => void;
   flyTo: { lon: number; lat: number; zoom?: number; bbox?: [number, number, number, number]; nonce: number } | null;
   tileOverlays?: TileOverlay[];
@@ -354,6 +360,7 @@ function MapView(p: MapViewProps) {
     };
     a.on('click', (e) => {
       if (!onGlobe(e)) return;
+      if (cb.current.inspecting) return; // the drag handlers below own the gesture
       // Coverage probe on: the click is a probe wherever it lands, markers and clusters included.
       if (cb.current.probing) return cb.current.onMapClick(e.lngLat.lng, e.lngLat.lat);
       const hits = a.queryRenderedFeatures(e.point, { layers: clickable.filter((id) => a.getLayer(id)) });
@@ -369,6 +376,36 @@ function MapView(p: MapViewProps) {
       // A reported / catalog event: its full record opens in the side panel.
       cb.current.onSelectContext(String(f.properties.id));
     });
+    // Inspect area: press, drag, release. Map dragging is suppressed for the gesture (preventDefault on the press).
+    let inspectStart: { lon: number; lat: number; x: number; y: number } | null = null;
+    const setInspect = (box: Box | null) => {
+      const src = a.getSource('inspect') as GeoJSONSource | undefined;
+      src?.setData(box ? { type: 'Feature', geometry: { type: 'Polygon', coordinates: [boxRing(box)] }, properties: {} } : EMPTY_FC);
+    };
+    const onPress = (e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) => {
+      if (!cb.current.inspecting || !onGlobe(e)) return;
+      e.preventDefault();
+      inspectStart = { lon: e.lngLat.lng, lat: e.lngLat.lat, x: e.point.x, y: e.point.y };
+    };
+    const onDrag = (e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) => {
+      if (!inspectStart) return;
+      setInspect(normalizeBox(inspectStart, { lon: e.lngLat.lng, lat: e.lngLat.lat }));
+    };
+    const onRelease = (e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) => {
+      const start = inspectStart;
+      inspectStart = null;
+      if (!start) return;
+      const moved = Math.hypot(e.point.x - start.x, e.point.y - start.y);
+      const box = moved < DRAG_MIN_PX ? pointBox(start.lon, start.lat) : normalizeBox(start, { lon: e.lngLat.lng, lat: e.lngLat.lat });
+      setInspect(box);
+      cb.current.onInspectBox?.(box);
+    };
+    a.on('mousedown', onPress);
+    a.on('touchstart', onPress);
+    a.on('mousemove', onDrag);
+    a.on('touchmove', onDrag);
+    a.on('mouseup', onRelease);
+    a.on('touchend', onRelease);
     for (const id of clickable) {
       // The pointer cursor only where a click opens the marker: not while probing (a click there is a probe, the
       // probe's crosshair stays) and not over a far-side marker in the space round the globe (a click there does
@@ -431,6 +468,20 @@ function MapView(p: MapViewProps) {
     const vis = hasSelection ? 'none' : 'visible';
     for (const id of ['ctx-clusters', 'ctx-count', 'ctx-points', 'sar-labels']) a.setLayoutProperty(id, 'visibility', vis);
   }, [loaded, hasSelection]);
+
+  // ---- Inspect area: the box the side panel is about, and a crosshair while the tool is on
+  useEffect(() => {
+    if (!loaded) return;
+    const a = maps.current!.a;
+    const src = a.getSource('inspect') as GeoJSONSource | undefined;
+    src?.setData(p.inspectBox ? { type: 'Feature', geometry: { type: 'Polygon', coordinates: [boxRing(p.inspectBox)] }, properties: {} } : EMPTY_FC);
+  }, [loaded, p.inspectBox]);
+  useEffect(() => {
+    const canvas = maps.current?.a.getCanvas();
+    if (!canvas) return;
+    if (p.inspecting) canvas.style.cursor = 'crosshair';
+    else canvas.style.removeProperty('cursor');
+  }, [p.inspecting]);
 
   // ---- focus ring: the reported event or probed point the side panel is about
   useEffect(() => {
