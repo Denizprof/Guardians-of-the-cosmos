@@ -46,6 +46,11 @@ export const IconInspect = () => (
     <circle cx="8" cy="8" r="1.500" />
   </Svg>
 );
+export const IconBuildings = () => (
+  <Svg>
+    <path d="M2.500 13.500h11M3.500 13.500V6.500l3-2v9M6.500 13.500V3l4 1.500v9M10.500 13.500V8h2v5.500" />
+  </Svg>
+);
 export const IconAsk = () => (
   <Svg>
     <path d="M2.500 3.500h11v7.500H7.500L4.500 13.500v-2.500h-2z" />

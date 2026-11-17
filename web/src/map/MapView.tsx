@@ -65,6 +65,8 @@ export interface MapViewProps {
   probing?: boolean;
   /** Inspect area on: a drag draws a box (a click inspects a small square round it); the box is reported once. */
   inspecting?: boolean;
+  /** 3D buildings layer on (default) or off. */
+  buildings?: boolean;
   onInspectBox?: (box: Box) => void;
   /** The box the side panel is describing: drawn on the globe. */
   inspectBox?: Box | null;
@@ -468,6 +470,13 @@ function MapView(p: MapViewProps) {
     const vis = hasSelection ? 'none' : 'visible';
     for (const id of ['ctx-clusters', 'ctx-count', 'ctx-points', 'sar-labels']) a.setLayoutProperty(id, 'visibility', vis);
   }, [loaded, hasSelection]);
+
+  // ---- 3D buildings on/off
+  useEffect(() => {
+    if (!loaded) return;
+    const { a, b } = maps.current!;
+    for (const m of [a, b]) if (m.getLayer('buildings-3d')) m.setLayoutProperty('buildings-3d', 'visibility', p.buildings === false ? 'none' : 'visible');
+  }, [loaded, p.buildings]);
 
   // ---- Inspect area: the box the side panel is about, and a crosshair while the tool is on
   useEffect(() => {
