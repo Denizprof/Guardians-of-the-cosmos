@@ -352,6 +352,8 @@ describe('a Turkish question about a record that only has English text', () => {
   });
 });
 
+
+
 describe('team facts and the two team easter eggs', () => {
   it.each([
     ['What is Cosmos Robot Works?', 'en', 'project-cosmos-robot-works'],
@@ -375,3 +377,17 @@ describe('team facts and the two team easter eggs', () => {
     expect(JSON.stringify(b.res.answer)).toMatch(/Guardians of the Cosmos/);
   });
 });
+
+describe('the Simple / Scientific buttons', () => {
+  const askAt = async (query: string, level: 'simple' | 'scientific') => {
+    const req = await shared.prepare(buildRequest({ query, locale: 'en', level, context: {} }));
+    return JSON.stringify((await shared.query(req)).answer);
+  };
+  it.each(['What is SAR?', 'what is InSAR', 'what are the limits of the results', 'what is coherence'])('%s reads differently at each level', async (q) => {
+    const simple = await askAt(q, 'simple');
+    const scientific = await askAt(q, 'scientific');
+    expect(simple).not.toBe(scientific);
+    expect(scientific.length).toBeGreaterThanOrEqual(simple.length);
+  });
+});
+

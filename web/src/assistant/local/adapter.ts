@@ -11,7 +11,7 @@
 import type { AssistantAdapter, ModelControl } from '../adapter';
 import type { Research } from './research';
 import { CONTRACT_VERSION, type AssistantRequest, type AssistantResponse, type Citation, type ContextKnowledge, type Health } from '../types';
-import { buildIndex, buildMessages, contextSources, detectLang, fold, parseOutput, rank, recordSource, retrieve, tokens, type ChatMessage, type Hit, type IntentModel, type KbFile, type KbIndex, type Lang, type Ranked, type Source } from './core';
+import { buildIndex, buildMessages, contextSources, detectLang, fold, parseOutput, rank, recordSource, retrieve, simplify, tokens, type ChatMessage, type Hit, type IntentModel, type KbFile, type KbIndex, type Lang, type Ranked, type Source } from './core';
 import { answerFromCatalog, catalogIntent, type CatalogFile } from './catalog';
 
 const CATALOG_ID = 'kb:live-catalog';
@@ -317,7 +317,7 @@ export class LocalAssistantAdapter implements AssistantAdapter {
       const found = this.research ? await this.research(query, lang) : { ok: false as const, reason: 'unavailable' as const };
       if (found.ok) {
         const r = found.result;
-        const item: ContextKnowledge = { citation_id: RESEARCH_ID, title: r.title.slice(0, 300), text: r.text.slice(0, 2000), source_label: `${r.site}, retrieved ${r.retrieved.slice(0, 10)}`, url: r.url };
+        const item: ContextKnowledge = { citation_id: RESEARCH_ID, title: r.title.slice(0, 300), text: (req.explanation_level === 'simple' ? simplify(r.text, 3) : r.text).slice(0, 2000), source_label: `${r.site}, retrieved ${r.retrieved.slice(0, 10)}`, url: r.url };
         if (weak) {
           // the unsure guess from the knowledge base is replaced, not shown next to the real answer
           knowledge.splice(0, knowledge.length, item);
