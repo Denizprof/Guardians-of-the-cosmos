@@ -6,9 +6,11 @@ import EventPanel from './components/EventPanel';
 import IntroPanel from './components/IntroPanel';
 import AssistantSidePanel from './components/AssistantSidePanel';
 import ContextPanel from './components/ContextPanel';
+import InspectPanel from './components/InspectPanel';
+import type { Box } from './inspect';
 import Timeline from './components/Timeline';
 import SarLens, { type LensGeometry } from './components/SarLens';
-import { IconAsk, IconFilters, IconInfo, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
+import { IconAsk, IconFilters, IconInfo, IconInspect, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
 import { InvestigationStrip, InvestigationsMenu } from './components/Investigations';
 import { readHash } from './app/readHash';
 import { markIntroSeen, shouldShowIntro } from './app/introSeen';
@@ -32,7 +34,7 @@ const NO_PINS: Pin[] = [];
 const ALL_CATS: Category[] = GROUPS.flatMap((g) => g.categories);
 
 /** What the on-demand side panel shows when no investigation is open. */
-type PanelView = 'none' | 'about' | 'probe' | 'context' | 'assistant';
+type PanelView = 'none' | 'about' | 'probe' | 'context' | 'assistant' | 'inspect';
 type Popover = null | 'investigations' | 'filters' | 'layers';
 
 export default function App() {
@@ -86,6 +88,9 @@ export default function App() {
   const [popover, setPopover] = useState<Popover>(null);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [coverageMode, setCoverageMode] = useState(false);
+  /** Inspect area: while on, a drag on the globe selects a box; the box stays while its panel is open. */
+  const [inspectMode, setInspectMode] = useState(false);
+  const [inspectBox, setInspectBox] = useState<Box | null>(null);
   const [coverage, setCoverage] = useState<CoverageResult | null>(null);
   /** Coverage probe: the one product shown on the map. A new probe result starts on its newest product. */
   const [coverageScene, setCoverageScene] = useState<string | null>(null);
@@ -245,6 +250,8 @@ export default function App() {
     if (id) {
       // an investigation takes the side panel over; probe results must not linger (or reappear on Back)
       setCoverageMode(false);
+      setInspectMode(false);
+      setInspectBox(null);
       setPanelView('none');
       setCtxSel(null);
       setPopover(null);
@@ -257,6 +264,7 @@ export default function App() {
     selectEvent(null);
     setPanelView('none');
     setCtxSel(null);
+    setInspectBox(null);
     clearCoverage();
   }, [selectEvent, clearCoverage]);
 
@@ -406,6 +414,25 @@ export default function App() {
     },
     [coverageMode, selected, runCoverage]
   );
+  const onInspectBox = useCallback(
+    (box: Box) => {
+      clearCoverage();
+      setSelectedId(null);
+      setCtxSel(null);
+      setInspectBox(box);
+      setPanelView('inspect');
+      setPopover(null);
+      setPanelCollapsed(false);
+    },
+    [clearCoverage]
+  );
+  const toggleInspect = useCallback(() => {
+    setInspectMode((on) => {
+      if (on) return false;
+      setCoverageMode(false);
+      return true;
+    });
+  }, []);
   const onMapPin = useCallback((id: string) => setActivePin((cur) => (cur === id ? null : id)), []);
   const onPlace = useCallback(
     (hit: GeocodeHit) => {
@@ -572,9 +599,15 @@ export default function App() {
             <span className="tool-label">SAR lens</span>
           </button>
           {!selected && (
-            <button className="tool" aria-pressed={coverageMode} onClick={() => setCoverageMode((v) => !v)} title="Click the map to list real NISAR acquisitions there" aria-label="Coverage probe" data-tut="probe">
+            <button className="tool" aria-pressed={coverageMode} onClick={() => { setInspectMode(false); setCoverageMode((v) => !v); }} title="Click the map to list real NISAR acquisitions there" aria-label="Coverage probe" data-tut="probe">
               <IconProbe />
               <span className="tool-label">Coverage probe</span>
+            </button>
+          )}
+          {!selected && (
+            <button className="tool" aria-pressed={inspectMode} onClick={toggleInspect} title="Drag a box on the globe to see what is known inside it" aria-label="Inspect area" data-tut="inspect">
+              <IconInspect />
+              <span className="tool-label">Inspect area</span>
             </button>
           )}
           <button
@@ -627,6 +660,9 @@ export default function App() {
         onSelectContext={selectContext}
         onMapClick={onMapClick}
         probing={coverageMode && !selected}
+        inspecting={inspectMode && !selected}
+        onInspectBox={onInspectBox}
+        inspectBox={panelView === 'inspect' && !selected ? inspectBox : null}
         onAskAssistant={askFromSatellite}
         onPin={onMapPin}
         flyTo={flyTo}
@@ -722,6 +758,12 @@ export default function App() {
         </div>
       )}
 
+      {inspectMode && !selected && (
+        <div className="hint" role="status">
+          Inspect area on: drag a box on the globe, or click a place
+        </div>
+      )}
+
       {popover === 'investigations' && <InvestigationsMenu events={events} selectedId={selectedId} onSelect={selectEvent} onClose={closePopover} />}
       {popover === 'layers' && <LayersPanel layers={catalogLayers} state={layerState} level={level} onChange={onLayerChange} onClose={closePopover} error={layersError} />}
       {popover === 'filters' && (
@@ -768,6 +810,18 @@ export default function App() {
         />
       ) : panelView === 'context' && ctxSel ? (
         <ContextPanel key={ctxSel.id} event={ctxSel} collapsed={panelCollapsed} onCheckCoverage={runCoverage} onClose={closePanel} onToggleCollapsed={toggleCollapsed} />
+      ) : panelView === 'inspect' && inspectBox ? (
+        <InspectPanel
+          box={inspectBox}
+          context={mapContext}
+          events={events}
+          collapsed={panelCollapsed}
+          onSelectEvent={selectEvent}
+          onSelectContext={selectContext}
+          onCheckCoverage={runCoverage}
+          onClose={closePanel}
+          onToggleCollapsed={toggleCollapsed}
+        />
       ) : panelView === 'assistant' ? (
         <AssistantSidePanel mapView={mapView} collapsed={panelCollapsed} onToggleCollapsed={toggleCollapsed} onClose={closePanel} />
       ) : panelView === 'about' || panelView === 'probe' ? (

@@ -47,4 +47,11 @@ export function addMarkers(map: MlMap) {
     id: 'focus-ring', type: 'circle', source: 'focus',
     paint: { 'circle-color': 'rgba(0,0,0,0)', 'circle-radius': 13, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 },
   });
+  // The box the visitor draws with Inspect area (and the one being dragged).
+  map.addSource('inspect', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  map.addLayer({ id: 'inspect-fill', type: 'fill', source: 'inspect', paint: { 'fill-color': '#6cc4ff', 'fill-opacity': 0.14 } });
+  map.addLayer({
+    id: 'inspect-line', type: 'line', source: 'inspect',
+    paint: { 'line-color': '#6cc4ff', 'line-width': 2, 'line-dasharray': [2, 1.5] },
+  });
 }
