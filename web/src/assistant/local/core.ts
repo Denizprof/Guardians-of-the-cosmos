@@ -473,8 +473,17 @@ export function retrieve(index: KbIndex, question: string, k = 3, minScore = TUN
 
 // ---------- sources ----------
 
+/** The Simple level: the opening sentences only, so a text with no separate plain wording still reads shorter. */
+export function simplify(text: string, sentences = 3): string {
+  const parts = text.split(/(?<=[.!?])\s+(?=[A-ZÇĞİÖŞÜ0-9"“(])/);
+  return parts.length <= sentences ? text : parts.slice(0, sentences).join(' ');
+}
+
 export function recordSource(r: KbRecord, lang: Lang, level: Level): Source {
-  const text = lang === 'tr' && r.text_tr ? r.text_tr : level === 'scientific' && r.text_scientific_en ? r.text_scientific_en : r.text_en;
+  let text: string;
+  if (lang === 'tr' && r.text_tr) text = level === 'simple' ? simplify(r.text_tr) : r.text_tr;
+  else if (level === 'scientific') text = r.text_scientific_en ?? r.text_en;
+  else text = r.text_scientific_en ? r.text_en : simplify(r.text_en);
   return { id: r.id, text, label: `${r.title} (${r.source.label})`, url: r.source.url, type: 'reference' };
 }
 
