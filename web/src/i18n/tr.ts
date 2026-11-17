@@ -11,6 +11,8 @@ export const TR: Record<string, string> = Object.assign(Object.create(null) as R
   'Satellite layers': 'Uydu katmanları',
   'SAR lens': 'SAR merceği',
   'Coverage probe': 'Kapsama sondası',
+  '3D buildings': '3B binalar',
+  'Show or hide 3D buildings when zoomed in close (turn off if the map is slow)': 'Yakınlaştırınca 3B binaları göster ya da gizle (harita yavaşsa kapatın)',
   'Inspect area': 'Alanı incele',
   'Drag a box on the globe to see what is known inside it': 'Küre üzerinde bir kutu çizerek içinde bilinenleri görün',
   'Inspect area on: drag a box on the globe, or click a place': 'Alan inceleme açık: küre üzerinde bir kutu çizin ya da bir yere tıklayın',

@@ -47,6 +47,8 @@ export const STYLE: StyleSpecification = {
   version: 8,
   name: 'Global SAR Earth',
   glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+  // Low sun from the south-west: walls facing it are lit, the others fall into shade, so 3D buildings read as solid.
+  light: { anchor: 'map', color: '#fff6e8', intensity: 0.45, position: [1.4, 210, 45] },
   projection: { type: 'globe' },
   sky: {
     // Transparent "space" so the CSS starfield shows through; blue glow at the limb / horizon.
@@ -135,15 +137,23 @@ export const STYLE: StyleSpecification = {
       paint: { 'line-color': '#ffffff', 'line-opacity': 0.6, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.5, 6, 1.1, 12, 2] },
     },
     // ---- 3D buildings: OpenStreetMap footprints (OpenMapTiles) raised to their mapped height when zoomed in close.
-    // Buildings without a mapped height get OpenMapTiles' default (about 2 floors). Shapes only, no façades.
+    // Colour: the building's own mapped colour where OpenStreetMap has one, otherwise a realistic facade tone
+    // picked from its footprint (so neighbouring buildings differ), darker and greyer for towers.
     {
       id: 'buildings-3d', type: 'fill-extrusion', source: 'openmaptiles', 'source-layer': 'building', minzoom: 14.5,
       filter: ['!=', ['get', 'hide_3d'], true],
       paint: {
-        'fill-extrusion-color': ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 6], 0, '#e9e4dc', 60, '#f4f1ec', 200, '#ffffff'],
+        'fill-extrusion-color': [
+          'case',
+          ['all', ['has', 'colour'], ['!=', ['get', 'colour'], '']], ['to-color', ['get', 'colour'], '#d9cbb5'],
+          ['>=', ['coalesce', ['get', 'render_height'], 0], 60],
+          ['match', ['%', ['round', ['+', ['to-number', ['coalesce', ['id'], 0], 0], ['*', ['coalesce', ['get', 'render_height'], 0], 13]]], 4], 0, '#9fb3c2', 1, '#b7c3cc', 2, '#8fa1ad', '#c4ccd1'],
+          ['match', ['%', ['round', ['+', ['to-number', ['coalesce', ['id'], 0], 0], ['*', ['coalesce', ['get', 'render_height'], 6], 37]]], 7],
+            0, '#dcd7ce', 1, '#c9c1b4', 2, '#e8e4dc', 3, '#bdb5a8', 4, '#d3c6b1', 5, '#aea89f', '#c8b49b'],
+        ],
         'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14.5, 0, 15.5, ['coalesce', ['get', 'render_height'], 6]],
         'fill-extrusion-base': ['interpolate', ['linear'], ['zoom'], 14.5, 0, 15.5, ['coalesce', ['get', 'render_min_height'], 0]],
-        'fill-extrusion-opacity': 0.9,
+        'fill-extrusion-opacity': 1,
         'fill-extrusion-vertical-gradient': true,
       },
     },
