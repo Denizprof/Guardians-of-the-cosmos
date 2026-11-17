@@ -134,19 +134,6 @@ export const STYLE: StyleSpecification = {
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: { 'line-color': '#ffffff', 'line-opacity': 0.6, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.5, 6, 1.1, 12, 2] },
     },
-    // ---- 3D buildings: OpenStreetMap footprints (OpenMapTiles) raised to their mapped height when zoomed in close.
-    // Buildings without a mapped height get OpenMapTiles' default (about 2 floors). Shapes only, no façades.
-    {
-      id: 'buildings-3d', type: 'fill-extrusion', source: 'openmaptiles', 'source-layer': 'building', minzoom: 14.5,
-      filter: ['!=', ['get', 'hide_3d'], true],
-      paint: {
-        'fill-extrusion-color': ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 6], 0, '#e9e4dc', 60, '#f4f1ec', 200, '#ffffff'],
-        'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14.5, 0, 15.5, ['coalesce', ['get', 'render_height'], 6]],
-        'fill-extrusion-base': ['interpolate', ['linear'], ['zoom'], 14.5, 0, 15.5, ['coalesce', ['get', 'render_min_height'], 0]],
-        'fill-extrusion-opacity': 0.9,
-        'fill-extrusion-vertical-gradient': true,
-      },
-    },
     // ---- labels (first symbol layer = insertion point for SAR imagery and coverage footprints)
     {
       id: 'label-water', type: 'symbol', source: 'openmaptiles', 'source-layer': 'water_name', filter: IS_POINT,
