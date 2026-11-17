@@ -33,18 +33,18 @@ Facts live in the knowledge base, where each has a source and can be corrected b
 classifier never supplies facts; it only decides which record a question is about. When nothing matches, the
 assistant says what it can help with and offers questions instead of guessing.
 
-## The knowledge base (173 records)
+## The knowledge base (176 records)
 
 `node assistant-model/build_kb.mjs` builds it from:
 
 | Source | Records | Checked how |
 | --- | --- | --- |
 | The app's own vetted text: radar explainers, the five investigations, 20 satellite layers and their legends | 72 | Copied as is from `web/src/content/explain.ts`, `events.json`, `layers.json` |
-| App and project guide (`knowledge/app.json`, `knowledge/project.json`): tools, team, results, methods, pipeline, technology, glossary, small talk | 68 | Hand-written from what the app shows and from the project README; English and Turkish |
+| App and project guide (`knowledge/app.json`, `knowledge/project.json`): tools, team, results, methods, pipeline, technology, glossary, small talk | 71 | Hand-written from what the app shows and from the project README; English and Turkish |
 | Radar reference (`knowledge/radar_reference.json`): NISAR's orbit and radars, radar bands, scattering, geometry | 9 | Each claim checked against its cited NASA or ASF page on 2026-11-16; what the pages did not state was left out |
 | General SAR / NISAR facts (`knowledge/verified_sar.json`) | 24 | Each checked against its cited NASA / USGS / NOAA / Earth Engine page on 2026-11-14 |
 
-136 of the 173 records have a Turkish text. Where the app already has a Turkish translation of a text
+139 of the 176 records have a Turkish text. Where the app already has a Turkish translation of a text
 (`web/src/i18n/tr.ts`) the builder uses it; a record without one is answered in English, with a note.
 
 The 24 general facts come from 83 legacy records supplied with the first prototype. Of those, 41 had no source
@@ -59,11 +59,11 @@ the 24 supported or trimmed ones are used. `verified_sar.json` keeps the verdict
 
 - **What it is:** a multinomial logistic regression over 4,096 hashed features of the question: its words, word
   pairs, synonyms and the 3 to 5 letter pieces of each word (which is what makes typos and Turkish suffixes land
-  near the right word). One class per knowledge record plus an off-topic class: 174 classes.
-- **Training data:** the records' example questions in English and Turkish (2,679 of them, in
+  near the right word). One class per knowledge record plus an off-topic class: 177 classes.
+- **Training data:** the records' example questions in English and Turkish (2,716 of them, in
   `knowledge/*.json` and `knowledge/paraphrases.json`), each also in roughened forms (a typo, a dropped word, a
   filler phrase), plus off-topic questions (`knowledge/offtopic.json`, `knowledge/offtopic_extra.json`):
-  11,230 examples, 40 epochs, about ten seconds on a laptop CPU. No GPU and no downloaded weights are involved.
+  11,379 examples, 40 epochs, about ten seconds on a laptop CPU. No GPU and no downloaded weights are involved.
 - **Deterministic:** the same knowledge base always gives the same weights, and a test checks that the shipped
   files are what the script produces today.
 - **A helper, not a requirement:** if the weight files cannot be loaded, or were trained for a different
@@ -76,9 +76,9 @@ the 24 supported or trimmed ones are used. `verified_sar.json` keeps the verdict
 | Stress set | | Right record first | Right record in top 3 | Off-topic given a source |
 | --- | --- | --- | --- | --- |
 | `stress_test.json` (128 questions, 22 off-topic), used for tuning | words only | 85.9 % | 94.5 % | 45.5 % |
-| | with the classifier | 93.0 % | 98.4 % | 4.5 % |
+| | with the classifier | 93.8 % | 98.4 % | 9.1 % |
 | `stress_test2.json` (92 questions, 22 off-topic), held out | words only | 69.6 % | 82.6 % | 27.3 % |
-| | with the classifier | 81.5 % | 90.2 % | 4.5 % |
+| | with the classifier | 79.3 % | 90.2 % | 4.5 % |
 
 Reading this honestly:
 
@@ -92,7 +92,7 @@ Reading this honestly:
 - About one held-out question in five does not get the best record first. In the app a low-confidence match is
   shown as "the closest topic I know", with suggestions, so the reader can tell.
 - "Off-topic given a source" counts questions answered from a record instead of being sent to live research.
-- Of 22 off-topic questions never seen in training, the classifier alone recognises 17; the word-coverage rule
+- Of 22 off-topic questions never seen in training, the classifier alone recognises 16; the word-coverage rule
   catches most of the rest. A determined user can still find an unrelated question that gets a record.
 - Both sets are small and written by the project. They say nothing about questions on subjects the knowledge
   base does not cover.

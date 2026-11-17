@@ -297,12 +297,6 @@ export function AssistantPanel(props: AssistantPanelProps) {
                 {!m.failed && typeof m.response?.confidence === 'number' && (
                   <p className="asst-meta">Model-reported confidence: {Math.round(m.response.confidence * 100)}%. This is the model's own estimate, not a verified measure.</p>
                 )}
-                {!m.failed && !m.declined && m.response?.limitations && m.response.limitations.length > 0 && (
-                  <div className="asst-limits">
-                    <strong>About this answer</strong>
-                    <ul>{m.response.limitations.map((l, i) => <li key={i}>{l}</li>)}</ul>
-                  </div>
-                )}
               </article>
               );
             })}

@@ -2,10 +2,10 @@
  "version": "2",
  "generated": "2026-11-16",
  "counts": {
-  "total": 173,
-  "app": 68,
+  "total": 176,
+  "app": 71,
   "reference": 9,
-  "turkish": 136,
+  "turkish": 139,
   "verified_sar": 24,
   "rejected_sar": 18
  },
@@ -749,8 +749,8 @@
    "id": "kb:project-team",
    "topic": "project",
    "title": "The team behind Global SAR",
-   "text_en": "Global SAR was built by the team Guardians of the Cosmos: Azra, Ece, Berk, Daniel, Efe and Arte. They made it for the NASA Space Apps Challenge 2026, in the challenge Dancing with the SARs. The code is open source on GitHub.",
-   "text_tr": "Global SAR'ı Guardians of the Cosmos takımı geliştirdi: Azra, Ece, Berk, Daniel, Efe ve Arte. Uygulamayı NASA Space Apps Challenge 2026'nın Dancing with the SARs görevi için yaptılar. Kod GitHub'da açık kaynaktır.",
+   "text_en": "Global SAR was built by the team Guardians of the Cosmos: Azra, Ece, Berk, Daniel, Efe and Arte, who are members of Cosmos Robot Works. They made it for the NASA Space Apps Challenge 2026, in the challenge Dancing with the SARs. The code is open source on GitHub.",
+   "text_tr": "Global SAR'ı Guardians of the Cosmos takımı geliştirdi: Azra, Ece, Berk, Daniel, Efe ve Arte; hepsi Cosmos Robot Works üyesidir. Uygulamayı NASA Space Apps Challenge 2026'nın Dancing with the SARs görevi için yaptılar. Kod GitHub'da açık kaynaktır.",
    "questions_en": [
     "Who made this?",
     "Who built Global SAR?",
@@ -777,6 +777,88 @@
    "source": {
     "label": "Global SAR project README",
     "url": "https://github.com/Denizprof/Guardians-of-the-cosmos#team"
+   }
+  },
+  {
+   "id": "kb:project-cosmos-robot-works",
+   "topic": "team",
+   "title": "Cosmos Robot Works, the team the members come from",
+   "text_en": "The members of Guardians of the Cosmos come from Cosmos Robot Works, the robotics team they belong to. Guardians of the Cosmos is the group of Cosmos Robot Works members who built Global SAR for the NASA Space Apps Challenge 2026.",
+   "text_tr": "Guardians of the Cosmos üyeleri, bağlı oldukları robotik takımı Cosmos Robot Works'ten gelir. Guardians of the Cosmos, Global SAR'ı NASA Space Apps Challenge 2026 için geliştiren Cosmos Robot Works üyelerinden oluşan gruptur.",
+   "questions_en": [
+    "What is Cosmos Robot Works?",
+    "Who is Cosmos Robot Works?",
+    "Tell me about Cosmos Robot Works",
+    "Which team are the members from?",
+    "Where are the team members from?",
+    "Which team do the Guardians of the Cosmos belong to?",
+    "What is the relationship between Cosmos Robot Works and Guardians of the Cosmos?",
+    "cosmos robot works"
+   ],
+   "questions_tr": [
+    "Cosmos Robot Works nedir?",
+    "Cosmos Robot Works kim?",
+    "Cosmos Robot Works hakkında bilgi ver",
+    "Takım üyeleri hangi takımdan?",
+    "Üyeler hangi takıma ait?",
+    "Guardians of the Cosmos hangi takıma bağlı?",
+    "cosmos robot works"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:egg-not-at-global",
+   "topic": "team",
+   "title": "Why we are not at the Global awards",
+   "text_en": "Because of Berk. That is the official team answer, and the team stands by it. 😄",
+   "text_tr": "Berk yüzünden. Takımın resmi cevabı bu ve arkasında duruyoruz. 😄",
+   "questions_en": [
+    "Why are we not at Global?",
+    "Why we are not at Global?",
+    "Why did Guardians of the Cosmos not make it to the global finals?",
+    "Why are we not in the global winners?",
+    "Why didn't the team win globally?",
+    "Why aren't we at the Global NASA Space Apps awards?",
+    "why not global"
+   ],
+   "questions_tr": [
+    "Neden Global'de değiliz?",
+    "Neden global finalde değiliz?",
+    "Guardians of the Cosmos neden global'e çıkamadı?",
+    "Global'de neden yokuz?",
+    "Neden global kazanamadık?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
+   }
+  },
+  {
+   "id": "kb:egg-best-team",
+   "topic": "team",
+   "title": "The best team at NASA Space Apps",
+   "text_en": "Guardians of the Cosmos, of course. 🏆",
+   "text_tr": "Guardians of the Cosmos, tabii ki. 🏆",
+   "questions_en": [
+    "Which team is the best at NASA Space Apps?",
+    "Which team is best at NASA Space Apps?",
+    "Who is the best team in NASA Space Apps Challenge?",
+    "What is the best team at Space Apps?",
+    "Which team is the greatest at NASA Space Apps?",
+    "best team at nasa space apps"
+   ],
+   "questions_tr": [
+    "NASA Space Apps'te en iyi takım hangisi?",
+    "Space Apps'te en iyi takım hangisi?",
+    "NASA Space Apps'in en iyi takımı kim?",
+    "En iyi takım hangisi?"
+   ],
+   "source": {
+    "label": "Global SAR app guide",
+    "url": "https://globalsar.earth/"
    }
   },
   {

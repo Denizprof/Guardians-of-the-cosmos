@@ -351,8 +351,8 @@ describe('a Turkish question about a record that only has English text', () => {
     expect(res.limitations?.join(' ')).toContain('Türkçe metni henüz yok');
   });
 });
-<<<<<<< Updated upstream
-=======
+
+
 
 describe('team facts and the two team easter eggs', () => {
   it.each([
@@ -390,4 +390,4 @@ describe('the Simple / Scientific buttons', () => {
     expect(scientific.length).toBeGreaterThanOrEqual(simple.length);
   });
 });
->>>>>>> Stashed changes
+
