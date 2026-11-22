@@ -1,7 +1,7 @@
 import { boxRing, DRAG_MIN_PX, normalizeBox, pointBox, type Box } from '../inspect';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
-import type { Map as MlMap, GeoJSONSource } from 'maplibre-gl';
+import type { Map as MlMap, GeoJSONSource, ImageSource, Coordinates } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { Category, CompareMode, ContextEvent, SarEvent, SarLayer } from '../types';
 import { layerBounds } from '../lib';
@@ -24,7 +24,8 @@ import {
   addOverlays, createLensDropPolicy, detachLayer, leaseObjectUrl, overlayUrls, reattachLayer, syncImageLayers, syncTileOverlays,
 } from './overlays';
 import type { DetachedLayer, TileOverlay } from './overlays';
-import { addMarkers } from './markers';
+import { addMarkers, addSimLayers } from './markers';
+import { circleRing } from '../sim/geo';
 import { drawStars } from './starfield';
 
 export type { TileOverlay };
@@ -81,6 +82,17 @@ export interface MapViewProps {
   onMapError?: (where: 'globe' | 'lens', source: string) => void;
   /** The camera settled: where the globe is looking. The assistant uses it to answer "what am I viewing?". */
   onViewChange?: (view: { center: [number, number]; zoom: number; bbox: [number, number, number, number] }) => void;
+  /** Planetary Simulation Lab: the active scenario's zones at the current simulation time, plus compared scenarios. */
+  sim?: SimOverlay | null;
+}
+
+export interface SimOverlay {
+  lat: number;
+  lon: number;
+  zones: { id: string; label: string; severity: number; radiusKm: number; currentKm: number }[];
+  compare: { lat: number; lon: number; radiusKm: number; label: string }[];
+  /** Gridded output (flood depth) as an image over its four corners. */
+  raster?: { url: string; corners: [number, number][] } | null;
 }
 
 /** Turn a MapLibre error event into a short source label and report it (also logged for diagnosis). */
@@ -306,6 +318,7 @@ function MapView(p: MapViewProps) {
     a.once('style.load', () => {
       addOverlays(a);
       addMarkers(a);
+      addSimLayers(a);
       setReady((n) => n + 1);
     });
     b.once('style.load', () => {
@@ -482,6 +495,31 @@ function MapView(p: MapViewProps) {
     if (p.inspecting) canvas.style.cursor = 'crosshair';
     else canvas.style.removeProperty('cursor');
   }, [p.inspecting]);
+
+  // ---- Simulation Lab zones: what the model computed, drawn at the simulation time on the timeline
+  useEffect(() => {
+    if (!loaded) return;
+    const a = maps.current!.a;
+    const set = (id: string, fc: GeoJSON.FeatureCollection) => (a.getSource(id) as GeoJSONSource | undefined)?.setData(fc);
+    const sim = p.sim;
+    const poly = (lat: number, lon: number, r: number, props: Record<string, unknown>): GeoJSON.Feature => ({ type: 'Feature', geometry: { type: 'Polygon', coordinates: [circleRing(lat, lon, Math.max(r, 0.05))] }, properties: props });
+    const raster = sim?.raster ?? null;
+    const img = a.getSource('sim-raster') as ImageSource | undefined;
+    if (!raster) {
+      if (a.getLayer('sim-raster')) a.removeLayer('sim-raster');
+      if (img) a.removeSource('sim-raster');
+    } else if (img) {
+      img.updateImage({ url: raster.url, coordinates: raster.corners as Coordinates });
+    } else {
+      a.addSource('sim-raster', { type: 'image', url: raster.url, coordinates: raster.corners as Coordinates });
+      a.addLayer({ id: 'sim-raster', type: 'raster', source: 'sim-raster', paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0, 'raster-resampling': 'nearest' } }, 'sim-zone-fill');
+    }
+    if (!sim) { for (const id of ['sim-zones', 'sim-extent', 'sim-compare', 'sim-point']) set(id, EMPTY_FC); return; }
+    set('sim-zones', { type: 'FeatureCollection', features: sim.zones.filter((z) => z.currentKm > 0).map((z) => poly(sim.lat, sim.lon, z.currentKm, { severity: z.severity })) });
+    set('sim-extent', { type: 'FeatureCollection', features: sim.zones.map((z) => poly(sim.lat, sim.lon, z.radiusKm, { severity: z.severity, label: z.label })) });
+    set('sim-compare', { type: 'FeatureCollection', features: sim.compare.map((c) => poly(c.lat, c.lon, c.radiusKm, { label: c.label })) });
+    set('sim-point', { type: 'Feature', geometry: { type: 'Point', coordinates: [sim.lon, sim.lat] }, properties: {} } as unknown as GeoJSON.FeatureCollection);
+  }, [loaded, p.sim]);
 
   // ---- focus ring: the reported event or probed point the side panel is about
   useEffect(() => {

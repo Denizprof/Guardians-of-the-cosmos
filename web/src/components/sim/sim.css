@@ -1,0 +1,60 @@
+/* Planetary Simulation Lab: uses the app's tokens (styles.css) so it keeps the Global SAR look. */
+.sim-lab .panel-body { gap: 0; }
+.sim-field { display: flex; flex-direction: column; gap: 4px; margin: 0 0 var(--sp-3, 12px); }
+.sim-field > span:first-child { font-weight: 500; }
+.sim-field input[type='number'] { background: var(--panel-2); color: var(--text); border: 1px solid var(--line-2); border-radius: var(--r-2); padding: 6px 8px; min-height: var(--ctl-sm, 30px); font: inherit; }
+.sim-field input[aria-invalid='true'] { border-color: #e8603c; }
+.sim-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3, 12px); }
+.sim-form fieldset { border: 1px solid var(--line); border-radius: var(--r-2); padding: var(--sp-3, 12px); margin: 0 0 var(--sp-3, 12px); }
+.sim-form legend { padding: 0 6px; color: var(--muted); font-size: var(--fs-small); text-transform: uppercase; letter-spacing: 0.08em; }
+.sim-error { color: #ff9a85; font-size: var(--fs-small); margin: 2px 0; }
+.sim-badge { border: 1px solid #c2253a; border-left-width: 4px; border-radius: var(--r-2); padding: 6px 10px; font-size: var(--fs-small); background: rgba(194, 37, 58, 0.12); }
+.sim-tabs { flex-wrap: wrap; margin: var(--sp-3, 12px) 0; }
+.sim-tabpanel { min-height: 120px; }
+.sim-table { width: 100%; border-collapse: collapse; font-size: var(--fs-small); }
+.sim-table th, .sim-table td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.sim-table th { font-weight: 500; color: var(--muted); }
+.sim-table th.active { color: var(--text); }
+.sim-compare { overflow-x: auto; }
+.sim-steps { padding-left: 1.2em; font-size: var(--fs-small); }
+.sim-steps li { margin-bottom: var(--sp-3, 12px); }
+.sim-steps .eq { overflow-wrap: anywhere; }
+.sim-zones { list-style: none; padding: 0; font-size: var(--fs-small); }
+.sim-zones li { margin-bottom: 8px; }
+.sim-zones .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+.sim-chart { margin: 0 0 var(--sp-3, 12px); }
+.sim-chart svg { width: 100%; height: auto; background: var(--panel-2); border-radius: var(--r-2); }
+.sim-chart .axis { stroke: var(--line-3, #5b6573); stroke-width: 1; }
+.sim-chart .line { fill: none; stroke: #f29b4b; stroke-width: 2; }
+.sim-chart .marker { stroke: #ffffff; stroke-dasharray: 3 3; }
+.sim-chart .tick, .sim-chart .label { fill: var(--muted); font-size: 9px; }
+.sim-export { display: flex; gap: 8px; flex-wrap: wrap; margin-top: var(--sp-3, 12px); }
+.sim-scenarios { display: flex; flex-wrap: wrap; gap: 6px; }
+.sim-chip { display: inline-flex; border: 1px solid var(--line-2); border-radius: 999px; overflow: hidden; }
+.sim-chip button { background: none; border: 0; color: var(--muted); padding: 3px 10px; cursor: pointer; }
+.sim-chip button[aria-pressed='true'] { background: var(--panel-3); color: var(--text); font-weight: 600; }
+.sim-chip button + button { padding: 3px 8px; border-left: 1px solid var(--line-2); }
+.sim-history { list-style: none; padding: 0; }
+.sim-history li { margin-bottom: 10px; }
+.ev { border-radius: 3px; padding: 0 4px; }
+.ev-historical-record { background: rgba(108, 196, 255, 0.18); }
+.ev-reconstruction { background: rgba(242, 209, 107, 0.18); }
+.sim-planned { margin-top: 6px; }
+
+.sim-timeline-wrap {
+  position: absolute; left: 16px; bottom: 16px; z-index: 5;
+  width: min(560px, calc(100% - var(--panel-w, 400px) - 48px));
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-3, 8px); padding: 10px 12px;
+}
+.app:not(.has-panel) .sim-timeline-wrap { width: min(560px, calc(100% - 32px)); bottom: 110px; }
+.sim-tl-actions { display: flex; gap: 12px; justify-content: flex-end; }
+.sim-tl-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sim-clock { margin-left: auto; font-size: var(--fs-small); }
+.sim-speed { display: inline-flex; align-items: center; gap: 4px; }
+.sim-phases { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.sim-state { margin: 4px 0 0; }
+.sim-timeline .sim-open { margin-left: 8px; }
+@media (max-width: 760px) {
+  .sim-timeline-wrap { left: 8px; right: 8px; width: auto; bottom: 8px; }
+  .sim-row { grid-template-columns: 1fr; }
+}
