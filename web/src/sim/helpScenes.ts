@@ -77,6 +77,16 @@ export const SCENES: Record<SceneId, SceneSpec> = {
       { t: 8, text: d('Water (and bare ground) cannot burn, so the lake stops the fire.', 'Cells with elevation ≤ 0 m are not burnable; features narrower than a cell are not resolved.') },
     ],
   },
+  climate: {
+    duration: 14, still: 12.4,
+    alt: 'Animation: four temperature curves start together today and spread apart toward 2100, the lowest for low emissions and the highest for very high emissions; then a map strip shows poles and land warming most; then a water tank rises to show sea level.',
+    steps: [
+      { t: 0, text: d('We start from today. Emissions decide how hot the world gets next.', 'Baseline: observed warming ≈ 1.1 °C above 1850–1900; ERF 2.72 W/m² in 2019 (AR6).') },
+      { t: 1.4, text: d('Four stories of the future: from fast cuts (blue) to very high emissions (red). The curves spread apart.', 'SSP1-2.6, 2-4.5, 3-7.0 and 5-8.5: the 2081–2100 warming is ≈1.5, 2.4, 3.4 and 4.1 °C in this model (AR6 very likely ranges 1.3–2.4, 2.1–3.5, 2.8–4.6, 3.3–5.7).') },
+      { t: 6, text: d('The world does not warm evenly: the poles and the land warm more than the oceans.', 'Pattern scaling: ΔT_local = ΔT_global × pattern(latitude, land/ocean), polar amplification up to ≈2–3×.') },
+      { t: 9.4, text: d('Warm water expands and ice melts, so the sea rises, more with more emissions.', 'GMSL: thermal expansion ≈ 1.9 mm/yr per W/m² of heat uptake plus glaciers and ice sheets.') },
+    ],
+  },
   timeline: {
     duration: 10, still: 8.6,
     alt: 'Animation: a dot moves along a time bar. Tick marks are evenly spaced before the event and then stretch apart, with named moments such as Impact, plus 1 minute, plus 1 hour and plus 1 day lighting up as the dot passes them.',

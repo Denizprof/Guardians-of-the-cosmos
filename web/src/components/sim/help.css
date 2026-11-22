@@ -30,6 +30,12 @@
 .k-rain { animation-name: hRain; animation-iteration-count: infinite; --e: linear; }
 .k-ping { animation-name: hPing; animation-iteration-count: infinite; --e: ease-out; }
 .k-burn { animation-name: hBurn; --e: linear; }
+.k-draw { animation-name: hDraw; stroke-dasharray: 1; --e: ease-out; }
+@keyframes hDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.s-base { stroke: #4b5563; stroke-width: 1; stroke-dasharray: 4 3; }
+.s-landmass { fill: none; stroke: #c9b08a; stroke-width: 1.6; }
+.s-tank { fill: #0b1118; stroke: #4b5563; stroke-width: 1.5; }
+.s-tankwater { fill: rgba(47, 123, 255, 0.75); }
 
 @keyframes hFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes hFadeOut { from { opacity: 1; } to { opacity: 0; } }

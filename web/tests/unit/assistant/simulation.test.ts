@@ -123,6 +123,23 @@ describe('assistant simulation tool', () => {
     expect(r.outputs.find((o) => o.id === 'burned')!.value).toBeGreaterThan(0);
   });
 
+  it('runs the climate engine for a future-climate question and labels it a projection, not a forecast', async () => {
+    const dem = { nx: 64, ny: 64, dx: 1, z: Float32Array.from({ length: 4096 }, (_, k) => ((k % 64) < 32 ? -3000 : 400)), corners: [[-180, 85], [180, 85], [180, -85], [-180, -85]] as [number, number][], source: 'synthetic' };
+    const a = new LocalAssistantAdapter({ loadKb: async () => KB, loadIntent: async () => undefined, loadCatalog: async () => undefined, loadDem: async () => dem });
+    const { res, allowed } = await ask(a, 'How much will temperature and sea level rise in Istanbul by 2100 under high emissions?');
+    expect(validateResponse(res, allowed).ok).toBe(true);
+    expect(res.answer!.text).toMatch(/CLIMATE PROJECTION SCENARIO \(climate engine/);
+    expect(res.answer!.text).toMatch(/Global warming in 2100/);
+    expect(res.limitations!.join(' ')).toMatch(/not a forecast/);
+    const r = simStore.get().scenarios[0].result;
+    expect(r.evidence).toBe('projection');
+    expect(r.inputs.scenario).toBe('SSP5-8.5');
+    // a follow-up moves to the next scenario up
+    const hi = await ask(a, 'What if emissions were lower?');
+    expect(hi.res.answer!.text).toMatch(/CLIMATE PROJECTION SCENARIO/);
+    expect(simStore.get().scenarios[1].result.inputs.scenario).toBe('SSP3-7.0');
+  });
+
   it('leaves ordinary questions to the knowledge base', async () => {
     const { res } = await ask(adapter(), 'What is SAR?');
     expect(res.citations![0].id).toBe('kb:concept-sar');

@@ -2,19 +2,24 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import type { SimResult } from '../../sim/types';
 import './sim.css';
-import { SLIDER_MAX, formatTime, sliderToTime, stateAt, timeToSlider } from '../../sim/time';
+import { SLIDER_MAX, formatSimTime, sliderToTime, stateAt, timeToSlider } from '../../sim/time';
 
 interface Props {
   result: SimResult;
   t: number;
   onTime: (t: number) => void;
+  /** Start playing at once (a meteor or an earthquake: the cinematic runs from the beginning). */
+  autoPlay?: boolean;
 }
 
 const SPEEDS = [1, 10, 60, 600, 3600];
+/** A climate run plays in years per second. */
+const YEAR_SPEEDS = [1, 2, 5, 10, 20];
 
-function SimTimeline({ result, t, onTime }: Props) {
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
+function SimTimeline({ result, t, onTime, autoPlay }: Props) {
+  const [playing, setPlaying] = useState(!!autoPlay);
+  const climate = result.engine === 'climate';
+  const [speed, setSpeed] = useState(climate ? 5 : 1);
   const tRef = useRef(t);
   tRef.current = t;
   const [t0, t1] = result.timeSpan;
@@ -43,20 +48,20 @@ function SimTimeline({ result, t, onTime }: Props) {
         <button className="btn primary" onClick={() => { if (t >= t1) onTime(t0); setPlaying((p) => !p); }} aria-label={playing ? 'Pause' : 'Play'}>{playing ? '❚❚' : '▶'}</button>
         <label className="small sim-speed">Speed
           <select className="layer-select" value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
-            {SPEEDS.map((s) => <option key={s} value={s}>{s}×</option>)}
+            {(climate ? YEAR_SPEEDS : SPEEDS).map((s) => <option key={s} value={s}>{climate ? `${s} yr/s` : `${s}×`}</option>)}
           </select>
         </label>
-        <span className="mono sim-clock" aria-live="off">{formatTime(t)}</span>
+        <span className="mono sim-clock" aria-live="off">{formatSimTime(result, t)}</span>
         <button className="btn" onClick={() => { setPlaying(false); onTime(t1); }} title="Show the final state">Reset to final</button>
       </div>
-      <input type="range" min={0} max={SLIDER_MAX} step={1} value={timeToSlider(t, result.timeSpan)} onChange={(e) => { setPlaying(false); onTime(sliderToTime(Number(e.target.value), result.timeSpan)); }} aria-label="Simulation time" aria-valuetext={formatTime(t)} />
+      <input type="range" min={0} max={SLIDER_MAX} step={1} value={timeToSlider(t, result.timeSpan)} onChange={(e) => { setPlaying(false); onTime(sliderToTime(Number(e.target.value), result.timeSpan)); }} aria-label="Simulation time" aria-valuetext={formatSimTime(result, t)} />
       <div className="sim-phases">
         {result.phases.map((p) => (
           <button key={p.id} className="link small" onClick={() => { setPlaying(false); onTime(p.t); }}>{p.label}</button>
         ))}
       </div>
       <p className="small sim-state" role="status">{stateAt(result, t)}</p>
-      <p className="muted small">Time span limited to what the model supports ({formatTime(t0)} to {formatTime(t1)}).</p>
+      <p className="muted small">Time span limited to what the model supports ({formatSimTime(result, t0)} to {formatSimTime(result, t1)}).</p>
     </div>
   );
 }

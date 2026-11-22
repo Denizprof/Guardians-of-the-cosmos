@@ -82,30 +82,31 @@ function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCo
     });
   }, []);
 
-  const run = useCallback((override?: Record<string, unknown>, name?: string) => {
+  const run = useCallback((override?: Record<string, unknown>, name?: string, forced?: SimCategory) => {
+    const cat = forced ?? category;
     const p = override ?? params;
-    if (ASYNC.has(category)) {
+    if (ASYNC.has(cat)) {
       abort.current?.abort();
       const ac = new AbortController();
       abort.current = ac;
       setIssues([]);
-      const what = category === 'tsunami' ? 'sea-floor depths' : category === 'volcano' ? 'terrain and winds aloft' : category === 'wildfire' ? 'terrain and current weather' : 'elevation data';
-      const solving = category === 'volcano' ? 'Settling ash through the wind field' : category === 'wildfire' ? 'Spreading the fire front' : 'Solving the shallow-water equations';
+      const what = cat === 'tsunami' ? 'sea-floor depths' : cat === 'volcano' ? 'terrain and winds aloft' : cat === 'wildfire' ? 'terrain and current weather' : cat === 'climate' ? 'the world land mask' : 'elevation data';
+      const solving = cat === 'volcano' ? 'Settling ash through the wind field' : cat === 'wildfire' ? 'Spreading the fire front' : cat === 'climate' ? 'Running the energy-balance model' : 'Solving the shallow-water equations';
       setBusy(`Loading ${what}…`);
-      void runAsync(category, p, { signal: ac.signal, onProgress: (stage, f) => setBusy(stage === 'dem' ? `Loading ${what}…` : `${solving}… ${Math.round(f * 100)}%`) })
+      void runAsync(cat, p, { signal: ac.signal, onProgress: (stage, f) => setBusy(stage === 'dem' ? `Loading ${what}…` : `${solving}… ${Math.round(f * 100)}%`) })
         .then((res) => {
           if (!res.ok) { setIssues(res.issues); return; }
-          simStore.add({ category, params: p, result: res.result, ...(name ? { name } : {}) });
-          onFly(res.result.location.lat, res.result.location.lon, category === 'tsunami' ? 4 : category === 'volcano' ? 6 : category === 'wildfire' ? 11 : 10.5);
+          simStore.add({ category: cat, params: p, result: res.result, ...(name ? { name } : {}) });
+          onFly(res.result.location.lat, res.result.location.lon, cat === 'tsunami' ? 4 : cat === 'volcano' ? 6 : cat === 'wildfire' ? 11 : cat === 'climate' ? 1.6 : 10.5);
         })
         .catch((e: unknown) => { if (!(e instanceof DOMException && e.name === 'AbortError')) setIssues([{ field: 'engine', message: e instanceof Error ? e.message : 'The run failed' }]); })
         .finally(() => { if (abort.current === ac) { abort.current = null; setBusy(null); } });
       return;
     }
-    const res = runSimulation(category, p);
+    const res = runSimulation(cat, p);
     if (!res.ok) { setIssues(res.issues); return; }
     setIssues([]);
-    simStore.add({ category, params: p, result: res.result, ...(name ? { name } : {}) });
+    simStore.add({ category: cat, params: p, result: res.result, ...(name ? { name } : {}) });
     onFly(res.result.location.lat, res.result.location.lon, 5);
   }, [category, params, onFly]);
 
@@ -176,6 +177,7 @@ function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCo
               <p className="small" role="status">{busy} <button type="button" className="link" onClick={() => abort.current?.abort()}>Cancel</button></p>
             )}
             {category === 'flood' && <p className="muted small">Uses real terrain (AWS Terrain Tiles) and runs in the background; the globe stays usable.</p>}
+            {category === 'climate' && <p className="muted small">A simple climate model driven by an emissions scenario (SSP). The map covers the whole Earth; the numbers are for the point you chose. It is a scenario, not a forecast.</p>}
             {category === 'wildfire' && <p className="muted small">Uses real terrain (slope) and, unless you choose to enter values by hand, the current wind, humidity and temperature at the ignition point (Open-Meteo). The fire starts at the chosen point and runs in the background.</p>}
             {category === 'volcano' && <p className="muted small">Uses real terrain (vent height and pyroclastic-flow reach) and current winds aloft at up to 15 pressure levels (Open-Meteo), and runs in the background.</p>}
             {category === 'tsunami' && <p className="muted small">Uses real sea-floor depths (AWS Terrain Tiles: ETOPO1 / SRTM15+) and runs in the background. Put the epicentre offshore on a subduction trench, with the strike along the trench.</p>}
@@ -225,6 +227,19 @@ function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCo
             {active && <SimResults result={active.result} scenarios={store.scenarios} activeId={store.activeId} simT={simT} onHelp={onHelp} />}
           </div>
         )}
+
+        {active?.category === 'climate' && (() => {
+          const sl = active.result.outputs.find((o) => o.id === 'gmsl');
+          if (!sl) return null;
+          const metres = Math.min(10, Math.max(0.1, Math.round(sl.value * 10) / 10));
+          return (
+            <div className="section">
+              <h3 className="small">What would that sea level do to the coast here?</h3>
+              <button type="button" className="btn" disabled={!!busy} onClick={() => run({ ...defaultsFor('flood'), lat: active.params.lat, lon: active.params.lon, label: active.params.label, seaLevel: metres, rainfall: 0, duration: 0 }, `Sea +${metres} m (${active.name})`, 'flood')}>Show a coastal flood map for +{metres} m of sea level</button>
+              <p className="muted small">Uses the flood engine on real terrain with the sea raised by the projected global sea-level rise ({metres} m). Storm surges, tides and local land movement are not included, so treat it as a rough picture of exposure.</p>
+            </div>
+          );
+        })()}
 
         <div className="section">
           <details data-ask>

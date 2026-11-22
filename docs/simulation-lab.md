@@ -73,7 +73,7 @@ Status of the Earth Intelligence and simulation upgrade (2026-11-22). Every Lab 
 
 ## Not done yet / dependencies
 
-- **The climate engine** is planned only. It should read published IPCC AR6 projections rather than run a climate model in the browser.
+- **All seven engines are built.** Remaining data wishes: a fuel map for wildfire, and real CMIP6 regional patterns (see the climate limits below).
 - **Wildfire limits:**
   - One fuel model everywhere (no fuel map); a global fuel or land-cover layer is the main missing dataset.
   - Constant weather.
@@ -147,3 +147,38 @@ Open it with "? Guide" in the Lab header, "What does this show?" on the time bar
 - "Load" buttons fill the Lab with a ready-made example without running it.
 - Content is in `sim/helpContent.ts` and `sim/helpScenes.ts`. Setting ranges are read from the engines, and tests fail if a setting has no explanation.
 - The guide is in English only for now; the rest of the Lab is too.
+
+## Climate scenarios
+
+- **Model** (`sim/climate.ts`, `sim/climateRun.ts`):
+  - A two-layer energy-balance model (Held 2010; Geoffroy 2013) driven by approximate effective radiative forcing from 1750 and the four CMIP6 SSP pathways (the number in an SSP name is the 2100 forcing in W/m²).
+  - Sea level: thermal expansion from the model's heat uptake, plus a semi-empirical glacier and ice-sheet term.
+  - Regional maps: pattern scaling. The patterns are qualitative: polar amplification, land warming faster than ocean, and a rainfall pattern of wetter tropics and high latitudes with drier subtropics. They are normalised to the global mean. They are NOT CMIP6 maps.
+  - Results are labelled "climate projection scenario", not "hypothetical simulation". It is a scenario, not a forecast.
+- **Land mask:** the AWS Terrain Tiles at zoom 2 (a world elevation grid). If the tiles can't be loaded, the run still works and says that oceans and land share one pattern.
+- **Settings:** emissions scenario, year (2025–2100), climate sensitivity (ECS 2–5 °C, AR6 best 3.0), a hypothetical extra forcing from 2030 (−3 to +3 W/m²), and whether the globe shows warming or rainfall change.
+- **Outputs:**
+  - global and local warming and rainfall change, with ranges
+  - global sea-level rise
+  - the year the 20-year average reaches 1.5 °C and 2 °C
+  - charts with all four scenarios
+  - a world map that plays 2015 → the chosen year on the time bar (in years)
+- **Coastal flood follow-up:** a button reruns the flood engine with the sea raised by the projected rise at the same place.
+- **Assistant:** reads "How much will … rise in Istanbul by 2100 under high emissions?" (a year, an SSP or words like "high emissions", a place, and rain versus warming). "What if emissions were higher?" moves to the next scenario.
+- **Checked against the record and AR6** (`tests/unit/sim/climate.test.ts`):
+  - Observed warming is reproduced without tuning: 1995–2014 gives 0.89 °C (AR6 0.85) and 2011–2020 gives 1.13 °C (AR6 1.09). Ocean heat uptake is about 0.8 W/m² (observed about 0.7).
+  - The sea-level constants are fitted to the observed 1901–2018 rise (0.21 m against 0.20) and the 2006–2018 rate (3.8 against 3.7 mm/yr).
+  - All four SSPs fall inside the AR6 2081–2100 warming very-likely ranges (1.46, 2.38, 3.43 and 4.12 °C), though a little below the best estimates (1.8, 2.7, 3.6 and 4.4).
+  - The 2100 sea-level rise falls inside the AR6 likely ranges for all four (0.39, 0.52, 0.66 and 0.77 m).
+  - The forcing pathways are approximations of the CMIP6 ones, so the future-scenario checks are consistency checks, not an independent validation.
+- **Limits:**
+  - Not a climate model: no ocean circulation, clouds, sea ice, tipping points, extremes or variability.
+  - Regional patterns can be wrong, and rainfall change is the most uncertain.
+  - Sea level is global-mean only.
+  - For decisions, use the IPCC reports and national climate services.
+
+## Cinematic effects on the globe
+
+- **Meteor from space** (`map/cinema.ts`): for an impact, the meteor flies in from the upper left along the model's real altitude track (100 km at entry, a straight lead-in before it). It glows as the air heats it and arrives at the impact point exactly at T+0, where a flash and a blue-white shock dome appear. For an airburst the flash is at the burst altitude, up the track. The direction it comes from is for the picture only.
+- **Lightning at the surface:** for an earthquake and for a tsunami's source, a white flash and branching, flickering cracks spread over the surface from the epicentre, then fade. The length follows the rupture length. For a tsunami the cracks follow the real strike; for the point-source earthquake the orientation is arbitrary. The cracks spread in at most 5 s so they can be seen (the real rupture speed is about 3 km/s), and the paths are decorative.
+- Both are drawn on a canvas over the globe from the simulation time, so they play, pause and scrub with the time bar, and they start playing when the run is created.

@@ -307,7 +307,50 @@ function Timeline(): ReactNode {
   );
 }
 
-const VIEWS: Record<SceneId, () => ReactNode> = { impact: Impact, earthquake: Earthquake, flood: Flood, tsunami: Tsunami, volcano: Volcano, wildfire: Wildfire, timeline: Timeline };
+function Climate(): ReactNode {
+  // temperature curves from today (x = 40) to 2100 (x = 230); y = 190 is 0.5 °C above 1850–1900, y = 40 is 4.5 °C
+  const curves: { color: string; label: string; d: string; at: number }[] = [
+    { color: '#4a8cff', label: 'SSP1-2.6', d: 'M40 150 C90 135 140 128 230 138', at: 1.6 },
+    { color: '#7fe8ff', label: 'SSP2-4.5', d: 'M40 150 C90 128 150 108 230 98', at: 2.4 },
+    { color: '#ffb02e', label: 'SSP3-7.0', d: 'M40 150 C90 122 150 86 230 70', at: 3.2 },
+    { color: '#ff5a5a', label: 'SSP5-8.5', d: 'M40 150 C90 118 150 70 230 52', at: 4.0 },
+  ];
+  const bands = [[10, 0.95], [30, 0.62], [48, 0.45], [66, 0.35], [84, 0.28], [102, 0.35], [120, 0.45], [138, 0.62], [156, 0.95]];
+  return (
+    <>
+      <rect width="400" height="240" className="s-bg" />
+      <line x1="40" y1="200" x2="240" y2="200" className="s-gauge" />
+      <line x1="40" y1="30" x2="40" y2="200" className="s-gauge" />
+      <text x="40" y="218" className="s-note">2015</text>
+      <text x="205" y="218" className="s-note">2100</text>
+      <text x="6" y="24" className="s-note">warmer</text>
+      <g {...at('fadein', 0.2, 0.5)}>
+        <line x1="40" x2="236" y1="150" y2="150" className="s-base" />
+        <text x="46" y="166" className="s-note">today</text>
+      </g>
+      {curves.map((c) => (
+        <g key={c.label}>
+          <path d={c.d} pathLength="1" fill="none" strokeWidth="3" strokeLinecap="round" {...at('draw', c.at, 2.2, {}, 's-curve')} style={{ ...at('draw', c.at, 2.2).style, stroke: c.color }} />
+          <text x="238" y={Number(c.d.split(' ').pop()) + 3} {...at('fadein', c.at + 1.8, 0.4, {}, 's-note-b')} style={{ ...at('fadein', c.at + 1.8, 0.4).style, fill: c.color }}>{c.label}</text>
+        </g>
+      ))}
+      <g {...at('fadein', 6.0, 0.8)}>
+        <rect x="290" y="14" width="100" height="106" rx="6" className="s-field" />
+        {bands.map(([y, k]) => <rect key={y} x="294" y={y - 4 + 4} width="92" height="16" rx="2" style={{ fill: `rgba(${Math.round(255 - 60 * k)},${Math.round(190 - 150 * k)},${Math.round(150 - 130 * k)},${0.35 + 0.6 * k})` }} />)}
+        <path d="M310 54 q10 -10 22 -2 q8 8 -2 16 q-14 6 -20 -14 M350 74 q14 -8 24 4 q4 12 -8 14 q-18 -2 -16 -18" className="s-landmass" />
+        <text x="340" y="132" textAnchor="middle" className="s-note-b">poles and land</text>
+        <text x="340" y="144" textAnchor="middle" className="s-note-b">warm most</text>
+      </g>
+      <g {...at('fadein', 9.4, 0.6)}>
+        <rect x="300" y="150" width="80" height="62" rx="4" className="s-tank" />
+        <rect x="302" y="152" width="76" height="58" {...at('rise', 9.6, 3.2, { '--dy': px(40) }, 's-tankwater')} />
+        <text x="340" y="228" textAnchor="middle" className="s-note-b">sea level rises</text>
+      </g>
+    </>
+  );
+}
+
+const VIEWS: Record<SceneId, () => ReactNode> = { impact: Impact, earthquake: Earthquake, flood: Flood, tsunami: Tsunami, volcano: Volcano, wildfire: Wildfire, climate: Climate, timeline: Timeline };
 
 function useReducedMotion(): boolean {
   const [r] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);

@@ -11,7 +11,7 @@ import type { SimCategory } from '../../../src/sim/types';
 
 beforeEach(() => localStorage.clear());
 
-const ENGINE_TOPICS: SimCategory[] = ['impact', 'earthquake', 'flood', 'tsunami', 'volcano', 'wildfire'];
+const ENGINE_TOPICS: SimCategory[] = ['impact', 'earthquake', 'flood', 'tsunami', 'volcano', 'wildfire', 'climate'];
 
 describe('guide content', () => {
   it.each(ENGINE_TOPICS)('%s: every setting of the engine is explained, with its range', (category) => {
@@ -20,7 +20,7 @@ describe('guide content', () => {
     const keys = new Set((topic.settings ?? []).map((s) => s.key).filter(Boolean));
     for (const p of engine.params) {
       expect(keys.has(p.key), `${category}.${p.key} has a help entry`).toBe(true);
-      expect(rangeOf(category, p.key)).toContain(`starts at ${p.default.toLocaleString('en-US')}`);
+      expect(rangeOf(category, p.key)).toContain(`starts at ${p.key === 'year' ? p.default : p.default.toLocaleString('en-US')}`); // a year has no thousands comma
     }
     for (const c of engine.choices) expect(keys.has(c.key), `${category}.${c.key} has a help entry`).toBe(true);
   });

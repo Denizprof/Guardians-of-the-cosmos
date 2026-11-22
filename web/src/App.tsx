@@ -18,6 +18,7 @@ import { topicForCategory, type HelpExample } from './sim/helpContent';
 import { simStore } from './sim/store';
 import { zoneRadiusAt } from './sim/time';
 import { depthToDataUrl, frameAt } from './sim/floodRender';
+import { cinemaFor } from './map/cinema';
 import type { SimOverlay } from './map/MapView';
 import { InvestigationStrip, InvestigationsMenu } from './components/Investigations';
 import { readHash } from './app/readHash';
@@ -124,13 +125,20 @@ export default function App() {
   const [helpTopic, setHelpTopic] = useState<string | null>(null);
   const [tryExample, setTryExample] = useState<{ category: HelpExample['category']; params: Record<string, unknown>; nonce: number } | null>(null);
   // a new or re-selected scenario shows its final state; Play replays it from before the event
-  useEffect(() => { if (activeSim) { setSimT(activeSim.result.timeSpan[1]); setSimHidden(false); } }, [activeSim]);
+  // a meteor or an earthquake starts from the beginning so the cinematic plays (the time bar auto-plays it)
+  const cinematic = !!activeSim && cinemaFor(activeSim.result, 0) !== null;
+  useEffect(() => {
+    if (!activeSim) return;
+    const [t0, t1] = activeSim.result.timeSpan;
+    setSimT(cinemaFor(activeSim.result, 0) ? (activeSim.result.engine === 'impact' ? t0 : Math.max(t0, -2)) : t1);
+    setSimHidden(false);
+  }, [activeSim]);
   // a simulation the assistant ran: bring the globe to it (the Lab flies there itself)
   useEffect(() => {
     if (!sims.openNonce) return;
     const r = simStore.active()?.result;
     if (!r) return;
-    const zoom = r.engine === 'flood' ? 10.5 : r.engine === 'tsunami' ? 4 : r.engine === 'volcano' ? 6 : r.engine === 'wildfire' ? 11 : r.engine === 'earthquake' ? 6 : 5;
+    const zoom = r.engine === 'flood' ? 10.5 : r.engine === 'tsunami' ? 4 : r.engine === 'volcano' ? 6 : r.engine === 'wildfire' ? 11 : r.engine === 'earthquake' ? 6 : r.engine === 'climate' ? 1.6 : 5;
     setFlyTo({ lon: r.location.lon, lat: r.location.lat, zoom, nonce: Date.now() });
   }, [sims.openNonce]);
   const simOverlay = useMemo<SimOverlay | null>(() => {
@@ -138,8 +146,9 @@ export default function App() {
     const r = activeSim.result;
     return {
       lat: r.location.lat, lon: r.location.lon,
+      cinema: cinemaFor(r, simT),
       zones: r.zones.map((z) => ({ id: z.id, label: `${z.label} · ${z.radiusKm < 10 ? z.radiusKm.toFixed(1) : Math.round(z.radiusKm)} km`, severity: z.severity, radiusKm: z.radiusKm, currentKm: zoneRadiusAt(z, simT) })),
-      raster: r.raster ? (() => { const f = frameAt(r.raster, simT); const url = depthToDataUrl(f.depth, r.raster.nx, r.raster.ny, r.raster.kind); return url ? { url, corners: r.raster.corners } : null; })() : null,
+      raster: r.raster ? (() => { const f = frameAt(r.raster, simT); const url = depthToDataUrl(f.depth, r.raster.nx, r.raster.ny, r.raster.kind); return url ? { url, corners: r.raster.corners, ...(r.engine === 'climate' ? { opacity: 0.62 } : {}) } : null; })() : null,
       compare: sims.scenarios.filter((s) => s.id !== activeSim.id && !s.result.raster).flatMap((s) => s.result.zones.slice(0, 1).map((z) => ({ lat: s.result.location.lat, lon: s.result.location.lon, radiusKm: z.radiusKm, label: s.name }))),
     };
   }, [activeSim, sims.scenarios, simT, simHidden]);
@@ -818,7 +827,7 @@ export default function App() {
 
       {activeSim && !selected && !simHidden && (
         <div className="sim-timeline-wrap">
-          <SimTimeline result={activeSim.result} t={simT} onTime={setSimT} />
+          <SimTimeline key={activeSim.id} result={activeSim.result} t={simT} onTime={setSimT} autoPlay={cinematic} />
           <div className="sim-tl-actions">
             {panelView !== 'sim' && <button className="link small" onClick={() => { closePanel(); setPanelView('sim'); setPanelCollapsed(false); }}>Open in Simulation Lab</button>}
             <button className="link small" onClick={() => setHelpTopic(topicForCategory(activeSim.category))}>What does this show?</button>

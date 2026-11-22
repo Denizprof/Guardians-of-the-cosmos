@@ -30,6 +30,7 @@ const VARIANT: Partial<Record<string, { en: string; tr: string }>> = {
   earthquake: { en: 'What if it were twice as strong?', tr: 'İki kat güçlü olsaydı ne olurdu?' },
   tsunami: { en: 'What if it were twice as strong?', tr: 'İki kat güçlü olsaydı ne olurdu?' },
   volcano: { en: 'What if the eruption lasted twice as long?', tr: 'Patlama iki kat uzun sürseydi ne olurdu?' },
+  climate: { en: 'What if emissions were higher?', tr: 'Emisyonlar daha yüksek olsaydı ne olurdu?' },
   wildfire: { en: 'What if the wind were twice as strong?', tr: 'Rüzgâr iki kat güçlü olsaydı ne olurdu?' },
 };
 const suggestFor = (category: string, lang: 'en' | 'tr'): string[] => {
@@ -46,7 +47,7 @@ export async function simulationAnswer(query: string, lang: 'en' | 'tr', level: 
     return { knowledge: [{ citation_id: 'sim:compare', title: 'Scenario comparison', text: compareScenarios(scenarios), source_label: 'Planetary Simulation Lab (hypothetical simulations)', url: scenarios[0].result.references[0].url }], notes: [NOTE[lang]], suggestions: SUGGEST[lang].slice(0, 2) };
   }
   const req = parseSimRequest(query);
-  const relative = !req && !!active && /\b(twice|double|half|iki kat|yarisi|yarı)\b/i.test(query);
+  const relative = !req && !!active && (/\b(twice|double|half|iki kat|yarisi|yarı)\b/i.test(query) || (active.category === 'climate' && /\b(higher|lower|worse|better|more|less|cut|reduce)\b/i.test(query) && /\b(emissions?|scenario)\b/i.test(query)));
   if (!req && !relative) {
     if (follow === 'explain' && active) return { knowledge: [toKnowledge(active.id, explainResult(active.result, [], 'scientific'), active.result)], notes: [NOTE[lang]], suggestions: SUGGEST[lang].slice(1) };
     return null;
@@ -58,11 +59,19 @@ export async function simulationAnswer(query: string, lang: 'en' | 'tr', level: 
   if (relative && active) {
     // "what if it were twice as fast?": the previous scenario with one parameter scaled
     category = active.category;
-    const f = /\b(half|yarisi|yarı)\b/i.test(query) ? 0.5 : 2;
+    const f = /\b(half|yarisi|yarı|lower|less|cut|reduce|better)\b/i.test(query) ? 0.5 : 2;
+    if (category === 'climate') {
+      // "what if emissions were higher?": the next scenario up (or down)
+      const order = ['ssp126', 'ssp245', 'ssp370', 'ssp585'];
+      const at = Math.max(0, order.indexOf(String(params.scenario ?? 'ssp245')));
+      params.scenario = order[Math.min(3, Math.max(0, at + (f > 1 ? 1 : -1)))];
+      stated = [...new Set([...stated, 'scenario'])];
+    } else {
     const key = category === 'wildfire' ? 'windKmh' : category === 'volcano' ? 'durationH' : category === 'flood' ? (/\b(sea|surge|deniz)\b/i.test(query) ? 'seaLevel' : 'rainfall') : category === 'earthquake' || category === 'tsunami' ? 'magnitude' : /(fast|speed|velocity|hızlı|hizli|hız)/i.test(query) ? 'velocity' : 'diameter';
     if (key === 'magnitude') params.magnitude = Math.min(9.5, Number(params.magnitude ?? 7) + (f > 1 ? 0.2 : -0.2)); // 2× energy ≈ +0.2 Mw
     else params[key] = Number(params[key] ?? (key === 'velocity' ? 20 : 500)) * f;
     stated = [...new Set([...stated, key])];
+    }
   }
   let placeLabel = req ? req.placeName : (params.label as string | undefined);
   if (req?.unresolved && geocode) {
@@ -72,6 +81,7 @@ export async function simulationAnswer(query: string, lang: 'en' | 'tr', level: 
     } catch { /* reported below as "no place" */ }
   }
   const notes = [NOTE[lang]];
+  const projectionNote = { en: 'Climate projection scenario from a simple energy-balance model driven by an emissions scenario (SSP), computed in your browser. It is a "what if emissions follow this path", not a forecast. Open the Lab for the full working, ranges and limits.', tr: 'Bir emisyon senaryosuyla (SSP) çalışan basit bir enerji dengesi modelinin tarayıcınızda hesapladığı iklim projeksiyonu senaryosudur; tahmin değildir. Tüm hesap, aralıklar ve sınırlar için Laboratuvarı açın.' };
   if (req && !placeLabel) {
     notes.push(lang === 'tr' ? 'Bir yer bulunamadı; simülasyon 0°, 0° noktasında çalıştırıldı. Konumu Laboratuvarda küre üzerinde seçebilirsiniz.' : `No location was recognised${req.unresolved ? ` ("${req.unresolved}")` : ''}, so the simulation ran at 0°, 0°. Pick the place on the globe in the Lab.`);
   }
@@ -85,10 +95,12 @@ export async function simulationAnswer(query: string, lang: 'en' | 'tr', level: 
   // values a run fetched itself (live weather for a fire, live winds aloft for ash) are not "defaults"
   const fetched = new Set(category === 'wildfire' && params.weather !== 'manual' ? ['windKmh', 'windFrom', 'rh', 'tempC', 'weather'] : category === 'volcano' && params.windMode !== 'calm' ? ['windMode'] : []);
   const defaults = [...engine.params.map((p) => p.key), ...engine.choices.map((c) => c.key)].filter((k) => !stated.includes(k) && !fetched.has(k) && !(k === 'waterDepth' && params.target !== 'water') && !(k === 'density' && params.composition !== 'custom'));
+  if (run.result.evidence === 'projection') notes[0] = projectionNote[lang];
   const sc = simStore.add({ category, params, result: run.result }, true);
   return { knowledge: [toKnowledge(sc.id, explainResult(run.result, defaults, level), run.result)], notes, suggestions: suggestFor(category, lang) };
 }
 
-function toKnowledge(id: string, text: string, r: { title: string; references: { url: string }[]; engine: string; engineVersion: string }): ContextKnowledge {
-  return { citation_id: `sim:${id}`, title: r.title.slice(0, 300), text, source_label: `Planetary Simulation Lab, ${r.engine} engine v${r.engineVersion} (hypothetical simulation)`, url: r.references[0]?.url ?? REF };
+function toKnowledge(id: string, text: string, r: { title: string; references: { url: string }[]; engine: string; engineVersion: string; evidence?: string }): ContextKnowledge {
+  const kind = r.evidence === 'projection' ? 'climate projection scenario' : 'hypothetical simulation';
+  return { citation_id: `sim:${id}`, title: r.title.slice(0, 300), text, source_label: `Planetary Simulation Lab, ${r.engine} engine v${r.engineVersion} (${kind})`, url: r.references[0]?.url ?? REF };
 }

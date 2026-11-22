@@ -43,6 +43,8 @@ export interface SimSeries {
   xLabel: string;
   yLabel: string;
   points: [number, number][];
+  /** Further lines drawn in the same chart (e.g. the other emissions scenarios). */
+  extra?: { label: string; points: [number, number][] }[];
 }
 
 export interface SimPhase {
@@ -71,7 +73,8 @@ export interface SimReference {
 export interface SimResult {
   engine: SimCategory;
   engineVersion: string;
-  evidence: 'simulation';
+  /** simulation = hypothetical event; projection = model-based scenario of a future climate. */
+  evidence: 'simulation' | 'projection';
   title: string;
   location: SimLocation;
   inputs: Record<string, number | string>;
@@ -94,7 +97,7 @@ export interface SimResult {
 
 export interface SimRaster {
   /** depth = water depth on land (flood); sea-surface = elevation η above sea level (tsunami). */
-  kind?: 'depth' | 'sea-surface' | 'thickness' | 'fire';
+  kind?: 'depth' | 'sea-surface' | 'thickness' | 'fire' | 'warming' | 'precip';
   /** [lon, lat] corners: top-left, top-right, bottom-right, bottom-left. */
   corners: [number, number][];
   nx: number;
