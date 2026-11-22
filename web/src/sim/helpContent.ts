@@ -2,7 +2,7 @@
 // "simple" = everyday words and pictures; "scientific" = the model, equations, units and references.
 // Ranges of settings are read from the engines themselves (rangeOf), so they cannot drift from the Lab.
 import { SIM_COLORS } from '../map/markers';
-import { ASH_CLASSES, DEPTH_CLASSES, FIRE_CLASSES, SURFACE_CLASSES } from './floodRender';
+import { ASH_CLASSES, DEPTH_CLASSES, FIRE_CLASSES, PRECIP_CLASSES, SURFACE_CLASSES, WARM_CLASSES } from './floodRender';
 import { ENGINES } from './registry';
 import type { SimCategory } from './types';
 
@@ -16,7 +16,7 @@ export interface HelpEntry {
   swatch?: string;
   text: Dual;
 }
-export type SceneId = 'impact' | 'earthquake' | 'flood' | 'tsunami' | 'volcano' | 'wildfire' | 'timeline';
+export type SceneId = 'impact' | 'earthquake' | 'flood' | 'tsunami' | 'volcano' | 'wildfire' | 'climate' | 'timeline';
 export interface HelpExample { label: string; category: SimCategory; params: Record<string, unknown> }
 export interface HelpTopic {
   id: string;
@@ -45,7 +45,8 @@ export function rangeOf(category: SimCategory | undefined, key: string | undefin
   const engine = category ? ENGINES[category] : undefined;
   if (!engine || !key) return null;
   const p = engine.params.find((x) => x.key === key);
-  if (p) return `${p.min.toLocaleString('en-US')} – ${p.max.toLocaleString('en-US')} ${p.unit} · starts at ${p.default.toLocaleString('en-US')}`;
+  const n = (x: number): string => (key === 'year' ? String(x) : x.toLocaleString('en-US'));
+  if (p) return `${n(p.min)} – ${n(p.max)}${p.unit ? ` ${p.unit}` : ''} · starts at ${n(p.default)}`;
   const c = engine.choices.find((x) => x.key === key);
   return c ? c.options.map((o) => o.label).join(' · ') : null;
 }
@@ -63,7 +64,7 @@ export const TOPICS: HelpTopic[] = [
     id: 'start', title: 'Start here', kicker: 'Overview',
     intro: d(
       'The Lab is a “what if?” machine. Pick a big event — a space rock hitting Earth, an earthquake, a flood, a tsunami, a volcano or a wildfire — pick a place, and watch what could happen on the globe. It is like a science experiment on a computer. Nothing is real: you are just playing “what if”.',
-      'The Planetary Simulation Lab runs six physical models in your browser from published equations (Collins et al. 2005; Bates et al. 2010; Bonadonna et al. 2005; Rothermel 1972 and others). Every run is a deterministic hypothetical scenario with stated assumptions, uncertainty ranges and references. The same inputs always give the same outputs.'),
+      'The Planetary Simulation Lab runs seven physical models in your browser from published equations (Collins et al. 2005; Bates et al. 2010; Bonadonna et al. 2005; Rothermel 1972 and others). Every run is a deterministic hypothetical scenario with stated assumptions, uncertainty ranges and references. The same inputs always give the same outputs.'),
     how: {
       simple: ['Open the Lab with the “What if?” button at the top.', 'Choose an Event (a space rock, an earthquake…).', 'Choose a place: type two numbers, or press “Pick on the globe” and click the map.', 'Change the settings, or leave them as they are.', 'Press “Validate and run”.', 'Watch the globe. Press ▶ on the time bar to see it happen.', 'Read the results below, then try changing one setting and run again to compare.'],
       scientific: ['Select an engine; coordinates are validated against its domain (e.g. tsunami: |lat| ≤ 75°).', 'Parameters are range-checked; an invalid one is reported by name and nothing is calculated.', 'Engines that need data (flood, tsunami, volcano, wildfire) download real terrain or weather, then solve in a Web Worker with progress and Cancel.', 'The result (steps, outputs with ranges, zones, series, phases, raster frames) is stored as Scenario A, B, C… (up to 6).', 'The globe, the time bar, the results tabs and the assistant all read the same stored scenario.', 'Export the report (.md) or the data (.json) to reproduce the run.']
@@ -102,7 +103,8 @@ export const TOPICS: HelpTopic[] = [
       { name: 'Thermal: 2nd / 3rd-degree burns', swatch: sev(1), text: d('The bright fireball is so hot it burns skin from far away. Shown only for fast ground impacts (15 km/s or more).', 'Radiant exposure thresholds scaled as E_Mt^(1/6); shown for ground impacts with v ≥ 15 km/s (vapour fireball, R_f = 0.002E^(1/3)).') },
       { name: 'Ejecta deposit ≥ 10 cm', swatch: sev(2), text: d('Rock thrown out of the hole falls back and lies at least a hand’s width (10 cm) deep.', 'Ejecta blanket thickness t_e = D_tc⁴/(112 r³) ≥ 10 cm.') },
       { name: 'Crater', swatch: sev(3), text: d('The hole in the ground. “Simple” is a bowl. “Complex” is a huge crater that collapses into a ring with a hill in the middle.', 'Final crater D_fr = 1.25 D_tc (simple) or 1.17 D_tc^1.13/D_c^0.13 (complex, D_c = 3.2 km). Depth in the Working tab.') },
-      { name: 'Open-ocean wave ≥ 1 m / ≥ 10 m', swatch: sev(1), text: d('Only for ocean hits: how far a tall wave travels across deep water. It does not say how high it climbs on a beach.', 'Ocean impacts: A(r) ≈ A_max(R_c/r) with A_max = min(D_tc,w/14.1, depth); coastal run-up is not computed.') },
+      { name: 'The meteor flying in from space', text: d('A cinematic: the rock streaks in from the sky, glows as the air heats it, and flashes where it lands. It follows the model’s real height and speed, but the direction it comes from is just for the picture.', 'Drawn from the computed altitude track (100 km at entry, ≈20 km/s lead-in before); the glow follows the heating, the flash sits at the burst point (the ground, or the airburst altitude). The approach direction on screen is arbitrary.') },
+  { name: 'Open-ocean wave ≥ 1 m / ≥ 10 m', swatch: sev(1), text: d('Only for ocean hits: how far a tall wave travels across deep water. It does not say how high it climbs on a beach.', 'Ocean impacts: A(r) ≈ A_max(R_c/r) with A_max = min(D_tc,w/14.1, depth); coastal run-up is not computed.') },
       { name: 'No crater at all?', text: d('A small rock can burn up and explode in the air (an “airburst”). Then you only see blast circles — like the 2013 Chelyabinsk meteor.', 'When the fragmented body reaches 7 L₀ before the ground, energy is released at the burst altitude; no crater is produced.') },
     ],
     settingsTitle: d('Settings, one by one', 'Parameters'),
@@ -143,7 +145,8 @@ export const TOPICS: HelpTopic[] = [
     },
     seeTitle: d('The circles (Mercalli shaking scale)', 'Intensity zones (Modified Mercalli, MMI)'),
     see: [
-      { name: 'Intensity IV+ — light', swatch: sev(0), text: d('Felt indoors by many people. Dishes rattle.', 'MMI ≥ IV: felt indoors by many.') },
+      { name: 'Lightning cracks at the surface', text: d('A cinematic: when the earthquake starts, a white flash and branching cracks spread out from the epicentre like lightning, then fade. Their length follows the rupture length; their exact paths are just for the picture.', 'Drawn from the rupture length L (≈3 km/s rupture speed, shown spreading in ≤ 5 s so it can be seen) with deterministic jagged branching. For a tsunami source the cracks follow the real strike; for the point-source earthquake the orientation is arbitrary.') },
+  { name: 'Intensity IV+ — light', swatch: sev(0), text: d('Felt indoors by many people. Dishes rattle.', 'MMI ≥ IV: felt indoors by many.') },
       { name: 'Intensity VI+ — strong', swatch: sev(2), text: d('Everyone feels it. Small damage, things fall off shelves.', 'MMI ≥ VI: felt by all, slight damage.') },
       { name: 'Intensity VIII+ — severe', swatch: sev(3), text: d('Ordinary buildings are badly damaged.', 'MMI ≥ VIII: considerable damage to ordinary buildings.') },
       { name: 'Intensity IX+ — violent', swatch: sev(3), text: d('Even well-built buildings are heavily damaged.', 'MMI ≥ IX: heavy damage even to well-designed structures.') },
@@ -323,6 +326,56 @@ export const TOPICS: HelpTopic[] = [
     ],
     limits: d('It assumes the same plants everywhere and the same weather for the whole run. Fire jumping ahead on wind-blown sparks, flames in the treetops and firefighters are not included — real fires can be much faster.', 'One fuel model, constant weather; no crown fire, spotting, fire–atmosphere coupling or suppression.'),
     example: { label: 'Load: fire in maquis hills near Izmir', category: 'wildfire', params: { lat: 38.4, lon: 27.33, label: 'Hills near Izmir', fuel: '4', weather: 'manual', windKmh: 30, windFrom: 270, rh: 20, tempC: 32, hours: 6 } },
+  },
+
+  {
+    id: 'climate', title: 'Climate scenario', kicker: 'Event 7', category: 'climate', scene: 'climate',
+    intro: d(
+      'Ask: “what if the world keeps putting heat-trapping gas into the air in this way?” The Lab shows how much hotter the world, a place of your choice, and the sea could get by a year up to 2100. It is a scenario to explore, not a weather forecast.',
+      'A reduced-complexity climate model: the two-layer energy-balance model (Held 2010; Geoffroy 2013) driven by approximate effective radiative forcing for the CMIP6 SSP scenarios, semi-empirical sea level, and pattern scaling for regional warming and rainfall. It is an emulator-style tool, not a general circulation model.'),
+    how: {
+      simple: ['Pick an emissions story (a scenario): low, middle, high or very high.', 'The computer works out how much extra heat the Earth traps each year.', 'The oceans soak up most of that heat slowly, so the air warms gradually. Warm water expands and ice melts, so the sea rises.', 'The poles and the land warm more than the oceans, so your chosen place warms more or less than the world average.', 'The map and the time bar play the years from 2015 to the year you chose.'],
+      scientific: ['ERF(t) from 1750 (≈2.72 W/m² in 2019, AR6) joins the SSP pathway; the SSP number is the 2100 forcing in W/m².', 'C dT/dt = F − λT − γ(T − T_d);  C_d dT_d/dt = γ(T − T_d);  λ = F₂ₓ/ECS, F₂ₓ = 3.93 W/m².', 'Sea level: thermal expansion ≈ 1.9 mm/yr per W/m² of heat uptake, plus glaciers and ice sheets max(0, 1.75(T + 0.21)) mm/yr (fitted to the observed 1901–2018 rise and 2006–2018 rate).', 'Regional: ΔT_local = ΔT_global × pattern(latitude, land/ocean), normalised to an area-weighted mean of 1; rainfall pattern p(latitude) with mean +2 %/K.', 'Ranges: ECS − 0.5 … ECS + 1.0 (AR6 likely 2.5–4.0) and ×0.85 … ×1.2 on sea level for ice-sheet uncertainty.']
+    },
+    seeTitle: d('The colours on the globe', 'Map classes (warming since 1850–1900, or rainfall change)'),
+    see: [
+      ...WARM_CLASSES.map((c, i) => ({
+        name: `Warming ${c.label}`, swatch: rgb(c.color),
+        text: [
+          d('A little warmer than before factories and cars (1850–1900).', 'Local warming 0.25–1 °C.'),
+          d('About where the world is today.', 'Local warming 1–2 °C (global mean today ≈ 1.1 °C).'),
+          d('The “2 degrees” people talk about in climate targets.', 'Local warming 2–3 °C.'),
+          d('Hot summers become much harder and many ice areas shrink a lot.', 'Local warming 3–4 °C.'),
+          d('Very hot. Mostly the polar regions and big landmasses in the high-emission stories.', 'Local warming 4–6 °C, typical of the Arctic and continental interiors at high emissions.'),
+          d('Extreme warming, only near the poles in the very-high story.', 'Local warming above 6 °C.'),
+        ][i],
+      })),
+      ...PRECIP_CLASSES.map((c, i) => ({
+        name: `Rainfall ${c.label}`, swatch: rgb(c.color),
+        text: i < 3 ? d('Less rain than before, so more dry spells. Many warm, dry regions get drier.', 'Negative precipitation change (the illustrative pattern: subtropics).') : d('More rain than before, often in heavier bursts. The tropics and the far north get wetter.', 'Positive precipitation change (the illustrative pattern: tropics and high latitudes).'),
+      })),
+    ],
+    settings: [
+      { name: 'Emissions scenario (SSP)', key: 'scenario', text: d('A story about the future. SSP1-2.6: fast cuts. SSP2-4.5: the middle road. SSP3-7.0: high emissions. SSP5-8.5: very high. The number is the extra heat-trapping push in 2100 (W/m²).', 'Shared Socioeconomic Pathway with its radiative forcing (CMIP6 ScenarioMIP): the name gives the 2100 forcing in W/m².') },
+      { name: 'Show on the globe', key: 'map', text: d('Colour the whole Earth by how much warmer it gets, or by how much wetter or drier. The numbers in the results are for the place you chose.', 'Selects the raster: local warming (°C) or rainfall change (%), both since 1850–1900.') },
+      { name: 'Year to look at', key: 'year', text: d('The year the results describe. The time bar plays from 2015 up to this year.', 'Target year; values are 20-year means around it (to 2100).') },
+      { name: 'Climate sensitivity (ECS)', key: 'ecs', text: d('How strongly the Earth warms when the heat-trapping gas doubles. Scientists’ best guess is 3 degrees; it is probably between 2.5 and 4.', 'Equilibrium climate sensitivity. AR6: best estimate 3.0 °C, likely 2.5–4.0, very likely 2–5. Sets λ = F₂ₓ/ECS.') },
+      { name: 'Extra forcing from 2030', key: 'extra', text: d('A “what if” push added on top of the story from 2030: below zero cools (like reflecting sunlight), above zero warms more.', 'Hypothetical additional effective radiative forcing, ramped in over 2030–2040 (negative: e.g. reflective aerosols; positive: extra emissions).') },
+    ],
+    numbers: [
+      { name: 'Global warming (since 1850–1900 / 1995–2014)', text: d('How much hotter the whole world is, compared with before factories (1850–1900) and with recent times (1995–2014). The grey range comes from the climate-sensitivity guess.', 'Global-mean surface air temperature, 20-year mean around the year; range from ECS − 0.5 … ECS + 1.0.') },
+      { name: 'Warming at this place', text: d('How much your chosen place warms. It is the world number times a pattern: more at the poles and on land.', 'ΔT_global × pattern(latitude, land/ocean); the pattern is qualitative, not a CMIP6 map.') },
+      { name: 'Rainfall change at this place', text: d('Wetter or drier, in percent. This is the least certain number; real changes can be different, even the opposite.', 'ΔT_global × p(latitude), a zonal pattern with global mean +2 %/K (illustrative); the range is ×0.5 … ×2.') },
+      { name: 'Global sea-level rise (since 1995–2014)', text: d('How many metres the ocean surface is higher. Warm water expands and melting ice adds water.', 'GMSL = thermal expansion + glaciers and ice sheets; range ×0.85 (ECS low) … ×1.2 (ECS high).') },
+      { name: 'Sea-level rise rate', text: d('How fast the sea is rising in that year, in millimetres per year.', 'dH/dt in mm/yr for the year.') },
+      { name: 'First reaches 1.5 °C / 2 °C in', text: d('The year the world’s long-term average passes these famous limits.', 'First year the centred 20-year mean warming reaches the level (as the IPCC reports); absent if not reached by 2090.') },
+    ],
+    real: [
+      { name: 'Today', text: d('The world is about 1.1 degrees hotter than before factories. The sea has risen about 20 cm since 1901.', '2011–2020: ≈1.09 °C above 1850–1900; GMSL +0.20 m 1901–2018, rate ≈3.7 mm/yr in 2006–2018 (AR6).') },
+      { name: 'What the model is checked against', text: d('It matches today’s measured warming and sea level, and its 2100 numbers fall inside the ranges of the big IPCC report for all four stories.', 'Observed warming and heat uptake are reproduced without tuning; the sea-level constants are fitted to the observed rise; the AR6 2081–2100 warming and 2100 sea-level ranges are an independent cross-check for all four SSPs.') },
+    ],
+    limits: d('It is a simple model, not a full climate model: no storms, no ocean currents, no sudden “tipping” events. The maps are rough patterns and can be wrong in many places, especially for rain. It is not a forecast; for decisions use the official IPCC reports and your national climate service.', 'No ocean dynamics, clouds, sea ice, tipping points, extremes or variability; patterns are qualitative; sea level is global-mean only and ice-sheet instabilities could add more. The coastal flood map reuses the flood engine with the sea raised by the projected rise.'),
+    example: { label: 'Load: Istanbul under very high emissions, 2100', category: 'climate', params: { lat: 41.0082, lon: 28.9784, label: 'Istanbul', scenario: 'ssp585', year: 2100 } },
   },
 
   {

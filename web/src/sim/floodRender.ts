@@ -35,13 +35,31 @@ export const FIRE_CLASSES: { min: number; color: [number, number, number]; label
   { min: 2, color: [255, 120, 20], label: 'active front (last 30 min)' },
 ];
 
+/** Climate maps: warming in °C (min = lower bound of the class) and rainfall change in % (signed). */
+export const WARM_CLASSES: { min: number; color: [number, number, number]; label: string }[] = [
+  { min: 0.25, color: [254, 229, 217], label: '0.25–1 °C' },
+  { min: 1, color: [252, 174, 145], label: '1–2 °C' },
+  { min: 2, color: [251, 106, 74], label: '2–3 °C' },
+  { min: 3, color: [222, 45, 38], label: '3–4 °C' },
+  { min: 4, color: [165, 15, 21], label: '4–6 °C' },
+  { min: 6, color: [103, 0, 13], label: 'more than 6 °C' },
+];
+export const PRECIP_CLASSES: { min: number; max: number; color: [number, number, number]; label: string }[] = [
+  { min: -Infinity, max: -10, color: [140, 81, 10], label: 'drier by more than 10 %' },
+  { min: -10, max: -5, color: [216, 179, 101], label: 'drier by 5–10 %' },
+  { min: -5, max: -2, color: [246, 232, 195], label: 'drier by 2–5 %' },
+  { min: 2, max: 5, color: [199, 234, 229], label: 'wetter by 2–5 %' },
+  { min: 5, max: 10, color: [90, 180, 172], label: 'wetter by 5–10 %' },
+  { min: 10, max: Infinity, color: [1, 102, 94], label: 'wetter by more than 10 %' },
+];
+
 function surfaceColor(v: number): [number, number, number] | null {
   if (Math.abs(v) < 0.05) return null;
   for (const c of SURFACE_CLASSES) if (v >= c.min) return c.label ? c.color : null;
   return null;
 }
 
-export function depthToDataUrl(depth: Float32Array, nx: number, ny: number, kind: 'depth' | 'sea-surface' | 'thickness' | 'fire' = 'depth'): string | null {
+export function depthToDataUrl(depth: Float32Array, nx: number, ny: number, kind: 'depth' | 'sea-surface' | 'thickness' | 'fire' | 'warming' | 'precip' = 'depth'): string | null {
   const hit = cache.get(depth);
   if (hit) return hit;
   if (typeof document === 'undefined') return null;
@@ -58,7 +76,12 @@ export function depthToDataUrl(depth: Float32Array, nx: number, ny: number, kind
       if (col) img.data.set([...col, 210], k * 4);
       continue;
     }
-    const classes = kind === 'thickness' ? ASH_CLASSES : kind === 'fire' ? FIRE_CLASSES : DEPTH_CLASSES;
+    if (kind === 'precip') {
+      const c = PRECIP_CLASSES.find((x) => d >= x.min && d < x.max);
+      if (c) img.data.set([...c.color, 190], k * 4);
+      continue;
+    }
+    const classes = kind === 'warming' ? WARM_CLASSES : kind === 'thickness' ? ASH_CLASSES : kind === 'fire' ? FIRE_CLASSES : DEPTH_CLASSES;
     let cls = -1;
     for (let i = classes.length - 1; i >= 0; i--) if (d >= classes[i].min) { cls = i; break; }
     if (cls < 0) continue;

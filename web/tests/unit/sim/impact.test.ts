@@ -126,6 +126,15 @@ describe('natural-language parsing for the assistant', () => {
     expect(parseSimRequest('Simulate a tsunami from Cascadia')!.params).toMatchObject({ lat: 46, lon: -125 });
     expect(parseSimRequest('What if a tsunami came from the Hellenic arc?')!.placeName).toMatch(/365 AD/);
   });
+  it('reads climate questions and keeps the sea-level what-if as a flood', () => {
+    const p = parseSimRequest('How warm will Istanbul be in 2080 under high emissions?')!;
+    expect(p.category).toBe('climate');
+    expect(p.params).toMatchObject({ year: 2080, scenario: 'ssp585', lat: 41.0082 });
+    expect(parseSimRequest('What will rainfall do in Lagos by 2060 under SSP1-2.6?')!.params).toMatchObject({ year: 2060, scenario: 'ssp126', map: 'precip' });
+    expect(parseSimRequest('Explain climate change in 2100 for Tokyo')!.category).toBe('climate');
+    expect(parseSimRequest('What if sea level rose 2 m in Lagos?')!.category).toBe('flood');
+    expect(parseSimRequest('What is the temperature today?')).toBeNull();
+  });
   it('ignores ordinary questions', () => {
     expect(parseSimRequest('What is SAR?')).toBeNull();
     expect(parseSimRequest('earthquakes in Japan')).toBeNull();

@@ -9,6 +9,8 @@ import { VOLCANO_PARAMS, VOLCANO_VERSION, validateVolcano } from './volcano';
 import { runVolcanoScenario } from './volcanoRun';
 import { WILDFIRE_CHOICES, WILDFIRE_PARAMS, WILDFIRE_VERSION, validateWildfire } from './wildfire';
 import { runWildfireScenario, type WildfireRunOptions } from './wildfireRun';
+import { CLIMATE_CHOICES, CLIMATE_PARAMS, CLIMATE_VERSION, validateClimate } from './climate';
+import { runClimateScenario } from './climateRun';
 import type { SimCategory, SimEngine, SimResult, Validated, ValidationIssue } from './types';
 
 export interface CategoryInfo {
@@ -41,16 +43,21 @@ const wildfireEngine: AnyEngine = {
   category: 'wildfire', label: 'Wildfire (Rothermel surface spread)', version: WILDFIRE_VERSION, params: WILDFIRE_PARAMS, choices: WILDFIRE_CHOICES, validate: validateWildfire,
   run: () => { throw new Error('The wildfire engine runs asynchronously: use runAsync().'); },
 };
-export const ASYNC: ReadonlySet<SimCategory> = new Set(['flood', 'tsunami', 'volcano', 'wildfire']);
+const climateEngine: AnyEngine = {
+  category: 'climate', label: 'Climate scenario (SSP projections)', version: CLIMATE_VERSION, params: CLIMATE_PARAMS, choices: CLIMATE_CHOICES, validate: validateClimate,
+  run: () => { throw new Error('The climate engine runs asynchronously: use runAsync().'); },
+};
+export const ASYNC: ReadonlySet<SimCategory> = new Set(['flood', 'tsunami', 'volcano', 'wildfire', 'climate']);
 
 /** Run an engine that needs downloaded terrain and a worker (flood, tsunami). */
 export function runAsync(category: SimCategory, raw: Record<string, unknown>, opts: WildfireRunOptions = {}): Promise<FloodRun> {
+  if (category === 'climate') return runClimateScenario(raw, opts);
   if (category === 'wildfire') return runWildfireScenario(raw, opts);
   if (category === 'volcano') return runVolcanoScenario(raw, opts);
   return category === 'tsunami' ? runTsunamiScenario(raw, opts) : runFloodScenario(raw, opts);
 }
 
-export const ENGINES: Partial<Record<SimCategory, AnyEngine>> = { impact: impactEngine, earthquake: quakeEngine, flood: floodEngine, tsunami: tsunamiEngine, volcano: volcanoEngine, wildfire: wildfireEngine };
+export const ENGINES: Partial<Record<SimCategory, AnyEngine>> = { impact: impactEngine, earthquake: quakeEngine, flood: floodEngine, tsunami: tsunamiEngine, volcano: volcanoEngine, wildfire: wildfireEngine, climate: climateEngine };
 
 export const CATEGORIES: CategoryInfo[] = [
   { category: 'impact', label: 'Asteroid / meteor impact', status: 'available' },
@@ -59,7 +66,7 @@ export const CATEGORIES: CategoryInfo[] = [
   { category: 'flood', label: 'Flood (rain and sea level)', status: 'available' },
   { category: 'volcano', label: 'Volcanic eruption (ash fall and pyroclastic flows)', status: 'available' },
   { category: 'wildfire', label: 'Wildfire (Rothermel surface spread)', status: 'available' },
-  { category: 'climate', label: 'Climate scenario', status: 'planned', plan: 'Should read published IPCC AR6 projections rather than run a climate model in the browser.' },
+  { category: 'climate', label: 'Climate scenario (SSP projections)', status: 'available' },
 ];
 
 export function runSimulation(category: SimCategory, raw: Record<string, unknown>): { ok: true; result: SimResult } | { ok: false; issues: ValidationIssue[] } {

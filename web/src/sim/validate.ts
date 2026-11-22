@@ -43,6 +43,9 @@ export function solveDecreasing(f: (r: number) => number, target: number, lo: nu
   return a;
 }
 
+/** An output value for display: a year is shown without a thousands separator. */
+export const fmtOut = (o: { value: number; unit: string }): string => (o.unit === 'year' ? String(Math.round(o.value)) : fmt(o.value));
+
 export function fmt(n: number, digits = 3): string {
   if (!Number.isFinite(n)) return String(n);
   if (n === 0) return '0';

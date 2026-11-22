@@ -9,6 +9,9 @@
 .sim-form legend { padding: 0 6px; color: var(--muted); font-size: var(--fs-small); text-transform: uppercase; letter-spacing: 0.08em; }
 .sim-error { color: #ff9a85; font-size: var(--fs-small); margin: 2px 0; }
 .sim-badge { border: 1px solid #c2253a; border-left-width: 4px; border-radius: var(--r-2); padding: 6px 10px; font-size: var(--fs-small); background: rgba(194, 37, 58, 0.12); }
+.sim-chart .line.extra { stroke-width: 1.4; opacity: 0.85; }
+.sim-legend span { margin-right: 8px; white-space: nowrap; }
+.sim-badge.proj { border-color: #4a8cff; background: rgba(74, 140, 255, 0.12); }
 .sim-tabs { flex-wrap: wrap; margin: var(--sp-3, 12px) 0; }
 .sim-tabpanel { min-height: 120px; }
 .sim-table { width: 100%; border-collapse: collapse; font-size: var(--fs-small); }

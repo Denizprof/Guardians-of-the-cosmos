@@ -26,6 +26,7 @@ import {
 import type { DetachedLayer, TileOverlay } from './overlays';
 import { addMarkers, addSimLayers } from './markers';
 import { circleRing } from '../sim/geo';
+import { CinemaOverlay, type CinemaState } from './cinema';
 import { drawStars } from './starfield';
 
 export type { TileOverlay };
@@ -92,7 +93,9 @@ export interface SimOverlay {
   zones: { id: string; label: string; severity: number; radiusKm: number; currentKm: number }[];
   compare: { lat: number; lon: number; radiusKm: number; label: string }[];
   /** Gridded output (flood depth) as an image over its four corners. */
-  raster?: { url: string; corners: [number, number][] } | null;
+  raster?: { url: string; corners: [number, number][]; opacity?: number } | null;
+  /** Cinematic effect for this moment of the run (meteor from space, lightning-like cracks): drawn on a canvas. */
+  cinema?: CinemaState | null;
 }
 
 /** Turn a MapLibre error event into a short source label and report it (also logged for diagnosis). */
@@ -496,6 +499,21 @@ function MapView(p: MapViewProps) {
     else canvas.style.removeProperty('cursor');
   }, [p.inspecting]);
 
+  // ---- Simulation Lab cinematics: a canvas over the globe, redrawn when the time changes or the camera moves
+  const cineEl = useRef<HTMLCanvasElement>(null);
+  const cinema = useRef<CinemaOverlay | null>(null);
+  useEffect(() => {
+    if (!loaded || !cineEl.current) return;
+    const a = maps.current!.a;
+    const ov = new CinemaOverlay(cineEl.current, (lon, lat) => a.project([lon, lat]));
+    cinema.current = ov;
+    const redraw = () => ov.draw();
+    a.on('move', redraw);
+    a.on('resize', redraw);
+    return () => { a.off('move', redraw); a.off('resize', redraw); cinema.current = null; ov.set(null); };
+  }, [loaded]);
+  useEffect(() => { cinema.current?.set(p.sim?.cinema ?? null); }, [p.sim?.cinema, loaded]);
+
   // ---- Simulation Lab zones: what the model computed, drawn at the simulation time on the timeline
   useEffect(() => {
     if (!loaded) return;
@@ -510,9 +528,10 @@ function MapView(p: MapViewProps) {
       if (img) a.removeSource('sim-raster');
     } else if (img) {
       img.updateImage({ url: raster.url, coordinates: raster.corners as Coordinates });
+      a.setPaintProperty('sim-raster', 'raster-opacity', raster.opacity ?? 0.85);
     } else {
       a.addSource('sim-raster', { type: 'image', url: raster.url, coordinates: raster.corners as Coordinates });
-      a.addLayer({ id: 'sim-raster', type: 'raster', source: 'sim-raster', paint: { 'raster-opacity': 0.85, 'raster-fade-duration': 0, 'raster-resampling': 'nearest' } }, 'sim-zone-fill');
+      a.addLayer({ id: 'sim-raster', type: 'raster', source: 'sim-raster', paint: { 'raster-opacity': raster.opacity ?? 0.85, 'raster-fade-duration': 0, 'raster-resampling': 'nearest' } }, 'sim-zone-fill');
     }
     if (!sim) { for (const id of ['sim-zones', 'sim-extent', 'sim-compare', 'sim-point']) set(id, EMPTY_FC); return; }
     set('sim-zones', { type: 'FeatureCollection', features: sim.zones.filter((z) => z.currentKm > 0).map((z) => poly(sim.lat, sim.lon, z.currentKm, { severity: z.severity })) });
@@ -894,6 +913,7 @@ function MapView(p: MapViewProps) {
       <canvas ref={starsEl} className="starfield" aria-hidden="true" />
       <div ref={aEl} className="map a" />
       <div ref={bEl} className="map b" aria-hidden={layoutClass === 'single'} />
+      <canvas ref={cineEl} className="sim-cinema" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 4 }} />
       {lensOn && <div ref={lensEl} className="map lens" aria-hidden="true" data-ready={lensReady} />}
     </main>
   );

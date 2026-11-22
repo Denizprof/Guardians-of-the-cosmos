@@ -41,6 +41,11 @@ export function interp(series: SimSeries | undefined, x: number): number | null 
   return p[p.length - 1][1];
 }
 
+/** Clock text for a result: years for a climate run (t counts years from 2015), T−/T+ otherwise. */
+export function formatSimTime(r: SimResult, t: number): string {
+  return r.engine === 'climate' ? `Year ${Math.round(2015 + t)}` : formatTime(t);
+}
+
 export function formatTime(t: number): string {
   const a = Math.abs(t);
   const sign = t < 0 ? 'T−' : 'T+';
@@ -59,6 +64,12 @@ export function stateAt(r: SimResult, t: number): string {
     return `Atmospheric entry · altitude ${z.toFixed(1)} km · ${v.toFixed(2)} km/s`;
   }
   if (t < 0) return 'Before the event';
+  if (r.engine === 'climate') {
+    const g = interp(r.series.find((s) => s.id === 'gsat'), 2015 + t);
+    const l = interp(r.series.find((s) => s.id === 'local'), 2015 + t);
+    const h = interp(r.series.find((s) => s.id === 'gmsl'), 2015 + t);
+    return `${Math.round(2015 + t)} · global ${g === null ? '–' : `+${g.toFixed(1)} °C`} · here ${l === null ? '–' : `+${l.toFixed(1)} °C`} · sea level ${h === null ? '–' : `+${h.toFixed(2)} m`} (since 1995–2014)`;
+  }
   if (r.engine === 'wildfire') {
     const a = interp(r.series.find((s) => s.id === 'area'), t / 3600);
     return `Fire spreading · ${a === null ? '–' : a.toFixed(2)} km² burned`;

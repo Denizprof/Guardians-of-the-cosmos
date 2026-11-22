@@ -2,11 +2,11 @@
 import { memo, useState } from 'react';
 import type { Scenario } from '../../sim/store';
 import type { SimResult } from '../../sim/types';
-import { fmt } from '../../sim/validate';
+import { fmt, fmtOut } from '../../sim/validate';
 import { toMarkdown } from '../../sim/explain';
 import { SIM_COLORS } from '../../map/markers';
 import LineChart from './LineChart';
-import { ASH_CLASSES, DEPTH_CLASSES, FIRE_CLASSES, SURFACE_CLASSES } from '../../sim/floodRender';
+import { ASH_CLASSES, DEPTH_CLASSES, FIRE_CLASSES, PRECIP_CLASSES, SURFACE_CLASSES, WARM_CLASSES } from '../../sim/floodRender';
 
 type Tab = 'summary' | 'working' | 'zones' | 'charts' | 'compare' | 'sources';
 const TABS: [Tab, string][] = [['summary', 'Summary'], ['working', 'Working'], ['zones', 'Zones'], ['charts', 'Charts'], ['compare', 'Compare'], ['sources', 'Sources']];
@@ -34,7 +34,9 @@ function SimResults({ result: r, scenarios, activeId, simT, onHelp }: Props) {
   const slug = `${r.engine}-${r.computedAt.slice(0, 19).replace(/[:T]/g, '-')}`;
   return (
     <div className="sim-results">
-      <p className="sim-badge" role="note"><b>Hypothetical simulation</b> · model output, not an observation or forecast</p>
+      {r.evidence === 'projection'
+        ? <p className="sim-badge proj" role="note"><b>Climate projection scenario</b> · “what if emissions follow this path”, from a simple model; not a forecast</p>
+        : <p className="sim-badge" role="note"><b>Hypothetical simulation</b> · model output, not an observation or forecast</p>}
       {onHelp && (
         <p className="small">
           <button type="button" className="link" onClick={() => onHelp(r.engine)}>What do the circles, colours and numbers mean?</button>
@@ -56,7 +58,7 @@ function SimResults({ result: r, scenarios, activeId, simT, onHelp }: Props) {
                 {r.outputs.map((o) => (
                   <tr key={o.id}>
                     <th scope="row">{o.label}</th>
-                    <td className="mono">{fmt(o.value)} {o.unit}{o.alt ? <span className="muted"> {o.alt}</span> : null}{o.range ? <span className="muted small"> ({fmt(o.range[0])}–{fmt(o.range[1])})</span> : null}</td>
+                    <td className="mono">{fmtOut(o)} {o.unit === 'year' ? '' : o.unit}{o.alt ? <span className="muted"> {o.alt}</span> : null}{o.range ? <span className="muted small"> ({fmt(o.range[0])}–{fmt(o.range[1])})</span> : null}</td>
                   </tr>
                 ))}
               </tbody>
@@ -88,15 +90,15 @@ function SimResults({ result: r, scenarios, activeId, simT, onHelp }: Props) {
               </li>
             ))}
             {!r.zones.length && !r.raster && <li className="muted">No zone exceeds the modelled thresholds.</li>}
-            {r.raster && (r.raster.kind === 'sea-surface' ? SURFACE_CLASSES.filter((c) => c.label) : r.raster.kind === 'thickness' ? ASH_CLASSES : r.raster.kind === 'fire' ? FIRE_CLASSES : DEPTH_CLASSES).map((c) => (
-              <li key={c.label}><span className="swatch" style={{ background: `rgb(${c.color.join(',')})` }} aria-hidden="true" />{r.raster!.kind === 'sea-surface' ? 'Sea surface' : r.raster!.kind === 'thickness' ? 'Ash thickness' : r.raster!.kind === 'fire' ? 'Fire:' : 'Water depth'} {c.label}</li>
+            {r.raster && (r.raster.kind === 'sea-surface' ? SURFACE_CLASSES.filter((c) => c.label) : r.raster.kind === 'thickness' ? ASH_CLASSES : r.raster.kind === 'fire' ? FIRE_CLASSES : r.raster.kind === 'warming' ? WARM_CLASSES : r.raster.kind === 'precip' ? PRECIP_CLASSES : DEPTH_CLASSES).map((c) => (
+              <li key={c.label}><span className="swatch" style={{ background: `rgb(${c.color.join(',')})` }} aria-hidden="true" />{r.raster!.kind === 'sea-surface' ? 'Sea surface' : r.raster!.kind === 'thickness' ? 'Ash thickness' : r.raster!.kind === 'fire' ? 'Fire:' : r.raster!.kind === 'warming' ? 'Warming' : r.raster!.kind === 'precip' ? 'Rainfall' : 'Water depth'} {c.label}</li>
             ))}
             {r.raster && <li className="muted small">The globe shows the grid at the time on the timeline ({r.raster.nx}×{r.raster.ny} cells).</li>}
           </ul>
         )}
         {tab === 'charts' && (
           <>
-            {r.series.map((s) => <LineChart key={s.id} series={s} reverseX={s.id === 'entry'} markerX={s.id === 'altitude' || s.id === 'velocity' ? simT : null} />)}
+            {r.series.map((s) => <LineChart key={s.id} series={s} reverseX={s.id === 'entry'} markerX={s.id === 'altitude' || s.id === 'velocity' ? simT : r.engine === 'climate' ? 2015 + simT : null} />)}
           </>
         )}
         {tab === 'compare' && <Compare scenarios={scenarios} activeId={activeId} />}
@@ -120,7 +122,7 @@ function SimResults({ result: r, scenarios, activeId, simT, onHelp }: Props) {
   );
 }
 
-const ROWS = ['burned', 'ros', 'flame', 'intensity', 'vei', 'mass', 'ash1mm', 'ash1cm', 'ash10cm', 'pdc', 'uplift', 'first', 'coastamp', 'shoreamp', 'area1m', 'area01', 'area05', 'area15', 'maxdepth', 'peak', 'energy', 'vi', 'burst', 'crater', 'depth', 'blast-20psi', 'blast-5psi', 'blast-1psi', 'thermal-3rd', 'magnitude', 'tsunami-1m', 'mmi0', 'rupture', 'mmi-6'];
+const ROWS = ['gwarm', 'gwarm2', 'lwarm', 'lprecip', 'gmsl', 'slrrate', 'y15', 'y20', 'burned', 'ros', 'flame', 'intensity', 'vei', 'mass', 'ash1mm', 'ash1cm', 'ash10cm', 'pdc', 'uplift', 'first', 'coastamp', 'shoreamp', 'area1m', 'area01', 'area05', 'area15', 'maxdepth', 'peak', 'energy', 'vi', 'burst', 'crater', 'depth', 'blast-20psi', 'blast-5psi', 'blast-1psi', 'thermal-3rd', 'magnitude', 'tsunami-1m', 'mmi0', 'rupture', 'mmi-6'];
 
 function Compare({ scenarios, activeId }: { scenarios: Scenario[]; activeId: string | null }) {
   if (scenarios.length < 2) return <p className="muted">Run at least two scenarios to compare them side by side. Each run is kept as Scenario A, B, C…</p>;
@@ -138,7 +140,7 @@ function Compare({ scenarios, activeId }: { scenarios: Scenario[]; activeId: str
             return (
               <tr key={id}>
                 <th scope="row">{label.label} <span className="muted">({label.unit})</span></th>
-                {scenarios.map((s) => { const o = s.result.outputs.find((x) => x.id === id); return <td key={s.id} className="mono">{o ? fmt(o.value) : '–'}{o?.range ? <div className="muted small">{fmt(o.range[0])}–{fmt(o.range[1])}</div> : null}</td>; })}
+                {scenarios.map((s) => { const o = s.result.outputs.find((x) => x.id === id); return <td key={s.id} className="mono">{o ? fmtOut(o) : '–'}{o?.range ? <div className="muted small">{fmt(o.range[0])}–{fmt(o.range[1])}</div> : null}</td>; })}
               </tr>
             );
           })}

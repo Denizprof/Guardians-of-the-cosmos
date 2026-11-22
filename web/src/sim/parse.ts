@@ -86,6 +86,8 @@ export function parseSimRequest(question: string): SimRequest | null {
   }
   const fire = parseWildfire(q);
   if (fire) return fire;
+  const climate = parseClimate(q);
+  if (climate) return climate;
   const impact = IMPACT_WORDS.test(q);
   const quake = !impact && QUAKE_WORDS.test(q) && HYPOTHETICAL.test(q);
   const flood = !impact && !quake && FLOOD_WORDS.test(q) && HYPOTHETICAL.test(q);
@@ -228,7 +230,39 @@ export const VOLCANOES: { name: string; aliases: string[]; lat: number; lon: num
   { name: 'Hunga Tonga–Hunga Haʻapai', aliases: ['hunga tonga'], lat: -20.536, lon: -175.382 },
 ];
 
-const FIRE_WORDS = /\b(wildfires?|forest fires?|bush ?fires?|brush ?fires?|grass ?fires?|wildland fire|orman yangin\w*|yangin\w*)\b/;
+const CLIMATE_WORDS = /\b(climate|global warming|warming|warmer|hotter|ipcc|ssp\s?-?[1-5]|emissions?|sea[- ]level rise|iklim\w*|kuresel isinma\w*|isinma\w*)\b/;
+const SSP_NAMES: [RegExp, string][] = [
+  [/ssp\s?-?1\s?-?\.?\s?2\.?6|\b(low|very low) emissions?|net[- ]zero|paris (goals?|agreement)|dusuk emisyon/, 'ssp126'],
+  [/ssp\s?-?2\s?-?\.?\s?4\.?5|middle[- ]of[- ]the[- ]road|moderate emissions?/, 'ssp245'],
+  [/ssp\s?-?3\s?-?\.?\s?7\.?0?\b|regional rivalry/, 'ssp370'],
+  [/ssp\s?-?5\s?-?\.?\s?8\.?5|(very )?high emissions?|business as usual|worst[- ]case|yuksek emisyon/, 'ssp585'],
+];
+
+/** "How warm will Istanbul be in 2080 under high emissions?", "sea level rise by 2100 in Lagos", "rainfall in 2060". */
+export function parseClimate(q: string): SimRequest | null {
+  const yearM = q.match(/\b(20[3-9]\d|2100)\b/);
+  const weather = /\b(temperature|sea[- ]level|rain\w*|precipitation|warm\w*|hot\w*|sicaklik\w*|deniz seviyesi\w*|yagis\w*)\b/.test(q);
+  const climateish = CLIMATE_WORDS.test(q) || (!!yearM && weather);
+  if (!climateish) return null;
+  // a hypothetical event ("what if a wildfire…") or an unrelated question about the app is not a climate question
+  if (!yearM && !/\b(climate|global warming|ipcc|ssp\s?-?[1-5]|iklim\w*)\b/.test(q)) return null;
+  const params: Record<string, unknown> = {};
+  const stated: string[] = [];
+  if (yearM) { params.year = Number(yearM[1]); stated.push('year'); }
+  const ssp = SSP_NAMES.find(([re]) => re.test(q));
+  if (ssp) { params.scenario = ssp[1]; stated.push('scenario'); }
+  if (/\b(rain\w*|precipitation|drought|dry|wet|yagis\w*)\b/.test(q) && !/\b(warm\w*|temperature|hot\w*)\b/.test(q)) { params.map = 'precip'; stated.push('map'); }
+  const ecs = q.match(/(?:ecs|climate sensitivity)\D{0,12}(\d(?:[.,]\d)?)/);
+  if (ecs) { params.ecs = Number(ecs[1].replace(',', '.')); stated.push('ecs'); }
+  const near = [...GAZETTEER].filter((p) => !p.water).sort((x, y) => y.name.length - x.name.length).find((p) => new RegExp(`\\b${fold(p.name)}`).test(q));
+  if (near) return { category: 'climate', params: { ...params, lat: near.lat, lon: near.lon }, stated, placeName: near.name };
+  const m = q.match(/\b(?:in|at|near|for|around)\s+([a-z][\p{L}'-]+(?:\s+[a-z][\p{L}'-]+)?)\s*(?:$|[,.?!]|\bunder\b|\bby\b|\bwith\b|\bin\b)/u);
+  const skip = /^(the|a|an|20\d\d|2100|general|total|ssp|case|this|that|future|world|global)$/;
+  if (m && !skip.test(m[1].split(' ')[0])) return { category: 'climate', params: { ...params, lat: 0, lon: 0 }, stated, unresolved: m[1] };
+  return { category: 'climate', params: { ...params, lat: 0, lon: 0 }, stated };
+}
+
+const FIRE_WORDS =/\b(wildfires?|forest fires?|bush ?fires?|brush ?fires?|grass ?fires?|wildland fire|orman yangin\w*|yangin\w*)\b/;
 
 export function parseWildfire(q: string): SimRequest | null {
   if (!FIRE_WORDS.test(q) || !HYPOTHETICAL.test(q)) return null;
