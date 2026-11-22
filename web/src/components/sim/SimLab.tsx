@@ -5,6 +5,7 @@ import { simStore } from '../../sim/store';
 import { HISTORICAL_IMPACTS } from '../../sim/history';
 import { VOLCANOES } from '../../sim/parse';
 import { COMPOSITION_DENSITY } from '../../sim/impact';
+import { topicForCategory } from '../../sim/helpContent';
 import type { SimCategory, ValidationIssue } from '../../sim/types';
 import { IconChevron, IconClose } from '../icons';
 import LazySection from '../LazySection';
@@ -22,6 +23,10 @@ export interface SimLabProps {
   onFly: (lat: number, lon: number, zoom: number) => void;
   onToggleCollapsed: () => void;
   onClose: () => void;
+  /** Open the guide at a topic (an event id, "results", "time", "words"…). */
+  onHelp: (topic: string) => void;
+  /** A ready-made scenario from the guide: fills the form (nothing is run). */
+  tryExample: { category: SimCategory; params: Record<string, unknown>; nonce: number } | null;
 }
 
 const defaultsFor = (c: SimCategory): Record<string, unknown> => {
@@ -30,7 +35,7 @@ const defaultsFor = (c: SimCategory): Record<string, unknown> => {
   return Object.fromEntries([...e.params.map((p) => [p.key, p.default]), ...e.choices.map((x) => [x.key, x.default])]);
 };
 
-function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCollapsed, onClose }: SimLabProps) {
+function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCollapsed, onClose, onHelp, tryExample }: SimLabProps) {
   const store = useSyncExternalStore(simStore.subscribe, simStore.get);
   const active = store.scenarios.find((s) => s.id === store.activeId);
   const [category, setCategory] = useState<SimCategory>(active?.category ?? 'impact');
@@ -54,6 +59,18 @@ function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCo
     setCategory(active.category);
     setParams({ ...defaultsFor(active.category), ...active.params });
   }, [active]);
+
+  // an example chosen in the guide fills the form; the visitor decides when to run it. It is declared after the
+  // effect above so that, when the Lab opens with a stored run, the example still wins.
+  useEffect(() => {
+    if (!tryExample) return;
+    setCategory(tryExample.category);
+    setIssues([]);
+    setParams({ ...defaultsFor(tryExample.category), ...tryExample.params });
+    const { lat, lon } = tryExample.params;
+    if (typeof lat === 'number' && typeof lon === 'number') onFly(lat, lon, 5);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tryExample?.nonce]);
 
   const set = useCallback((k: string, v: unknown) => {
     setParams((p) => {
@@ -100,6 +117,7 @@ function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCo
       <header className="panel-head">
         <div className="kicker">
           <span className="kicker-text">WHAT IF? · Planetary Simulation Lab</span>
+          <button type="button" className="btn small" onClick={() => onHelp(topicForCategory(category))} aria-label="Open the guide: what everything means" title="What every circle, colour and setting means, with animations">? Guide</button>
           <button className="close mobile-only" onClick={onToggleCollapsed} aria-label={collapsed ? 'Expand panel' : 'Collapse panel'}><IconChevron up={collapsed} /></button>
           <button className="close" onClick={onClose} aria-label="Close panel"><IconClose /></button>
         </div>
@@ -115,6 +133,7 @@ function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCo
             </select>
           </label>
           {info.status === 'planned' && <p className="muted small">{info.plan}</p>}
+          <p className="small"><button type="button" className="link" onClick={() => onHelp(topicForCategory(category))}>New here? Open the guide with animations for this event</button></p>
           <details className="small sim-planned">
             <summary>Planned engines</summary>
             <ul>{CATEGORIES.filter((c) => c.status === 'planned').map((c) => <li key={c.category}><b>{c.label}</b>: {c.plan}</li>)}</ul>
@@ -203,7 +222,7 @@ function SimLab({ collapsed, picking, picked, simT, onPicking, onFly, onToggleCo
                 </span>
               ))}
             </div>
-            {active && <SimResults result={active.result} scenarios={store.scenarios} activeId={store.activeId} simT={simT} />}
+            {active && <SimResults result={active.result} scenarios={store.scenarios} activeId={store.activeId} simT={simT} onHelp={onHelp} />}
           </div>
         )}
 

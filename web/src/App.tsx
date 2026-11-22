@@ -13,6 +13,8 @@ import SarLens, { type LensGeometry } from './components/SarLens';
 import { IconAsk, IconFilters, IconInfo, IconInspect, IconInvestigations, IconLayers, IconLens, IconProbe, IconSim } from './components/icons';
 import SimLab from './components/sim/SimLab';
 import SimTimeline from './components/sim/SimTimeline';
+import SimHelp from './components/sim/SimHelp';
+import { topicForCategory, type HelpExample } from './sim/helpContent';
 import { simStore } from './sim/store';
 import { zoneRadiusAt } from './sim/time';
 import { depthToDataUrl, frameAt } from './sim/floodRender';
@@ -118,6 +120,9 @@ export default function App() {
   const [simPicked, setSimPicked] = useState<{ lat: number; lon: number; nonce: number } | null>(null);
   const [simT, setSimT] = useState(0);
   const [simHidden, setSimHidden] = useState(false);
+  // the Simulation Lab guide (help page) and an example it hands to the Lab
+  const [helpTopic, setHelpTopic] = useState<string | null>(null);
+  const [tryExample, setTryExample] = useState<{ category: HelpExample['category']; params: Record<string, unknown>; nonce: number } | null>(null);
   // a new or re-selected scenario shows its final state; Play replays it from before the event
   useEffect(() => { if (activeSim) { setSimT(activeSim.result.timeSpan[1]); setSimHidden(false); } }, [activeSim]);
   // a simulation the assistant ran: bring the globe to it (the Lab flies there itself)
@@ -816,6 +821,7 @@ export default function App() {
           <SimTimeline result={activeSim.result} t={simT} onTime={setSimT} />
           <div className="sim-tl-actions">
             {panelView !== 'sim' && <button className="link small" onClick={() => { closePanel(); setPanelView('sim'); setPanelCollapsed(false); }}>Open in Simulation Lab</button>}
+            <button className="link small" onClick={() => setHelpTopic(topicForCategory(activeSim.category))}>What does this show?</button>
             <button className="link small" onClick={() => setSimHidden(true)}>Hide simulation</button>
           </div>
         </div>
@@ -901,6 +907,8 @@ export default function App() {
           onFly={(lat, lon, zoom) => setFlyTo({ lon, lat, zoom, nonce: Date.now() })}
           onToggleCollapsed={toggleCollapsed}
           onClose={() => { closePanel(); setSimPick(false); }}
+          onHelp={setHelpTopic}
+          tryExample={tryExample}
         />
       ) : panelView === 'assistant' ? (
         <AssistantSidePanel mapView={mapView} collapsed={panelCollapsed} onToggleCollapsed={toggleCollapsed} onClose={closePanel} />
@@ -933,6 +941,21 @@ export default function App() {
       {tutorialOn && !frontOpen && !introOpen && <Tutorial key={tutorialRun} state={tutorialState} onEnd={endTutorial} />}
     </div>
     {frontOpen && <FrontPage onStart={startFromFront} onTutorial={startTutorial} />}
+    {helpTopic && (
+      <SimHelp
+        topic={helpTopic}
+        onTopic={setHelpTopic}
+        onClose={() => setHelpTopic(null)}
+        onTry={(ex) => {
+          setTryExample({ category: ex.category, params: ex.params, nonce: Date.now() });
+          closePanel();
+          setPanelView('sim');
+          setPanelCollapsed(false);
+          setPopover(null);
+          setHelpTopic(null);
+        }}
+      />
+    )}
     </>
   );
 }

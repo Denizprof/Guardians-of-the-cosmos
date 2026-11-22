@@ -135,3 +135,15 @@ Status of the Earth Intelligence and simulation upgrade (2026-11-22). Every Lab 
   - No terrain or bathymetry, coastal run-up or population exposure.
   - Thermal radiation from an airburst is not modelled.
   - Earthquake shaking uses a point source with no site effects.
+
+## The in-app guide
+
+Open it with "? Guide" in the Lab header, "What does this show?" on the time bar, or the links under the results.
+
+- It is a full-screen help page (`components/sim/SimHelp.tsx`) with a topic list: Start here, the six events, Time controls, Reading the results, and Words and units.
+- A **Simple / Scientific** switch changes every sentence. Simple uses everyday words; Scientific gives the model, equations and units. The choice is remembered.
+- Each event has an animation (`HelpScenes.tsx`, drawn in the Event Atlas style) with Play/Pause and clickable steps. With "reduce motion" set, it opens paused on the finished picture.
+- Each event explains every circle and colour (with the same colours as the globe), every setting with its allowed range, every result number, real events to compare with, and the limits.
+- "Load" buttons fill the Lab with a ready-made example without running it.
+- Content is in `sim/helpContent.ts` and `sim/helpScenes.ts`. Setting ranges are read from the engines, and tests fail if a setting has no explanation.
+- The guide is in English only for now; the rest of the Lab is too.
