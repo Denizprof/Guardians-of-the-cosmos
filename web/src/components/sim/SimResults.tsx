@@ -16,6 +16,8 @@ interface Props {
   scenarios: Scenario[];
   activeId: string | null;
   simT: number;
+  /** Opens the guide at a topic ("What do these numbers mean?"). */
+  onHelp?: (topic: string) => void;
 }
 
 function download(name: string, text: string, type: string): void {
@@ -27,12 +29,19 @@ function download(name: string, text: string, type: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function SimResults({ result: r, scenarios, activeId, simT }: Props) {
+function SimResults({ result: r, scenarios, activeId, simT, onHelp }: Props) {
   const [tab, setTab] = useState<Tab>('summary');
   const slug = `${r.engine}-${r.computedAt.slice(0, 19).replace(/[:T]/g, '-')}`;
   return (
     <div className="sim-results">
       <p className="sim-badge" role="note"><b>Hypothetical simulation</b> · model output, not an observation or forecast</p>
+      {onHelp && (
+        <p className="small">
+          <button type="button" className="link" onClick={() => onHelp(r.engine)}>What do the circles, colours and numbers mean?</button>
+          {' · '}
+          <button type="button" className="link" onClick={() => onHelp('results')}>How to read these tabs</button>
+        </p>
+      )}
       <div className="seg sim-tabs" role="tablist" aria-label="Results">
         {TABS.map(([id, label]) => (
           <button key={id} role="tab" aria-selected={tab === id} aria-pressed={tab === id} onClick={() => setTab(id)}>{label}</button>
