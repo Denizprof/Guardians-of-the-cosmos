@@ -88,3 +88,10 @@ export const IconExternal = () => (
     <path d="M6.500 3.500h-3v9h9v-3M9.500 2.500h4v4M13.500 2.500 7.500 8.500" />
   </Svg>
 );
+/** Planetary Simulation Lab: an impactor with its trail. */
+export const IconSim = () => (
+  <Svg>
+    <circle cx="10.5" cy="10.5" r="3" />
+    <path d="M2 2l5.700 5.700M4.500 1.500l3.700 3.700M1.500 4.500l3.700 3.700" />
+  </Svg>
+);

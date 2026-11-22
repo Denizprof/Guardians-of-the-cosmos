@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import MapView from './map/MapView';
 import SearchBox from './components/SearchBox';
 import Filters from './components/Filters';
@@ -10,7 +10,13 @@ import InspectPanel from './components/InspectPanel';
 import type { Box } from './inspect';
 import Timeline from './components/Timeline';
 import SarLens, { type LensGeometry } from './components/SarLens';
-import { IconAsk, IconFilters, IconInfo, IconInspect, IconInvestigations, IconLayers, IconLens, IconProbe } from './components/icons';
+import { IconAsk, IconFilters, IconInfo, IconInspect, IconInvestigations, IconLayers, IconLens, IconProbe, IconSim } from './components/icons';
+import SimLab from './components/sim/SimLab';
+import SimTimeline from './components/sim/SimTimeline';
+import { simStore } from './sim/store';
+import { zoneRadiusAt } from './sim/time';
+import { depthToDataUrl, frameAt } from './sim/floodRender';
+import type { SimOverlay } from './map/MapView';
 import { InvestigationStrip, InvestigationsMenu } from './components/Investigations';
 import { readHash } from './app/readHash';
 import { markIntroSeen, shouldShowIntro } from './app/introSeen';
@@ -34,7 +40,7 @@ const NO_PINS: Pin[] = [];
 const ALL_CATS: Category[] = GROUPS.flatMap((g) => g.categories);
 
 /** What the on-demand side panel shows when no investigation is open. */
-type PanelView = 'none' | 'about' | 'probe' | 'context' | 'assistant' | 'inspect';
+type PanelView = 'none' | 'about' | 'probe' | 'context' | 'assistant' | 'inspect' | 'sim';
 type Popover = null | 'investigations' | 'filters' | 'layers';
 
 export default function App() {
@@ -105,6 +111,33 @@ export default function App() {
   const [catalogLayers, setCatalogLayers] = useState<CatalogLayer[]>([]);
   const [layerState, setLayerState] = useState<Record<string, LayerState>>({});
   const [lensOn, setLensOn] = useState(false);
+  // ---- Planetary Simulation Lab
+  const sims = useSyncExternalStore(simStore.subscribe, simStore.get);
+  const activeSim = sims.scenarios.find((s) => s.id === sims.activeId) ?? null;
+  const [simPick, setSimPick] = useState(false);
+  const [simPicked, setSimPicked] = useState<{ lat: number; lon: number; nonce: number } | null>(null);
+  const [simT, setSimT] = useState(0);
+  const [simHidden, setSimHidden] = useState(false);
+  // a new or re-selected scenario shows its final state; Play replays it from before the event
+  useEffect(() => { if (activeSim) { setSimT(activeSim.result.timeSpan[1]); setSimHidden(false); } }, [activeSim]);
+  // a simulation the assistant ran: bring the globe to it (the Lab flies there itself)
+  useEffect(() => {
+    if (!sims.openNonce) return;
+    const r = simStore.active()?.result;
+    if (!r) return;
+    const zoom = r.engine === 'flood' ? 10.5 : r.engine === 'tsunami' ? 4 : r.engine === 'volcano' ? 6 : r.engine === 'wildfire' ? 11 : r.engine === 'earthquake' ? 6 : 5;
+    setFlyTo({ lon: r.location.lon, lat: r.location.lat, zoom, nonce: Date.now() });
+  }, [sims.openNonce]);
+  const simOverlay = useMemo<SimOverlay | null>(() => {
+    if (!activeSim || simHidden) return null;
+    const r = activeSim.result;
+    return {
+      lat: r.location.lat, lon: r.location.lon,
+      zones: r.zones.map((z) => ({ id: z.id, label: `${z.label} · ${z.radiusKm < 10 ? z.radiusKm.toFixed(1) : Math.round(z.radiusKm)} km`, severity: z.severity, radiusKm: z.radiusKm, currentKm: zoneRadiusAt(z, simT) })),
+      raster: r.raster ? (() => { const f = frameAt(r.raster, simT); const url = depthToDataUrl(f.depth, r.raster.nx, r.raster.ny, r.raster.kind); return url ? { url, corners: r.raster.corners } : null; })() : null,
+      compare: sims.scenarios.filter((s) => s.id !== activeSim.id && !s.result.raster).flatMap((s) => s.result.zones.slice(0, 1).map((z) => ({ lat: s.result.location.lat, lon: s.result.location.lon, radiusKm: z.radiusKm, label: s.name }))),
+    };
+  }, [activeSim, sims.scenarios, simT, simHidden]);
   const [lensFull, setLensFull] = useState(false);
   const [lensChoice, setLensChoice] = useState<'base' | 'nisar'>('base');
   const appRef = useRef<HTMLDivElement>(null);
@@ -410,9 +443,10 @@ export default function App() {
   // ---- stable callbacks for the memoized children
   const onMapClick = useCallback(
     (lon: number, lat: number) => {
+      if (simPick) { setSimPicked({ lat, lon, nonce: Date.now() }); return; }
       if (coverageMode && !selected) runCoverage(lon, lat);
     },
-    [coverageMode, selected, runCoverage]
+    [simPick, coverageMode, selected, runCoverage]
   );
   const onInspectBox = useCallback(
     (box: Box) => {
@@ -612,6 +646,24 @@ export default function App() {
           )}
           <button
             className="tool"
+            aria-pressed={!selected && panelView === 'sim'}
+            onClick={() => {
+              if (!selected && panelView === 'sim') { closePanel(); setSimPick(false); return; }
+              closePanel();
+              setCoverageMode(false);
+              setInspectMode(false);
+              setPanelView('sim');
+              setPanelCollapsed(false);
+              setPopover(null);
+            }}
+            title="WHAT IF? Planetary Simulation Lab: simulate an asteroid impact or an earthquake anywhere on Earth"
+            aria-label="What if? Simulation Lab"
+          >
+            <IconSim />
+            <span className="tool-label">What if?</span>
+          </button>
+          <button
+            className="tool"
             aria-pressed={!selected && panelView === 'assistant'}
             onClick={() => askAssistant(true)}
             title="Ask the assistant about radar, NISAR and this app"
@@ -659,7 +711,7 @@ export default function App() {
         onSelectEvent={selectEvent}
         onSelectContext={selectContext}
         onMapClick={onMapClick}
-        probing={coverageMode && !selected}
+        probing={(coverageMode && !selected) || simPick}
         inspecting={inspectMode && !selected}
         onInspectBox={onInspectBox}
         inspectBox={panelView === 'inspect' && !selected ? inspectBox : null}
@@ -671,6 +723,7 @@ export default function App() {
         lens={lensProp}
         onMapError={onMapError}
         onViewChange={setMapView}
+        sim={selected ? null : simOverlay}
       />
 
       {mapErrors.size > 0 && (
@@ -752,6 +805,22 @@ export default function App() {
         />
       )}
 
+      {simPick && (
+        <div className="hint" role="status">
+          Simulation Lab: click the globe to set the event location
+        </div>
+      )}
+
+      {activeSim && !selected && !simHidden && (
+        <div className="sim-timeline-wrap">
+          <SimTimeline result={activeSim.result} t={simT} onTime={setSimT} />
+          <div className="sim-tl-actions">
+            {panelView !== 'sim' && <button className="link small" onClick={() => { closePanel(); setPanelView('sim'); setPanelCollapsed(false); }}>Open in Simulation Lab</button>}
+            <button className="link small" onClick={() => setSimHidden(true)}>Hide simulation</button>
+          </div>
+        </div>
+      )}
+
       {coverageMode && !selected && (
         <div className="hint" role="status">
           Coverage probe on: click anywhere on the globe
@@ -821,6 +890,17 @@ export default function App() {
           onCheckCoverage={runCoverage}
           onClose={closePanel}
           onToggleCollapsed={toggleCollapsed}
+        />
+      ) : panelView === 'sim' ? (
+        <SimLab
+          collapsed={panelCollapsed}
+          picking={simPick}
+          picked={simPicked}
+          simT={simT}
+          onPicking={setSimPick}
+          onFly={(lat, lon, zoom) => setFlyTo({ lon, lat, zoom, nonce: Date.now() })}
+          onToggleCollapsed={toggleCollapsed}
+          onClose={() => { closePanel(); setSimPick(false); }}
         />
       ) : panelView === 'assistant' ? (
         <AssistantSidePanel mapView={mapView} collapsed={panelCollapsed} onToggleCollapsed={toggleCollapsed} onClose={closePanel} />

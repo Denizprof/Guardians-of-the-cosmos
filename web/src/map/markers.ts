@@ -55,3 +55,26 @@ export function addMarkers(map: MlMap) {
     paint: { 'line-color': '#6cc4ff', 'line-width': 2, 'line-dasharray': [2, 1.5] },
   });
 }
+
+/** Severity colours for Simulation Lab zones (0 mild .. 3 extreme). */
+export const SIM_COLORS = ['#f2d16b', '#f29b4b', '#e8603c', '#c2253a'] as const;
+
+/** Planetary Simulation Lab: zones growing to their front (fill), the model's final extent (dashed) and ground zero. */
+export function addSimLayers(map: MlMap) {
+  const fc = { type: 'FeatureCollection' as const, features: [] };
+  const sev: any = ['match', ['get', 'severity'], 0, SIM_COLORS[0], 1, SIM_COLORS[1], 2, SIM_COLORS[2], SIM_COLORS[3]];
+  map.addSource('sim-zones', { type: 'geojson', data: fc });
+  map.addSource('sim-extent', { type: 'geojson', data: fc });
+  map.addSource('sim-compare', { type: 'geojson', data: fc });
+  map.addSource('sim-point', { type: 'geojson', data: fc });
+  map.addLayer({ id: 'sim-zone-fill', type: 'fill', source: 'sim-zones', paint: { 'fill-color': sev, 'fill-opacity': 0.16 } });
+  map.addLayer({ id: 'sim-zone-line', type: 'line', source: 'sim-zones', paint: { 'line-color': sev, 'line-width': 2 } });
+  map.addLayer({ id: 'sim-extent-line', type: 'line', source: 'sim-extent', paint: { 'line-color': sev, 'line-width': 1.2, 'line-opacity': 0.75, 'line-dasharray': [2, 2] } });
+  map.addLayer({ id: 'sim-compare-line', type: 'line', source: 'sim-compare', paint: { 'line-color': '#b9c4d0', 'line-width': 1.2, 'line-opacity': 0.8, 'line-dasharray': [1, 2] } });
+  map.addLayer({
+    id: 'sim-extent-label', type: 'symbol', source: 'sim-extent',
+    layout: { 'symbol-placement': 'line', 'text-field': ['get', 'label'], 'text-font': FONT, 'text-size': 11, 'text-max-angle': 30, 'symbol-spacing': 400 },
+    paint: { 'text-color': '#ffffff', 'text-halo-color': '#05070a', 'text-halo-width': 1.5 },
+  });
+  map.addLayer({ id: 'sim-point', type: 'circle', source: 'sim-point', paint: { 'circle-radius': 6, 'circle-color': '#ffffff', 'circle-stroke-color': SIM_COLORS[3], 'circle-stroke-width': 3 } });
+}

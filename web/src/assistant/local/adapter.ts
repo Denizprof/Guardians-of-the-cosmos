@@ -13,6 +13,8 @@ import type { Research } from './research';
 import { CONTRACT_VERSION, type AssistantRequest, type AssistantResponse, type Citation, type ContextKnowledge, type Health } from '../types';
 import { buildIndex, buildMessages, contextSources, detectLang, fold, parseOutput, rank, recordSource, retrieve, simplify, tokens, type ChatMessage, type Hit, type IntentModel, type KbFile, type KbIndex, type Lang, type Ranked, type Source } from './core';
 import { answerFromCatalog, catalogIntent, type CatalogFile } from './catalog';
+import { simulationAnswer, type Geocoder } from './simulate';
+import type { WildfireRunOptions } from '../../sim/wildfireRun';
 
 const CATALOG_ID = 'kb:live-catalog';
 /** The knowledge record the classifier picks for questions about events on the map (project.json). */
@@ -116,6 +118,16 @@ export interface LocalAdapterOptions {
   research?: Research | null;
   /** The optional language model that words answers from the sources. Omitted: answers quote the sources. */
   engine?: Engine | null;
+  /** Place search for simulation requests that name a place outside the built-in gazetteer. */
+  geocode?: Geocoder | null;
+  /** Elevation source for flood simulations (default: AWS Terrain Tiles). */
+  loadDem?: WildfireRunOptions['demLoader'];
+  /** Current surface weather for wildfire simulations (default: Open-Meteo). */
+  loadWeather?: WildfireRunOptions['weatherLoader'];
+  /** Winds aloft for volcano simulations (default: Open-Meteo forecast). */
+  loadWind?: WildfireRunOptions['windLoader'];
+  /** Run the Planetary Simulation Lab for "what if" questions (default on). */
+  simulate?: boolean;
 }
 
 /** An on-device language model. `generate` returns the raw text of one reply. */
@@ -145,6 +157,11 @@ export class LocalAssistantAdapter implements AssistantAdapter {
   readonly model?: ModelControl;
   private engine: Engine | null;
   private research: Research | null;
+  private geocode: Geocoder | null;
+  private simulate: boolean;
+  private loadDem?: WildfireRunOptions['demLoader'];
+  private loadWind?: WildfireRunOptions['windLoader'];
+  private loadWeather?: WildfireRunOptions['weatherLoader'];
   private loadKb: () => Promise<KbFile>;
   private loadIntent: () => Promise<IntentModel | undefined>;
   private loadCatalog: () => Promise<CatalogFile | undefined>;
@@ -159,6 +176,11 @@ export class LocalAssistantAdapter implements AssistantAdapter {
     this.loadCatalog = opts.loadCatalog ?? defaultLoadCatalog;
     this.research = opts.research ?? null;
     this.engine = opts.engine ?? null;
+    this.geocode = opts.geocode ?? null;
+    this.simulate = opts.simulate ?? true;
+    this.loadDem = opts.loadDem;
+    this.loadWind = opts.loadWind;
+    this.loadWeather = opts.loadWeather;
     this.model = this.engine?.control;
   }
 
@@ -204,6 +226,15 @@ export class LocalAssistantAdapter implements AssistantAdapter {
     const lang = detectLang(req.query, req.locale);
     const t = TEXT[lang];
     const query = req.query.trim();
+    // Simulation tool: a "what if" question runs the real engine; its computed numbers are the only source quoted.
+    if (this.simulate) {
+      const sim = await simulationAnswer(query, lang, req.explanation_level, this.geocode ?? undefined, this.loadDem, this.loadWind, this.loadWeather);
+      if (sim) {
+        const out: AssistantRequest = { ...req, context: { ...req.context, knowledge: sim.knowledge } };
+        this.plans.set(out, { mode: 'answer', quote: 1, suggestions: sim.suggestions, notes: sim.notes, sure: true });
+        return out;
+      }
+    }
     const turns = req.conversation ?? [];
     // the question a follow-up refers to: the last one that was not itself a "tell me more"
     const prevUser = [...turns].reverse().find((x) => x.role === 'user' && !MORE.test(fold(x.content)))?.content;

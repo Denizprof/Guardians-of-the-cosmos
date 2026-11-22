@@ -1,3 +1,4 @@
+import { geocode } from '../../services';
 // Which assistant the app talks to by default:
 //   - a gateway URL is configured (VITE_ASSISTANT_GATEWAY_URL): the owner's remote service, through the gateway;
 //   - otherwise: Global SAR AI in the browser (adapter.ts), which needs no server and so also works on a static site.
@@ -28,6 +29,7 @@ export function defaultAdapter(env: Env = import.meta.env as Env): AssistantAdap
     const model = env.VITE_ASSISTANT_MODEL?.trim();
     local = new LocalAssistantAdapter({
       research: env.VITE_ASSISTANT_RESEARCH?.trim() === '0' ? null : createWikipediaResearch(),
+      geocode: async (q) => { const h = (await geocode(q))[0]; return h ? { lat: h.lat, lon: h.lon, label: h.label } : undefined; },
       engine: model ? createEngine({ model, dtype: env.VITE_ASSISTANT_MODEL_DTYPE?.trim() || 'q4', size: env.VITE_ASSISTANT_MODEL_SIZE?.trim() || 'about 1.7 GB' }) : null,
     });
   }
